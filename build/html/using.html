@@ -1,0 +1,449 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Simple Injector &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="next" title="Advanced scenarios" href="advanced.html" />
+    <link rel="prev" title="Quick Start" href="quickstart.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="advanced.html" title="Advanced scenarios"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-simple-injector">
+<h1>Using Simple Injector<a class="headerlink" href="#using-simple-injector" title="Permalink to this headline">¶</a></h1>
+<p>This section will walk you through the basics of Simple Injector. After reading this section, you will have a good idea how to use Simple Injector.</p>
+<div class="note container">
+<strong>Note</strong>: this documentation is specific for <em>Simple Injector version 2.0</em> and up. Look <a class="reference external" href="https://simpleinjector.codeplex.com/wikipage?title=UsingtheSimpleInjector&amp;version=19">here</a> for 1.x specific documentation.</div>
+<div class="section" id="id2">
+<span id="id1"></span><span id="id3"></span><h2>Using Simple Injector<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>A good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library if ever required. Minimizing can be achieved by designing the types in your application around the constructor injection pattern: Define all dependencies of a class in the single public constructor of that type; do this for all service types that need to be resolved and resolve only the top most types in the application directly (let the container build up the complete graph of dependent objects for you).</p>
+<p id="the-container">Simple Injector&#8217;s main type is the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm">Container</a> class. An instance of <strong>Container</strong> is used to register mappings between an abstraction (service) and implementation (component). Your application code should depend on abstractions, and it is the role of the <strong>Container</strong> to supply the application with the right implementation. The easiest way to look at a <strong>Container</strong> is as a big dictionary where the type of the abstraction is used as key, and its value is the definition of how to create the implementation. When the application requests for a service, it is looked up in the dictionary, and the correct implementation is returned.</p>
+<div class="note container">
+<strong>Tip</strong>: You should typically create a single Container instance for the whole application (one instance per app domain); Container instances are thread-safe</div>
+<div class="note container">
+<strong>Warning</strong>: Registering types in a container instance should be done from one single thread. Although requesting instances from the container is thread-safe, <a class="reference external" href="https://simpleinjector.codeplex.com/discussions/349908]">registration is not</a>.</div>
+<div class="note container">
+<strong>Warning</strong>: Do not create an infinite number of Container instances (such as one instance per request). This will drain the performance of your application. The library is optimized for using a limited number of <strong>Container</strong> instances. Creating and initializing a container instance has a lot of overhead, but is extremely fast once initialized.</div>
+<p>Creating a new container is done by newing up a new instance and start calling the <em>RegisterXXX</em> overloads to register new services:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">SimpleInjector</span><span class="p">.</span><span class="n">Container</span><span class="p">();</span>
+
+<span class="c1">// Registrations here</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">FileLogger</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+<p>Ideally, the only place in an application that should directly reference and use Simple Injector is the startup path. For an ASP.NET Web Forms or MVC application this will usually be the <strong>{&#8220;Application_OnStart&#8221;}</strong> event in the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/1xaas8a2%28VS.71%29.aspx">Global.asax</a> page of the web application project. For a Windows Forms or console application this will be the <strong>Main</strong> method in the application assembly.</p>
+<div class="note container">
+<strong>Tip</strong>: For more information about usage of Simple Injector for a specific technology, please see the [Integration Guide]._</div>
+<p>The usage of Simple Injector consists of four or five steps:</p>
+<p># Create a new container
+# Configure the container (register)
+# Optionally verify the container
+# Store the container for use by the application
+# Retrieve instances from the container (resolve)</p>
+<p>The first four steps are done once during application startup. The last step is usually performed more than once (usually once per request) for most types of applications. While the first three steps are platform agnostic, performing the last two steps depends on your own taste and which presentation framework you use, but below is an example for the configuration of a ASP.NET MVC application:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System.Web.Mvc</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Integration.Web.Mvc</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Global</span> <span class="p">:</span> <span class="n">System</span><span class="p">.</span><span class="n">Web</span><span class="p">.</span><span class="n">HttpApplication</span> <span class="p">{</span>
+
+    <span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 1. Create a new Simple Injector container</span>
+        <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+        <span class="c1">// 2. Configure the container (register)</span>
+        <span class="c1">// See below for more configuration examples</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserService</span><span class="p">,</span> <span class="n">UserService</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
+
+        <span class="c1">// 3. Optionally verify the container&#39;s configuration.</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+        <span class="c1">// 4. Store the container for use by the application</span>
+        <span class="n">DependencyResolver</span><span class="p">.</span><span class="n">SetResolver</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nf">SimpleInjectorDependencyResolver</span><span class="p">(</span><span class="n">container</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In the case of MVC, the fifth step is done for us by MVC. When a web requests comes in, MVC will map that request to a controller type and asks the application&#8217;s <strong>IDependencyResolver</strong> to create an instance of that controller type. The registration of the <strong>SimpleInjectorDependencyResolver</strong> (which is part of the <em>SimpleInjector.Integration.Web.Mvc.dll</em>) will ensure that the request for creating an instance is forwarded to Simple Injector. Simple Injector will create that controller with its dependencies.</p>
+<p>The example below shows an MVC Controller:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Web.Mvc</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">UserController</span> <span class="p">:</span> <span class="n">Controller</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span> <span class="n">logger</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">UserController</span><span class="p">(</span><span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">,</span> <span class="n">ILogger</span> <span class="n">logger</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">repository</span> <span class="p">=</span> <span class="n">repository</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">logger</span> <span class="p">=</span> <span class="n">logger</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="na">    [HttpGet]</span>
+    <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">(</span><span class="n">Guid</span> <span class="n">id</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">logger</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="s">&quot;Index called.&quot;</span><span class="p">);</span>
+        <span class="n">User</span> <span class="n">user</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">repository</span><span class="p">.</span><span class="n">GetById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">View</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<span id="resolving-instances"></span><span id="id5"></span><h2>Resolving instances<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>Simple Injector allows two scenarios by which you can retrieve instances:</p>
+<p><strong>Getting an object by a specified type</strong></p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">repository</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">&gt;();</span>
+
+<span class="c1">// Alternatively, you can use the weakly typed version</span>
+<span class="kt">var</span> <span class="n">repository</span> <span class="p">=</span> <span class="p">(</span><span class="n">IUserRepository</span><span class="p">)</span><span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IUserRepository</span><span class="p">));</span>
+</pre></div>
+</div>
+<p><strong>Getting a collection of objects by their type</strong></p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">ICommand</span><span class="p">&gt;</span> <span class="n">commands</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">&lt;</span><span class="n">ICommand</span><span class="p">&gt;();</span>
+
+<span class="c1">// Alternatively, you can use the weakly typed version</span>
+<span class="n">IEnumerable</span><span class="p">&lt;</span><span class="kt">object</span><span class="p">&gt;</span> <span class="n">commands</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">ICommand</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuring-simple-injector">
+<span id="id6"></span><span id="usage-configuring-simple-injector"></span><h2>Configuring Simple Injector<a class="headerlink" href="#configuring-simple-injector" title="Permalink to this headline">¶</a></h2>
+<p>The <em>Container</em> class consists of several methods that enable registering instances to be retrieved when requested from the application. These methods enable most common scenarios. Here are the most common scenarios with a code example per scenario:</p>
+<p><strong>Configuring an automatically constructed single instance to be always returned:</strong></p>
+<p>The following example configures that a single instance of type <strong>RealUserService</strong> will always be returned when an instance of <strong>IUserService</strong> is requested. The <strong>RealUserService</strong> will be constructed using [automatic constructor injection|#Automatic_constructor_injection].</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IUserService</span><span class="p">,</span> <span class="n">RealUserService</span><span class="p">&gt;();</span>
+
+<span class="c1">// Alternatively you can supply a Lifestyle with the same effect.</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserService</span><span class="p">,</span> <span class="n">RealUserService</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
+
+<span class="c1">// Usage</span>
+<span class="n">IUserService</span> <span class="n">service</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserService</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: instances that are declared as <em>Single</em> should be thread-safe in a multi-threaded environment.</div>
+<p><strong>Configuring a single - manually created - instance to be always returned:</strong></p>
+<p>The following example configures a single instance that will always be returned when an instance of that type will be requested.</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">&gt;(</span><span class="k">new</span> <span class="n">SqlUserRepository</span><span class="p">());</span>
+
+<span class="c1">// Usage</span>
+<span class="n">IUserRepository</span> <span class="n">repository</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: Registering types using automatic constructor injection (auto-wiring) is the preferred way of registering types. Only new up instances manually when automatic constructor injection is not possible.</div>
+<p><strong>Configuring a single instance using a delegate:</strong></p>
+<p>The following example configures a single instance using a delegate. The container will ensure that the delegate is not called more than once.</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="n">UserRepFactory</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="s">&quot;some constr&quot;</span><span class="p">));</span>
+
+<span class="c1">// Alternatively you can supply the singleton Lifestyle with the same effect.</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="n">UserRepFactory</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="s">&quot;some constr&quot;</span><span class="p">),</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
+
+<span class="c1">// Usage</span>
+<span class="n">IUserRepository</span> <span class="n">repository</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: Registering types using automatic constructor injection (auto-wiring) is the preferred way of registering types. Only new up instances manually when automatic constructor injection is not possible.</div>
+<p><strong>Configuring an automatically constructed new instance to be returned:</strong></p>
+<p>By supplying the service type and the created implementation as generic types, the container can create new instances of the implementation (<strong>MoveCustomerHandler</strong> in this case) by using [automatic constructor injection|#Automatic_constructor_injection].</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;,</span> <span class="n">MoveCustomerHandler</span><span class="p">&gt;();</span>
+
+<span class="c1">// Alternatively you can supply the transient Lifestyle with the same effect.</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;,</span> <span class="n">MoveCustomerHandler</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;&gt;();</span>
+</pre></div>
+</div>
+<p><strong>Configuring a new instance to be returned on each call using a delegate:</strong></p>
+<p>By supplying a delegate, types can be registered that can not be created by using automatic constructor injection. By calling the container inside the delegate, you can let the container do as much as work for you as possible:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;&gt;(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="c1">// Get a new instance of the concrete MoveCustomerHandler class:</span>
+    <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">MoveCustomerHandler</span><span class="p">&gt;();</span>
+
+    <span class="c1">// Configure the handler:</span>
+    <span class="n">handler</span><span class="p">.</span><span class="n">ExecuteAsynchronously</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">handler</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;&gt;(()</span> <span class="p">=&gt;</span> <span class="p">{</span> <span class="p">...</span> <span class="p">},</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
+<span class="c1">// Alternatively you can supply the transient Lifestyle with the same effect.</span>
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;&gt;();</span>
+</pre></div>
+</div>
+<p id="id7"><span id="configuring-property-injection"></span><strong>Configuring property injection on an instance:</strong></p>
+<p>For types that need to be injected, define a single public constructor that holds all dependencies whenever possible. In scenarios where constructor injection is not possible, property injection is your second best pick. The previous example already showed an example of this. The preferred way of doing this however, is by using the <em>RegisterInitializer</em> method:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;&gt;,</span> <span class="n">MoveCustomerHandler</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">ShipOrderCommand</span><span class="p">&gt;&gt;,</span> <span class="n">ShipOrderHandler</span><span class="p">&gt;();</span>
+
+<span class="c1">// MoveCustomerCommand and ShipOrderCommand both inherit from HandlerBase</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">HandlerBase</span><span class="p">&gt;(</span><span class="n">handlerToInitialize</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="n">handlerToInitialize</span><span class="p">.</span><span class="n">ExecuteAsynchronously</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">handler1</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;&gt;();</span>
+<span class="n">Assert</span><span class="p">.</span><span class="n">IsTrue</span><span class="p">(</span><span class="n">handler1</span><span class="p">.</span><span class="n">ExecuteAsynchronously</span><span class="p">);</span>
+
+<span class="kt">var</span> <span class="n">handler2</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">ShipOrderCommand</span><span class="p">&gt;&gt;();</span>
+<span class="n">Assert</span><span class="p">.</span><span class="n">IsTrue</span><span class="p">(</span><span class="n">handler2</span><span class="p">.</span><span class="n">ExecuteAsynchronously</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <strong>Action&lt;T&gt;</strong> delegate that is registered using the <em>RegisterInitializer</em> method will be called after the container created a new instance that inherits from or implements the given T (or inherits from or implements the given T). In the case of the given example, the <strong>MoveCustomerHandler</strong> inherits from <strong>HandlerBase</strong> and because of this, <strong>Action&lt;HandlerBase&gt;</strong> delegate will get called with the reference to the created instance.</p>
+<div class="note container">
+<strong>Note</strong>: The container will not be able to call an initializer delegate on a type that is manually constructed using the <em>new</em> operator. Use automatic constructor injection whenever possible.</div>
+<div class="note container">
+<strong>Tip</strong>: Multiple initializers can apply to a concrete type and the container will call all initializers that apply to that type. They are guaranteed to run in the same order as they are registered.</div>
+<p id="collections"><strong>Configuring a collection of instances to be returned:</strong></p>
+<p>Simple Injector contains several methods for registration and resolving collections of types. Here are some examples:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
+<span class="c1">// Registering a list of instances that will be created by the container.</span>
+<span class="c1">// Supplying a collection of types is the preferred way of registering collections.</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IMailLogger</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">SqlLogger</span><span class="p">));</span>
+
+<span class="c1">// Register a fixed list (these instances should be thread-safe).</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="k">new</span> <span class="n">MailLogger</span><span class="p">(),</span> <span class="k">new</span> <span class="n">SqlLogger</span><span class="p">());</span>
+
+<span class="c1">// Using a collection from another subsystem</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="n">Logger</span><span class="p">.</span><span class="n">Providers</span><span class="p">);</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">loggers</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>:  When no instances are registered using <em>RegisterAll</em>, <em>Container.GetAllInstances</em> will always return an empty list.</div>
+<p>Just as with normal types, Simple Injector can inject collections of instances into constructors:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Definition</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Service</span> <span class="p">:</span> <span class="n">IService</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;</span> <span class="n">loggers</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">Service</span><span class="p">(</span><span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;</span> <span class="n">loggers</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">loggers</span> <span class="p">=</span> <span class="n">loggers</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">void</span> <span class="n">IService</span><span class="p">.</span><span class="n">DoStuff</span><span class="p">()</span> <span class="p">{</span>
+        <span class="c1">// Log to all loggers</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">logger</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="n">loggers</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">logger</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="s">&quot;Some message&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="k">typeof</span><span class="p">(</span><span class="n">MailLogger</span><span class="p">)),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">SqlLogger</span><span class="p">));</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">Service</span><span class="p">&gt;();</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">service</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;();</span>
+<span class="n">service</span><span class="p">.</span><span class="n">DoStuff</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The <em>RegisterAll</em> overloads that take a collection of <strong>Type</strong> instances, forward the creation of those types to the container, which means that the same rules apply to them. Take a look at the following configuration:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">MailLogger</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">FileLogger</span><span class="p">&gt;();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="k">typeof</span><span class="p">(</span><span class="n">MailLogger</span><span class="p">)),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">SqlLogger</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">ILogger</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>When the registered collection of <strong>ILogger</strong> instance is resolved, the container will resolve each and every one of them using their configuration. When no such registration exists, the type is created with the <strong>Transient</strong> lifestyle (which means, that a new instance is created every time the returned collection is iterated). The <strong>MailLogger</strong> type however, has an explicit registration and since it is registered as <strong>Singleton</strong>, the resolved <strong>ILogger</strong> collections will always have the same instance.</p>
+<p>Since the creation is forwarded, also abstract types can be registered using <em>RegisterAll</em>. In this case the <strong>ILogger</strong> type itself is registered using <em>RegisterAll</em>. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration, that is included in the collection of <strong>ILogger</strong> instances as well.</p>
+<p>While resolving collections is useful and also works with automatic constructor injection, the registration of composites is preferred over the use of collections as constructor arguments in application code. Register a composite whenever possible, as shown in the example below:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Definition</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">CompositeLogger</span> <span class="p">:</span> <span class="n">ILogger</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span><span class="p">[]</span> <span class="n">loggers</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">CompositeLogger</span><span class="p">(</span><span class="k">params</span> <span class="n">ILogger</span><span class="p">[]</span> <span class="n">loggers</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">loggers</span> <span class="p">=</span> <span class="n">loggers</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Log</span><span class="p">(</span><span class="kt">string</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">logger</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="n">loggers</span><span class="p">)</span>
+            <span class="n">logger</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">Service</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span>
+    <span class="k">new</span> <span class="nf">CompositeLogger</span><span class="p">(</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">MailLogger</span><span class="p">&gt;(),</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">SqlLogger</span><span class="p">&gt;()</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">service</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;();</span>
+<span class="n">service</span><span class="p">.</span><span class="n">DoStuff</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>When using the approach given above, your services don’t need a dependency on <strong>IEnumerable&lt;ILogger&gt;</strong>, but can simply have a dependency on the <strong>ILogger</strong> interface itself.</p>
+</div>
+<div class="section" id="verifying-the-container-s-configuration">
+<span id="id8"></span><span id="verifying-container"></span><h2>Verifying the container&#8217;s configuration<a class="headerlink" href="#verifying-the-container-s-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Optionally, you can call the <em>Verify</em> method of the <em>Container</em>. This method allows a fail-fast mechanism to prevent the application to start when the container is misconfigured. The <em>Verify</em> method checks the container&#8217;s configuration by creating an instance of all registered types.</p>
+<p>For more information about creating an application and container configuration that can be succesfully verified, please read the [How To Verify the container’s configuration|How-to#Verifying_Configuration].</p>
+</div>
+<div class="section" id="automatic-constructor-injection-auto-wiring">
+<span id="id9"></span><span id="automatic-constructor-injection"></span><h2>Automatic constructor injection / auto-wiring<a class="headerlink" href="#automatic-constructor-injection-auto-wiring" title="Permalink to this headline">¶</a></h2>
+<p>Simple Injector uses the public constructor of a registered type and looks at the arguments of that constructor. The container will resolve instances for the argument types and invokes the constructor using those instances. This mechanism is called automatic constructor injection or auto-wiring and this is one of the core differences that separates DI containers from doing injection manually. For Simple Injector to be able to use auto-wiring, the following requirements must be met:</p>
+<p># The type is concrete (not abstract, no interface, no generic type definition).
+# The type has exactly one public constructor (this may be a default constructor).
+# All types of the arguments on that constructor can be resolved by the container.</p>
+<p>Simple Injector can create a type even if it hasn’t registered in the container by using constructor injection.</p>
+<p>The following code shows an example of the use of automatic constructor injection. The example shows an <strong>IUserRepository</strong> interface with a concrete <strong>SqlUserRepository</strong> implementation and a concrete <strong>UserService</strong> class. The <strong>UserService</strong> class has one public constructor with an <strong>IUserRepository</strong> argument. Because the dependencies of the <strong>UserService</strong> are registered, Simple Injector is able to create a new <strong>UserService</strong> instance.</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Definitions</span>
+<span class="k">public</span> <span class="k">interface</span> <span class="n">IUserRepository</span> <span class="p">{</span> <span class="p">}</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">SqlUserRepository</span> <span class="p">:</span> <span class="n">IUserRepository</span> <span class="p">{</span> <span class="p">}</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">UserService</span> <span class="p">:</span> <span class="n">IUserService</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nf">UserService</span><span class="p">(</span><span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Configuration</span>
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IUserService</span><span class="p">,</span> <span class="n">UserService</span><span class="p">&gt;();</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">service</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserService</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: Because UserService is a concrete type, calling <em>container.GetInstance&lt;UserService&gt;()</em> without registering it explicitly will work as well. This can simplify the container’s configuration significantly for more complex scenarios. However, keep in mind that the best practice is to program to an interface, not a concrete type. Prevent using and depending on concrete types whenever possible.</div>
+</div>
+<div class="section" id="id10">
+<span id="more-information"></span><span id="id11"></span><h2>More information<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<p>For more information about Simple Injector please visit the following links:</p>
+<ul class="simple">
+<li>The [Simple Injector and object lifetime management|ObjectLifestyleManagement] page explains how to configure lifestyles such as <strong>transient</strong>, <strong>singleton</strong>, and many others.</li>
+<li>See the [Integration Guide] for more information about how to integrate Simple Injector into your specific application framework.</li>
+<li>For more information about <strong>dependency injection</strong> in general, please visit <a class="reference external" href="https://stackoverflow.com/tags/dependency-injection/info">this page on Stackoverflow</a>.</li>
+<li>If you have any questions about how to use Simple Injector or about <strong>dependency injection</strong> in general, the experts at <a class="reference external" href="https://stackoverflow.com/questions/ask?tags=simple-injector+%20ioc-container+dependency-injection+.net+c%23">Stackoverflow.com</a> are waiting for you.</li>
+<li>For all other Simple Injector related question and discussions, such as bug reports and feature requests, the <a class="reference external" href="https://simpleinjector.codeplex.com/discussions">Simple Injector discussion forum</a> will be the place to start.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using Simple Injector</a><ul>
+<li><a class="reference internal" href="#id2">Using Simple Injector</a></li>
+<li><a class="reference internal" href="#id4">Resolving instances</a></li>
+<li><a class="reference internal" href="#configuring-simple-injector">Configuring Simple Injector</a></li>
+<li><a class="reference internal" href="#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
+<li><a class="reference internal" href="#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
+<li><a class="reference internal" href="#id10">More information</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="previous chapter">Quick Start</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="advanced.html"
+                        title="next chapter">Advanced scenarios</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/using.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="advanced.html" title="Advanced scenarios"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
