@@ -323,6 +323,7 @@ The `SOLID <https://en.wikipedia.org/wiki/SOLID>`_ principles give us important 
 
 
 One of the ways to add new functionality (such as `cross-cutting concerns <https://en.wikipedia.org/wiki/Cross-cutting_concern>`_) to classes is by the use of the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the :ref:`Registration of open generic types <Registration_Of_Open_Generic_Types>` section of this page or for instance the use of an generic **ICommandHandler<TCommand>** interface.
+
 .. container:: Note
 
     **Tip**: `This article <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91>`_ describes an architecture based on the use of the **ICommandHandler<TCommand>** interface.
