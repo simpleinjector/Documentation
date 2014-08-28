@@ -10,7 +10,20 @@ Although its name may not imply it, *Simple Injector* is capable of handling man
 
 .. container:: Note
 
-    **Note**: After including the *SimpleInjector.dll* to your project, you will have to add the *SimpleInjector.Extensions* namespace to your code to be able to use the majority of features that are presented in this wiki page.
+    **Note**: After including the *SimpleInjector.dll* in your project, you will have to add the *SimpleInjector.Extensions* namespace to your code to be able to use the majority of features that are presented in this wiki page.
+
+This page discusses the following subjects:
+
+* :ref:`Generics <Generics>`
+* :ref:`Batch registration / Automatic registration <Batch-Registration>`
+* :ref:`Registration of open generic types <Registration-Of-Open-Generic-Types>`
+* :ref:`Unregistered type resolution <Unregistered-Type-Resolution>`
+* :ref:`Context based injection / Contextual binding <Context-Based-Injection>`
+* :ref:`Decorators <Decorators>`
+* :ref:`Interception <Interception>`
+* :ref:`Property injection <Property-Injection>`
+* :ref:`Covariance and Contravariance <Covariance-Contravariance>`
+* :ref:`Registering plugins dynamically <Plugins>`
 
 .. _Generics:
 

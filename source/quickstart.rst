@@ -119,7 +119,7 @@ More information
 
 For more information about *Simple Injector* please visit the following links: 
 
-* :doc:`Using the Simple Injector <using>` will guide you through the *Simple Injector* basics.
+* :doc:`Using Simple Injector <using>` will guide you through the *Simple Injector* basics.
 * The [Simple Injector and object lifetime management|ObjectLifestyleManagement] page explains how to configure lifestyles such as **transient**, **singleton**, and many others.
 * See the `Reference library <https://simpleinjector.org/ReferenceLibrary/>`_ for the complete API documentation.
 * See the [Integration Guide] for more information about how to integrate *Simple Injector* into your specific application framework.

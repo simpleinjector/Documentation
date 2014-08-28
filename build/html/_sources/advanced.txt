@@ -10,7 +10,20 @@ Although its name may not imply it, *Simple Injector* is capable of handling man
 
 .. container:: Note
 
-    **Note**: After including the *SimpleInjector.dll* to your project, you will have to add the *SimpleInjector.Extensions* namespace to your code to be able to use the majority of features that are presented in this wiki page.
+    **Note**: After including the *SimpleInjector.dll* in your project, you will have to add the *SimpleInjector.Extensions* namespace to your code to be able to use the majority of features that are presented in this wiki page.
+
+This page discusses the following subjects:
+
+* :ref:`Generics <Generics>`
+* :ref:`Batch registration / Automatic registration <Batch-Registration>`
+* :ref:`Registration of open generic types <Registration-Of-Open-Generic-Types>`
+* :ref:`Unregistered type resolution <Unregistered-Type-Resolution>`
+* :ref:`Context based injection / Contextual binding <Context-Based-Injection>`
+* :ref:`Decorators <Decorators>`
+* :ref:`Interception <Interception>`
+* :ref:`Property injection <Property-Injection>`
+* :ref:`Covariance and Contravariance <Covariance-Contravariance>`
+* :ref:`Registering plugins dynamically <Plugins>`
 
 .. _Generics:
 
@@ -323,6 +336,7 @@ The `SOLID <https://en.wikipedia.org/wiki/SOLID>`_ principles give us important 
 
 
 One of the ways to add new functionality (such as `cross-cutting concerns <https://en.wikipedia.org/wiki/Cross-cutting_concern>`_) to classes is by the use of the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the :ref:`Registration of open generic types <Registration_Of_Open_Generic_Types>` section of this page or for instance the use of an generic **ICommandHandler<TCommand>** interface.
+
 .. container:: Note
 
     **Tip**: `This article <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91>`_ describes an architecture based on the use of the **ICommandHandler<TCommand>** interface.

@@ -51,7 +51,20 @@
 <div class="note container">
 <strong>Note</strong>: this documentation is specific for <em>Simple Injector version 2.0</em> and up. Look <a class="reference external" href="https://simpleinjector.codeplex.com/wikipage?title=Advanced-scenarios&amp;version=48">here</a> for 1.x specific documentation.</div>
 <div class="note container">
-<strong>Note</strong>: After including the <em>SimpleInjector.dll</em> to your project, you will have to add the <em>SimpleInjector.Extensions</em> namespace to your code to be able to use the majority of features that are presented in this wiki page.</div>
+<strong>Note</strong>: After including the <em>SimpleInjector.dll</em> in your project, you will have to add the <em>SimpleInjector.Extensions</em> namespace to your code to be able to use the majority of features that are presented in this wiki page.</div>
+<p>This page discusses the following subjects:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#generics"><em>Generics</em></a></li>
+<li><a class="reference internal" href="#id2"><em>Batch registration / Automatic registration</em></a></li>
+<li><a class="reference internal" href="#id3"><em>Registration of open generic types</em></a></li>
+<li><a class="reference internal" href="#id5"><em>Unregistered type resolution</em></a></li>
+<li><a class="reference internal" href="#id7"><em>Context based injection / Contextual binding</em></a></li>
+<li><a class="reference internal" href="#decorators"><em>Decorators</em></a></li>
+<li><a class="reference internal" href="#interception"><em>Interception</em></a></li>
+<li><a class="reference internal" href="#property-injection"><em>Property injection</em></a></li>
+<li><a class="reference internal" href="#id18"><em>Covariance and Contravariance</em></a></li>
+<li><a class="reference internal" href="#plugins"><em>Registering plugins dynamically</em></a></li>
+</ul>
 <div class="section" id="generics">
 <span id="id1"></span><h2>Generics<a class="headerlink" href="#generics" title="Permalink to this headline">¶</a></h2>
 <p>.NET has superior support for generic programming and Simple Injector has been designed to make full use of it. Simple Injector arguably has the most advanced support for generics of all DI libraries. Simple Injector can handle any generic type and implementing patterns such as decorator, mediator, strategy and chain of responsibility is simple.</p>
@@ -275,10 +288,9 @@
 <div class="section" id="generic-decorators">
 <span id="decorators"></span><span id="id9"></span><h2>Decorators<a class="headerlink" href="#generic-decorators" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="https://en.wikipedia.org/wiki/SOLID">SOLID</a> principles give us important guidance when it comes to writing maintainable software. The &#8216;O&#8217; of the &#8216;SOLID&#8217; acronym stands for the <a class="reference external" href="https://en.wikipedia.org/wiki/Open/closed_principle">Open/closed Principle</a> which states that classes should be open for extension, but closed for modification. Designing systems around the Open/closed principle means that new behavior can be plugged into the system, without the need to change any existing parts, making the change of breaking existing code much smaller.</p>
-<p>One of the ways to add new functionality (such as <a class="reference external" href="https://en.wikipedia.org/wiki/Cross-cutting_concern">cross-cutting concerns</a>) to classes is by the use of the <a class="reference external" href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a>. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the <a class="reference internal" href="#registration-of-open-generic-types"><em>Registration of open generic types</em></a> section of this page or for instance the use of an generic <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.
-.. container:: Note</p>
-<blockquote>
-<div><strong>Tip</strong>: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91">This article</a> describes an architecture based on the use of the <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.</div></blockquote>
+<p>One of the ways to add new functionality (such as <a class="reference external" href="https://en.wikipedia.org/wiki/Cross-cutting_concern">cross-cutting concerns</a>) to classes is by the use of the <a class="reference external" href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a>. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the <a class="reference internal" href="#registration-of-open-generic-types"><em>Registration of open generic types</em></a> section of this page or for instance the use of an generic <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.</p>
+<div class="note container">
+<strong>Tip</strong>: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91">This article</a> describes an architecture based on the use of the <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.</div>
 <p>Take the plausible scenario where we want to validate all commands that get executed by an <strong>ICommandHandler&lt;TCommand&gt;</strong> implementation. The Open/Closed principle states that we want to do this, without having to alter each and every implementation. We can do this using a (single) decorator:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">ValidationCommandHandlerDecorator</span><span class="p">&lt;</span><span class="n">TCommand</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">TCommand</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">IValidator</span> <span class="n">validator</span><span class="p">;</span>
