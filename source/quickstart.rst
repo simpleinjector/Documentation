@@ -7,7 +7,7 @@ Overview
 
 The goal of *Simple Injector* is to provide .NET application developers with an easy, flexible, and fast `Inversion of Control library <http://martinfowler.com/articles/injection.html>`_, that uses best practices to steer developers towards the pit of success.
 
-Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack the features to be used in large developement projects. *Simple Injector* fills this gap by supplying a simple implementation with carefully chosen features in the core library. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any [advanced scenario|Advanced-scenarios].
+Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack the features to be used in large developement projects. *Simple Injector* fills this gap by supplying a simple implementation with carefully chosen features in the core library. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any :doc:`advanced scenario <Advanced-scenarios>`.
 
 The following platforms are supported:
 
@@ -38,8 +38,8 @@ The easiest way to get started is by using  `the available NuGet packages <https
 # Unpack the downloaded .zip file;
 # Add the **SimpleInjector.dll** to your start-up project by right-clicking on a project in the Visual Studio solution explorer and selecting 'Add Reference...'.
 # Add the **using SimpleInjector;** directive on the top of the code file where you wish to configure the application.
-# Look at the [Usage|Using the Simple Injector] section in the documentation on how to configure and use the *Simple Injector*.
-# Look at the [More information|#More**information] section if you want to learn more or have any questions.
+# Look at the :doc:`Usage <using>` section in the documentation on how to configure and use the *Simple Injector*.
+# Look at the [More information|#More_information] section if you want to learn more or have any questions.
 
 A Quick Example
 ===============
@@ -112,14 +112,14 @@ This is in fact all it takes to start using the *Simple Injector*. Design your c
 
 .. container:: Note
 
-    Please go to the [Using the Simple Injector] section in the documentation to see more examples.
+    Please go to the :doc:`Using the Simple Injector <using>` section in the documentation to see more examples.
 
 More information
 ================
 
 For more information about *Simple Injector* please visit the following links: 
 
-* [Using the Simple Injector] will guide you through the *Simple Injector* basics.
+* :doc:`Using the Simple Injector <using>` will guide you through the *Simple Injector* basics.
 * The [Simple Injector and object lifetime management|ObjectLifestyleManagement] page explains how to configure lifestyles such as **transient**, **singleton**, and many others.
 * See the `Reference library <https://simpleinjector.org/ReferenceLibrary/>`_ for the complete API documentation.
 * See the [Integration Guide] for more information about how to integrate *Simple Injector* into your specific application framework.
@@ -127,4 +127,4 @@ For more information about *Simple Injector* please visit the following links:
 * If you have any questions about how to use *Simple Injector* or about **dependency injection** in general, the experts at `Stackoverflow.com <http://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23&title=Simple%20Injector>`_ are waiting for you.
 * For all other *Simple Injector* related question and discussions, such as bug reports and feature requests, the `Simple Injector discussion forum <https://simpleinjector.codeplex.com/discussions>`_ will be the place to start.
 
-Happy injecting!
+**Happy injecting!**

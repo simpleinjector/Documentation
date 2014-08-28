@@ -45,7 +45,7 @@ Ideally, the only place in an application that should directly reference and use
 
 .. container:: Note
 
-    **Tip**: For more information about usage of Simple Injector for a specific technology, please see the [Integration Guide]._
+    **Tip**: For more information about usage of Simple Injector for a specific technology, please see the [Integration Guide].
 
 The usage of Simple Injector consists of four or five steps:
 
@@ -145,7 +145,7 @@ The *Container* class consists of several methods that enable registering instan
 
 **Configuring an automatically constructed single instance to be always returned:**
 
-The following example configures that a single instance of type **RealUserService** will always be returned when an instance of **IUserService** is requested. The **RealUserService** will be constructed using [automatic constructor injection|#Automatic_constructor_injection].
+The following example configures that a single instance of type **RealUserService** will always be returned when an instance of **IUserService** is requested. The **RealUserService** will be constructed using :ref:`automatic constructor injection <Automatic_constructor_injection>`.
 
 .. code-block:: c#
 
@@ -199,7 +199,7 @@ The following example configures a single instance using a delegate. The contain
 
 **Configuring an automatically constructed new instance to be returned:**
 
-By supplying the service type and the created implementation as generic types, the container can create new instances of the implementation (**MoveCustomerHandler** in this case) by using [automatic constructor injection|#Automatic_constructor_injection].
+By supplying the service type and the created implementation as generic types, the container can create new instances of the implementation (**MoveCustomerHandler** in this case) by using :ref:`automatic constructor injection <Automatic_constructor_injection>`.
 
 .. code-block:: c#
 

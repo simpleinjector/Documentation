@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
-    <link rel="prev" title="Quick Start" href="quickstart.html" /> 
+    <link rel="prev" title="Using Simple Injector" href="using.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,7 +34,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="quickstart.html" title="Quick Start"
+          <a href="using.html" title="Using Simple Injector"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
       </ul>
@@ -124,7 +124,7 @@
     <span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The code snippet registers all types from the given assembly that implement <strong>IValidator&lt;T&gt;</strong>. As we now have multiple implementations the container cannot inject a single instance of <strong>IValidator&lt;T&gt;</strong> and we can no longer call <strong>container.GetInstance&lt;IValidator&lt;T&gt;&gt;()</strong>. Instead instances can be retrieved by having an <strong>IEnumerable&lt;IValidator&lt;T&gt;&gt;</strong> constructor argument or by calling <strong>container.GetAllInstances&lt;IValidator&lt;T&gt;&gt;()</strong>.</p>
+<p>The code snippet registers all types from the given assembly that implement <strong>IValidator&lt;T&gt;</strong>. As we now have multiple implementations the container cannot inject a single instance of <strong>IValidator&lt;T&gt;</strong> and we can no longer call <em>container.GetInstance&lt;IValidator&lt;T&gt;&gt;()</em>. Instead instances can be retrieved by having an <strong>IEnumerable&lt;IValidator&lt;T&gt;&gt;</strong> constructor argument or by calling <em>container.GetAllInstances&lt;IValidator&lt;T&gt;&gt;()</em>.</p>
 <p>It is not generally regarded as best practice to have an <strong>IEnumerable&lt;IValidator&lt;T&gt;&gt;</strong> dependency in multiple class constructors (or accessed from the  container directly). Depending on a set of types complicates your application design and can often be simplified with an alternate configuration. A better way is to have a single composite type that wraps <strong>IEnumerable&lt;IValidator&lt;T&gt;&gt;</strong> and presents it to the consumer as a single instance, in this case a <strong>CompositeValidator&lt;T&gt;</strong>:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">CompositeValidator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IValidator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">IValidator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">validators</span><span class="p">;</span>
@@ -231,7 +231,7 @@
 </div>
 <div class="section" id="id5">
 <span id="unregistered-type-resolution"></span><span id="id6"></span><h2>Unregistered type resolution<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
-<p>Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the change of registering that type. <em>Simple Injector</em> supports this scenario with the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm">ResolveUnregisteredType</a> event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the [registration of open generic types|Advanced-scenarios#Registration_Of_Open_Generic_Types]. Other examples of possible scenarios that can be built on top of this event are [resolving array and lists|How-to#Resolve-Arrays-And-Lists] and [covariance and contravariance|Advanced-scenarios#Covariance-Contravariance]. Those scenarios are described here in the advanced scenarios page.</p>
+<p>Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the change of registering that type. <em>Simple Injector</em> supports this scenario with the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm">ResolveUnregisteredType</a> event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the <a class="reference internal" href="#registration-of-open-generic-types"><em>registration of open generic types</em></a>. Other examples of possible scenarios that can be built on top of this event are <em class="xref std std-ref">resolving array and lists</em> and <a class="reference internal" href="#id18"><em>covariance and contravariance</em></a>. Those scenarios are described here in the advanced scenarios page.</p>
 <p>For more information about how to use this event, please take a look at the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm">ResolveUnregisteredType event documentation</a> in the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">reference library</a>.</p>
 </div>
 <div class="section" id="id7">
@@ -275,9 +275,10 @@
 <div class="section" id="generic-decorators">
 <span id="decorators"></span><span id="id9"></span><h2>Decorators<a class="headerlink" href="#generic-decorators" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="https://en.wikipedia.org/wiki/SOLID">SOLID</a> principles give us important guidance when it comes to writing maintainable software. The &#8216;O&#8217; of the &#8216;SOLID&#8217; acronym stands for the <a class="reference external" href="https://en.wikipedia.org/wiki/Open/closed_principle">Open/closed Principle</a> which states that classes should be open for extension, but closed for modification. Designing systems around the Open/closed principle means that new behavior can be plugged into the system, without the need to change any existing parts, making the change of breaking existing code much smaller.</p>
-<p>One of the ways to add new functionality (such as [cross-cutting concerns|https://en.wikipedia.org/wiki/Cross-cutting_concern]) to classes is by the use of the <a class="reference external" href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a>. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the [Registration of open generic types|Advanced-scenarios#Registration_Of_Open_Generic_Types] section of this page or for instance the use of an generic <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.</p>
-<div class="note container">
-<strong>Tip</strong>: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91">This article</a> describes an architecture based on the use of the <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.</div>
+<p>One of the ways to add new functionality (such as <a class="reference external" href="https://en.wikipedia.org/wiki/Cross-cutting_concern">cross-cutting concerns</a>) to classes is by the use of the <a class="reference external" href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a>. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the <a class="reference internal" href="#registration-of-open-generic-types"><em>Registration of open generic types</em></a> section of this page or for instance the use of an generic <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.
+.. container:: Note</p>
+<blockquote>
+<div><strong>Tip</strong>: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91">This article</a> describes an architecture based on the use of the <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.</div></blockquote>
 <p>Take the plausible scenario where we want to validate all commands that get executed by an <strong>ICommandHandler&lt;TCommand&gt;</strong> implementation. The Open/Closed principle states that we want to do this, without having to alter each and every implementation. We can do this using a (single) decorator:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">ValidationCommandHandlerDecorator</span><span class="p">&lt;</span><span class="n">TCommand</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">TCommand</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">IValidator</span> <span class="n">validator</span><span class="p">;</span>
@@ -508,7 +509,7 @@
 <div class="note container">
 <strong>Note</strong>: the interfaces in the given [Interception extensions|InterceptionExtensions] code snippets are a simplified version of the Castle Project interception facility. If you need to create lots different interceptors, you might benefit from using the interception abilities of the Castle Project. Also please note that the given snippets use dynamic proxies to do the interception, while Castle uses lightweight code generation (LCG). LCG allows much better performance than the use of dynamic proxies.</div>
 <div class="note container">
-<strong>Note</strong>: Don&#8217;t use interception for intercepting types that all implement the same generic interface, such as <strong>ICommandHandler&lt;T&gt;</strong> or <strong>IValidator&lt;T&gt;</strong>. Try using decorator classes instead, as shown in the [Decorators|Advanced-scenarios#Decorators] section on this page.</div>
+<strong>Note</strong>: Don&#8217;t use interception for intercepting types that all implement the same generic interface, such as <strong>ICommandHandler&lt;T&gt;</strong> or <strong>IValidator&lt;T&gt;</strong>. Try using decorator classes instead, as shown in the <a class="reference internal" href="#decorators"><em>Decorators</em></a> section on this page.</div>
 </div>
 <div class="section" id="property-injection">
 <span id="id16"></span><span id="implicit-property-injection"></span><span id="id17"></span><h2>Property injection<a class="headerlink" href="#property-injection" title="Permalink to this headline">¶</a></h2>
@@ -520,7 +521,7 @@ We strongly feel that explicit property injection is a much better way to go. Wi
 <p>Because <em>Simple Injector</em> does not encourage its users to take a dependency on the container (except for the startup path of course), <em>Simple Injector</em> does not contain any attributes that allow explicit property injection and it can therefore not explicitly inject properties out-of-the-box.</p>
 <p>Besides this, the use of property injection should be very exceptional and in general constructor injection should be used in the majority of cases. If a constructor gets too many parameters (constructor over-injection anti-pattern), it is an indication of a violation of the <a class="reference external" href="https://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> (SRP). SRP violations often lead to maintainability issues. So instead of patching constructor over-injection with property injection, the root cause should be analyzed and the type should be refactored, probably with <a class="reference external" href="http://blog.ploeh.dk/2010/02/02/RefactoringtoAggregateServices/">Facade Services</a>. Another common reason to use properties is because those dependencies are optional. Instead of using optional property dependencies, best practice is to inject empty implementations (a.k.a. <a class="reference external" href="https://en.wikipedia.org/wiki/Null_Object_pattern">Null Object pattern</a>) into the constructor.</p>
 <p><em>Enabling property injection</em>
-<em>Simple Injector</em> contains two ways to enable property injection. First of all the [RegisterInitializer&lt;T&gt;|Using the Simple Injector#Configuring_Property_Injection] method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:</p>
+<em>Simple Injector</em> contains two ways to enable property injection. First of all the <a class="reference internal" href="using.html#configuring-property-injection"><em>RegisterInitializer&lt;T&gt;</em></a> method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">HandlerBase</span><span class="p">&gt;(</span><span class="n">handlerToInitialize</span> <span class="p">=&gt;</span> <span class="p">{</span>
     <span class="n">handlerToInitialize</span><span class="p">.</span><span class="n">ExecuteAsynchronously</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
 <span class="p">});</span>
@@ -668,8 +669,8 @@ We strongly feel that explicit property injection is a much better way to go. Wi
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="quickstart.html"
-                        title="previous chapter">Quick Start</a></p>
+  <p class="topless"><a href="using.html"
+                        title="previous chapter">Using Simple Injector</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/advanced.txt"
@@ -699,7 +700,7 @@ We strongly feel that explicit property injection is a much better way to go. Wi
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="quickstart.html" title="Quick Start"
+          <a href="using.html" title="Using Simple Injector"
              >previous</a> |</li>
         <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
       </ul>

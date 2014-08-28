@@ -73,7 +73,7 @@
 </div>
 <p>Ideally, the only place in an application that should directly reference and use Simple Injector is the startup path. For an ASP.NET Web Forms or MVC application this will usually be the <strong>{&#8220;Application_OnStart&#8221;}</strong> event in the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/1xaas8a2%28VS.71%29.aspx">Global.asax</a> page of the web application project. For a Windows Forms or console application this will be the <strong>Main</strong> method in the application assembly.</p>
 <div class="note container">
-<strong>Tip</strong>: For more information about usage of Simple Injector for a specific technology, please see the [Integration Guide]._</div>
+<strong>Tip</strong>: For more information about usage of Simple Injector for a specific technology, please see the [Integration Guide].</div>
 <p>The usage of Simple Injector consists of four or five steps:</p>
 <p># Create a new container
 # Configure the container (register)
@@ -152,7 +152,7 @@
 <span id="id6"></span><span id="usage-configuring-simple-injector"></span><h2>Configuring Simple Injector<a class="headerlink" href="#configuring-simple-injector" title="Permalink to this headline">¶</a></h2>
 <p>The <em>Container</em> class consists of several methods that enable registering instances to be retrieved when requested from the application. These methods enable most common scenarios. Here are the most common scenarios with a code example per scenario:</p>
 <p><strong>Configuring an automatically constructed single instance to be always returned:</strong></p>
-<p>The following example configures that a single instance of type <strong>RealUserService</strong> will always be returned when an instance of <strong>IUserService</strong> is requested. The <strong>RealUserService</strong> will be constructed using [automatic constructor injection|#Automatic_constructor_injection].</p>
+<p>The following example configures that a single instance of type <strong>RealUserService</strong> will always be returned when an instance of <strong>IUserService</strong> is requested. The <strong>RealUserService</strong> will be constructed using <a class="reference internal" href="#automatic-constructor-injection"><em>automatic constructor injection</em></a>.</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IUserService</span><span class="p">,</span> <span class="n">RealUserService</span><span class="p">&gt;();</span>
 
@@ -191,7 +191,7 @@
 <div class="note container">
 <strong>Note</strong>: Registering types using automatic constructor injection (auto-wiring) is the preferred way of registering types. Only new up instances manually when automatic constructor injection is not possible.</div>
 <p><strong>Configuring an automatically constructed new instance to be returned:</strong></p>
-<p>By supplying the service type and the created implementation as generic types, the container can create new instances of the implementation (<strong>MoveCustomerHandler</strong> in this case) by using [automatic constructor injection|#Automatic_constructor_injection].</p>
+<p>By supplying the service type and the created implementation as generic types, the container can create new instances of the implementation (<strong>MoveCustomerHandler</strong> in this case) by using <a class="reference internal" href="#automatic-constructor-injection"><em>automatic constructor injection</em></a>.</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;,</span> <span class="n">MoveCustomerHandler</span><span class="p">&gt;();</span>
 

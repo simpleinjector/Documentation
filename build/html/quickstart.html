@@ -24,6 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="next" title="Using Simple Injector" href="using.html" />
     <link rel="prev" title="Welcome to Simple Injector’s documentation!" href="index.html" /> 
   </head>
   <body>
@@ -33,6 +34,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="using.html" title="Using Simple Injector"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to Simple Injector’s documentation!"
              accesskey="P">previous</a> |</li>
@@ -50,7 +54,7 @@
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>The goal of <em>Simple Injector</em> is to provide .NET application developers with an easy, flexible, and fast <a class="reference external" href="http://martinfowler.com/articles/injection.html">Inversion of Control library</a>, that uses best practices to steer developers towards the pit of success.</p>
-<p>Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack the features to be used in large developement projects. <em>Simple Injector</em> fills this gap by supplying a simple implementation with carefully chosen features in the core library. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any [advanced scenario|Advanced-scenarios].</p>
+<p>Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack the features to be used in large developement projects. <em>Simple Injector</em> fills this gap by supplying a simple implementation with carefully chosen features in the core library. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any <tt class="xref doc docutils literal"><span class="pre">advanced</span> <span class="pre">scenario</span></tt>.</p>
 <p>The following platforms are supported:</p>
 <ul class="simple">
 <li><em>.NET 4.0</em> and up.</li>
@@ -74,8 +78,8 @@
 # Unpack the downloaded .zip file;
 # Add the <strong>SimpleInjector.dll</strong> to your start-up project by right-clicking on a project in the Visual Studio solution explorer and selecting &#8216;Add Reference...&#8217;.
 # Add the <strong>using SimpleInjector;</strong> directive on the top of the code file where you wish to configure the application.
-# Look at the [Usage|Using the Simple Injector] section in the documentation on how to configure and use the <em>Simple Injector</em>.
-# Look at the [More information|#More**information] section if you want to learn more or have any questions.</p>
+# Look at the <a class="reference internal" href="using.html"><em>Usage</em></a> section in the documentation on how to configure and use the <em>Simple Injector</em>.
+# Look at the [More information|#More_information] section if you want to learn more or have any questions.</p>
 </div>
 <div class="section" id="a-quick-example">
 <h2>A Quick Example<a class="headerlink" href="#a-quick-example" title="Permalink to this headline">¶</a></h2>
@@ -132,13 +136,13 @@
 <strong>Note</strong>: We did not register the <strong>UserController</strong>, because the <strong>UserController</strong> is a concrete type, <em>Simple Injector</em> can implicitly create it (as long as its dependencies can be resolved).</div>
 <p>This is in fact all it takes to start using the <em>Simple Injector</em>. Design your classes around the dependency injection principle (which is actually the hard part) and configure them in the top of your application. Some frameworks (such as ASP.NET MVC) will do the rest for you. Other frameworks (like ASP.NET Web Forms) will need a little bit more work to get this done. See the [Integration Guide] for examples of your framework of choice.</p>
 <div class="note container">
-Please go to the [Using the Simple Injector] section in the documentation to see more examples.</div>
+Please go to the <a class="reference internal" href="using.html"><em>Using the Simple Injector</em></a> section in the documentation to see more examples.</div>
 </div>
 <div class="section" id="more-information">
 <h2>More information<a class="headerlink" href="#more-information" title="Permalink to this headline">¶</a></h2>
 <p>For more information about <em>Simple Injector</em> please visit the following links:</p>
 <ul class="simple">
-<li>[Using the Simple Injector] will guide you through the <em>Simple Injector</em> basics.</li>
+<li><a class="reference internal" href="using.html"><em>Using the Simple Injector</em></a> will guide you through the <em>Simple Injector</em> basics.</li>
 <li>The [Simple Injector and object lifetime management|ObjectLifestyleManagement] page explains how to configure lifestyles such as <strong>transient</strong>, <strong>singleton</strong>, and many others.</li>
 <li>See the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">Reference library</a> for the complete API documentation.</li>
 <li>See the [Integration Guide] for more information about how to integrate <em>Simple Injector</em> into your specific application framework.</li>
@@ -146,7 +150,7 @@ Please go to the [Using the Simple Injector] section in the documentation to see
 <li>If you have any questions about how to use <em>Simple Injector</em> or about <strong>dependency injection</strong> in general, the experts at <a class="reference external" href="http://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23&amp;title=Simple%20Injector">Stackoverflow.com</a> are waiting for you.</li>
 <li>For all other <em>Simple Injector</em> related question and discussions, such as bug reports and feature requests, the <a class="reference external" href="https://simpleinjector.codeplex.com/discussions">Simple Injector discussion forum</a> will be the place to start.</li>
 </ul>
-<p>Happy injecting!</p>
+<p><strong>Happy injecting!</strong></p>
 </div>
 </div>
 
@@ -171,6 +175,9 @@ Please go to the [Using the Simple Injector] section in the documentation to see
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to Simple Injector&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="using.html"
+                        title="next chapter">Using Simple Injector</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/quickstart.txt"
@@ -199,6 +206,9 @@ Please go to the [Using the Simple Injector] section in the documentation to see
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="using.html" title="Using Simple Injector"
+             >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to Simple Injector’s documentation!"
              >previous</a> |</li>

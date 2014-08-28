@@ -108,7 +108,7 @@ As an example, imagine the scenario where you have a **CustomerValidator** type 
         (serviceType, implTypes) => container.RegisterAll(serviceType, implTypes),
         typeof(IValidator<>).Assembly);
 
-The code snippet registers all types from the given assembly that implement **IValidator<T>**. As we now have multiple implementations the container cannot inject a single instance of **IValidator<T>** and we can no longer call **container.GetInstance<IValidator<T>>()**. Instead instances can be retrieved by having an **IEnumerable<IValidator<T>>** constructor argument or by calling **container.GetAllInstances<IValidator<T>>()**.
+The code snippet registers all types from the given assembly that implement **IValidator<T>**. As we now have multiple implementations the container cannot inject a single instance of **IValidator<T>** and we can no longer call *container.GetInstance<IValidator<T>>()*. Instead instances can be retrieved by having an **IEnumerable<IValidator<T>>** constructor argument or by calling *container.GetAllInstances<IValidator<T>>()*.
 
 It is not generally regarded as best practice to have an **IEnumerable<IValidator<T>>** dependency in multiple class constructors (or accessed from the  container directly). Depending on a set of types complicates your application design and can often be simplified with an alternate configuration. A better way is to have a single composite type that wraps **IEnumerable<IValidator<T>>** and presents it to the consumer as a single instance, in this case a **CompositeValidator<T>**:
 
@@ -254,7 +254,7 @@ The type **SomeValidator<List<T>>** is called **partially-closed**, since althou
 Unregistered type resolution
 ============================
 
-Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the change of registering that type. *Simple Injector* supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the [registration of open generic types|Advanced-scenarios#Registration_Of_Open_Generic_Types]. Other examples of possible scenarios that can be built on top of this event are [resolving array and lists|How-to#Resolve-Arrays-And-Lists] and [covariance and contravariance|Advanced-scenarios#Covariance-Contravariance]. Those scenarios are described here in the advanced scenarios page.
+Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the change of registering that type. *Simple Injector* supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the :ref:`registration of open generic types <Registration_Of_Open_Generic_Types>`. Other examples of possible scenarios that can be built on top of this event are :ref:`resolving array and lists <Resolve-Arrays-And-Lists>` and :ref:`covariance and contravariance <Covariance-Contravariance>`. Those scenarios are described here in the advanced scenarios page.
 
 For more information about how to use this event, please take a look at the `ResolveUnregisteredType event documentation <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ in the `reference library <https://simpleinjector.org/ReferenceLibrary/>`_.
 
@@ -321,8 +321,8 @@ Decorators
 
 The `SOLID <https://en.wikipedia.org/wiki/SOLID>`_ principles give us important guidance when it comes to writing maintainable software. The 'O' of the 'SOLID' acronym stands for the `Open/closed Principle <https://en.wikipedia.org/wiki/Open/closed_principle>`_ which states that classes should be open for extension, but closed for modification. Designing systems around the Open/closed principle means that new behavior can be plugged into the system, without the need to change any existing parts, making the change of breaking existing code much smaller.
 
-One of the ways to add new functionality (such as [cross-cutting concerns|https://en.wikipedia.org/wiki/Cross-cutting_concern]) to classes is by the use of the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the [Registration of open generic types|Advanced-scenarios#Registration_Of_Open_Generic_Types] section of this page or for instance the use of an generic **ICommandHandler<TCommand>** interface.
 
+One of the ways to add new functionality (such as `cross-cutting concerns <https://en.wikipedia.org/wiki/Cross-cutting_concern>`_) to classes is by the use of the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the :ref:`Registration of open generic types <Registration_Of_Open_Generic_Types>` section of this page or for instance the use of an generic **ICommandHandler<TCommand>** interface.
 .. container:: Note
 
     **Tip**: `This article <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91>`_ describes an architecture based on the use of the **ICommandHandler<TCommand>** interface.
@@ -621,7 +621,7 @@ The current example doesn't add much compared to simply using a decorator. When 
 
 .. container:: Note
 
-    **Note**: Don't use interception for intercepting types that all implement the same generic interface, such as **ICommandHandler<T>** or **IValidator<T>**. Try using decorator classes instead, as shown in the [Decorators|Advanced-scenarios#Decorators] section on this page.
+    **Note**: Don't use interception for intercepting types that all implement the same generic interface, such as **ICommandHandler<T>** or **IValidator<T>**. Try using decorator classes instead, as shown in the :ref:`Decorators <Decorators>` section on this page.
 
 .. _Implicit_Property_Injection:
 .. _Implicit-Property-Injection:
@@ -643,7 +643,7 @@ Because *Simple Injector* does not encourage its users to take a dependency on t
 Besides this, the use of property injection should be very exceptional and in general constructor injection should be used in the majority of cases. If a constructor gets too many parameters (constructor over-injection anti-pattern), it is an indication of a violation of the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). SRP violations often lead to maintainability issues. So instead of patching constructor over-injection with property injection, the root cause should be analyzed and the type should be refactored, probably with `Facade Services <http://blog.ploeh.dk/2010/02/02/RefactoringtoAggregateServices/>`_. Another common reason to use properties is because those dependencies are optional. Instead of using optional property dependencies, best practice is to inject empty implementations (a.k.a. `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) into the constructor.
 
 *Enabling property injection*
-*Simple Injector* contains two ways to enable property injection. First of all the [RegisterInitializer<T>|Using the Simple Injector#Configuring_Property_Injection] method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:
+*Simple Injector* contains two ways to enable property injection. First of all the :ref:`RegisterInitializer\<T\> <Configuring_Property_Injection>` method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:
 
 .. code-block:: c#
 
