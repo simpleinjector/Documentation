@@ -34,12 +34,12 @@ Getting started
 
 The easiest way to get started is by using  `the available NuGet packages <https://nuget.org/packages?q=simpleinjector&sortOrder=package-download-count>`_. If you're not a NuGet fan, follow the steps below, to start using *Simple Injector*:
 
-# Go to the `Downloads <https://simpleinjector.codeplex.com/releases/>`_ tab and download the latest **runtime library**;
-# Unpack the downloaded .zip file;
-# Add the **SimpleInjector.dll** to your start-up project by right-clicking on a project in the Visual Studio solution explorer and selecting 'Add Reference...'.
-# Add the **using SimpleInjector;** directive on the top of the code file where you wish to configure the application.
-# Look at the :doc:`Usage <using>` section in the documentation on how to configure and use the *Simple Injector*.
-# Look at the [More information|#More_information] section if you want to learn more or have any questions.
+#. Go to the `Downloads <https://simpleinjector.codeplex.com/releases/>`_ tab and download the latest **runtime library**;
+#. Unpack the downloaded .zip file;
+#. Add the **SimpleInjector.dll** to your start-up project by right-clicking on a project in the Visual Studio solution explorer and selecting 'Add Reference...'.
+#. Add the **using SimpleInjector;** directive on the top of the code file where you wish to configure the application.
+#. Look at the :doc:`Usage <using>` section in the documentation on how to configure and use the *Simple Injector*.
+#. Look at the [More information|#More_information] section if you want to learn more or have any questions.
 
 A Quick Example
 ===============
