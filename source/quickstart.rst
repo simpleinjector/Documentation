@@ -7,7 +7,7 @@ Overview
 
 The goal of *Simple Injector* is to provide .NET application developers with an easy, flexible, and fast `Inversion of Control library <http://martinfowler.com/articles/injection.html>`_, that uses best practices to steer developers towards the pit of success.
 
-Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack the features to be used in large developement projects. *Simple Injector* fills this gap by supplying a simple implementation with carefully chosen features in the core library. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any :doc:`advanced scenario <Advanced-scenarios>`.
+Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack the features to be used in large developement projects. *Simple Injector* fills this gap by supplying a simple implementation with carefully chosen features in the core library. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any :doc:`advanced scenario <advanced>`.
 
 The following platforms are supported:
 

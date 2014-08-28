@@ -46,11 +46,11 @@ Ideally, the only place in an application that should directly reference and use
 
 The usage of Simple Injector consists of four or five steps:
 
-# Create a new container
-# Configure the container (register)
-# Optionally verify the container
-# Store the container for use by the application
-# Retrieve instances from the container (resolve)
+#. Create a new container
+#. Configure the container (register)
+#. Optionally verify the container
+#. Store the container for use by the application
+#. Retrieve instances from the container (resolve)
 
 The first four steps are done once during application startup. The last step is usually performed more than once (usually once per request) for most types of applications. While the first three steps are platform agnostic, performing the last two steps depends on your own taste and which presentation framework you use, but below is an example for the configuration of a ASP.NET MVC application:
 

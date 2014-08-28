@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
-    <link rel="next" title="Advanced scenarios" href="advanced.html" />
+    <link rel="next" title="Advanced Scenarios" href="advanced.html" />
     <link rel="prev" title="Quick Start" href="quickstart.html" /> 
   </head>
   <body>
@@ -35,7 +35,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="advanced.html" title="Advanced scenarios"
+          <a href="advanced.html" title="Advanced Scenarios"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="quickstart.html" title="Quick Start"
@@ -73,11 +73,13 @@
 <div class="note container">
 <strong>Tip</strong>: For more information about usage of Simple Injector for a specific technology, please see the [Integration Guide].</div>
 <p>The usage of Simple Injector consists of four or five steps:</p>
-<p># Create a new container
-# Configure the container (register)
-# Optionally verify the container
-# Store the container for use by the application
-# Retrieve instances from the container (resolve)</p>
+<ol class="arabic simple">
+<li>Create a new container</li>
+<li>Configure the container (register)</li>
+<li>Optionally verify the container</li>
+<li>Store the container for use by the application</li>
+<li>Retrieve instances from the container (resolve)</li>
+</ol>
 <p>The first four steps are done once during application startup. The last step is usually performed more than once (usually once per request) for most types of applications. While the first three steps are platform agnostic, performing the last two steps depends on your own taste and which presentation framework you use, but below is an example for the configuration of a ASP.NET MVC application:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System.Web.Mvc</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
@@ -399,7 +401,7 @@
                         title="previous chapter">Quick Start</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="advanced.html"
-                        title="next chapter">Advanced scenarios</a></p>
+                        title="next chapter">Advanced Scenarios</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/using.txt"
@@ -429,7 +431,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="advanced.html" title="Advanced scenarios"
+          <a href="advanced.html" title="Advanced Scenarios"
              >next</a> |</li>
         <li class="right" >
           <a href="quickstart.html" title="Quick Start"
