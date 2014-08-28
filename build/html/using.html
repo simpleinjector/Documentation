@@ -54,9 +54,7 @@
 <p>This section will walk you through the basics of Simple Injector. After reading this section, you will have a good idea how to use Simple Injector.</p>
 <div class="note container">
 <strong>Note</strong>: this documentation is specific for <em>Simple Injector version 2.0</em> and up. Look <a class="reference external" href="https://simpleinjector.codeplex.com/wikipage?title=UsingtheSimpleInjector&amp;version=19">here</a> for 1.x specific documentation.</div>
-<div class="section" id="id2">
-<span id="id1"></span><span id="id3"></span><h2>Using Simple Injector<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<p>A good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library if ever required. Minimizing can be achieved by designing the types in your application around the constructor injection pattern: Define all dependencies of a class in the single public constructor of that type; do this for all service types that need to be resolved and resolve only the top most types in the application directly (let the container build up the complete graph of dependent objects for you).</p>
+<p id="id2"><span id="id1"></span>Good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library if ever required. Minimizing can be achieved by designing the types in your application around the constructor injection pattern: Define all dependencies of a class in the single public constructor of that type; do this for all service types that need to be resolved and resolve only the top most types in the application directly (let the container build up the complete graph of dependent objects for you).</p>
 <p id="the-container">Simple Injector&#8217;s main type is the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm">Container</a> class. An instance of <strong>Container</strong> is used to register mappings between an abstraction (service) and implementation (component). Your application code should depend on abstractions, and it is the role of the <strong>Container</strong> to supply the application with the right implementation. The easiest way to look at a <strong>Container</strong> is as a big dictionary where the type of the abstraction is used as key, and its value is the definition of how to create the implementation. When the application requests for a service, it is looked up in the dictionary, and the correct implementation is returned.</p>
 <div class="note container">
 <strong>Tip</strong>: You should typically create a single Container instance for the whole application (one instance per app domain); Container instances are thread-safe</div>
@@ -129,9 +127,8 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id4">
-<span id="resolving-instances"></span><span id="id5"></span><h2>Resolving instances<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<span id="resolving-instances"></span><span id="id4"></span><h2>Resolving instances<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>Simple Injector allows two scenarios by which you can retrieve instances:</p>
 <p><strong>Getting an object by a specified type</strong></p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">repository</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">&gt;();</span>
@@ -149,7 +146,7 @@
 </div>
 </div>
 <div class="section" id="configuring-simple-injector">
-<span id="id6"></span><span id="usage-configuring-simple-injector"></span><h2>Configuring Simple Injector<a class="headerlink" href="#configuring-simple-injector" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><span id="usage-configuring-simple-injector"></span><h2>Configuring Simple Injector<a class="headerlink" href="#configuring-simple-injector" title="Permalink to this headline">¶</a></h2>
 <p>The <em>Container</em> class consists of several methods that enable registering instances to be retrieved when requested from the application. These methods enable most common scenarios. Here are the most common scenarios with a code example per scenario:</p>
 <p><strong>Configuring an automatically constructed single instance to be always returned:</strong></p>
 <p>The following example configures that a single instance of type <strong>RealUserService</strong> will always be returned when an instance of <strong>IUserService</strong> is requested. The <strong>RealUserService</strong> will be constructed using <a class="reference internal" href="#automatic-constructor-injection"><em>automatic constructor injection</em></a>.</p>
@@ -221,7 +218,7 @@
 <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;&gt;();</span>
 </pre></div>
 </div>
-<p id="id7"><span id="configuring-property-injection"></span><strong>Configuring property injection on an instance:</strong></p>
+<p id="id6"><span id="configuring-property-injection"></span><strong>Configuring property injection on an instance:</strong></p>
 <p>For types that need to be injected, define a single public constructor that holds all dependencies whenever possible. In scenarios where constructor injection is not possible, property injection is your second best pick. The previous example already showed an example of this. The preferred way of doing this however, is by using the <em>RegisterInitializer</em> method:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;&gt;,</span> <span class="n">MoveCustomerHandler</span><span class="p">&gt;();</span>
@@ -333,12 +330,12 @@
 <p>When using the approach given above, your services don’t need a dependency on <strong>IEnumerable&lt;ILogger&gt;</strong>, but can simply have a dependency on the <strong>ILogger</strong> interface itself.</p>
 </div>
 <div class="section" id="verifying-the-container-s-configuration">
-<span id="id8"></span><span id="verifying-container"></span><h2>Verifying the container&#8217;s configuration<a class="headerlink" href="#verifying-the-container-s-configuration" title="Permalink to this headline">¶</a></h2>
+<span id="id7"></span><span id="verifying-container"></span><h2>Verifying the container&#8217;s configuration<a class="headerlink" href="#verifying-the-container-s-configuration" title="Permalink to this headline">¶</a></h2>
 <p>Optionally, you can call the <em>Verify</em> method of the <em>Container</em>. This method allows a fail-fast mechanism to prevent the application to start when the container is misconfigured. The <em>Verify</em> method checks the container&#8217;s configuration by creating an instance of all registered types.</p>
 <p>For more information about creating an application and container configuration that can be succesfully verified, please read the [How To Verify the container’s configuration|How-to#Verifying_Configuration].</p>
 </div>
 <div class="section" id="automatic-constructor-injection-auto-wiring">
-<span id="id9"></span><span id="automatic-constructor-injection"></span><h2>Automatic constructor injection / auto-wiring<a class="headerlink" href="#automatic-constructor-injection-auto-wiring" title="Permalink to this headline">¶</a></h2>
+<span id="id8"></span><span id="automatic-constructor-injection"></span><h2>Automatic constructor injection / auto-wiring<a class="headerlink" href="#automatic-constructor-injection-auto-wiring" title="Permalink to this headline">¶</a></h2>
 <p>Simple Injector uses the public constructor of a registered type and looks at the arguments of that constructor. The container will resolve instances for the argument types and invokes the constructor using those instances. This mechanism is called automatic constructor injection or auto-wiring and this is one of the core differences that separates DI containers from doing injection manually. For Simple Injector to be able to use auto-wiring, the following requirements must be met:</p>
 <p># The type is concrete (not abstract, no interface, no generic type definition).
 # The type has exactly one public constructor (this may be a default constructor).
@@ -364,10 +361,10 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: Because UserService is a concrete type, calling <em>container.GetInstance&lt;UserService&gt;()</em> without registering it explicitly will work as well. This can simplify the container’s configuration significantly for more complex scenarios. However, keep in mind that the best practice is to program to an interface, not a concrete type. Prevent using and depending on concrete types whenever possible.</div>
+<strong>Note</strong>: Because <strong>UserService</strong> is a concrete type, calling <em>container.GetInstance&lt;UserService&gt;()</em> without registering it explicitly will work as well. This can simplify the container’s configuration significantly for more complex scenarios. However, keep in mind that the best practice is to program to an interface, not a concrete type. Prevent using and depending on concrete types whenever possible.</div>
 </div>
-<div class="section" id="id10">
-<span id="more-information"></span><span id="id11"></span><h2>More information<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id9">
+<span id="more-information"></span><span id="id10"></span><h2>More information<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>For more information about Simple Injector please visit the following links:</p>
 <ul class="simple">
 <li>The [Simple Injector and object lifetime management|ObjectLifestyleManagement] page explains how to configure lifestyles such as <strong>transient</strong>, <strong>singleton</strong>, and many others.</li>
@@ -388,12 +385,11 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Using Simple Injector</a><ul>
-<li><a class="reference internal" href="#id2">Using Simple Injector</a></li>
-<li><a class="reference internal" href="#id4">Resolving instances</a></li>
+<li><a class="reference internal" href="#id3">Resolving instances</a></li>
 <li><a class="reference internal" href="#configuring-simple-injector">Configuring Simple Injector</a></li>
 <li><a class="reference internal" href="#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
 <li><a class="reference internal" href="#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
-<li><a class="reference internal" href="#id10">More information</a></li>
+<li><a class="reference internal" href="#id9">More information</a></li>
 </ul>
 </li>
 </ul>

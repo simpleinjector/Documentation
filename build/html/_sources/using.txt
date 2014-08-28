@@ -11,10 +11,7 @@ This section will walk you through the basics of Simple Injector. After reading 
 .. _Using_Simple_Injector:
 .. _Using-Simple-Injector:
 
-Using Simple Injector
-=====================
-
-A good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library if ever required. Minimizing can be achieved by designing the types in your application around the constructor injection pattern: Define all dependencies of a class in the single public constructor of that type; do this for all service types that need to be resolved and resolve only the top most types in the application directly (let the container build up the complete graph of dependent objects for you).
+Good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library if ever required. Minimizing can be achieved by designing the types in your application around the constructor injection pattern: Define all dependencies of a class in the single public constructor of that type; do this for all service types that need to be resolved and resolve only the top most types in the application directly (let the container build up the complete graph of dependent objects for you).
 
 .. _The-Container:
 
@@ -418,7 +415,7 @@ The following code shows an example of the use of automatic constructor injectio
 
 .. container:: Note
 
-    **Note**: Because UserService is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work as well. This can simplify the container’s configuration significantly for more complex scenarios. However, keep in mind that the best practice is to program to an interface, not a concrete type. Prevent using and depending on concrete types whenever possible.
+    **Note**: Because **UserService** is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work as well. This can simplify the container’s configuration significantly for more complex scenarios. However, keep in mind that the best practice is to program to an interface, not a concrete type. Prevent using and depending on concrete types whenever possible.
 
 .. _More_information:
 .. _More-Information:
