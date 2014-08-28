@@ -1,5 +1,5 @@
 ==================
-Advanced scenarios
+Advanced Scenarios
 ==================
 
 Although its name may not imply it, *Simple Injector* is capable of handling many advanced scenarios. Either through writing custom code, copying  code from this wiki, or via the extension points that can be found in the *SimpleInjector.Extensions* namespace of the core library.
