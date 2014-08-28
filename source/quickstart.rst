@@ -112,7 +112,7 @@ This is in fact all it takes to start using the *Simple Injector*. Design your c
 
 .. container:: Note
 
-    Please go to the :doc:`Using the Simple Injector <using>` section in the documentation to see more examples.
+    Please go to the :doc:`Using Simple Injector <using>` section in the documentation to see more examples.
 
 More information
 ================
