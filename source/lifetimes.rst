@@ -233,7 +233,9 @@ SynchronizationContext <https://vegetarianprogrammer.blogspot.de/2012/12/underst
 .. _PerWcfOperation:
 .. _WcfOperation:
 
-!! Per WCF Operation
+Per WCF Operation
+=================
+
 Only one instance will be created by the container per call to a WCF operation and the instance will be disposed when the operation ends (unless specified otherwise).
 
 The `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ is available (and available as **SimpleInjector.Integration.Wcf.dll** in the default download here on CodePlex) contains *RegisterPerWcfOperation* extension methods and a *WcfOperationLifestyle* class that enable easy *Per WCF Operation* registrations:
