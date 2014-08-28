@@ -15,6 +15,7 @@ Contents:
 
    quickstart
    using
+   lifetimes
    advanced
 
 
