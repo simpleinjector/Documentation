@@ -1,6 +1,6 @@
-=================================
-Simple Injector Design Principles
-=================================
+=================
+Design Principles
+=================
 
 While designing Simple Injector we defined a set of rules that formed the foundation for development. These rules still keep us focused today and continue to help us decide how to implement a feature and which features **not** to implement. In the section below you'll find details of the design principles of Simple Injector. Below that you'll find details of some of the :ref:`design decisions <Design-Decisions>` we made based on these principles.
 
@@ -75,9 +75,9 @@ If you encounter a scenario where we fail to do this, please let us know. We are
 
 .. _Design-Decisions:
 
-===============================================
-Design Decisions Based On The Design Principles
-===============================================
+================
+Design Decisions
+================
 
 Our design principles have influenced the direction of the development of features in Simple Injector. In this section we would like to explain some of the design decisions.
 

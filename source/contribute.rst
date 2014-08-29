@@ -1,6 +1,6 @@
-======================
-How to Contribute Code
-======================
+=================
+How to Contribute
+=================
 
 For any contributions to be accepted you first need to print, sign, scan and email a copy of the `file:CLA <Simple Injector Contributor License Agreement.pdf>`_ to `mailto:cla@simpleinjector.org <mailto:cla@simpleinjector.org>`_
 

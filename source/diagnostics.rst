@@ -1,6 +1,6 @@
-===========================================================
-Diagnosing your configuration using the Diagnostic Services
-===========================================================
+===================
+Diagnostic Services
+===================
 
 The *Diagnostic Services* allow you to analyze the container's configuration to search for common configuration mistakes.
 
