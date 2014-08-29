@@ -1,6 +1,6 @@
-=========
-How To...
-=========
+======
+How To
+======
 
 * How to :ref:`Register factory delegates <Register-Factory-Delegates>`
 * How to :ref:`Resolve instances by key <Resolve-Instances-By-Key>`

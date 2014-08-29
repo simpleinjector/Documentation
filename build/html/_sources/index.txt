@@ -23,6 +23,7 @@ Contents:
    extensibility
    pipeline
    principles
+   decisions
    legal
    contribute
 
