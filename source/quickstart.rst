@@ -27,7 +27,7 @@ Simple Injector 2.0 adds the ability to warn about common misconfigurations whil
 .. image:: images/diagnosticsdebuggerview.png 
    :alt: Diagnostics debugger view context menu
 
-See the [Debug Diagnostic Services|Diagnostics] page for more information.
+See the :doc:`Debug Diagnostic Services <diagnostics>` page for more information.
 
 Getting started
 ===============

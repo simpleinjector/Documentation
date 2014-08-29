@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>WCF Integration Guide &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Integration Guide" href="integration.html" />
+    <link rel="next" title="Windows Presentation Foundation Integration Guide" href="wpfintegration.html" />
+    <link rel="prev" title="Windows Forms Integration Guide" href="windowsformsintegration.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="wpfintegration.html" title="Windows Presentation Foundation Integration Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="windowsformsintegration.html" title="Windows Forms Integration Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" accesskey="U">Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="wcf-integration-guide">
+<h1>WCF Integration Guide<a class="headerlink" href="#wcf-integration-guide" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">Simple Injector WCF Integration NuGet Package</a> allows WCF services to be resolved by the container, which enables constructor injection.</p>
+<p>After installing this NuGet package, it must be initialized in the start-up path of the application by calling the <em>SimpleInjectorServiceHostFactory.SetContainer</em> method:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Create the container as usual.</span>
+    <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+    <span class="c1">// Register your types, for instance:</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">EfUnitOfWork</span><span class="p">&gt;();</span>
+
+    <span class="c1">// Register the container to the SimpleInjectorServiceHostFactory.</span>
+    <span class="n">SimpleInjectorServiceHostFactory</span><span class="p">.</span><span class="n">SetContainer</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Warning</strong>: Instead of what the name of the names of the <em>WcfOperationLifestyle</em> class and the <em>RegisterPerWcfOperation</em> methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how  the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx">InstanceContextMode enumeration</a>. Components that are registers <em>PerWcfOperation</em> live as long as the WCF service class they are injected into.</div>
+<p>For each service class, you should supply a factory attribute in the .SVC file of each service class. For instance:</p>
+<div class="highlight-xml"><div class="highlight"><pre>&lt;%@ ServiceHost
+    Service=&quot;UserService&quot;
+    CodeBehind=&quot;UserService.svc.cs&quot;
+    Factory=&quot;SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory, SimpleInjector.Integration.Wcf&quot;
+%&gt;
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: Instead of having a WCF service layer consisting of many service classes and methods, consider a design that consists of just a single service class with a single method as explained in <a class="reference external" href="http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=95">this article</a>. A design where operations are communicated through messages allows the creation of highly maintainable WCF services. With such a design, this integration package will be ​​redundant.</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="windowsformsintegration.html"
+                        title="previous chapter">Windows Forms Integration Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="wpfintegration.html"
+                        title="next chapter">Windows Presentation Foundation Integration Guide</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/wcfintegration.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="wpfintegration.html" title="Windows Presentation Foundation Integration Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="windowsformsintegration.html" title="Windows Forms Integration Guide"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" >Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

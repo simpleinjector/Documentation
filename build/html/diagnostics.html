@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Diagnosing your configuration using the Diagnostic Services &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="next" title="Diagnostic Warning - Potential Lifestyle Mismatches" href="PotentialLifestyleMismatches.html" />
+    <link rel="prev" title="Object Lifetime Management" href="lifetimes.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="PotentialLifestyleMismatches.html" title="Diagnostic Warning - Potential Lifestyle Mismatches"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="lifetimes.html" title="Object Lifetime Management"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="diagnosing-your-configuration-using-the-diagnostic-services">
+<h1>Diagnosing your configuration using the Diagnostic Services<a class="headerlink" href="#diagnosing-your-configuration-using-the-diagnostic-services" title="Permalink to this headline">¶</a></h1>
+<p>The <em>Diagnostic Services</em> allow you to analyze the container&#8217;s configuration to search for common configuration mistakes.</p>
+<div class="section" id="how-to-view-diagnostic-results">
+<h2>How to view diagnostic results<a class="headerlink" href="#how-to-view-diagnostic-results" title="Permalink to this headline">¶</a></h2>
+<p>There are two ways to view the diagnostic results. Diagnostic results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.</p>
+<p>Diagnostic results are available during debugging in Visual Studio after calling <em>Container.Verify()</em>. You simply set a breakpoint after the line that calls  <strong>Verify()</strong> and when the breakpoint hits, you hover over the <strong>Container</strong> instance with the mouse. After the debugger context menu appears for the container variable you can unfold it and see the diagnostic results. This might look like this:</p>
+<img alt="Diagnostics debugger view context menu" src="_images/diagnosticsdebuggerview.png" />
+<p>Another option is to add the <strong>container</strong> variable to the Visual Studio watch window by right clicking on the variable and selecting &#8216;Add Watch&#8217; in the context menu:</p>
+<img alt="Diagnostics debugger view watch window" src="_images/diagnostics2.png" />
+<p>These same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the <em>SimpleInjector.Diagnostics.dll</em>. This dll is part of the core NuGet package. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="na">[TestMethod]</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">Container_Always_ContainsNoDiagnosticWarnings</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Arrange</span>
+    <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="n">Bootstrapper</span><span class="p">.</span><span class="n">GetInitializedContainer</span><span class="p">();</span>
+
+    <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+    <span class="c1">// Assert</span>
+    <span class="kt">var</span> <span class="n">results</span> <span class="p">=</span> <span class="n">Analyzer</span><span class="p">.</span><span class="n">Analyze</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+
+    <span class="n">Assert</span><span class="p">.</span><span class="n">IsFalse</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">Any</span><span class="p">(),</span> <span class="n">Environment</span><span class="p">.</span><span class="n">NewLine</span> <span class="p">+</span>
+        <span class="kt">string</span><span class="p">.</span><span class="n">Join</span><span class="p">(</span><span class="n">Environment</span><span class="p">.</span><span class="n">NewLine</span><span class="p">,</span>
+            <span class="k">from</span> <span class="n">result</span> <span class="k">in</span> <span class="n">results</span>
+            <span class="k">select</span> <span class="n">result</span><span class="p">.</span><span class="n">Description</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: The Diagnostic API is new in <em>Simple Injector v2.4</em>.</div>
+</div>
+<div class="section" id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
+<div class="note container">
+<strong>Warning</strong>: Although the container can spot several configuration mistakes, be aware that there will always be ways to make configuration errors that the Diagnostic Services won&#8217;t spot. Wiring your dependencies is a delicate matter and should be done with care. Always follow best practices.</div>
+<p>The <em>Diagnostic Services</em> work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as analyzing constructor arguments) can be analyzed. The container is able to use the following information for analysis:</p>
+<ul class="simple">
+<li>Constructor arguments of types that are created by the container (auto-wired types).</li>
+<li>Dependencies added by [registered decorators|Advanced-scenarios#Decorators].</li>
+<li>Dependencies that are not registered explicitly but are referenced as constructor argument (this included types that got created through unregistered type resolution).</li>
+</ul>
+<p>The analyzer however <strong>won&#8217;t</strong> be able to analyze the following:</p>
+<ul class="simple">
+<li>Types that are completely unknown to the container, because they are not registered explicitly and no registered type depends on them. In general you should register all root types (types that are requested directly by calling <em>GetInstance&lt;T&gt;()</em>, such as MVC Controllers) explicitly.</li>
+<li>Dependencies added using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> method:</li>
+</ul>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(</span><span class="n">service</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="c1">// These dependencies will be unknown during diagnosis</span>
+    <span class="n">service</span><span class="p">.</span><span class="n">Dependency</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Dependency</span><span class="p">();</span>
+    <span class="n">service</span><span class="p">.</span><span class="n">TimeProvider</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">ITimeProvider</span><span class="p">&gt;()</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Types that are created manually by registering a <strong>Func&lt;T&gt;</strong> delegate using one of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_Register__1_2.htm">Register&lt;TService&gt;(Func&lt;TService&gt;)</a> overloads, for instance:</li>
+</ul>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">MyService</span><span class="p">(</span>
+    <span class="c1">// These dependencies will be unknown during diagnosis</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(),</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">ITimeProvider</span><span class="p">&gt;()));</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Dependencies that got injected using the (legacy) <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_InjectProperties.htm">InjectProperties</a> method will not be spotted as dependencies of the type they are injected into.</li>
+<li>Dependencies that are resolved by requesting them manually from the container, for instance by injecting the <strong>Container</strong> into a constructor and calling <em>container.GetInstance&lt;T&gt;()</em> from within the container:</li>
+</ul>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span> <span class="p">:</span> <span class="n">IService</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="n">ITimeProvider</span> <span class="n">provider</span><span class="p">;</span>
+
+    <span class="c1">// Type depends on the container (don&#39;t do this)</span>
+    <span class="k">public</span> <span class="nf">MyService</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// This dependency will be unknown during diagnosis</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">provider</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">ITimeProvider</span><span class="p">&gt;();</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Tip</strong>: Try to prevent depending on framework features in the list above, because they prevent you getting a [verifiable configuration|How-to#Verifying_Configuration] and prevent you from getting trustworthy diagnostic results.</div>
+</div>
+<div class="section" id="supported-warnings">
+<h2>Supported Warnings<a class="headerlink" href="#supported-warnings" title="Permalink to this headline">¶</a></h2>
+<p>The <em>Diagnostic Services</em> currently supports the following types of warnings:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="PotentialLifestyleMismatches.html">Potential Lifestyle Mismatches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ShortCircuitedDependencies.html">Short Circuited Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PotentialSingleResponsibilityViolations.html">Potential Single Responsibility Violations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="UnregisteredTypes.html">Unregistered Types</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Diagnosing your configuration using the Diagnostic Services</a><ul>
+<li><a class="reference internal" href="#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#supported-warnings">Supported Warnings</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="lifetimes.html"
+                        title="previous chapter">Object Lifetime Management</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="PotentialLifestyleMismatches.html"
+                        title="next chapter">Diagnostic Warning - Potential Lifestyle Mismatches</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/diagnostics.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="PotentialLifestyleMismatches.html" title="Diagnostic Warning - Potential Lifestyle Mismatches"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="lifetimes.html" title="Object Lifetime Management"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

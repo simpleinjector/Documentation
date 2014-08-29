@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ASP.NET Web Forms Integration Guide &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Integration Guide" href="integration.html" />
+    <link rel="next" title="Windows Forms Integration Guide" href="windowsformsintegration.html" />
+    <link rel="prev" title="ASP.NET Web API Integration Guide" href="webapiintegration.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="windowsformsintegration.html" title="Windows Forms Integration Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="webapiintegration.html" title="ASP.NET Web API Integration Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" accesskey="U">Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="asp-net-web-forms-integration-guide">
+<h1>ASP.NET Web Forms Integration Guide<a class="headerlink" href="#asp-net-web-forms-integration-guide" title="Permalink to this headline">¶</a></h1>
+<p>ASP.NET Web Forms was never designed with dependency injection in mind. Although using constructor injection in our <strong>Page</strong> classes, user controls and http handlers would be preferable, it is unfortunately not possible, because ASP.NET expects those types to have a default constructor.</p>
+<div class="note container">
+<strong>Note</strong>: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=81">This blog post</a> shows how to do constructor injection in pages and user controls, but please keep in mind that this will fail when trying to run the application in partial trust. Besides, it still doesn&#8217;t work for <strong>IHttpHandlers</strong>.</div>
+<p>Instead of doing constructor injection, there are alternatives. The simplest thing to do is to fall back to property injection and initialize the page in the constructor.</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.ComponentModel.Composition</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Reflection</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Web</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Web.Compilation</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Web.UI</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Advanced</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="nc">BasePage</span> <span class="p">:</span> <span class="n">Page</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nf">BasePage</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">Global</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Global</span> <span class="p">:</span> <span class="n">HttpApplication</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Initialize</span><span class="p">(</span><span class="n">Page</span> <span class="n">page</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="n">page</span><span class="p">.</span><span class="n">GetType</span><span class="p">().</span><span class="n">BaseType</span><span class="p">,</span> <span class="k">true</span><span class="p">).</span><span class="n">Registration</span>
+            <span class="p">.</span><span class="n">InitializeInstance</span><span class="p">(</span><span class="n">page</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Bootstrap</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Bootstrap</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// 1. Create a new Simple Injector container.</span>
+        <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+        <span class="c1">// Registere a custom PropertySelectionBehavior to enable property injection.</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">PropertySelectionBehavior</span> <span class="p">=</span>
+            <span class="k">new</span> <span class="nf">ImportAttributePropertySelectionBehavior</span><span class="p">();</span>
+
+        <span class="c1">// 2. Configure the container (register)</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWebRequest</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">,</span> <span class="n">AspNetUserContext</span><span class="p">&gt;();</span>
+
+        <span class="c1">// 3. Store the container for use by Page classes.</span>
+        <span class="n">Global</span><span class="p">.</span><span class="n">container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
+
+        <span class="c1">// 4. Optionally verify the container&#39;s configuration.</span>
+        <span class="c1">//    Did you know the container can diagnose your configuration?</span>
+        <span class="c1">//    For more information, go to: https://bit.ly/YE8OJj.</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+        <span class="n">VerifyPages</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// This method tests if each Page class can be created. Because Page classes</span>
+    <span class="c1">// manually call Global.Initialize in their ctor, we want to test on application</span>
+    <span class="c1">// startup if all pages can be initialized, to prevent having to go through</span>
+    <span class="c1">// each page in the application during testing.</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">VerifyPages</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">assemblies</span> <span class="p">=</span> <span class="n">BuildManager</span><span class="p">.</span><span class="n">GetReferencedAssemblies</span><span class="p">().</span><span class="n">Cast</span><span class="p">&lt;</span><span class="n">Assembly</span><span class="p">&gt;();</span>
+
+        <span class="kt">var</span> <span class="n">pageTypes</span> <span class="p">=</span>
+            <span class="k">from</span> <span class="n">assembly</span> <span class="k">in</span> <span class="n">assemblies</span>
+            <span class="k">from</span> <span class="n">type</span> <span class="k">in</span> <span class="n">assembly</span><span class="p">.</span><span class="n">GetExportedTypes</span><span class="p">()</span>
+            <span class="k">where</span> <span class="nf">typeof</span><span class="p">(</span><span class="n">Page</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">type</span><span class="p">)</span> <span class="p">&amp;&amp;</span> <span class="p">!</span><span class="n">type</span><span class="p">.</span><span class="n">IsAbstract</span>
+            <span class="k">select</span> <span class="n">type</span><span class="p">;</span>
+
+        <span class="k">foreach</span> <span class="p">(</span><span class="n">Type</span> <span class="n">pageType</span> <span class="k">in</span> <span class="n">pageTypes</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">(</span><span class="n">pageType</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">class</span> <span class="nc">ImportAttributePropertySelectionBehavior</span> <span class="p">:</span> <span class="n">IPropertySelectionBehavior</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">bool</span> <span class="nf">SelectProperty</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">PropertyInfo</span> <span class="n">propertyInfo</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">// Makes use of the System.ComponentModel.Composition assembly</span>
+            <span class="k">return</span> <span class="nf">typeof</span><span class="p">(</span><span class="n">Page</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">serviceType</span><span class="p">)</span> <span class="p">&amp;&amp;</span>
+                <span class="n">propertyInfo</span><span class="p">.</span><span class="n">GetCustomAttributes</span><span class="p">&lt;</span><span class="n">ImportAttribute</span><span class="p">&gt;().</span><span class="n">Any</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>With this code in place, we can now write our page classes as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">Default</span> <span class="p">:</span> <span class="n">BasePage</span>
+<span class="p">{</span>
+<span class="na">    [Import]</span>
+    <span class="k">public</span> <span class="n">IUserRepository</span> <span class="n">UserRepository</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+<span class="na">    [Import]</span>
+    <span class="k">public</span> <span class="n">IUserContext</span> <span class="n">UserContext</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">void</span> <span class="nf">Page_Load</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">UserContext</span><span class="p">.</span><span class="n">IsAdministrator</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">UserRepository</span><span class="p">.</span><span class="n">DoSomeStuff</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="webapiintegration.html"
+                        title="previous chapter">ASP.NET Web API Integration Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="windowsformsintegration.html"
+                        title="next chapter">Windows Forms Integration Guide</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/webformsintegration.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="windowsformsintegration.html" title="Windows Forms Integration Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="webapiintegration.html" title="ASP.NET Web API Integration Guide"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" >Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -11,13 +11,20 @@ Welcome to Simple Injector's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    quickstart
    using
    lifetimes
+   diagnostics
+   howto
    advanced
-
+   integration
+   extensibility
+   pipeline
+   principles
+   legal
+   contribute
 
 Indices and tables
 ==================
@@ -25,4 +32,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

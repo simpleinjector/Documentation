@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Diagnostic Warning - Unregistered Types &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Diagnosing your configuration using the Diagnostic Services" href="diagnostics.html" />
+    <link rel="next" title="How To..." href="howto.html" />
+    <link rel="prev" title="Diagnostic Warning - Potential Single Responsibility Violations" href="PotentialSingleResponsibilityViolations.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="howto.html" title="How To..."
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="PotentialSingleResponsibilityViolations.html" title="Diagnostic Warning - Potential Single Responsibility Violations"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="diagnostics.html" accesskey="U">Diagnosing your configuration using the Diagnostic Services</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="diagnostic-warning-unregistered-types">
+<h1>Diagnostic Warning - Unregistered Types<a class="headerlink" href="#diagnostic-warning-unregistered-types" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="cause">
+<h2>Cause<a class="headerlink" href="#cause" title="Permalink to this headline">¶</a></h2>
+<p>A concrete type that was not registered explicitly and was not resolved using unregistered type resolution, but was created by the container using the transient lifestyle.</p>
+</div>
+<div class="section" id="warning-description">
+<h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
+<p>The unregistered typed warning shows all concrete types that weren&#8217;t registered explicitly, but registered by the container as transient for you, because they were referenced by another component&#8217;s constructor or were resolved through a direct call to <em>container.GetIntance&lt;T&gt;()</em> (inside a   <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> registered delegate for instance).</p>
+<p>This warning deserves your attention, since it might indicate that you program to implementations, instead of abstractions. Although the <a class="reference internal" href="PotentialLifestyleMismatches.html"><em>Potential Lifestyle Mismatches</em></a> and <a class="reference internal" href="ShortCircuitedDependencies.html"><em>Short Circuited Dependencies</em></a> warnings are a very strong signal of a configuration problem, this <em>Unregistered Type</em> warnings is just a point of attention.</p>
+</div>
+<div class="section" id="how-to-fix-violations">
+<h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
+<p>Let components depend on an interface that described the contract that this concrete type implements and register that concrete type in the container by that interface.</p>
+</div>
+<div class="section" id="when-to-ignore-warnings">
+<h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
+<p>If your intention is to resolve those types as transient and don&#8217;t depend directly on their concrete types, this warning can in general be ignored safely.</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">HomeController</span><span class="p">&gt;();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+<span class="c1">// Definition of HomeController</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">SqlUserRepository</span> <span class="n">repository</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">HomeController</span><span class="p">(</span><span class="n">SqlUserRepository</span> <span class="n">repository</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">repository</span> <span class="p">=</span> <span class="n">repository</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The given example registers a <strong>HomeController</strong> class that depends on an unregistered <strong>SqlUserRepository</strong> class. Injecting a concrete type can lead to a lot of problems, such as:</p>
+<ul class="simple">
+<li>It makes the <strong>HomeController</strong> hard to test, since concrete types are often hard to fake (or when using a mocking framework that fixes this, would still result in unit tests that contain a lot of configuration for the mocking framework, instead of pure test logic) making the unit tests hard to read and hard to maintain.</li>
+<li>It makes it harder to reuse the class, since it expects a certain implementation of its dependency.</li>
+<li>It makes it harder to add cross-cutting concerns (such as logging, audit trailing and authorization) to the system, because this must now either be added directly in the <strong>SqlUserRepository</strong> class (which will make this class hard to test and hard to maintain) or all constructors of classes that depend on <strong>SqlUserRepository</strong> must be changed to allow injecting a type that adds these cross-cutting concerns.</li>
+</ul>
+<p>Instead of depending directly on <strong>SqlUserRepository</strong>, <strong>HomeController</strong> can better depend on an <strong>IUserRepository</strong> abstraction:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">HomeController</span><span class="p">&gt;();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+<span class="c1">// Definition of HomeController</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">HomeController</span><span class="p">(</span><span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">repository</span> <span class="p">=</span> <span class="n">repository</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Tip</strong>: It would probably be better to define a generic <em>IRepository&lt;T&gt;</em> abstraction. This makes easy to <a class="reference internal" href="advanced.html#batch-registration"><em>batch registration</em></a> implementations and allows cross-cutting concerns to be added using <a class="reference internal" href="advanced.html#generic-decorators"><em>decorators</em></a>.</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Diagnostic Warning - Unregistered Types</a><ul>
+<li><a class="reference internal" href="#cause">Cause</a></li>
+<li><a class="reference internal" href="#warning-description">Warning Description</a></li>
+<li><a class="reference internal" href="#how-to-fix-violations">How to Fix Violations</a></li>
+<li><a class="reference internal" href="#when-to-ignore-warnings">When to Ignore Warnings</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="PotentialSingleResponsibilityViolations.html"
+                        title="previous chapter">Diagnostic Warning - Potential Single Responsibility Violations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="howto.html"
+                        title="next chapter">How To...</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/UnregisteredTypes.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="howto.html" title="How To..."
+             >next</a> |</li>
+        <li class="right" >
+          <a href="PotentialSingleResponsibilityViolations.html" title="Diagnostic Warning - Potential Single Responsibility Violations"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="diagnostics.html" >Diagnosing your configuration using the Diagnostic Services</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

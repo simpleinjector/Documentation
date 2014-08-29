@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
-    <link rel="next" title="Advanced Scenarios" href="advanced.html" />
+    <link rel="next" title="&lt;no title&gt;" href="diagnostics.html" />
     <link rel="prev" title="Using Simple Injector" href="using.html" /> 
   </head>
   <body>
@@ -35,7 +35,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="advanced.html" title="Advanced Scenarios"
+          <a href="diagnostics.html" title="&lt;no title&gt;"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="using.html" title="Using Simple Injector"
@@ -214,8 +214,10 @@ container.RegisterSingle&lt;IService, RealService&gt;();</p>
 </ul>
 <p>For more information, check out the blog entry of Stephen Toub regarding the <a class="reference external" href="https://vegetarianprogrammer.blogspot.de/2012/12/understanding-synchronizationcontext-in.html">difference between ExecutionContext and
 SynchronizationContext</a>.</p>
-<p id="wcfoperation"><span id="perwcfoperation"></span>!! Per WCF Operation
-Only one instance will be created by the container per call to a WCF operation and the instance will be disposed when the operation ends (unless specified otherwise).</p>
+</div>
+<div class="section" id="per-wcf-operation">
+<span id="wcfoperation"></span><span id="perwcfoperation"></span><h2>Per WCF Operation<a class="headerlink" href="#per-wcf-operation" title="Permalink to this headline">¶</a></h2>
+<p>Only one instance will be created by the container per call to a WCF operation and the instance will be disposed when the operation ends (unless specified otherwise).</p>
 <p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">WCF Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Wcf.dll</strong> in the default download here on CodePlex) contains <em>RegisterPerWcfOperation</em> extension methods and a <em>WcfOperationLifestyle</em> class that enable easy <em>Per WCF Operation</em> registrations:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IOrderRepository</span><span class="p">,</span> <span class="n">SqlOrderRepository</span><span class="p">&gt;();</span>
@@ -431,6 +433,7 @@ Only one instance will be created by the container per call to a WCF operation a
 <li><a class="reference internal" href="#per-web-request">Per Web Request</a></li>
 <li><a class="reference internal" href="#per-web-api-request">Per Web API Request</a></li>
 <li><a class="reference internal" href="#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
+<li><a class="reference internal" href="#per-wcf-operation">Per WCF Operation</a></li>
 <li><a class="reference internal" href="#per-lifetime-scope">Per Lifetime Scope</a></li>
 <li><a class="reference internal" href="#per-execution-context-scope">Per Execution Context Scope</a></li>
 <li><a class="reference internal" href="#per-graph">Per Graph</a></li>
@@ -446,8 +449,8 @@ Only one instance will be created by the container per call to a WCF operation a
   <p class="topless"><a href="using.html"
                         title="previous chapter">Using Simple Injector</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="advanced.html"
-                        title="next chapter">Advanced Scenarios</a></p>
+  <p class="topless"><a href="diagnostics.html"
+                        title="next chapter">&lt;no title&gt;</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/lifetimes.txt"
@@ -477,7 +480,7 @@ Only one instance will be created by the container per call to a WCF operation a
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="advanced.html" title="Advanced Scenarios"
+          <a href="diagnostics.html" title="&lt;no title&gt;"
              >next</a> |</li>
         <li class="right" >
           <a href="using.html" title="Using Simple Injector"

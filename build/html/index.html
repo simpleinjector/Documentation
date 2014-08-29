@@ -74,6 +74,7 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-web-request">Per Web Request</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-web-api-request">Per Web API Request</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope">Per Execution Context Scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
@@ -83,19 +84,114 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#developing-a-custom-lifestyle">Developing a Custom Lifestyle</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnosing your configuration using the Diagnostic Services</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="PotentialLifestyleMismatches.html">Potential Lifestyle Mismatches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ShortCircuitedDependencies.html">Short Circuited Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PotentialSingleResponsibilityViolations.html">Potential Single Responsibility Violations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UnregisteredTypes.html">Unregistered Types</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How To...</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#id1">Register factory delegates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#id3">Resolve instances by key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-array-and-lists">Resolve array and lists</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#id6">Register multiple interfaces with the same implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#id8">Override existing registrations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-containers-configuration">Verify the container’s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Scenarios</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#generics">Generics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#batch-automatic-registration">Batch / Automatic registration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#id3">Registration of open generic types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#id5">Unregistered type resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#id7">Context based injection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#generic-decorators">Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#generic-decorators">Decorators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="advanced.html#decorators-with-func-t-factories">Decorators with Func&lt;T&gt; factories</a></li>
+<li class="toctree-l3"><a class="reference internal" href="advanced.html#id11">Decorated collections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="advanced.html#decorator-registration-factories">Decorator registration factories</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#interception">Interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#property-injection">Property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#covariance-and-contravariance">Covariance and Contravariance</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#registering-plugins-dynamically">Registering plugins dynamically</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="webapiintegration.html#basic-setup">Basic setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="webapiintegration.html#extra-features">Extra features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://stackoverflow.com/questions/10940988/how-to-configure-simple-injector-ioc-to-use-ravendb">    RavenDB</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://stackoverflow.com/questions/10555791/using-simpleinjector-with-signalr">    SignalR</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://stackoverflow.com/questions/9984144/what-is-the-correct-way-to-register-fluentvalidation-with-simpleinjector">    Fluent Validations</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://simpleinjector.codeplex.com/discussions/283850">    PetaPoco</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://stackoverflow.com/questions/14562176/constructor-injection-with-quartz-net-and-simple-injector">    Quartz.NET</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://stackoverflow.com/questions/16123641/membus-and-ioc-simpleinjector-wiring-command-handlers-automatically-by-interfa">    Membus</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://stackoverflow.com/questions/15123515/pass-runtime-value-to-constructor-using-simpleinjector">    Web Forms MVP</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://simpleinjector.codeplex.com/discussions/541398">    Nancy</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor">    Castle DynamicProxy Interception</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://stackoverflow.com/questions/10585478">    Unit of Work pattern</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://simpleinjector.codeplex.com/discussions/434951">    Multi-tenant applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#property-injection">Property Injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#resolving-unregistered-types">Resolving Unregistered Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#registration-pipeline">Registration Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#resolve-pipeline">Resolve Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="principles.html">Simple Injector Design Principles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#make-simple-use-cases-easy-make-complex-use-cases-possible">Make simple use cases easy, make complex use cases possible</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#push-developers-into-best-practices">Push developers into best practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#fast-by-default">Fast by default</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#don-t-force-vendor-lock-in">Don&#8217;t force vendor lock-in</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#never-fail-silently">Never fail silently</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#features-should-be-intuitive">Features should be intuitive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#communicate-errors-clearly-and-describe-how-to-solve-them">Communicate errors clearly and describe how to solve them</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="principles.html#design-decisions-based-on-the-design-principles">Design Decisions Based On The Design Principles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#the-container-is-locked-after-the-first-call-to-resolve">The container is locked after the first call to resolve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#dont-allow-resolving-scoped-instances-outside-an-active-scope">Don’t allow resolving scoped instances outside an active scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#limited-batch-registration-api">Limited batch-registration API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="legal.html#simple-injector-license">Simple Injector License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="legal.html#contributions">Contributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="legal.html#simple-injector-trademark-policy">Simple Injector Trademark Policy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute Code</a></li>
 </ul>
 </div>
 </div>

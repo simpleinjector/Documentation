@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Simple Injector Design Principles &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="next" title="Legal stuff" href="legal.html" />
+    <link rel="prev" title="Simple Injector Pipeline" href="pipeline.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="legal.html" title="Legal stuff"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pipeline.html" title="Simple Injector Pipeline"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="simple-injector-design-principles">
+<h1>Simple Injector Design Principles<a class="headerlink" href="#simple-injector-design-principles" title="Permalink to this headline">¶</a></h1>
+<p>While designing Simple Injector we defined a set of rules that formed the foundation for development. These rules still keep us focused today and continue to help us decide how to implement a feature and which features <strong>not</strong> to implement. In the section below you&#8217;ll find details of the design principles of Simple Injector. Below that you&#8217;ll find details of some of the <a class="reference internal" href="#design-decisions"><em>design decisions</em></a> we made based on these principles.</p>
+<p>The design principles:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#make-simple-use-cases-easy"><em>Make simple use cases easy, make complex use cases possible</em></a></li>
+<li><a class="reference internal" href="#push-developers-into-best-practices"><em>Push developers into best practices</em></a></li>
+<li><a class="reference internal" href="#fast-by-default"><em>Fast by default</em></a></li>
+<li><a class="reference internal" href="#vendor-lock-in"><em>Don&#8217;t force vendor lock-in</em></a></li>
+<li><a class="reference internal" href="#never-fail-silently"><em>Never fail silently</em></a></li>
+<li><a class="reference internal" href="#features-should-be-intuitive"><em>Features should be intuitive</em></a></li>
+<li><a class="reference internal" href="#communicate-errors-clearly"><em>Communicate errors clearly and describe how to solve them</em></a></li>
+</ul>
+<div class="section" id="make-simple-use-cases-easy-make-complex-use-cases-possible">
+<span id="make-simple-use-cases-easy"></span><h2>Make simple use cases easy, make complex use cases possible<a class="headerlink" href="#make-simple-use-cases-easy-make-complex-use-cases-possible" title="Permalink to this headline">¶</a></h2>
+<p>This guideline comes directly from the <a class="reference external" href="http://www.amazon.com/Framework-Design-Guidelines-Conventions-Libraries/dp/0321545613">Framework Design Guidelines</a> and is an important guidance for us. Commonly used features should be easy to implement, even for a new user, but the framework must be flexible and extensible enough to support complex scenarios.</p>
+</div>
+<div class="section" id="push-developers-into-best-practices">
+<span id="id1"></span><h2>Push developers into best practices<a class="headerlink" href="#push-developers-into-best-practices" title="Permalink to this headline">¶</a></h2>
+<p>We believe in good design and best practices. When it comes to Dependency Injection, we believe that we know quite a bit about applying design patterns correctly and also how to prevent applying patterns incorrectly. We have designed Simple Injector in a way that promotes these best practices. Occasional we may explicitly choose to <strong>not</strong> implement certain features because they don&#8217;t steer the developer in the right direction. Our intention has always been to build a framework that makes it difficult to shoot yourself in the foot!</p>
+</div>
+<div class="section" id="fast-by-default">
+<span id="id2"></span><h2>Fast by default<a class="headerlink" href="#fast-by-default" title="Permalink to this headline">¶</a></h2>
+<p>For most applications the performance of the IoC container is not an issue, I/O is usually the bottleneck. You will find, however, that certain DI libraries are very sensitive to different configurations and you will need to monitor the container for potential performance problems. Most performance problems can be fixed by changing the configuration (changing registrations to singleton, adding caching, etc), no matter which library you use. At that point however it can get really complicated to configure certain libraries.</p>
+<p>Making Simple Injector fast by default removes any concerns regarding the performance of the construction of object graphs. Instead of having to monitor Simple Injector’s performance and make ugly tweaks to the configuration when object construction is too slow, the developer is free to worry about more important things.</p>
+<p>_Fast by default** means that the performance of object instantiation from any of the registration features that the library supplies out-of-the-box will be comparable to the performance of hard-wired object instantiation.</p>
+</div>
+<div class="section" id="don-t-force-vendor-lock-in">
+<span id="vendor-lock-in"></span><h2>Don&#8217;t force vendor lock-in<a class="headerlink" href="#don-t-force-vendor-lock-in" title="Permalink to this headline">¶</a></h2>
+<p>The Dependency injection pattern promotes the use of loosely coupled components. -When done right- loosely coupled code can be much more maintainable. When building a library that promotes this pattern it would be ironic if that same library was to ask you to take a dependency on the library. The truth is many 3rd party library providers do want you to use certain abstractions and attributes from their offering and thereby force you to create a hard dependency to their code.</p>
+<p>When we build applications ourselves, we try to prevent any vendor lock-in (even to Simple Injector), so why should we force you to get locked into Simple Injector? We don&#8217;t want to do this. We want you to get hooked to Simple Injector, but we want this to be through the compelling vision and competing features; not by vendor lock-in. If Simple Injector doesn&#8217;t suit your needs you should be able to easily swap it for another competing product, just as you would want to replace your logging library without it affecting your entire code base.</p>
+</div>
+<div class="section" id="never-fail-silently">
+<span id="id3"></span><h2>Never fail silently<a class="headerlink" href="#never-fail-silently" title="Permalink to this headline">¶</a></h2>
+<p>We all hate the hunt for bugs in our code. It can be made even worse when we discover a library or framework we have chosen to use is hiding these bugs by ignoring them and failing to report them to us. A good example is logging libraries - many of us have been frustrated when we discover our logging libraries continue to run without logging, because we misconfigured it, but didn’t bother to inform us. This frustration can lead to real world costs and a lack of trust in the tools we use.</p>
+<p>We decided that Simple Injector should by default never fail silently. If you make a configuration error then Simple Injector should tell you as soon as reasonably possible. We want Simple Injector to fail fast!</p>
+</div>
+<div class="section" id="features-should-be-intuitive">
+<span id="id4"></span><h2>Features should be intuitive<a class="headerlink" href="#features-should-be-intuitive" title="Permalink to this headline">¶</a></h2>
+<p>This means that features should be easy to use and do the right thing by default.</p>
+</div>
+<div class="section" id="communicate-errors-clearly-and-describe-how-to-solve-them">
+<span id="communicate-errors-clearly"></span><h2>Communicate errors clearly and describe how to solve them<a class="headerlink" href="#communicate-errors-clearly-and-describe-how-to-solve-them" title="Permalink to this headline">¶</a></h2>
+<p>In our day jobs we regularly encounter exception messages that aren&#8217;t helpful or, even worse, are misleading (we have all seen the <strong>NullReferenceException</strong>). It frustrates us, takes time to track down and therefore costs money. We don&#8217;t want to put any developer in that position and therefore defined an explicit design rule stating that Simple Injector should always communicate errors as clearly as possible. And, not only should it describe the problem, it should offer details on the options for solving the problem.</p>
+<p>If you encounter a scenario where we fail to do this, please let us know. We are serious about this and we will fix it!</p>
+</div>
+</div>
+<div class="section" id="design-decisions-based-on-the-design-principles">
+<span id="design-decisions"></span><h1>Design Decisions Based On The Design Principles<a class="headerlink" href="#design-decisions-based-on-the-design-principles" title="Permalink to this headline">¶</a></h1>
+<p>Our design principles have influenced the direction of the development of features in Simple Injector. In this section we would like to explain some of the design decisions.</p>
+<ul class="simple">
+<li><a class="reference internal" href="#container-is-locked"><em>The container is locked after the first call to resolve</em></a></li>
+<li><a class="reference internal" href="#separate-collections"><em>The API clearly separates registration of collections from other registrations</em></a></li>
+<li><a class="reference internal" href="#no-support-for-xml"><em>No support for  XML based configuration</em></a></li>
+<li><a class="reference internal" href="#never-force-release"><em>Never force users to release what they resolve</em></a></li>
+<li><a class="reference internal" href="#dont-allow-resolving-outside-an-active-scope"><em>Don’t allow resolving scoped instances outside an active scope</em></a></li>
+<li><a class="reference internal" href="#no-property-injection"><em>No out-of-the-box support for property injection</em></a></li>
+<li><a class="reference internal" href="#no-interception"><em>No out-of-the-box support for interception</em></a></li>
+<li><a class="reference internal" href="#limited-batch-registration"><em>Limited batch-registration API</em></a></li>
+<li><a class="reference internal" href="#no-per-thread-lifestyle"><em>No per-thread lifestyle</em></a></li>
+</ul>
+<div class="section" id="the-container-is-locked-after-the-first-call-to-resolve">
+<span id="container-is-locked"></span><h2>The container is locked after the first call to resolve<a class="headerlink" href="#the-container-is-locked-after-the-first-call-to-resolve" title="Permalink to this headline">¶</a></h2>
+<p>When an application makes its first call to <em>GetInstance</em>, <em>GetAllIntances</em> or <em>Verify</em>, the container locks itself to prevent any future changes being made by explicit registrations. This strictly separates the configuration of the container from its use and forces the user to configure the container in one single place. This design decision is inspired by the following two design principles:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#push-developers-into-best-practices"><em>Push developers into best practices</em></a></li>
+<li><a class="reference internal" href="#fast-by-default"><em>Fast by default</em></a></li>
+</ul>
+<p>In most situations it makes little sense to change the configuration once the application is running. This would make the application much more complex, whereas dependency injection as a pattern is meant to lower the total complexity of a system. By strictly separating the registration/startup phase from the phase where the application is in a running state, it is much easier to determine how the container will behave and it is much easier to verify the container’s configuration. The locking behavior of Simple Injector exists to protect the user from defining invalid and/or confusing combinations of registrations.</p>
+<p>Allowing the ability to alter the DI configuration while the application is running could easily cause strange, hard to debug, and hard to verify behavior. This may also mean the application has numerous hard references to the container –and this is something we work hard to prevent. Attempting to alter the configuration when running a multi-threaded application would lead to very un-deterministic behavior, even if the container itself is thread-safe.</p>
+<p>Imagine the scenario where you want to replace some <strong>FileLogger</strong> component for a different implementation with the same <strong>ILogger</strong> interface. If there’s a different registration that directly or indirectly depends on this registration, replacing the <strong>ILogger</strong> might not work as you would expect. If the depending registration is registered as singleton, for example, the container should guarantee that only one instance will be created. When you are allowed to change the implementation of <strong>ILogger</strong> after a singleton instance already holds a reference to the “old” registered implementation the container has 2 choices – neither of which are correct:</p>
+<ol class="arabic simple">
+<li>Return the cached instance of the registration that has a reference to the &#8220;wrong&#8221; <strong>ILogger</strong>.</li>
+<li>Create and cache a new instance of that registration and, in doing so, break the promise of the type being registered as a singleton and the guarantee that the container will always return the same instance.</li>
+</ol>
+<p>The description above is a simple to grasp example of dealing with the runtime replacement of services. But adding new registrations can also cause things to go wrong in unexpected ways. A simple example would be where the container has previously supplied the object graph with a default implementation resolved through unregistered type resolution.</p>
+<p>Problems with thread-safety can easily emerge when the user changes a registration during a web request. If the container allowed such registration changes during a request, other requests could directly be impacted by those changes (since in general there should only be one Container instance per AppDomain). Depending on things such as the lifestyle of the registration; the use of factories and how the object graph is structured, it could be a real possibility that another request gets both the old and the new registration. Take for instance a transient registration that is replaced with a different one. If this is done while an object graph for a different thread is being resolved while the service is injected into multiple points within the graph - the graph would contain different instance of that abstraction with different lifetimes at the same time in the same request – and this is bad.</p>
+<p>Since we consider it good practice to lock the container, we were able to greatly optimize performance of the container and adhere to the <a class="reference internal" href="#fast-by-default"><em>Fast by default</em></a> principle.</p>
+<p>Do note that container lock-down still allows runtime registrations. A few common ways to add registrations to the container are:</p>
+<ol class="arabic simple">
+<li>Resolving an unregistered concrete type from the container. The container will auto-register that type for you as transient registration.</li>
+<li>Using <a class="reference internal" href="advanced.html#id5"><em>unregistered type resolution</em></a> the container will be able to at a later time resolve new types.</li>
+<li>The <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Lifestyle_CreateProducer.htm">Lifestyle.CreateProducer</a> overloads can be called at any point in time to create new <em>InstanceProducer</em> instances that allow building new registrations.</li>
+</ol>
+</div>
+<div class="section" id="the-api-clearly-differentiates-the-registration-of-collections">
+<span id="separate-collections"></span><h2>The API clearly differentiates the registration of collections<a class="headerlink" href="#the-api-clearly-differentiates-the-registration-of-collections" title="Permalink to this headline">¶</a></h2>
+<p>When designing Simple Injector, we made a very explicit design decision to define a separate <em>RegisterAll</em> method for registering a collection of services for an abstraction. This design adheres to the following principles:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#never-fail-silently"><em>Never fail silently</em></a></li>
+<li><a class="reference internal" href="#features-should-be-intuitive"><em>Features should be intuitive</em></a></li>
+</ul>
+<p>This design differentiates vastly from how other DI libraries work. Most libraries provide the same API for single registrations and collections. Registering a collection of some abstraction in that case means that you call the <em>Register</em> method multiple times with the same abstraction but with different implementations. There are some clear downsides to such an approach.</p>
+<ul class="simple">
+<li>There’s a big difference between having a collection of services and a single service. For many of the services you register you will have one implementation and it doesn’t make sense for there to be multiple implementations. For other services you will always expect a collection of them (even if you have one or no implementations). In the majority (if not all) of cases you wouldn’t expect to switch dynamically between one and multiple implementations and it doesn’t make much sense to create an API that makes it possible.</li>
+<li>An API that mixes these concepts will be unable to warn you if you accidentally add a second registration for the same service. Those APIs will ‘fail silently’ and simply return one of the items you registered. Simple Injector will throw an exception when you call <em>Register&lt;T&gt;</em> for the same T and will describe that collections should be registered using <em>RegisterAll</em>.</li>
+<li>None of the APIs that mix these concepts make it clear which of the registered services is returned if you resolve one of them. Some libraries will return the first registered element, while others return the last. Although all of them describe this behavior in their documentation it’s not clear from the API itself i.e. it is not discoverable. An API design like this is unintuitive. A design that separates <em>Register</em> from <em>RegisterAll</em> makes the intention of the code very clear to anyone who reads it.</li>
+</ul>
+<p>In general, your services should not depend on an <strong>IEnumerable&lt;ISomeService&gt;</strong>, especially when your application has multiple services that need to work with <strong>ISomeService</strong>. The problem with injecting <strong>IEnumerable</strong> into multiple consumers is that you will have to iterate that collection in multiple places. This forces the consumers to know about having multiple implementations and how to iterate and process that collection. As far as the consumer is concerned this should be an implementation detail. If you ever need to change the way a collection is processed you will have to go through the application, since this logic will have be duplicated throughout the system.</p>
+<p>Instead of injecting an <strong>IEnumerable</strong> a consumer should instead depend on a single abstraction and you can achieve this using a <a class="reference external" href="https://en.wikipedia.org/wiki/Composite_pattern">Composite</a> Implementation that wraps the actual collection and contains the logic of processing the collection. Registering composite implementation is so much easier with Simple Injector because of the clear separation between a single implementation and a collection of implementations. Take the following configuration for example, where we register a collection of <strong>ILogger</strong> implementations and a single composite implementation for use in the rest of our code:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="k">typeof</span><span class="p">(</span><span class="n">FileLogger</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">SqlLogger</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">EventLogLogger</span><span class="p">));</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">CompositeLogger</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="no-support-for-xml-based-configuration">
+<span id="no-support-for-xml"></span><h2>No support for XML based configuration<a class="headerlink" href="#no-support-for-xml-based-configuration" title="Permalink to this headline">¶</a></h2>
+<p>While designing Simple Injector, we decided to <strong>not</strong> provide an XML based configuration API, since we want to push:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#push-developers-into-best-practices"><em>developers into best practices</em></a> and having a XML centered configuration is <strong>not</strong> best practice</li>
+</ul>
+<p>XML based configuration is brittle, error prone and always provides a subset of what you can achieve with code based configuration. General consensus is to use code based configuration as much as possible and only fall back to file based configuration for the parts of the configuration that really need to be customizable after deployment. These are normally just a few registrations since the majority of changes would still require developer interaction (write unit tests or recompiling for instance). Even for those few lines that do need to be configurable, it&#8217;s a bad idea to require the fully qualified type name in a configuration file. A configuration switch (true/false or simple enum) is more than enough. You can read the configured value in your code based configuration and this allows you to keep the type names in your code. This allows you to refactor easily and gives you compile-time support.</p>
+</div>
+<div class="section" id="never-force-users-to-release-what-they-resolve">
+<span id="never-force-release"></span><h2>Never force users to release what they resolve<a class="headerlink" href="#never-force-users-to-release-what-they-resolve" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="http://blog.ploeh.dk/2010/09/29/TheRegisterResolveReleasepattern/">Register Resolve Release</a> (RRR) pattern is a common pattern that DI containers implement. In general terms the pattern describes that you should tell the container how to build each object  graph (Register) during application start-up, ask the container for an object graph (Resolve) at the beginning of a request, and tell the container when you’re done with that object graph (Release) after the request.</p>
+<p>Although this pattern applies to Simple Injector, we never force users to have to explicitly release any service once they have finished with it. With Simple Injector your components are automatically released when the web request finishes, or when you dispose of your <a class="reference internal" href="lifetimes.html#perlifetimescope"><em>Lifetime Scope</em></a> or <a class="reference internal" href="lifetimes.html#perexecutioncontextscope"><em>Execution Context Scope</em></a>. By not forcing users to release what they resolve, we adhere to the following design principles:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#never-fail-silently"><em>Never fail silently</em></a></li>
+<li><a class="reference internal" href="#features-should-be-intuitive"><em>Features should be intuitive</em></a></li>
+</ul>
+<p>A container that expects the user to release the instances they resolve will fail silently when a user forgets to release, because forgetting to release is a failure and the container doesn’t know when the user is done with the object graph. Forgetting to release can sometimes leads to out of memory exceptions that are often hard to trace back and are therefore costly to fix. The need to release explicitly is far from intuitive and is therefore not needed when working with Simple Injector.</p>
+</div>
+<div class="section" id="dont-allow-resolving-scoped-instances-outside-an-active-scope">
+<span id="dont-allow-resolving-outside-an-active-scope"></span><h2>Don’t allow resolving scoped instances outside an active scope<a class="headerlink" href="#dont-allow-resolving-scoped-instances-outside-an-active-scope" title="Permalink to this headline">¶</a></h2>
+<p>When you register a component in Simple Injector with a <a class="reference internal" href="lifetimes.html#scoped"><em>scoped lifestyle</em></a>, you can only resolve an instance when there is an active instance of that specified scope. For instance, when you register your <strong>DbContext</strong> per Web Request Lifestyle, resolving that instance on a background thread will fail in Simple Injector. This design is chosen because we want to:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#never-fail-silently"><em>Never fail silently</em></a></li>
+</ul>
+<p>The reason is simple - resolving an instance outside of the context of a scope is a bug. The container could decide to return a singleton or transient for you (as other DI libraries do), but neither of these cases is usually what you would expect. Take a look at the DbContext example for instance, the class is normally registered as Per Web Request lifestyle for a reason, probably because you want to reuse one instance for the whole request. Not reusing an instance, but instead injecting a new instance (transient) would most likely not give the expected results. Returning a single instance (singleton) when outside of a scope, i.e. reusing a single DbContext over multiple requests/threads will sooner or later lead you down the path of failure.</p>
+<p>Because there is not a standard logical default for Simple Injector to return when you request an instance outside of the context of an active scope, the right thing to do is throwing an exception. Returning a transient or singleton is a form of failing silently.</p>
+<p>That doesn’t mean that you’re lost when you really need the option of per request and transient or singleton, you are required to configure such a scope explicitly by defining a <a class="reference internal" href="lifetimes.html#hybrid"><em>Hybrid</em></a> lifestyle. We <a class="reference internal" href="#make-simple-use-cases-easy"><em>Make simple use cases easy, and complex use cases possible</em></a>.</p>
+</div>
+<div class="section" id="no-out-of-the-box-support-for-property-injection">
+<span id="no-property-injection"></span><h2>No out-of-the-box support for property injection<a class="headerlink" href="#no-out-of-the-box-support-for-property-injection" title="Permalink to this headline">¶</a></h2>
+<p>Simple Injector has no out-of-the-box support for property injection, to adhere to the following principles:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#vendor-lock-in"><em>Don&#8217;t force vendor lock-in</em></a></li>
+<li><a class="reference internal" href="#never-fail-silently"><em>Never fail silently</em></a></li>
+</ul>
+<p>In general there are two ways of implementing property injection: Implicit and Explicit property injection.
+With implicit property injection, the container injects any public writable property by default for any instance you resolve. This is done by mapping those properties to configured types. When no such registration exists, or when the property doesn’t have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that implicit property injection is simply too uuhh... implicit :-). There are many reasons for a container to skip a property, but in none of the cases the container doesn’t know if skipping the property is really what the user wants, or whether it was a bug. In other words, the container is forced to fail silently.</p>
+<p>With explicit property injection, the container is forced to inject a property and the process will fail immediately when a property can&#8217;t be mapped or injected. The common way containers allow you to specify whether a property should be injected or not is by the use of library-defined attributes. As previously discussed, this would force the application to take a dependency on the library, which causes a vendor lock-in.</p>
+<p>The use of property injection should be non-standard; constructor injection should be used in the majority of cases. If a constructor gets too many parameters (the constructor over-injection anti-pattern), it is an indication of a violation of the <a class="reference external" href="https://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> (SRP). SRP violations often lead to maintainability issues. Instead of fixing constructor over-injection with property injection the root cause should be analyzed and the type should be refactored, probably with <a class="reference external" href="http://blog.ploeh.dk/2010/02/02/RefactoringtoAggregateServices/">Facade Services</a>. Another common reason to use properties is because the dependencies are optional. But instead of using optional property dependencies, the best practice is to inject empty implementations (a.k.a. <a class="reference external" href="https://en.wikipedia.org/wiki/Null_Object_pattern">Null Object pattern</a>) into the constructor; Dependencies should rarely be optional.</p>
+<p>This doesn’t mean that you can’t do property injection with Simple Injector, but with Simple Injector this will have to be <a class="reference internal" href="extensibility.html#property-injection"><em>explicitly configured</em></a>.</p>
+</div>
+<div class="section" id="no-out-of-the-box-support-for-interception">
+<span id="no-interception"></span><h2>No out-of-the-box support for interception<a class="headerlink" href="#no-out-of-the-box-support-for-interception" title="Permalink to this headline">¶</a></h2>
+<p>Simple Injector does support interception out-of-the box, because we want to:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#push-developers-into-best-practices"><em>Push developers into best practices</em></a></li>
+<li><a class="reference internal" href="#fast-by-default"><em>Fast by default</em></a></li>
+<li><a class="reference internal" href="#vendor-lock-in"><em>Don&#8217;t force vendor lock-in</em></a></li>
+</ul>
+<p>Simple Injector tries to push developers into good design, and the use of interception is often an indication of a suboptimal design. We prefer to promote the use of decorators. If you can&#8217;t apply a decorator around a group of related types, you are probably missing a common (generic) abstraction.</p>
+<p>Simple Injector is designed to be fast by default. Applying decorators in Simple Injector is just as fast as normal injection, while applying interceptors has a much higher cost, since it involves the use of reflection.</p>
+<p>To be able to intercept, you will need to take a dependency on your interception library, since this library defines an <strong>IInterceptor</strong> interface or something similar (such as Castle’s <strong>IInterceptor</strong> or Unity&#8217;s <strong>ICallHandler</strong>). Decorators on the other hand can be created without asking you to take a dependency on an external library. Since vendor lock-in should be avoided the Simple Injector library doesn&#8217;t define any interfaces or attributes to be used at the application level.</p>
+</div>
+<div class="section" id="limited-batch-registration-api">
+<span id="limited-batch-registration"></span><h2>Limited batch-registration API<a class="headerlink" href="#limited-batch-registration-api" title="Permalink to this headline">¶</a></h2>
+<p>Most DI libraries have a large and advanced batch-registration API that often allow specifying registrations in a fluent way. The downside of these APIs is that developers will struggle to use them correctly; they are often far from intuitive and the library’s documentation needs to be repeatedly consulted.</p>
+<p>Instead of creating our own API that would fall into the same trap as all the others, we decided not to have such elaborate API, because:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#features-should-be-intuitive"><em>Features should be intuitive</em></a></li>
+</ul>
+<p>In most cases we found it much easier to write batch registrations using LINQ; a language that many developers are already familiar with. Specifying your registrations in LINQ reduces the need to learn yet another (domain specific) language (with all its quirks).</p>
+<p>When it comes to batch-registering generic-types things are different. Batch-registering generic types can be very complex without tool support. We have defined a clear API consisting of a single <em>RegisterManyForOpenGeneric</em> extension method that covers the majority of the cases.</p>
+</div>
+<div class="section" id="no-per-thread-lifestyle">
+<span id="id5"></span><h2>No per-thread lifestyle<a class="headerlink" href="#no-per-thread-lifestyle" title="Permalink to this headline">¶</a></h2>
+<p>While designing Simple Injector, we explicitly decided not to include a Per Thread lifestyle out-of-the-box, because we want to:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#push-developers-into-best-practices"><em>Push developers into best practices</em></a></li>
+</ul>
+<p>The Per Thread lifestyle is very dangerous and in general you should not use it in your application, especially web applications.</p>
+<p>This lifestyle should be considered dangerous, because it is very hard to predict what the actual lifespan of a thread is. When you create and start a thread using <cite>new Thread().Start()</cite>, you&#8217;ll get a fresh block of thread-static memory, which means the container will create a new per-threaded instance for you. When starting threads from the thread pool using <strong>ThreadPool.QueueUserWorkItem</strong> however, you may get an existing thread from the pool. The same holds when running in ASP.NET (ASP.NET pools threads to increase performance).</p>
+<p>All this means that a thread will almost certainly outlive a web request. ASP.NET can run requests asynchronously meaning that a web request can be finished on a different thread to the thread the request started executing on. These are some of the problems you can encounter when working with a Per Thread lifestyle.</p>
+<p>A web request will typically begin with a call to <em>GetInstance</em> which will load the complete object graph including any services registered with the Per Thread lifestyle. At some point during the operation the call is postponed (due to the asynchronous nature of the ASP.NET framework). At some future moment in time ASP.NET will resume processing this call on a different thread and at this point we have a problem – some of the objects in our object graph are tied up on another thread, possibly doing something else for another operation. What a mess!</p>
+<p>Since these instances are registered as Per Thread, they are probably not suited to be used in another thread. They are almost certainly not thread-safe (otherwise they would be registered as Singleton). Since the first thread that initially started the request is already free to pick up new requests, we can run into the situation where two threads access those Per Thread instances simultaneously. This will lead to race conditions and bugs that are hard to diagnose and find.</p>
+<p>So in general, using Per Thread is a bad idea and that’s why Simple Injector does not support it. If you wish, you can always shoot yourself in the foot by implementing such a custom lifestyle, but don’t blame us :-)</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Simple Injector Design Principles</a><ul>
+<li><a class="reference internal" href="#make-simple-use-cases-easy-make-complex-use-cases-possible">Make simple use cases easy, make complex use cases possible</a></li>
+<li><a class="reference internal" href="#push-developers-into-best-practices">Push developers into best practices</a></li>
+<li><a class="reference internal" href="#fast-by-default">Fast by default</a></li>
+<li><a class="reference internal" href="#don-t-force-vendor-lock-in">Don&#8217;t force vendor lock-in</a></li>
+<li><a class="reference internal" href="#never-fail-silently">Never fail silently</a></li>
+<li><a class="reference internal" href="#features-should-be-intuitive">Features should be intuitive</a></li>
+<li><a class="reference internal" href="#communicate-errors-clearly-and-describe-how-to-solve-them">Communicate errors clearly and describe how to solve them</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#design-decisions-based-on-the-design-principles">Design Decisions Based On The Design Principles</a><ul>
+<li><a class="reference internal" href="#the-container-is-locked-after-the-first-call-to-resolve">The container is locked after the first call to resolve</a></li>
+<li><a class="reference internal" href="#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
+<li><a class="reference internal" href="#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
+<li><a class="reference internal" href="#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
+<li><a class="reference internal" href="#dont-allow-resolving-scoped-instances-outside-an-active-scope">Don’t allow resolving scoped instances outside an active scope</a></li>
+<li><a class="reference internal" href="#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
+<li><a class="reference internal" href="#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
+<li><a class="reference internal" href="#limited-batch-registration-api">Limited batch-registration API</a></li>
+<li><a class="reference internal" href="#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pipeline.html"
+                        title="previous chapter">Simple Injector Pipeline</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="legal.html"
+                        title="next chapter">Legal stuff</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/principles.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="legal.html" title="Legal stuff"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pipeline.html" title="Simple Injector Pipeline"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

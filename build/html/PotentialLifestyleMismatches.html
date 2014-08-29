@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Diagnostic Warning - Potential Lifestyle Mismatches &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Diagnosing your configuration using the Diagnostic Services" href="diagnostics.html" />
+    <link rel="next" title="Diagnostic Warning - Short Circuited Dependencies" href="ShortCircuitedDependencies.html" />
+    <link rel="prev" title="Diagnosing your configuration using the Diagnostic Services" href="diagnostics.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ShortCircuitedDependencies.html" title="Diagnostic Warning - Short Circuited Dependencies"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="diagnostics.html" title="Diagnosing your configuration using the Diagnostic Services"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="diagnostics.html" accesskey="U">Diagnosing your configuration using the Diagnostic Services</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="diagnostic-warning-potential-lifestyle-mismatches">
+<h1>Diagnostic Warning - Potential Lifestyle Mismatches<a class="headerlink" href="#diagnostic-warning-potential-lifestyle-mismatches" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="cause">
+<h2>Cause<a class="headerlink" href="#cause" title="Permalink to this headline">¶</a></h2>
+<p>The component depends on a service with a lifestyle that is shorter than that of the component.</p>
+</div>
+<div class="section" id="warning-description">
+<h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
+<p>In general, components should only depend on other components that are configured to live at least as long. In other words, it is safe for a transient component to depend on a singleton, but not the other way around. Since components store a reference to their dependencies in (private) instance fields, those dependencies are kept alive for the lifetime of that component. This means that dependencies that are configured with a shorter lifetime than their consumer, accidentally live longer than intended. This can lead to all sorts of bugs, such as hard to debug multi-threading issues.</p>
+<p>The <em>Diagnostic Services</em> detect this kind of misconfiguration and report it. The container will be able to compare all built-in lifestyles (and sometimes even custom lifestyles). Here is an overview of the built-in lifestyles ordered by their length:</p>
+<ul class="simple">
+<li><a class="reference internal" href="lifetimes.html#transient"><em>Transient</em></a></li>
+<li><a class="reference internal" href="lifetimes.html#perlifetimescope"><em>Lifetime Scope</em></a></li>
+<li><a class="reference internal" href="lifetimes.html#executioncontextscope"><em>Execution Context Scope</em></a></li>
+<li><a class="reference internal" href="lifetimes.html#perwcfoperation"><em>WCF Operation</em></a></li>
+<li><a class="reference internal" href="lifetimes.html#perwebrequest"><em>Web Request</em></a></li>
+<li><a class="reference internal" href="lifetimes.html#perwebapirequest"><em>Web API Request</em></a></li>
+<li><a class="reference internal" href="lifetimes.html#singleton"><em>Singleton</em></a></li>
+</ul>
+<div class="note container">
+<strong>Note</strong>: This kind of error is also known as <a class="reference external" href="http://blog.ploeh.dk/2014/06/02/captive-dependency/">Captive Dependency</a>.</div>
+</div>
+<div class="section" id="how-to-fix-violations">
+<h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
+<p>There are multiple ways to fix this violation:</p>
+<ul class="simple">
+<li>Change the lifestyle of the component to a lifestyle that is as short or shorter than that of the dependency.</li>
+<li>Change the lifestyle of the dependency to a lifestyle as long or longer than that of the component.</li>
+<li>Instead of injecting the dependency, inject a factory for the creation of that dependency and call that factory every time an instance is required.</li>
+</ul>
+</div>
+<div class="section" id="when-to-ignore-warnings">
+<h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
+<p>Do not ignore these warnings. False positives for this warning are rare and even when they occur, the registration or the application design can always be changed in a way that the warning disappears.</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>The following example shows a configuration that will trigger the warning:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">InMemoryUserRepository</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
+
+<span class="c1">// RealUserService depends on IUserRepository</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">RealUserService</span><span class="p">&gt;();</span>
+
+<span class="c1">// FakeUserService depends on IUserRepository</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">FakeUserService</span><span class="p">&gt;();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The <strong>RealUserService</strong> component is registered as <em>Singleton</em> but it depends on <strong>IUserRepository</strong> which is configured with the shorter <em>Transient</em> lifestyle. Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.</p>
+<img alt="Diagnostics debugger view watch window with lifestyle mismatches" src="_images/lifestylemismatch.png" />
+<p>The following example shows how to query the Diagnostic API for Potential Lifetime Mismatches:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Diagnostics;</span>
+
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="cm">/* get verified container */</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">results</span> <span class="p">=</span> <span class="n">Analyzer</span><span class="p">.</span><span class="n">Analyze</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">OfType</span><span class="p">&lt;</span><span class="n">PotentialLifestyleMismatchDiagnosticResult</span><span class="p">&gt;();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">result</span> <span class="k">in</span> <span class="n">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">Description</span><span class="p">);</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Lifestyle of service: &quot;</span> <span class="p">+</span>
+        <span class="n">result</span><span class="p">.</span><span class="n">Relationship</span><span class="p">.</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Name</span><span class="p">);</span>
+
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Lifestyle of service&#39;s dependency: &quot;</span> <span class="p">+</span>
+        <span class="n">result</span><span class="p">.</span><span class="n">Relationship</span><span class="p">.</span><span class="n">Dependency</span><span class="p">.</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Name</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: The Diagnostic API is new in <em>Simple Injector v2.4</em>.</div>
+</div>
+<div class="section" id="what-about-hybrid-lifestyles">
+<h2>What about Hybrid lifestyles?<a class="headerlink" href="#what-about-hybrid-lifestyles" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference internal" href="lifetimes.html#hybrid"><em>Hybrid lifestyle</em></a> is a mix between two or more other lifestyles. Here is an example of a custom lifestyle that mixes the <em>Transient</em> and <em>Singleton</em> lifestyles together:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">hybrid</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateHybrid</span><span class="p">(</span>
+    <span class="n">lifestyleSelector</span><span class="p">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">someCondition</span><span class="p">,</span>
+    <span class="n">trueLifestyle</span><span class="p">:</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">,</span>
+    <span class="n">falseLifestyle</span><span class="p">:</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong> that this example is quite bizarre, since it is a very unlikely combination of lifestyles to mix together, but it serves us well for the purpose of this explanation.</div>
+<p>As explained, components should only depend on longer lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of <cite>someCondition</cite>. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).</p>
+<p>From the <em>Diagnostic Services</em>&#8216; perspective, a component can only safely depend on a hybrid lifestyled service if the consuming component&#8217;s lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid lifestyled component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the <em>Diagnostic Services</em>, the +longest+ lifestyle is used in the comparison when the hybrid is part of the consuming component, and the +shortest+ lifestyle is used when the hybrid is part of the dependency.</p>
+<p>This does imply that two components with the same hybrid lifestyle can&#8217;t safely depend on each other. This is true since in theory the supplied predicate could change results in each call. In practice however, those components would usually be able safely relate, since it is normally unlikely that the predicate changes lifestyles within a single object graph. This is an exception the <em>Diagnostic Services</em> can make pretty safely. From the <em>Diagnostic Services</em>&#8216; perspective, components can safely be related when both share the exact same lifestyle instance and no warning will be displayed in this case. This does mean however, that you should be very careful using predicates that change the lifestyle during the object graph.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Diagnostic Warning - Potential Lifestyle Mismatches</a><ul>
+<li><a class="reference internal" href="#cause">Cause</a></li>
+<li><a class="reference internal" href="#warning-description">Warning Description</a></li>
+<li><a class="reference internal" href="#how-to-fix-violations">How to Fix Violations</a></li>
+<li><a class="reference internal" href="#when-to-ignore-warnings">When to Ignore Warnings</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#what-about-hybrid-lifestyles">What about Hybrid lifestyles?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="diagnostics.html"
+                        title="previous chapter">Diagnosing your configuration using the Diagnostic Services</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ShortCircuitedDependencies.html"
+                        title="next chapter">Diagnostic Warning - Short Circuited Dependencies</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/PotentialLifestyleMismatches.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ShortCircuitedDependencies.html" title="Diagnostic Warning - Short Circuited Dependencies"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="diagnostics.html" title="Diagnosing your configuration using the Diagnostic Services"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="diagnostics.html" >Diagnosing your configuration using the Diagnostic Services</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

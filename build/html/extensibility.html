@@ -1,0 +1,425 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Extensibility Points &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="next" title="Simple Injector Pipeline" href="pipeline.html" />
+    <link rel="prev" title="T4MVC Integration Guide" href="t4mvc.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="pipeline.html" title="Simple Injector Pipeline"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="t4mvc.html" title="T4MVC Integration Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="extensibility-points">
+<h1>Extensibility Points<a class="headerlink" href="#extensibility-points" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="#overriding-constructor-resolution-behavior"><em>Overriding Constructor Resolution Behavior</em></a></li>
+<li><a class="reference internal" href="#overriding-parameter-injection-behavior"><em>Overriding Parameter Injection Behavior</em></a></li>
+<li><a class="reference internal" href="#property-injection"><em>Property Injection</em></a></li>
+<li><a class="reference internal" href="#overriding-parameter-injection-behavior"><em>Overriding Parameter Injection Behavior</em></a></li>
+<li><a class="reference internal" href="#overriding-lifestyle-selection-behavior"><em>Overriding Lifestyle Selection Behavior</em></a></li>
+<li><a class="reference internal" href="#intercepting-the-creation-of-types"><em>Intercepting the Creation of Types</em></a></li>
+</ul>
+<div class="section" id="overriding-constructor-resolution-behavior">
+<span id="id1"></span><h2>Overriding Constructor Resolution Behavior<a class="headerlink" href="#overriding-constructor-resolution-behavior" title="Permalink to this headline">¶</a></h2>
+<p>Out of the box, Simple Injector only allows the creation of classes that contain a single public constructor. This behavior is chosen deliberately because <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=97">having multiple constructors is an anti-pattern</a>.</p>
+<p>There are some exceptional circumstances though, where we don&#8217;t control the amount of public constructors a type has. Code generators for instance, can have this annoying side effect. Earlier versions of the <a class="reference external" href="https://t4mvc.codeplex.com">T4MVC</a> template for instance did this.</p>
+<p>In these rare cases we need to override the way Simple Injector does its constructor overload resolution. This can be done by creating custom implementation of <em>IConstructorResolutionBehavior</em>. The default behavior can be replaced by setting the <em>Container.Options.ConstructorResolutionBehavior</em> property.</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">IConstructorResolutionBehavior</span> <span class="p">{</span>
+    <span class="n">ConstructorInfo</span> <span class="nf">GetConstructor</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">implementationType</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Simple Injector will call into the registered <em>IConstructorResolutionBehavior</em> when the type is registered to allow the <em>IConstructorResolutionBehavior</em> implementation to verify the type. The implementation is called again when the registered type is resolved for the first time.</p>
+<p>The following example changes the constructor resolution behavior to always select the constructor with the most parameters (the greediest constructor):</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Custom constructor resolution behavior</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">GreediestConstructorBehavior</span> <span class="p">:</span> <span class="n">IConstructorResolutionBehavior</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="n">ConstructorInfo</span> <span class="nf">GetConstructor</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">implementationType</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="k">from</span> <span class="n">ctor</span> <span class="k">in</span> <span class="n">implementationType</span><span class="p">.</span><span class="n">GetConstructors</span><span class="p">()</span>
+            <span class="k">orderby</span> <span class="n">ctor</span><span class="p">.</span><span class="n">GetParameters</span><span class="p">().</span><span class="n">Length</span> <span class="k">descending</span>
+            <span class="k">select</span> <span class="n">ctor</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">First</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">ConstructorResolutionBehavior</span> <span class="p">=</span> <span class="k">new</span> <span class="n">GreediestConstructorBehavior</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The following bit more advanced example changes the constructor resolution behavior to always select the constructor with the most parameters from the list of constructors with only resolvable parameters:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Reflection</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Advanced</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">MostResolvableConstructorBehavior</span> <span class="p">:</span> <span class="n">IConstructorResolutionBehavior</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">MostResolvableConstructorBehavior</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="kt">bool</span> <span class="n">IsCalledDuringRegistrationPhase</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="p">!</span><span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">IsLocked</span><span class="p">();</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">ConstructorInfo</span> <span class="nf">GetConstructor</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span>
+        <span class="n">Type</span> <span class="n">implementationType</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="k">from</span> <span class="n">ctor</span> <span class="k">in</span> <span class="n">implementationType</span><span class="p">.</span><span class="n">GetConstructors</span><span class="p">()</span>
+            <span class="n">let</span> <span class="n">parameters</span> <span class="p">=</span> <span class="n">ctor</span><span class="p">.</span><span class="n">GetParameters</span><span class="p">()</span>
+            <span class="k">orderby</span> <span class="n">parameters</span><span class="p">.</span><span class="n">Length</span> <span class="k">descending</span>
+            <span class="k">where</span> <span class="k">this</span><span class="p">.</span><span class="n">IsCalledDuringRegistrationPhase</span> <span class="p">||</span>
+                <span class="n">parameters</span><span class="p">.</span><span class="n">All</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">CanBeResolved</span><span class="p">)</span>
+            <span class="k">select</span> <span class="n">ctor</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">First</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="kt">bool</span> <span class="nf">CanBeResolved</span><span class="p">(</span><span class="n">ParameterInfo</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ParameterType</span><span class="p">)</span> <span class="p">!=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">ConstructorResolutionBehavior</span> <span class="p">=</span>
+    <span class="k">new</span> <span class="nf">MostResolvableConstructorBehavior</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The previous examples changed the constructor overload resolution for all registered types. This is usually not the best approach, since this promotes ambiguity in design of our classes. Since ambiguity is usually only a problem in code generation scenarios, it&#8217;s best to only override the behavior for types that are affected by the code generator. Take for instance this example for earlier versions of T4MVC:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">T4MvcConstructorBehavior</span> <span class="p">:</span> <span class="n">IConstructorResolutionBehavior</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="n">IConstructorResolutionBehavior</span> <span class="n">defaultBehavior</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">T4MvcConstructorBehavior</span><span class="p">(</span>
+        <span class="n">IConstructorResolutionBehavior</span> <span class="n">defaultBehavior</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">defaultBehavior</span> <span class="p">=</span> <span class="n">defaultBehavior</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">ConstructorInfo</span> <span class="nf">GetConstructor</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">impType</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IController</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">impType</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">nonDefaultConstructors</span> <span class="p">=</span>
+                <span class="k">from</span> <span class="n">constructor</span> <span class="k">in</span> <span class="n">impType</span><span class="p">.</span><span class="n">GetConstructors</span><span class="p">()</span>
+                <span class="k">where</span> <span class="n">constructor</span><span class="p">.</span><span class="n">GetParameters</span><span class="p">().</span><span class="n">Length</span> <span class="p">&gt;</span> <span class="m">0</span>
+                <span class="k">select</span> <span class="n">constructor</span><span class="p">;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">nonDefaultConstructors</span><span class="p">.</span><span class="n">Count</span><span class="p">()</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">return</span> <span class="n">nonDefaultConstructors</span><span class="p">.</span><span class="n">Single</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="c1">// fall back to the container&#39;s default behavior.</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">defaultBehavior</span><span class="p">.</span><span class="n">GetConstructor</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">impType</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">ConstructorResolutionBehavior</span> <span class="p">=</span>
+    <span class="k">new</span> <span class="nf">T4MvcConstructorBehavior</span><span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">ConstructorResolutionBehavior</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The old T4MVC template generated an extra public constructor on MVC Controller types and overload resolution only had to be changed for types implementing <strong>System.Web.Mvc.IController</strong>, which is what the previous code snippet does. For all other types of registration in the container, the container&#8217;s default behavior is used.</p>
+</div>
+<div class="section" id="property-injection">
+<span id="id2"></span><h2>Property Injection<a class="headerlink" href="#property-injection" title="Permalink to this headline">¶</a></h2>
+<p>Attribute based property injection and implicit property injection are not supported by Simple Injector out of the box. With attribute based property injection the container injects properties that are decorated with an attribute. With implicit property injection the container automatically injects all properties that can be mapped to a registration, but silently skips other properties. An extension point is provided to change the library&#8217;s default behavior, which is to <strong>not</strong> inject any property at all.</p>
+<p>Out of the box, Simple Injector does allow explicit property injection based on registration of delegates using the <em>RegisterInitializer</em> method:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">FileLogger</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">FileLogger</span><span class="p">&gt;(</span><span class="n">instance</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="n">instance</span><span class="p">.</span><span class="n">Path</span> <span class="p">=</span> <span class="s">&quot;c:\logs\log.txt&quot;</span><span class="p">;</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<p>This enables property injection on a per-type basis and it allows configuration errors to be spot by the C# compiler and is especially suited for injection of configuration values. Downside of this approach is that the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a> will not be able to analyze properties injected this way and although the <em>RegisterInitializer</em> can be called on base types and interfaces, it is cumbersome when applying property injection on a larger scale.</p>
+<p>The Simple Injector API exposes the <em>IPropertySelectionBehavior</em> interface to change the way the library does property injection. The example below shows a custom <em>IPropertySelectionBehavior</em> implementation that enables attribute based property injection using any custom attribute:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Reflection</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Advanced</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">PropertySelectionBehavior</span><span class="p">&lt;</span><span class="n">TAttribute</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IPropertySelectionBehavior</span>
+    <span class="k">where</span> <span class="n">TAttribute</span> <span class="p">:</span> <span class="n">Attribute</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">bool</span> <span class="nf">SelectProperty</span><span class="p">(</span><span class="n">Type</span> <span class="n">type</span><span class="p">,</span> <span class="n">PropertyInfo</span> <span class="n">prop</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">prop</span><span class="p">.</span><span class="n">GetCustomAttributes</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">TAttribute</span><span class="p">)).</span><span class="n">Any</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage:</span>
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">PropertySelectionBehavior</span> <span class="p">=</span>
+    <span class="k">new</span> <span class="n">PropertySelectionBehavior</span><span class="p">&lt;</span><span class="n">MyInjectAttribute</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+<p>This enables explicit property injection on all properties that are marked with the supplied attribute (in this case <strong>MyInjectAttribute</strong>). In case a property is decorated that can&#8217;t be injected, the container will throw an exception.</p>
+<div class="note container">
+<strong>Tip</strong>: Dependencies injected by the container through the <em>IPropertySelectionBehavior</em> will be analyzed by the <a class="reference internal" href="diagnostics.html"><em>Diagnostic</em></a>.</div>
+<p>Implicit property injection can be enabled by creating an <em>IPropertySelectionBehavior</em> implementation that queries the container to check whether the property&#8217;s type to be registered in the container:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">ImplicitPropertyInjectionBehavior</span> <span class="p">:</span> <span class="n">IPropertySelectionBehavior</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
+    <span class="k">internal</span> <span class="nf">ImplicitPropertyInjectionBehavior</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">bool</span> <span class="nf">SelectProperty</span><span class="p">(</span><span class="n">Type</span> <span class="n">type</span><span class="p">,</span> <span class="n">PropertyInfo</span> <span class="n">property</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">IsImplicitInjectable</span><span class="p">(</span><span class="n">property</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="kt">bool</span> <span class="nf">IsImplicitInjectable</span><span class="p">(</span><span class="n">PropertyInfo</span> <span class="n">property</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nf">IsInjectableProperty</span><span class="p">(</span><span class="n">property</span><span class="p">)</span> <span class="p">&amp;&amp;</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">IsAvailable</span><span class="p">(</span><span class="n">property</span><span class="p">.</span><span class="n">PropertyType</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">static</span> <span class="kt">bool</span> <span class="nf">IsInjectableProperty</span><span class="p">(</span><span class="n">PropertyInfo</span> <span class="n">prop</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">MethodInfo</span> <span class="n">setMethod</span> <span class="p">=</span> <span class="n">prop</span><span class="p">.</span><span class="n">GetSetMethod</span><span class="p">(</span><span class="n">nonPublic</span><span class="p">:</span> <span class="k">false</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">setMethod</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">&amp;&amp;</span> <span class="p">!</span><span class="n">setMethod</span><span class="p">.</span><span class="n">IsStatic</span> <span class="p">&amp;&amp;</span> <span class="n">prop</span><span class="p">.</span><span class="n">CanWrite</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="kt">bool</span> <span class="nf">IsAvailable</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="n">serviceType</span><span class="p">)</span> <span class="p">!=</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage:</span>
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">PropertySelectionBehavior</span> <span class="p">=</span>
+    <span class="k">new</span> <span class="nf">ImplicitPropertyInjectionBehavior</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Warning</strong>: Silently skipping properties that can&#8217;t be mapped can lead to a DI configuration that can&#8217;t be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified. Prefer explicit property injection -or better- constructor injection whenever possible.</div>
+</div>
+<div class="section" id="overriding-parameter-injection-behavior">
+<span id="id3"></span><h2>Overriding Parameter Injection Behavior<a class="headerlink" href="#overriding-parameter-injection-behavior" title="Permalink to this headline">¶</a></h2>
+<p>Simple Injector does not allow injecting primitive types (such as integers and string) into constructors. The <em>IConstructorInjectionBehavior</em> interface is defined by the library to change this default behavior.</p>
+<p>The following article contains more information about changing the library&#8217;s default behavior: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=94">Primitive Dependencies with the Simple Injector</a>.</p>
+</div>
+<div class="section" id="resolving-unregistered-types">
+<span id="id4"></span><h2>Resolving Unregistered Types<a class="headerlink" href="#resolving-unregistered-types" title="Permalink to this headline">¶</a></h2>
+<p>Unregistered type resolution is the ability to get notified by the container when a type is requested that is currently unregistered in the container. This gives you the change of registering that type. Simple Injector supports this scenario with the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm">ResolveUnregisteredType</a> event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the <a class="reference internal" href="advanced.html#registration-of-open-generic-types"><em>registration of open generic types</em></a>. Other examples of possible scenarios that can be built on top of this event are <a class="reference internal" href="howto.html#resolve-arrays-and-lists"><em>resolving array and lists</em></a> and <a class="reference internal" href="advanced.html#id18"><em>covariance and contravariance</em></a>. Those scenarios are described here in the advanced scenarios page.</p>
+<p>For more information about how to use this event, please look at the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm">ResolveUnregisteredType event documentation</a> in the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">reference library</a>.</p>
+</div>
+<div class="section" id="overriding-lifestyle-selection-behavior">
+<span id="id5"></span><h2>Overriding Lifestyle Selection Behavior<a class="headerlink" href="#overriding-lifestyle-selection-behavior" title="Permalink to this headline">¶</a></h2>
+<p>By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the <em>Transient</em> lifestyle. Since <em>Simple Injector 2.6</em>, this behavior can be overridden and this is especially useful in batch-registration scenarios.</p>
+<p>Here are some examples of registration calls that all register types as <em>transient</em>:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">,</span> <span class="n">AspNetUserContext</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ITimeProvider</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">RealTimeProvider</span><span class="p">());</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="k">typeof</span><span class="p">(</span><span class="n">SqlLogger</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">FileLogger</span><span class="p">));</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterManyForOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">LoggingCommandHandlerDecorator</span><span class="p">&lt;&gt;));</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">NullValidator</span><span class="p">&lt;&gt;));</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterMvcControllers</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterWcfServices</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiControllers</span><span class="p">(</span><span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Most of these methods have overloads that allow supplying a different lifestyle. This works great in situations where you register a single type (using one of the <em>Register</em> method overloads for instance), and when all registrations need the same lifestyle. This is less suitable for cases where you batch-register a set of types where each type needs a different lifestyle.</p>
+<p>In this case we need to override the way Simple Injector does lifestyle selection. This can be done by creating custom implementation of <em>ILifestyleSelectionBehavior</em>.</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">ILifestyleSelectionBehavior</span> <span class="p">{</span>
+    <span class="n">Lifestyle</span> <span class="nf">SelectLifestyle</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">implementationType</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>When no lifestyle is explicitly supplied by the user, Simple Injector will call into the registered ILifestyleSelectionBehavior when the type is registered to allow the ILifestyleSelectionBehavior implementation to select the proper lifestyle. The default behavior can be replaced by setting the <em>Container.Options.LifestyleSelectionBehavior</em> property.</p>
+<p>The following (not very useful) example changes the lifestyle selection behavior to always register those instances as singleton:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Advanced</span><span class="p">;</span>
+
+<span class="c1">// Custom lifestyle selection behavior</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">SingletonLifestyleSelectionBehavior</span> <span class="p">:</span> <span class="n">ILifestyleSelectionBehavior</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="n">Lifestyle</span> <span class="nf">SelectLifestyle</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">implementationType</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">LifestyleSelectionBehavior</span> <span class="p">=</span>
+    <span class="k">new</span> <span class="nf">SingletonLifestyleSelectionBehavior</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The following example changes the lifestyle selection behavior to pick the lifestyle based on an attribute:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Reflection</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Advanced</span><span class="p">;</span>
+
+<span class="c1">// Attribute for use by the application</span>
+<span class="k">public</span> <span class="k">enum</span> <span class="n">CreationPolicy</span> <span class="p">{</span> <span class="n">Transient</span><span class="p">,</span> <span class="n">Scoped</span><span class="p">,</span> <span class="n">Singleton</span> <span class="p">}</span>
+
+<span class="na">[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface,</span>
+<span class="na">    Inherited = false, AllowMultiple = false)]</span>
+<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">CreationPolicyAttribute</span> <span class="p">:</span> <span class="n">Attribute</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="nf">CreationPolicyAttribute</span><span class="p">(</span><span class="n">CreationPolicy</span> <span class="n">policy</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">Policy</span> <span class="p">=</span> <span class="n">policy</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">CreationPolicy</span> <span class="n">Policy</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">private</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Custom lifestyle selection behavior</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">AttributeBasedLifestyleSelectionBehavior</span> <span class="p">:</span> <span class="n">ILifestyleSelectionBehavior</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">const</span> <span class="n">CreationPolicy</span> <span class="n">DefaultPolicy</span> <span class="p">=</span> <span class="n">CreationPolicy</span><span class="p">.</span><span class="n">Transient</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ScopedLifestyle</span> <span class="n">scopedLifestyle</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">AttributeBasedLifestyleSelectionBehavior</span><span class="p">(</span><span class="n">ScopedLifestyle</span> <span class="n">scopedLifestyle</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="n">scopedLifestyle</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">Lifestyle</span> <span class="nf">SelectLifestyle</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">implementationType</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">attribute</span> <span class="p">=</span> <span class="n">implementationType</span><span class="p">.</span><span class="n">GetCustomAttribute</span><span class="p">&lt;</span><span class="n">CreationPolicyAttribute</span><span class="p">&gt;()</span>
+            <span class="p">??</span> <span class="n">serviceType</span><span class="p">.</span><span class="n">GetCustomAttribute</span><span class="p">&lt;</span><span class="n">CreationPolicyAttribute</span><span class="p">&gt;();</span>
+
+        <span class="kt">var</span> <span class="n">policy</span> <span class="p">=</span> <span class="n">attribute</span> <span class="p">==</span> <span class="k">null</span> <span class="p">?</span> <span class="n">DefaultPolicy</span> <span class="p">:</span> <span class="n">attribute</span><span class="p">.</span><span class="n">Policy</span><span class="p">;</span>
+
+        <span class="k">switch</span> <span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="n">CreationPolicy</span><span class="p">.</span><span class="n">Singleton</span><span class="p">:</span> <span class="k">return</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">;</span>
+            <span class="k">case</span> <span class="n">CreationPolicy</span><span class="p">.</span><span class="n">Scoped</span><span class="p">:</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">scopedLifestyle</span><span class="p">;</span>
+            <span class="k">default</span><span class="p">:</span> <span class="k">return</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="c1">// Create a scope lifestyle (if needed)</span>
+<span class="n">ScopedLifestyle</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">LifestyleSelectionBehavior</span> <span class="p">=</span>
+    <span class="k">new</span> <span class="nf">AttributeBasedLifestyleSelectionBehavior</span><span class="p">(</span><span class="n">scopedLifestyle</span><span class="p">);</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">,</span> <span class="n">AspNetUserContext</span><span class="p">&gt;();</span>
+
+<span class="c1">// Usage in application</span>
+<span class="na">[CreationPolicy(CreationPolicy.Scoped)]</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">AspNetUserContext</span> <span class="p">:</span> <span class="n">IUserContext</span> <span class="p">{</span>
+    <span class="c1">// etc</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="intercepting-the-creation-of-types">
+<span id="id6"></span><h2>Intercepting the Creation of Types<a class="headerlink" href="#intercepting-the-creation-of-types" title="Permalink to this headline">¶</a></h2>
+<p>Interception the creation of types allows registrations to be modified. This enables all sorts of advanced scenarios where the creation of a single type or whole object graphs gets altered. Simple Injector contains two events that allow altering the type&#8217;s creation: <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm">ExpressionBuilding</a> and <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm">ExpressionBuilt</a>. Both events are quite similar but are called in different stages of the <a class="reference internal" href="pipeline.html#resolve-pipeline"><em>building process</em></a>.</p>
+<p>The <em>ExpressionBuilding</em> event gets called just after the registrations expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for <a class="reference internal" href="advanced.html#id7"><em>Context based injection</em></a>.</p>
+<p>The <em>ExpressionBuilt</em> event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time <em>ExpressionBuilding</em> was called, is gone. While <em>ExpressionBuilding</em> is especially suited for changing the relationship between the resolved type and its dependencies, <em>ExpressionBuilt</em> is especially useful for applying decorators or <a class="reference internal" href="advanced.html#interception"><em>applying interceptors</em></a>. Note that Simple Injector has built-in support for <a class="reference internal" href="advanced.html#decorators"><em>applying decorators</em></a> using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm">RegisterDecorator</a> extension methods. These methods internally use the <em>ExpressionBuilt</em> event.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Extensibility Points</a><ul>
+<li><a class="reference internal" href="#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
+<li><a class="reference internal" href="#property-injection">Property Injection</a></li>
+<li><a class="reference internal" href="#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
+<li><a class="reference internal" href="#resolving-unregistered-types">Resolving Unregistered Types</a></li>
+<li><a class="reference internal" href="#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
+<li><a class="reference internal" href="#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="t4mvc.html"
+                        title="previous chapter">T4MVC Integration Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pipeline.html"
+                        title="next chapter">Simple Injector Pipeline</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/extensibility.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="pipeline.html" title="Simple Injector Pipeline"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="t4mvc.html" title="T4MVC Integration Guide"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

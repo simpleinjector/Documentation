@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ASP.NET MVC Integration Guide &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Integration Guide" href="integration.html" />
+    <link rel="next" title="ASP.NET Web API Integration Guide" href="webapiintegration.html" />
+    <link rel="prev" title="Integration Guide" href="integration.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="webapiintegration.html" title="ASP.NET Web API Integration Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="integration.html" title="Integration Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" accesskey="U">Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="asp-net-mvc-integration-guide">
+<h1>ASP.NET MVC Integration Guide<a class="headerlink" href="#asp-net-mvc-integration-guide" title="Permalink to this headline">¶</a></h1>
+<p>Simple Injector contains <a class="reference external" href="https://nuget.org/packages/SimpleInjector.MVC3">Simple Injector MVC Integration Quick Start NuGet package</a>. If you&#8217;re not using NuGet, you can include the <em>SimpleInjector.Integration.Web.Mvc.dll</em> in your MVC application, which is part of the standard CodePlex download.</p>
+<div class="note container">
+<strong>Warning</strong>: If you are starting from an Empty MVC project template (File | New | Project | MVC 4 | Empty Project Template) you have to manually setup <strong>System.Web.Mvc</strong> binding redirects, or reference System.Web.Mvc from the GAC.</div>
+<p>The following code snippet shows how to use the use the integration package (note that the quick start package this code for you).</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// You&#39;ll need to include the following namespaces</span>
+<span class="k">using</span> <span class="nn">System.Web.Mvc</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Integration.Web.Mvc</span><span class="p">;</span>
+
+<span class="c1">// This is the Application_Start event from the Global.asax file.</span>
+<span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Create the container as usual.</span>
+    <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+    <span class="c1">// Register your types, for instance:</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
+
+    <span class="c1">// This is an extension method from the integration package.</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">RegisterMvcControllers</span><span class="p">(</span><span class="n">Assembly</span><span class="p">.</span><span class="n">GetExecutingAssembly</span><span class="p">());</span>
+
+    <span class="c1">// This is an extension method from the integration package as well.</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">RegisterMvcIntegratedFilterProvider</span><span class="p">();</span>
+
+    <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+    <span class="n">DependencyResolver</span><span class="p">.</span><span class="n">SetResolver</span><span class="p">(</span>
+        <span class="k">new</span> <span class="nf">SimpleInjectorDependencyResolver</span><span class="p">(</span><span class="n">container</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="integration.html"
+                        title="previous chapter">Integration Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="webapiintegration.html"
+                        title="next chapter">ASP.NET Web API Integration Guide</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/mvcintegration.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="webapiintegration.html" title="ASP.NET Web API Integration Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="integration.html" title="Integration Guide"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" >Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

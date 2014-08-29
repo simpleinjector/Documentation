@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CollectionRegistrationExtensions &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="collectionregistrationextensions">
+<h1>CollectionRegistrationExtensions<a class="headerlink" href="#collectionregistrationextensions" title="Permalink to this headline">¶</a></h1>
+<p>!!! Allowing the Simple Injector to resolve arrays and other list types
+The default behavior of the <em>Simple Injector</em> is to resolve collections of types through the _IEnumerable&lt;T&gt;_ interface. Resolving a set of elements using other collection types is possible by registrering a mapping on a per type basis, such as can be seen the following example:</p>
+<p>{code:c#}
+container.RegisterAll&lt;IFilter&gt;(</p>
+<blockquote>
+<div>typeof(SqlFilter), typeof(XssFilter), typeof(SmartFilter));</div></blockquote>
+<dl class="docutils">
+<dt>container.Register&lt;IFilter[]&gt;(</dt>
+<dd>() =&gt; container.GetAllInstances&lt;IFilter&gt;().ToArray());</dd>
+</dl>
+<p>{code:c#}
+When having many collections of types that need to be resolved in this way, the registration can be come cumbersome. Alternatively you can revert to unregistered type resolution, as can be seen in the following example:</p>
+<p>{code:c#}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;</p>
+<p>using SimpleInjector;</p>
+<p>public static class CollectionRegistrationExtensions
+{</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>public static void AllowToResolveArraysAndLists(</dt>
+<dd>this Container container)</dd>
+</dl>
+<dl class="docutils">
+<dt>{</dt>
+<dd><p class="first">container.ResolveUnregisteredType += (sender, e) =&gt;
+{</p>
+<blockquote>
+<div><p>var serviceType = e.UnregisteredServiceType;</p>
+<p>if (serviceType.IsArray)
+{</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>RegisterArrayResolver(e, container,</dt>
+<dd>serviceType.GetElementType());</dd>
+</dl>
+</div></blockquote>
+<p>}
+else if (serviceType.IsGenericType &amp;&amp;</p>
+<blockquote>
+<div>serviceType.GetGenericTypeDefinition() == typeof(IList&lt;&gt;))</div></blockquote>
+<dl class="docutils">
+<dt>{</dt>
+<dd><dl class="first last docutils">
+<dt>RegisterArrayResolver(e, container,</dt>
+<dd>serviceType.GetGenericArguments()[0]);</dd>
+</dl>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p class="last">};</p>
+</dd>
+</dl>
+<p>}</p>
+<dl class="docutils">
+<dt>private static void RegisterArrayResolver(UnregisteredTypeEventArgs e,</dt>
+<dd>Container container, Type elementType)</dd>
+</dl>
+<dl class="docutils">
+<dt>{</dt>
+<dd><dl class="first docutils">
+<dt>var producer = container.GetRegistration(typeof(IEnumerable&lt;&gt;)</dt>
+<dd>.MakeGenericType(elementType));</dd>
+</dl>
+<p>var enumerableExpression = producer.BuildExpression();
+var arrayMethod = typeof(Enumerable).GetMethod(&#8220;ToArray&#8221;)</p>
+<blockquote>
+<div>.MakeGenericMethod(elementType);</div></blockquote>
+<dl class="docutils">
+<dt>var arrayExpression =</dt>
+<dd>Expression.Call(arrayMethod, enumerableExpression);</dd>
+</dl>
+<p class="last">e.Register(arrayExpression);</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>}
+{code:c#}
+After copying the previous code snippet to your project, you can allow mapping of array and _IList&lt;T&gt;_ types to _IEnumerable&lt;T&gt;_ for all registered collections, with the following lines:</p>
+<p>{code:c#}
+container.AllowToResolveArraysAndLists();
+{code:c#}</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/CollectionRegistrationExtensions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

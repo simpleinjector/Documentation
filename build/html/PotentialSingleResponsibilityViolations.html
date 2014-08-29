@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Diagnostic Warning - Potential Single Responsibility Violations &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Diagnosing your configuration using the Diagnostic Services" href="diagnostics.html" />
+    <link rel="next" title="Diagnostic Warning - Unregistered Types" href="UnregisteredTypes.html" />
+    <link rel="prev" title="Diagnostic Warning - Short Circuited Dependencies" href="ShortCircuitedDependencies.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="UnregisteredTypes.html" title="Diagnostic Warning - Unregistered Types"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ShortCircuitedDependencies.html" title="Diagnostic Warning - Short Circuited Dependencies"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="diagnostics.html" accesskey="U">Diagnosing your configuration using the Diagnostic Services</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="diagnostic-warning-potential-single-responsibility-violations">
+<h1>Diagnostic Warning - Potential Single Responsibility Violations<a class="headerlink" href="#diagnostic-warning-potential-single-responsibility-violations" title="Permalink to this headline">¶</a></h1>
+<div class="note container">
+<strong>Note</strong>: This warning type is new in <em>Simple Injector version 2.1</em>.</div>
+<div class="section" id="cause">
+<h2>Cause<a class="headerlink" href="#cause" title="Permalink to this headline">¶</a></h2>
+<p>The component depends on too many services.</p>
+</div>
+<div class="section" id="warning-description">
+<h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
+<p>In general, components should only depend on a few other components. When a component depends on many other components (usually caused by constructor over-injection), it might indicate that the component has too many responsibilities. In other words it might be a sign that the component violates the <a class="reference external" href="https://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> (SRP). Violations of the SRP will often lead to maintainability issues later on in the application lifecycle.</p>
+<p>The general consensus is that a constructor with more than 4 or 5 dependencies is a code smell. To prevent too many false positives, the threshold for the Diagnostic Services is 6 dependencies, so you&#8217;ll start to see warnings on types with 7 or more dependencies.</p>
+</div>
+<div class="section" id="how-to-fix-violations">
+<h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
+<p>The article <a class="reference external" href="https://deals.manningpublications.com/DependencyInjectioninNET.pdf">Dealing with constructor over-injection by Mark Seemann</a> goes into detail how to about fixing the root cause of constructor over-injection.</p>
+<p>Note that moving dependencies out of the constructor and into properties might solve the constructor over-injection code smell, but does not solve a violation of the SRP, since the class itself is not refactored.</p>
+<p>Moving those properties to a base class also doesn&#8217;t solve the SRP violation. Often derived types will still use the dependencies of the base class making them still violating the SRP and even if they don&#8217;t, the base class itself will probably violate the SRP.</p>
+<p>Those base classes will often just be helpers to implement all kinds of cross-cutting concerns. Instead of using base classes, a better way to implementing cross-cutting concerns is through <a class="reference internal" href="advanced.html#decorators"><em>decorators</em></a>.</p>
+</div>
+<div class="section" id="when-to-ignore-warnings">
+<h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
+<p>This warning can safely be ignored when the type in question does not violate the SRP and the number of dependencies is stable (does not change often).</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">Foo</span> <span class="p">:</span> <span class="n">IFoo</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nf">Foo</span><span class="p">(</span><span class="n">IUnitOfWorkFactory</span> <span class="n">uowFactory</span><span class="p">,</span>
+        <span class="n">CurrencyProvider</span> <span class="n">currencyProvider</span><span class="p">,</span>
+        <span class="n">IFooPolicy</span> <span class="n">fooPolicy</span><span class="p">,</span>
+        <span class="n">IBarService</span> <span class="n">barService</span><span class="p">,</span>
+        <span class="n">ICoffeeMaker</span> <span class="n">coffeeMaker</span><span class="p">,</span>
+        <span class="n">IKitchenSink</span> <span class="n">kitchenSink</span><span class="p">,</span>
+        <span class="n">IIceCubeProducer</span> <span class="n">iceCubeProducer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <strong>Foo</strong> class has 7 dependencies and when it is registered in the container, it will result in the warning. Here is an example of this warning in the watch window:</p>
+<img alt="Debugger watch window showing the SRP violation" src="_images/srp.png" />
+<p>The following example shows how to query the Diagnostic API for possible Single Responsibility Violations:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Diagnostics;</span>
+
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="cm">/* get verified container */</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">results</span> <span class="p">=</span> <span class="n">Analyzer</span><span class="p">.</span><span class="n">Analyze</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">OfType</span><span class="p">&lt;</span><span class="n">SingleResponsibilityViolationDiagnosticResult</span><span class="p">&gt;();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">result</span> <span class="k">in</span> <span class="n">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span> <span class="p">+</span>
+            <span class="s">&quot; has &quot;</span> <span class="p">+</span> <span class="n">result</span><span class="p">.</span><span class="n">Dependencies</span><span class="p">.</span><span class="n">Count</span> <span class="p">+</span> <span class="s">&quot; dependencies.&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: The Diagnostic API is new in <em>Simple Injector v2.4</em>.</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Diagnostic Warning - Potential Single Responsibility Violations</a><ul>
+<li><a class="reference internal" href="#cause">Cause</a></li>
+<li><a class="reference internal" href="#warning-description">Warning Description</a></li>
+<li><a class="reference internal" href="#how-to-fix-violations">How to Fix Violations</a></li>
+<li><a class="reference internal" href="#when-to-ignore-warnings">When to Ignore Warnings</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ShortCircuitedDependencies.html"
+                        title="previous chapter">Diagnostic Warning - Short Circuited Dependencies</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="UnregisteredTypes.html"
+                        title="next chapter">Diagnostic Warning - Unregistered Types</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/PotentialSingleResponsibilityViolations.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="UnregisteredTypes.html" title="Diagnostic Warning - Unregistered Types"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ShortCircuitedDependencies.html" title="Diagnostic Warning - Short Circuited Dependencies"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="diagnostics.html" >Diagnosing your configuration using the Diagnostic Services</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

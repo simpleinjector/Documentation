@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ASP.NET Web API Integration Guide &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Integration Guide" href="integration.html" />
+    <link rel="next" title="ASP.NET Web Forms Integration Guide" href="webformsintegration.html" />
+    <link rel="prev" title="ASP.NET MVC Integration Guide" href="mvcintegration.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="webformsintegration.html" title="ASP.NET Web Forms Integration Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mvcintegration.html" title="ASP.NET MVC Integration Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" accesskey="U">Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="asp-net-web-api-integration-guide">
+<h1>ASP.NET Web API Integration Guide<a class="headerlink" href="#asp-net-web-api-integration-guide" title="Permalink to this headline">¶</a></h1>
+<div class="note container">
+<strong>Note</strong>: this wiki page is specific for <em>Simple Injector version 2.5</em> and up. Look <a class="reference external" href="https://simpleinjector.codeplex.com/wikipage?title=WebAPIIntegration&amp;version=8">here</a> for documentation for earlier versions.</div>
+<p>Simple Injector contains <a class="reference external" href="https://www.nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart">Simple Injector ASP.NET Web API Integration Quick Start NuGet package for IIS-hosted applications</a>. If you&#8217;re not using NuGet, you must include both the <em>SimpleInjector.Integration.WebApi.dll</em> and <em>SimpleInjector.Extensions.ExecutionContextScoping.dll</em> in your Web API application, which is part of the standard CodePlex download.</p>
+<div class="note container">
+<strong>Note</strong>: To be able to run the Web API integration packages, <a class="reference external" href="https://stackoverflow.com/questions/22392032/are-there-any-technical-reasons-simpleinjector-cannot-support-webapi-on-net-4-0">you need</a> <em>.NET 4.5</em> or above.</div>
+<div class="section" id="basic-setup">
+<h2>Basic setup<a class="headerlink" href="#basic-setup" title="Permalink to this headline">¶</a></h2>
+<p>The following code snippet shows how to use the use the integration package (note that the quick start package injects this code for you).</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// You&#39;ll need to include the following namespaces</span>
+<span class="k">using</span> <span class="nn">System.Web.Http</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Integration.WebApi</span><span class="p">;</span>
+
+<span class="c1">// This is the Application_Start event from the Global.asax file.</span>
+<span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Create the container as usual.</span>
+    <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+    <span class="c1">// Register your types, for instance using the RegisterWebApiRequest</span>
+    <span class="c1">// extension from the integration package:</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiRequest</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
+
+    <span class="c1">// This is an extension method from the integration package.</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiControllers</span><span class="p">(</span><span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">);</span>
+
+    <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+    <span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">.</span><span class="n">DependencyResolver</span> <span class="p">=</span>
+        <span class="k">new</span> <span class="nf">SimpleInjectorWebApiDependencyResolver</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+
+    <span class="c1">// Here your usual Web API configuration stuff.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>With this configuration, ASP.NET Web API will create new <strong>IHttpController</strong> instances through the container. Because controllers are concrete classes, the container will be able to create them without any registration. However, to be able to <a class="reference internal" href="diagnostics.html"><em>diagnose</em></a> and <a class="reference internal" href="howto.html#verify-configuration"><em>verify</em></a> the container&#8217;s configuration, it is important to register all root types explicitly.</p>
+<div class="note container">
+<strong>Note</strong>: For Web API applications the use of the <em>WebApiRequestLifestyle</em> is adviced over the <em>WebRequestLifestyle</em>. Please take a look at the <a class="reference internal" href="lifetimes.html#webapirequest-vs-webrequest"><em>Web API Request Object Lifestyle Management wiki page</em></a> for more information.</div>
+<p>Given the configuration above, an actual controller could look like this:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">UserController</span> <span class="p">:</span> <span class="n">ApiController</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">;</span>
+
+    <span class="c1">// Use constructor injection here</span>
+    <span class="k">public</span> <span class="nf">UserController</span><span class="p">(</span><span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">repository</span> <span class="p">=</span> <span class="n">repository</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">User</span><span class="p">&gt;</span> <span class="n">GetAllUsers</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">repository</span><span class="p">.</span><span class="n">GetAll</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">User</span> <span class="nf">GetUserById</span><span class="p">(</span><span class="kt">int</span> <span class="n">id</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">repository</span><span class="p">.</span><span class="n">GetById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">catch</span> <span class="p">(</span><span class="n">KeyNotFoundException</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">HttpResponseException</span><span class="p">(</span><span class="n">HttpStatusCode</span><span class="p">.</span><span class="n">NotFound</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="extra-features">
+<h2>Extra features<a class="headerlink" href="#extra-features" title="Permalink to this headline">¶</a></h2>
+<p>The basic features of the Web API integration package are the <em>SimpleInjectorWebApiDependencyResolver</em> class and the <em>WebApiRequestLifestyle</em> with its <em>RegisterWebApiRequest</em> extension methods. Besides these basic features, the integration package contains extra features that can make your life easier.</p>
+<div class="section" id="getting-the-current-request-s-httprequestmessage">
+<h3>Getting the current request&#8217;s HttpRequestMessage<a class="headerlink" href="#getting-the-current-request-s-httprequestmessage" title="Permalink to this headline">¶</a></h3>
+<p>When working with Web API you will often find yourself wanting access to the current <strong>HttpRequestMessage_. Simple Injector allows fetching the current **HttpRequestMessage</strong> by calling the <strong>container.GetCurrentHttpRequestMessage()</strong> extension method. To be able to request the current <strong>HttpRequestMessage</strong> you need to explicitly enable this as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">EnableHttpRequestMessageTracking</span><span class="p">(</span><span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>There are several ways to get the current <strong>HttpRequestMessage</strong> in your services, but since it is discouraged to inject the <strong>Container</strong> itself into any services, the best way is to define an abstraction for this. For instance:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">IRequestMessageProvider</span> <span class="p">{</span>
+    <span class="n">HttpRequestMessage</span> <span class="n">CurrentMessage</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This abstraction can be injected into your services, which can call the <strong>CurrentMessage</strong> property to get the <strong>HttpRequestMessage</strong>. Close to your DI configuration you can now create an implementation for this interface as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Register this class per Web API request</span>
+<span class="k">private</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">RequestMessageProvider</span>
+    <span class="p">:</span> <span class="n">IRequestMessageProvider</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">Lazy</span><span class="p">&lt;</span><span class="n">HttpRequestMessage</span><span class="p">&gt;</span> <span class="n">message</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">RequestMessageProvider</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">message</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Lazy</span><span class="p">&lt;</span><span class="n">HttpRequestMessage</span><span class="p">&gt;(</span>
+            <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentHttpRequestMessage</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">HttpRequestMessage</span> <span class="n">CurrentMessage</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">message</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This implementation can be implemented as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiRequest</span><span class="p">&lt;</span><span class="n">IRequestMessageProvider</span><span class="p">,</span> <span class="n">RequestMessageProvider</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="injecting-dependencies-into-web-api-filter-attributes">
+<h3>Injecting dependencies into Web API filter attributes<a class="headerlink" href="#injecting-dependencies-into-web-api-filter-attributes" title="Permalink to this headline">¶</a></h3>
+<p>Simple Injector allows integrating Web API filter attributes with the Simple Injector pipeline. This means that Simple Injector can inject properties into those attributes and allow any registered initializer delegates to be applied to those attributes. Constructor injection however is out of the picture. Since it is the reflection API of the CLR that is responsible for creating attributes, it&#8217;s impossible to inject dependencies into the attribute&#8217;s constructor.</p>
+<p>To allow attributes to be integrated into the Simple Injector pipeline, you have to register a custom filter provider as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiFilterProvider</span><span class="p">(</span><span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This ensures that attributes are initialized by Simple Injector according to the container&#8217;s configuration. This by itself however, doesn&#8217;t do much, since Simple Injector will not inject any properties by default. By registering a custom <em>IPropertySelectionBehavior</em> however, you can property injection to take place on attributes. An example of such custom behavior is given <a class="reference internal" href="advanced.html#importpropertyselectionbehavior"><em>here</em></a> in the advanced sections of the wiki.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ASP.NET Web API Integration Guide</a><ul>
+<li><a class="reference internal" href="#basic-setup">Basic setup</a></li>
+<li><a class="reference internal" href="#extra-features">Extra features</a><ul>
+<li><a class="reference internal" href="#getting-the-current-request-s-httprequestmessage">Getting the current request&#8217;s HttpRequestMessage</a></li>
+<li><a class="reference internal" href="#injecting-dependencies-into-web-api-filter-attributes">Injecting dependencies into Web API filter attributes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mvcintegration.html"
+                        title="previous chapter">ASP.NET MVC Integration Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="webformsintegration.html"
+                        title="next chapter">ASP.NET Web Forms Integration Guide</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/webapiintegration.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="webformsintegration.html" title="ASP.NET Web Forms Integration Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mvcintegration.html" title="ASP.NET MVC Integration Guide"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" >Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
