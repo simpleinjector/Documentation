@@ -11,7 +11,6 @@ How To
 * How to :ref:`Work with dependency injection in multi-threaded applications <Multi-Threaded-Applications>`
 
 .. _Register-Factory-Delegates:
-.. _Register_Factory_Delegates:
 
 Register factory delegates
 ==========================
@@ -225,7 +224,6 @@ This way the application can simply depend on **IMyService** instead of **Lazy<I
     **Warning**: The same warning applies to the use of **Lazy<T>** as it does for the use of **Func<T>** delegates. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container’s configuration <Verify-Configuration>`.
 
 .. _Resolve-Instances-By-Key:
-.. _Resolve_Instances_By_Key:
 
 Resolve instances by key
 ========================
@@ -367,7 +365,6 @@ The registration will then look as follows:
 The advantage of this method is that it completely integrates with the container. For instance, decorators can be applied to individual returned instances, types can be registered multiple times if needed, and the registered handlers will can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
 
 .. _Resolve-Arrays-And-Lists:
-.. _Resolve_Arrays_And_Lists:
 
 Resolve array and lists
 =======================
@@ -411,7 +408,6 @@ Instead of injecting a collection of dependencies, the consumer might not really
 A composite allows you to remove this boilerplate iteration logic from the application, which makes the application cleaner and when changes have to be made to the way the collection of loggers is processed, only the composite has to be changed.
 
 .. _Register-Multiple-Interfaces-With-The-Same-Implementation:
-.. _Register_Multiple_Interfaces_With_The_Same_Implementation:
 
 Register multiple interfaces with the same implementation
 =========================================================
@@ -441,7 +437,6 @@ The first line creates a **Registration** instance for the **Impl**, in this cas
     **Note:** This is different from having three *RegisterSingle* registrations, since that will results three separate singletons.
 
 .. _Override-Existing-Registrations:
-.. _Override_Existing_Registrations:
 
 Override existing registrations
 ===============================
@@ -485,7 +480,6 @@ The previous example created a *Container* instance that allows overriding. It i
     container.Register<IUserService, RealUserService>();
 
 .. _Verifying-Configuration:
-.. _Verifying_Configuration:
 .. _Verify-Configuration:
 
 Verify the container’s configuration
@@ -507,7 +501,6 @@ Calling the *Verify()* method however, is just part of the story. It is very eas
 #. But even when all registrations can be resolved succesfully by the container, that still doesn't mean your configuration is correct. It is very easy to accidentally misconfigure the container in a way that only shows up late in the development process. *Simple Injector* contains :doc:`Diagnostics Services <diagnostics>` to help you spot common configuration mistakes. It is advicable to analyze the container using these services from time to time or write an automated test that does this for you.
 
 .. _Multi-Threaded-Applications:
-.. _Multi_Threaded_Applications:
 
 Work with dependency injection in multi-threaded applications
 =============================================================

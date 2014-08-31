@@ -2,7 +2,7 @@
 Advanced Scenarios
 ==================
 
-Although its name may not imply it, *Simple Injector* is capable of handling many advanced scenarios. Either through writing custom code, copying  code from this wiki, or via the extension points that can be found in the *SimpleInjector.Extensions* namespace of the core library.
+Although its name may not imply it, Simple Injector is capable of handling many advanced scenarios. Either through writing custom code, copying  code from this wiki, or via the extension points that can be found in the *SimpleInjector.Extensions* namespace of the core library.
 
 .. container:: Note
 
@@ -39,7 +39,6 @@ Aspect Oriented Programming is easy with Simple Injector's advanced support for 
 * :ref:`Registration of generic decorators <Decorators>`
 * :ref:`Resolving Covariant/Contravariant types <Covariance-Contravariance>`
 
-.. _Batch_Registration:
 .. _Batch-Registration:
 
 Batch / Automatic registration
@@ -110,7 +109,7 @@ By default *RegisterManyForOpenGeneric* searches the supplied assembly for all p
 
     **Note**: There are numerous *RegisterManyForOpenGeneric* `overloads <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_OpenGenericBatchRegistrationExtensions_RegisterManyForOpenGeneric.htm>`_ available that take a list of *System.Type*'s, instead a list of *Assembly*'s.
 
-Above are a couple of examples of the things you can do with batch registration. A more advanced scenario could be the registration of multiple implementations of the same closed generic type to a common interface, i.e. a set of types that all implement the same interface. There are so many possible variations of this scenario that *Simple Injector* does not contain an explicit method to handle this. What it does contain, however, are multiple overloads of the *RegisterManyForOpenGeneric* method that allow you to supply a callback delegate that enables you make the registrations yourself. 
+Above are a couple of examples of the things you can do with batch registration. A more advanced scenario could be the registration of multiple implementations of the same closed generic type to a common interface, i.e. a set of types that all implement the same interface. There are so many possible variations of this scenario that Simple Injector does not contain an explicit method to handle this. What it does contain, however, are multiple overloads of the *RegisterManyForOpenGeneric* method that allow you to supply a callback delegate that enables you make the registrations yourself. 
 
 As an example, imagine the scenario where you have a **CustomerValidator** type and a **GoldCustomerValidator** type and they both implement **IValidator<Customer>** and you want to register them both at the same time. The earlier registration methods would throw an exception alerting you to the fact that you have multiple types implementing the same closed generic type. The following registration however, does enable this scenario:
 
@@ -157,11 +156,10 @@ This registration maps the open generic **IValidator<T>** interface to the open 
 
 .. container:: Note
 
-    **Note**: *Simple Injector* preserves the lifestyle of instances that are returned from an injected **IEnumerable<T>** instance. In reality you should not see the the injected **IEnumerable<IValidator<T>>** as a collection of implementations, you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same stream (the **IEnumerable<T>** itself is a *Singleton*) and each time you iterate the **IEnumerable<T>**, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the **CompositeValidator<T>** is registered as singleton the validators it wraps will each have their own specific lifestyle.
+    **Note**: Simple Injector preserves the lifestyle of instances that are returned from an injected **IEnumerable<T>** instance. In reality you should not see the the injected **IEnumerable<IValidator<T>>** as a collection of implementations, you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same stream (the **IEnumerable<T>** itself is a *Singleton*) and each time you iterate the **IEnumerable<T>**, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the **CompositeValidator<T>** is registered as singleton the validators it wraps will each have their own specific lifestyle.
 
 The next section will explain mapping of open generic types (just like **CompositeValidator<>** seen above).
 
-.. _Registration_Of_Open_Generic_Types:
 .. _Registration-Of-Open-Generic-Types:
 
 Registration of open generic types
@@ -206,7 +204,7 @@ We could configure the container to use this **NullValidator<T>** for any entity
     container.Register<IValidate<Mothership>, NullValidator<Mothership>>();
     // and the list goes on...
 
-This repeated registration is, of course, not very practical. Falling back to such a default implementation is a good example for **unregistered type resolution**. *Simple Injector* contains an event that you can hook into that allows you to fallback to a default implementation. The `RegisterOpenGeneric <https://simpleinjector.org/ReferenceLibrary/?topic=html/Methods_T_SimpleInjector_Extensions_OpenGenericRegistrationExtensions.htm>`_ extension method is defined to handle this registration. The **NullValidator<>** would be registered as follows:
+This repeated registration is, of course, not very practical. Falling back to such a default implementation is a good example for **unregistered type resolution**. Simple Injector contains an event that you can hook into that allows you to fallback to a default implementation. The `RegisterOpenGeneric <https://simpleinjector.org/ReferenceLibrary/?topic=html/Methods_T_SimpleInjector_Extensions_OpenGenericRegistrationExtensions.htm>`_ extension method is defined to handle this registration. The **NullValidator<>** would be registered as follows:
 
 .. code-block:: c#
 
@@ -229,7 +227,7 @@ There's an advanced version of *RegisterOpenGeneric* overload that allows applyi
     container.RegisterOpenGeneric(typeof(IValidator<>), typeof(RightValidator<>),
         c => c.ServiceType.GetGenericArguments().Single().Namespace.Contains("Right"));
 
-*Simple Injector* protects you from defining invalid registrations by ensuring that given the registrations do not overlap. Building on the last code snippet, imagine accidentally defining a type in the namespace "MyCompany.LeftRight". In this case both open-generic implementations would apply, but *Simple Injector* will never silently pick one. It will throw an exception instead.
+Simple Injector protects you from defining invalid registrations by ensuring that given the registrations do not overlap. Building on the last code snippet, imagine accidentally defining a type in the namespace "MyCompany.LeftRight". In this case both open-generic implementations would apply, but Simple Injector will never silently pick one. It will throw an exception instead.
 
 There are some instance where want to have a fallback implementation in the case that no other implementation was applied and this can be achieved by checking the **Handled** property of the predicate's **OpenGenericPredicateContext** object:
 
@@ -241,7 +239,7 @@ There are some instance where want to have a fallback implementation in the case
     container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>),
         c => !c.Handled);
 
-In the case where the open generic implementation contains generic type constraints *Simple Injector* will automatically apply the type conditionally based on its generic type constraints:
+In the case where the open generic implementation contains generic type constraints Simple Injector will automatically apply the type conditionally based on its generic type constraints:
 
 .. code-block:: c#
 
@@ -251,7 +249,7 @@ In the case where the open generic implementation contains generic type constrai
     container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>),
         c => !c.Handled);
 
-The final option in *Simple Injector* is to supply the *RegisterOpenGeneric* method with a partially-closed generic type:
+The final option in Simple Injector is to supply the *RegisterOpenGeneric* method with a partially-closed generic type:
 
 .. code-block:: c#
 
@@ -259,27 +257,24 @@ The final option in *Simple Injector* is to supply the *RegisterOpenGeneric* met
     var partiallyClosedType = typeof(SomeValidator<>).MakeGenericType(typeof(List<>));
     container.RegisterOpenGeneric(typeof(IValidator<>), partiallyClosedType);
 
-The type **SomeValidator<List<T>>** is called **partially-closed**, since although its generic type argument has been filled in with a type, it still contains a generic type argument. *Simple Injector* will be able to apply these constraints, just as it handles any other generic type constraints.
+The type **SomeValidator<List<T>>** is called **partially-closed**, since although its generic type argument has been filled in with a type, it still contains a generic type argument. Simple Injector will be able to apply these constraints, just as it handles any other generic type constraints.
 
-.. _Unregistered_Type_Resolution:
 .. _Unregistered-Type-Resolution:
 
 Unregistered type resolution
 ============================
 
-Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the change of registering that type. *Simple Injector* supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the :ref:`registration of open generic types <Registration_Of_Open_Generic_Types>`. Other examples of possible scenarios that can be built on top of this event are :ref:`resolving array and lists <Resolve-Arrays-And-Lists>` and :ref:`covariance and contravariance <Covariance-Contravariance>`. Those scenarios are described here in the advanced scenarios page.
+Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the change of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the :ref:`registration of open generic types <Registration-Of-Open-Generic-Types>`. Other examples of possible scenarios that can be built on top of this event are :ref:`resolving array and lists <Resolve-Arrays-And-Lists>` and :ref:`covariance and contravariance <Covariance-Contravariance>`. Those scenarios are described here in the advanced scenarios page.
 
 For more information about how to use this event, please take a look at the `ResolveUnregisteredType event documentation <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ in the `reference library <https://simpleinjector.org/ReferenceLibrary/>`_.
 
 
-.. _Context_Based_Injection:
-.. _Contextual_Binding:
 .. _Context-Based-Injection:
 
 Context based injection
 =======================
 
-Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don’t. *Simple Injector* does **not** contain such a feature out of the box, but this ability can easily be added by using the [context based injection extension method|ContextDependentExtensions] code snippet.
+Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don’t. Simple Injector does **not** contain such a feature out of the box, but this ability can easily be added by using the [context based injection extension method|ContextDependentExtensions] code snippet.
 
 .. container:: Note
 
@@ -327,7 +322,6 @@ In the previous code snippet we registered a **Func<DependencyContext, ILogger>*
     **Note**: Even though the use of a generic **Logger<T>** is a common design (with log4net as the grand godfather of this design), doesn't always make it a good design. The need for having the logger contain information about its parent type, might indicate design problems. If you're doing this, please take a look at `this Stackoverflow answer <https://stackoverflow.com/a/9915056/264697>`_. It talks about logging in conjunction with the SOLID design principles.
 
 .. _Decorators:
-.. _Generic_Decorators:
 
 Decorators
 ==========
@@ -335,7 +329,7 @@ Decorators
 The `SOLID <https://en.wikipedia.org/wiki/SOLID>`_ principles give us important guidance when it comes to writing maintainable software. The 'O' of the 'SOLID' acronym stands for the `Open/closed Principle <https://en.wikipedia.org/wiki/Open/closed_principle>`_ which states that classes should be open for extension, but closed for modification. Designing systems around the Open/closed principle means that new behavior can be plugged into the system, without the need to change any existing parts, making the change of breaking existing code much smaller.
 
 
-One of the ways to add new functionality (such as `cross-cutting concerns <https://en.wikipedia.org/wiki/Cross-cutting_concern>`_) to classes is by the use of the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the :ref:`Registration of open generic types <Registration_Of_Open_Generic_Types>` section of this page or for instance the use of an generic **ICommandHandler<TCommand>** interface.
+One of the ways to add new functionality (such as `cross-cutting concerns <https://en.wikipedia.org/wiki/Cross-cutting_concern>`_) to classes is by the use of the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the :ref:`Registration of open generic types <Registration-Of-Open-Generic-Types>` section of this page or for instance the use of an generic **ICommandHandler<TCommand>** interface.
 
 .. container:: Note
 
@@ -359,8 +353,7 @@ Take the plausible scenario where we want to validate all commands that get exec
             // validate the supplied command (throws when invalid).
             this.validator.ValidateObject(command);
             
-            // forward the (valid) command to the real
-            // command handler.
+            // forward the (valid) command to the real command handler.
             this.handler.Handle(command);
         }
     }
@@ -387,6 +380,7 @@ The implementations of the **ICommandHandler<T>** interface can be registered us
 
 .. code-block:: c#
 
+    // using SimpleInjector.Extensions;
     container.RegisterManyForOpenGeneric(
         typeof(ICommandHandler<>), 
         typeof(ICommandHandler<>).Assembly);
@@ -435,19 +429,18 @@ The given context contains several properties that allows you to analyze whether
 
 .. container:: Note
 
-    **Tip**: [This extension method|Runtime-Decorators] allows registering decorators that can be applied based on runtime conditions (such as the role of the current user).
+    **Tip**: `This extension method <https://simpleinjector.codeplex.com/wikipage?title=Runtime-Decorators>`_ allows registering decorators that can be applied based on runtime conditions (such as the role of the current user).
 
-.. _Decorators_With_Func_Factories:
 .. _Decorators-with-Func-factories:
 
 Decorators with Func<T> factories
 ---------------------------------
 
-In certain scenarios, it is needed to postpone building part of the object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be [executed on a different thread|How-to#Multi_Threaded_Applications], or when instances need to be created in a certain [scope|ObjectLifestyleManagement#Scoped] or (security) context.
+In certain scenarios, it is needed to postpone building part of the object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be :ref:`executed on a different thread <Multi-Threaded-Applications>`, or when instances need to be created in a certain :ref:`scope <Scoped>` or (security) context.
 
 When building a 'normal' object graph with dependencies, you can easily delay building a part of the graph by letting a service depend on a factory. This allows building that part of the object graph to be postponed until the time the type starts using the factory. When working with decorators however, injecting a factory to postpone the creation of the decorated instance will not work. Take for instance a **AsyncCommandHandlerDecorator<T>** that allows executing a command handler on a different thread. We could let the **AsyncCommandHandlerDecorator<T>** depend on a **CommandHandlerFactory<T>**, and let this factory call back into the container to retrieve a new **ICommandHandler<T>**. Unfortunately this would fail, since requesting an **ICommandHandler<T>** would again wrap this instance with a new **AsyncCommandHandlerDecorator<T>**, and we'd end up recursively creating the same instance and causing a stack overflow.
 
-Since this is a scenario that is really hard to solve without library support, *Simple Injector* allows injecting a **Func<T>** delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance. Taking the **AsyncCommandHandlerDecorator<T>** as example, it could be implemented as follows:
+Since this is a scenario that is really hard to solve without library support, Simple Injector allows injecting a **Func<T>** delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance. Taking the **AsyncCommandHandlerDecorator<T>** as example, it could be implemented as follows:
 
 .. code-block:: c#
 
@@ -460,10 +453,15 @@ Since this is a scenario that is really hard to solve without library support, *
         
         public void Handle(T command) {
             // Execute on different thread.
-            ThreadPool.QueueUserWorkItem(** => {
-                // Create new handler in this thread.
-                var handler = this.factory.Invoke();
-                handler.Handle(command)
+            ThreadPool.QueueUserWorkItem(state => {
+                try {
+                    // Create new handler in this thread.
+                    ICommandHandler<T> handler = this.factory.Invoke();
+                    handler.Handle(command);
+                }
+                catch (Exception ex) {
+                    // log the exception
+                }			
             });
         }
     }
@@ -513,13 +511,12 @@ When mixing this with other (synchronous) decorators, you'll get an extremely po
 
 This configuration has an interesting mix of decorator registrations. The registration of the **AsyncCommandHandlerDecorator<T>** allows (some of) the command handlers to be executed on the background (while others -who's name does not start with 'Async'- still run synchronously), but before execution, all commands are validated synchronously (to allow communicating validation errors to the caller). And all handlers (even the asynchronous ones) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock).
 
-.. _Decorated_Collections:
 .. _Decorated-Collections:
 
 Decorated collections
 ---------------------
 
-When registering a decorator, *Simple Injector* will automatically decorate any collection with elements of that service type:
+When registering a decorator, Simple Injector will automatically decorate any collection with elements of that service type:
 
 .. code-block:: c#
 
@@ -553,14 +550,61 @@ Although this registration contains a list of singletons, the container has no w
 
 .. container:: Note
 
-    **Warning**: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can't help you in doing [diagnostics|Diagnostics]. Since the lifetime of those items is unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the *RegisterAll* overloads that take a collection of *System.Type* instances.
+    **Warning**: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can't help you in doing :doc:`diagnostics <diagnostics>`. Since the lifetime of those items is unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the *RegisterAll* overloads that take a collection of *System.Type* instances.
 
+.. _Using-contextual-information-inside-decorators:
+
+Using contextual information inside decorators
+--------------------------------
+
+As we shown before, you can apply a decorator conditionally based on a predicate you can supply to the *RegisterDecorator* overloads:
+
+.. code-block:: c#
+
+    container.RegisterDecorator(
+        typeof(ICommandHandler<>),
+        typeof(AsyncCommandHandlerDecorator<>),
+        c => c.ImplementationType.Name.StartsWith("Async"));
+
+Sometimes however you might want to apply a decorator unconditionally, but let the decorator act at runtime based on this contextual information. You can do this by injecting the **DecoratorPredicateContext** into the decorator's constructor as cam be seem in the following example:
+
+.. code-block:: c#
+
+    public class TransactionCommandHandlerDecorator<T> : ICommandHandler<T> {
+        private readonly DecoratorPredicateContext decoratorContext;
+        private readonly ICommandHandler<T> decoratee;
+        private readonly ITransactionBuilder transactionBuilder;
+
+        public TransactionCommandHandlerDecorator(DecoratorPredicateContext decoratorContext,
+            ICommandHandler<T> decoratee, ITransactionBuilder transactionBuilder) {
+            this.decoratorContext = decoratorContext;
+            this.decoratee = decoratee;
+            this.transactionBuilder = transactionBuilder;
+        }
+        
+        public void Handle(T command) {
+            TransactionType transactionType = this.decoratorContext.ImplementationType
+                .GetCustomAttribute<TransactionAttribute>()
+                .TransactionType;
+            	
+            using (var transaction = this.transactionBuilder.BeginTransaction(transactionType)) {
+                this.decoratee.Handle(command);
+            }
+        }
+    }
+	
+The previous code snippet shows a decorator that applies a transaction behavior to command handlers. The decorator is injected with the **DecoratorPredicateContext** class which supplies the decorator with contextual information about the other decorators in the chain and the actual implementation type. In this example the decorator expects a **TransactionAttribute** to be applied to the wrapped command handler implementation and it starts the correct transaction type based on this information.
+
+If the attribute was applied to the command class instead of the command handler, this decorator would been able to gather this information without the use of the **DecoratorPredicateContext*. This would however leak implementation details throughout the command, since in which type of transaction a handler should run is clearly an implementation detail. Placing that attribute on the handler instead of the command is therefore a much more reasonable thing to do.
+
+The decorator would also be able to get the attribute by using the injected decoratee, but this would only work when the decorator would directly wrap the handler. This would make the system quite fragile, since it would break once you start placing other decorator in between this decorator and the handler, which is a very likely thing to happen.
+	
 .. _Decorator-registration-factories:
 
 Decorator registration factories
 --------------------------------
 
-In some advanced scenarios, it can be useful to depend the actual decorator type based on some contextual information. *Simple Injector* contains a *RegisterDecorator* overload that accepts a factory delegate that allows building the exact decorator type based on the actual type being decorated.
+In some advanced scenarios, it can be useful to depend the actual decorator type based on some contextual information. Simple Injector contains a *RegisterDecorator* overload that accepts a factory delegate that allows building the exact decorator type based on the actual type being decorated.
 
 Take the following registration for instance:
 
@@ -583,7 +627,7 @@ Interception
 
 Interception is the ability to intercept a call from a consumer to a service, and add or change behavior. The `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_ describes a form of interception, but when it comes to applying cross-cutting concerns, you might end up writing decorators for many service interfaces, but with the exact same code. If this is happening, it is time to explore the possibilities of interception.
 
-Using the [Interception extensions|InterceptionExtensions] code snippets, you can add the ability to do interception with *Simple Injector*. Using the given code, you can for instance define a **MonitoringInterceptor** that allows logging the execution time of the called service method:
+Using the [Interception extensions|InterceptionExtensions] code snippets, you can add the ability to do interception with Simple Injector. Using the given code, you can for instance define a **MonitoringInterceptor** that allows logging the execution time of the called service method:
 
 .. code-block:: c#
 
@@ -637,7 +681,6 @@ The current example doesn't add much compared to simply using a decorator. When 
 
     **Note**: Don't use interception for intercepting types that all implement the same generic interface, such as **ICommandHandler<T>** or **IValidator<T>**. Try using decorator classes instead, as shown in the :ref:`Decorators <Decorators>` section on this page.
 
-.. _Implicit_Property_Injection:
 .. _Implicit-Property-Injection:
 .. _Property-Injection:
 
@@ -652,12 +695,12 @@ Some containers (such as Castle Windsor) implicitly inject public writable prope
 *Explicit property injection*
 We strongly feel that explicit property injection is a much better way to go. With explicit property injection the container is forced to inject a property and the process will fail immediately when a property can't be mapped or injected. Some containers (such as Unity and Ninject) allow explicit property injection by allowing properties to be decorated with attributes that are defined by the DI library. Problem with this is that this forces the application to take a dependency on the library, which is something that should be prevented.
 
-Because *Simple Injector* does not encourage its users to take a dependency on the container (except for the startup path of course), *Simple Injector* does not contain any attributes that allow explicit property injection and it can therefore not explicitly inject properties out-of-the-box.
+Because Simple Injector does not encourage its users to take a dependency on the container (except for the startup path of course), Simple Injector does not contain any attributes that allow explicit property injection and it can therefore not explicitly inject properties out-of-the-box.
 
 Besides this, the use of property injection should be very exceptional and in general constructor injection should be used in the majority of cases. If a constructor gets too many parameters (constructor over-injection anti-pattern), it is an indication of a violation of the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). SRP violations often lead to maintainability issues. So instead of patching constructor over-injection with property injection, the root cause should be analyzed and the type should be refactored, probably with `Facade Services <http://blog.ploeh.dk/2010/02/02/RefactoringtoAggregateServices/>`_. Another common reason to use properties is because those dependencies are optional. Instead of using optional property dependencies, best practice is to inject empty implementations (a.k.a. `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) into the constructor.
 
 *Enabling property injection*
-*Simple Injector* contains two ways to enable property injection. First of all the :ref:`RegisterInitializer\<T\> <Configuring_Property_Injection>` method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:
+Simple Injector contains two ways to enable property injection. First of all the :ref:`RegisterInitializer\<T\> <Configuring_Property_Injection>` method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:
 
 .. code-block:: c#
 
@@ -707,7 +750,6 @@ This enables explicit property injection on all properties that are marked with 
 
     **Note**: The **IPropertySelectionBehavior** extension mechanism can also be used to implement implicit property injection. There's `an example of this <https://simpleinjector.codeplex.com/SourceControl/latest#SimpleInjector.CodeSamples/ImplicitPropertyInjectionExtensions.cs>`_ in the source code. Doing so however is not advised because of the reasons given above.
 
-.. _Covariance_Contravariance:
 .. _Covariance-Contravariance:
 
 Covariance and Contravariance
@@ -717,7 +759,7 @@ Since version 4.0 of the .NET framework, the type system allows `Covariance and 
 
 In some circumstances, the application design can benefit from the use of covariance and contravariance (or variance for short) and it would be beneficial when the IoC container returns services that are 'compatible' to the requested service, even although the requested service is not registered. To stick with the previous example, the container could return an **IEnumerable<string>** even when an **IEnumerable<object>** is requested.
 
-By default, *Simple Injector* does not return variant implementations of given services, but Simple Injector can be extended to behave this way. The actual way to write this extension depends on the requirements of the application.
+By default, Simple Injector does not return variant implementations of given services, but Simple Injector can be extended to behave this way. The actual way to write this extension depends on the requirements of the application.
 
 Take a look at the following application design around the **IEventHandler<in TEvent>** interface:
 
@@ -786,7 +828,7 @@ This is just one example and one way of adding variance support. For a more elab
 Registering plugins dynamically
 ===============================
 
-Applications with a plugin architecture often allow special plugin assemblies to be dropped in a special folder and to be picked up by the application, without the need of a recompile. Although *Simple Injector* has no out of the box support for this, registering plugins from dynamically loaded assemblies can be implemented in a few lines of code. Here is an example:
+Applications with a plugin architecture often allow special plugin assemblies to be dropped in a special folder and to be picked up by the application, without the need of a recompile. Although Simple Injector has no out of the box support for this, registering plugins from dynamically loaded assemblies can be implemented in a few lines of code. Here is an example:
 
 .. code-block:: c#
 
