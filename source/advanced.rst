@@ -566,16 +566,16 @@ As we shown before, you can apply a decorator conditionally based on a predicate
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-Sometimes however you might want to apply a decorator unconditionally, but let the decorator act at runtime based on this contextual information. You can do this by injecting the **DecoratorPredicateContext** into the decorator's constructor as cam be seem in the following example:
+Sometimes however you might want to apply a decorator unconditionally, but let the decorator act at runtime based on this contextual information. You can do this by injecting the **DecoratorContext** into the decorator's constructor as cam be seem in the following example:
 
 .. code-block:: c#
 
     public class TransactionCommandHandlerDecorator<T> : ICommandHandler<T> {
-        private readonly DecoratorPredicateContext decoratorContext;
+        private readonly DecoratorContext decoratorContext;
         private readonly ICommandHandler<T> decoratee;
         private readonly ITransactionBuilder transactionBuilder;
 
-        public TransactionCommandHandlerDecorator(DecoratorPredicateContext decoratorContext,
+        public TransactionCommandHandlerDecorator(DecoratorContext decoratorContext,
             ICommandHandler<T> decoratee, ITransactionBuilder transactionBuilder) {
             this.decoratorContext = decoratorContext;
             this.decoratee = decoratee;
@@ -593,9 +593,9 @@ Sometimes however you might want to apply a decorator unconditionally, but let t
         }
     }
 	
-The previous code snippet shows a decorator that applies a transaction behavior to command handlers. The decorator is injected with the **DecoratorPredicateContext** class which supplies the decorator with contextual information about the other decorators in the chain and the actual implementation type. In this example the decorator expects a **TransactionAttribute** to be applied to the wrapped command handler implementation and it starts the correct transaction type based on this information.
+The previous code snippet shows a decorator that applies a transaction behavior to command handlers. The decorator is injected with the **DecoratorContext** class which supplies the decorator with contextual information about the other decorators in the chain and the actual implementation type. In this example the decorator expects a **TransactionAttribute** to be applied to the wrapped command handler implementation and it starts the correct transaction type based on this information.
 
-If the attribute was applied to the command class instead of the command handler, this decorator would been able to gather this information without the use of the **DecoratorPredicateContext*. This would however leak implementation details throughout the command, since in which type of transaction a handler should run is clearly an implementation detail. Placing that attribute on the handler instead of the command is therefore a much more reasonable thing to do.
+If the attribute was applied to the command class instead of the command handler, this decorator would been able to gather this information without the use of the **DecoratorContext*. This would however leak implementation details into the command, since which type of transaction a handler should run is clearly an implementation detail and is of no concern to the consumer of that command. Placing that attribute on the handler instead of the command is therefore a much more reasonable thing to do.
 
 The decorator would also be able to get the attribute by using the injected decoratee, but this would only work when the decorator would directly wrap the handler. This would make the system quite fragile, since it would break once you start placing other decorator in between this decorator and the handler, which is a very likely thing to happen.
 	
