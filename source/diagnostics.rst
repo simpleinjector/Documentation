@@ -7,9 +7,9 @@ The *Diagnostic Services* allow you to analyze the container's configuration to 
 How to view diagnostic results
 ==============================
 
-There are two ways to view the diagnostic results. Diagnostic results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.
+There are two ways to view the diagnostic results - results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.
 
-Diagnostic results are available during debugging in Visual Studio after calling *Container.Verify()*. You simply set a breakpoint after the line that calls  **Verify()** and when the breakpoint hits, you hover over the **Container** instance with the mouse. After the debugger context menu appears for the container variable you can unfold it and see the diagnostic results. This might look like this:
+Diagnostic results are available during debugging in Visual Studio after calling *Container.Verify()*. Set a breakpoint after the line that calls *Verify()* and when the breakpoint breaks, hover over the *Container* instance with the mouse. The debugger context menu will appear for the *Container* variable which you can unfold to view the diagnostic results. This might look like this:
 
 .. image:: images/diagnosticsdebuggerview.png 
    :alt: Diagnostics debugger view context menu
@@ -19,7 +19,7 @@ Another option is to add the **container** variable to the Visual Studio watch w
 .. image:: images/diagnostics2.png 
    :alt: Diagnostics debugger view watch window
 
-These same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the *SimpleInjector.Diagnostics.dll*. This dll is part of the core NuGet package. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:
+These same information can be requested programmatically by using the *Diagnostic API*. The *Diagnostic API* is located in the *SimpleInjector.Diagnostics.dll*. This dll is part of the core NuGet package. Interacting with the *Diagnostic API* is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:
 
 .. code-block:: c#
 
@@ -42,24 +42,24 @@ These same information can be requested programmatically by using the Diagnostic
 
 .. container:: Note
 
-    **Note**: The Diagnostic API is new in *Simple Injector v2.4*.
+    **Note**: The *Diagnostic API* is new in *Simple Injector v2.4*.
 
 Limitations
 ===========
 
 .. container:: Note
 
-    **Warning**: Although the container can spot several configuration mistakes, be aware that there will always be ways to make configuration errors that the Diagnostic Services won't spot. Wiring your dependencies is a delicate matter and should be done with care. Always follow best practices.
+    **Warning**: Although the *Container* can spot several configuration mistakes, be aware that there will always be ways to make configuration errors that the *Diagnostic Services* cannot identify. Wiring your dependencies is a delicate matter and should be done with care. Always follow best practices.
 
-The *Diagnostic Services* work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as analyzing constructor arguments) can be analyzed. The container is able to use the following information for analysis:
+The *Diagnostic Services* work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as analyzing constructor arguments) can be analyzed. The *Container* uses the following information for analysis:
 
 * Constructor arguments of types that are created by the container (auto-wired types).
-* Dependencies added by [registered decorators|Advanced-scenarios#Decorators].
+* Dependencies added by :ref:`Decorators`.
 * Dependencies that are not registered explicitly but are referenced as constructor argument (this included types that got created through unregistered type resolution).
 
-The analyzer however **won't** be able to analyze the following:
+The *Diagnostic Services* cannot analyze the following:
 
-* Types that are completely unknown to the container, because they are not registered explicitly and no registered type depends on them. In general you should register all root types (types that are requested directly by calling *GetInstance<T>()*, such as MVC Controllers) explicitly.
+* Types that are completely unknown, because these types are not registered explicitly and no registered type depends on them. In general you should register all root types (types that are requested directly by calling *GetInstance<T>()*, such as MVC Controllers) explicitly.
 * Dependencies added using the `RegisterInitializer <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm>`_ method:
 
 .. code-block:: c#
@@ -80,8 +80,8 @@ The analyzer however **won't** be able to analyze the following:
         container.GetInstance<ILogger>(),
         container.GetInstance<ITimeProvider>()));
 
-* Dependencies that got injected using the (legacy) `InjectProperties <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_InjectProperties.htm>`_ method will not be spotted as dependencies of the type they are injected into.
-* Dependencies that are resolved by requesting them manually from the container, for instance by injecting the **Container** into a constructor and calling *container.GetInstance<T>()* from within the container:
+* Any dependencies that are injected using the (now legacy) `InjectProperties <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_InjectProperties.htm>`_ method will not be seen as dependencies of the type they are injected into.
+* Dependencies that are resolved by requesting them manually from the *Container*, for instance by injecting the *Container* into a class and then calling *container.GetInstance<T>()* from within that class:
 
 .. code-block:: c#
 
@@ -99,7 +99,7 @@ The analyzer however **won't** be able to analyze the following:
 
 .. container:: Note
 
-    **Tip**: Try to prevent depending on framework features in the list above, because they prevent you getting a [verifiable configuration|How-to#Verifying_Configuration] and prevent you from getting trustworthy diagnostic results.
+    **Tip**: Try to prevent depending on any framework features listed above because they all prevent you from having a :ref:`verifiable configuration <Verifying-Configuration>` and trustworthy diagnostic results.
 
 Supported Warnings
 ==================

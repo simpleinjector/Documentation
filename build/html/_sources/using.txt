@@ -15,11 +15,11 @@ Good practice is to minimize the dependency between your application and the DI 
 
 .. _The-Container:
 
-Simple Injector's main type is the `Container <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm>`_ class. An instance of *Container* is used to register mappings between each abstraction (service) and implementation (component). Your application code should depend on abstractions and it is the role of the *Container* to supply the application with the right implementation. The easiest way to view the *Container* is as a big dictionary where the type of the abstraction is used as key, and each key's related value is the definition of how to create that particular implementation. Each time the application requests for a service, a look up is made within the dictionary and the correct implementation is returned.
+*Simple Injector*'s main type is the `Container <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm>`_ class. An instance of *Container* is used to register mappings between each abstraction (service) and its corresponding implementation (component). Your application code should depend on abstractions and it is the role of the *Container* to supply the application with the right implementation. The easiest way to view the *Container* is as a big dictionary where the type of the abstraction is used as key, and each key's related value is the definition of how to create that particular implementation. Each time the application requests for a service, a look up is made within the dictionary and the correct implementation is returned.
 
 .. container:: Note
 
-    **Tip**: You should typically create a single *Container* instance for the whole application (one instance per app domain); *Container* instances are thread-safe
+    **Tip**: You should typically create a single *Container* instance for the whole application (one instance per app domain); *Container* instances are thread-safe.
 
 .. container:: Note
 
@@ -258,7 +258,7 @@ For types that need to be injected we recommend that you define a single public 
     var handler2 = container.GetInstance<IHandler<ShipOrderCommand>>();
     Assert.IsTrue(handler2.ExecuteAsynchronously);
 
-The **Action<T>** delegate that is registered by the *RegisterInitializer* method is called once the *Container* has created a new instance of `T` (or any instance that inherits from or implements `T` depending on exactly how you have configured that registration). In the example **MoveCustomerHandler** inherits from **HandlerBase** and because of this the **Action<HandlerBase>** delegate will be called with a reference to the newly created instance.
+The **Action<T>** delegate that is registered by the *RegisterInitializer* method is called once the *Container* has created a new instance of `T` (or any instance that inherits from or implements `T` depending on exactly how you have configured your registrations). In the example **MoveCustomerHandler** inherits from **HandlerBase** and because of this the **Action<HandlerBase>** delegate will be called with a reference to the newly created instance.
 
 .. container:: Note
 
@@ -292,7 +292,7 @@ Simple Injector contains several methods for registering and resolving collectio
 
 .. container:: Note
 
-    **Note**:  When zero instances are registered using *RegisterAll*, the call to *Container.GetAllInstances* will always return an empty list.
+    **Note**:  When zero instances are registered using *RegisterAll*, each call to *Container.GetAllInstances* will return an empty list.
 
 Just as with normal types, *Simple Injector* can inject collections of instances into constructors:
 
@@ -419,15 +419,14 @@ The following code shows an example of the use of automatic constructor injectio
 
     **Note**: Because **UserService** is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can significantly simplify the *Container*’s configuration for more complex scenarios. Alwasy keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
 
-.. _More_information:
 .. _More-Information:
 
 More information
 ================
 For more information about Simple Injector please visit the following links: 
 
-* The [Simple Injector and object lifetime management|ObjectLifestyleManagement] page explains how to configure lifestyles such as **transient**, **singleton**, and many others.
-* See the [Integration Guide] for more information about how to integrate Simple Injector into your specific application framework.
+* The :doc:`lifetimes` page explains how to configure lifestyles such as **transient**, **singleton**, and many others.
+* See the :doc:`integration` for more information about how to integrate Simple Injector into your specific application framework.
 * For more information about **dependency injection** in general, please visit `this page on Stackoverflow <https://stackoverflow.com/tags/dependency-injection/info>`_.
-* If you have any questions about how to use Simple Injector or about **dependency injection** in general, the experts at `Stackoverflow.com <https://stackoverflow.com/questions/ask?tags=simple-injector+%20ioc-container+dependency-injection+.net+c%23>`_ are waiting for you.
-* For all other Simple Injector related question and discussions, such as bug reports and feature requests, the `Simple Injector discussion forum <https://simpleinjector.codeplex.com/discussions>`_ will be the place to start.
+* If you have any questions about how to use *Simple Injector* or about **dependency injection** in general, the experts at `Stackoverflow.com <https://stackoverflow.com/questions/ask?tags=simple-injector+%20ioc-container+dependency-injection+.net+c%23>`_ are waiting for you.
+* For all other *Simple Injector* related question and discussions, such as bug reports and feature requests, the `Simple Injector discussion forum <https://simpleinjector.codeplex.com/discussions>`_ will be the place to start.

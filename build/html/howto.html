@@ -54,7 +54,7 @@
 <ul class="simple">
 <li>How to <a class="reference internal" href="#register-factory-delegates"><em>Register factory delegates</em></a></li>
 <li>How to <a class="reference internal" href="#resolve-instances-by-key"><em>Resolve instances by key</em></a></li>
-<li>How to <a class="reference internal" href="#resolve-arrays-and-lists"><em>Resolve array and lists</em></a></li>
+<li>How to <a class="reference internal" href="#resolve-arrays-and-lists"><em>Resolve arrays and lists</em></a></li>
 <li>How to <a class="reference internal" href="#register-multiple-interfaces-with-the-same-implementation"><em>Register multiple interfaces with the same implementation</em></a></li>
 <li>How to <a class="reference internal" href="#override-existing-registrations"><em>Override existing registrations</em></a></li>
 <li>How to <a class="reference internal" href="#verify-configuration"><em>Verify the container&#8217;s configuration</em></a></li>
@@ -62,11 +62,11 @@
 </ul>
 <div class="section" id="register-factory-delegates">
 <span id="id1"></span><h2>Register factory delegates<a class="headerlink" href="#register-factory-delegates" title="Permalink to this headline">¶</a></h2>
-<p><em>Simple Injector</em> allows you to register a <strong>Func&lt;T&gt;</strong> delegate for the creation of an instance. This is especially useful in scenarios where it is impossible for the container to create the instance. There are overloads of the <em>Register</em> method available that accept an <strong>Func&lt;T&gt;</strong> argument:</p>
+<p><em>Simple Injector</em> allows you to register a <strong>Func&lt;T&gt;</strong> delegate for the creation of an instance. This is especially useful in scenarios where it is impossible for the <em>Container</em> to create the instance. There are overloads of the <em>Register</em> method available that accept a  <strong>Func&lt;T&gt;</strong> argument:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="n">SomeSubSystem</span><span class="p">.</span><span class="n">CreateMyService</span><span class="p">());</span>
 </pre></div>
 </div>
-<p>In situations where a service needs to create multiple instances of a certain dependencies, or needs to explicitly control the lifetime of such dependency, abstract factories can be used. Instead of injecting an <strong>IMyService</strong>, you should inject an <strong>IMyServiceFactory</strong> that allows services to create new instances of <strong>IMyService</strong>:</p>
+<p>In situations where a service needs to create multiple instances of a certain dependencies, or needs to explicitly control the lifetime of such dependency, abstract factories can be used. Instead of injecting an <strong>IMyService</strong>, you should inject an <strong>IMyServiceFactory</strong> that creates new instances of <strong>IMyService</strong>:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Definition</span>
 <span class="k">public</span> <span class="k">interface</span> <span class="n">IMyServiceFactory</span> <span class="p">{</span>
     <span class="n">IMyService</span> <span class="nf">CreateNew</span><span class="p">();</span>
@@ -125,8 +125,8 @@
 </div>
 <p>This saves you from having to define a new interface and implementation per factory.</p>
 <div class="note container">
-<strong>Note</strong>: On the downside however, this communicates less clearly the intend of your code and as a result might make your code harder to grasp for other developers.</div>
-<p>When you choose <strong>Func&lt;T&gt;</strong> delegates over specific factory interfaces, you can define the following extension method that makes it easier to register <strong>Func&lt;T&gt;</strong> factories:</p>
+<strong>Note</strong>: On the downside however, this communicates less clearly the intent of your code and as a result might make your code harder to grasp.</div>
+<p>When you choose <strong>Func&lt;T&gt;</strong> delegates over specific factory interfaces you can define the following extension method to simplify the registration of <strong>Func&lt;T&gt;</strong> factories:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using System;</span>
 <span class="c1">// using SimpleInjector;</span>
 <span class="c1">// using SimpleInjector.Advanced;</span>
@@ -157,9 +157,9 @@
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterFuncFactory</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">,</span> <span class="n">RealService</span><span class="p">&gt;();</span>
 </pre></div>
 </div>
-<p>The previous extension method allowed registration of a single factory, but won&#8217;t be maintainable when you want all registrations to be resolvable using <strong>Func&lt;T&gt;</strong> delegates by default.</p>
+<p>The extension method allows registration of a single factory, but won&#8217;t be maintainable when you want all registrations to be resolvable using <strong>Func&lt;T&gt;</strong> delegates by default.</p>
 <div class="note container">
-<strong>Note</strong>: We personally think that allowing to register <strong>Func&lt;T&gt;</strong> delegates by default is a design smell. The use of <strong>Func&lt;T&gt;</strong> delegates makes your design harder to follow and your system harder to maintain and test. If you have many constructors in your system that depend on a <strong>Func&lt;T&gt;</strong>, please take a good look at your dependency strategy. If in doubt, please ask us here on CodePlex or on Stackoverflow.</div>
+<strong>Note</strong>: We personally think that allowing to register <strong>Func&lt;T&gt;</strong> delegates by default is a design smell. The use of <strong>Func&lt;T&gt;</strong> delegates makes your design harder to follow and your system harder to maintain and test. If you have many constructors in your system that depend on a <strong>Func&lt;T&gt;</strong>, please take a good look at your dependency strategy. If in doubt, please ask us here on the forum or on Stackoverflow.</div>
 <p>The following extension method allows Simple Injector to resolve all types using a <strong>Func&lt;T&gt;</strong> delegate by default:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using System;</span>
 <span class="c1">// using System.Linq;</span>
@@ -195,7 +195,7 @@
 </pre></div>
 </div>
 <p>After calling the <em>AllowResolvingFuncFactories</em> extension method, the container allows resolving <strong>Func&lt;T&gt;</strong> delegates.</p>
-<p id="lazy">Just like <strong>Func&lt;T&gt;</strong> delegates can be injected, <strong>Lazy&lt;T&gt;</strong> instances can be injected into services. <strong>Lazy&lt;T&gt;</strong> is useful in situations where the creation of a service is time consuming, but is not always used. Thus <strong>Lazy&lt;T&gt;</strong> allows you to postpone the creation of that service until the moment that it is really needed:</p>
+<p id="lazy">Just like <strong>Func&lt;T&gt;</strong> delegates can be injected, <strong>Lazy&lt;T&gt;</strong> instances can also be injected into services. <strong>Lazy&lt;T&gt;</strong> is useful in situations where the creation of a service is time consuming and not always required. <strong>Lazy&lt;T&gt;</strong> enables you to postpone the creation of a service until the moment  it is actually requried:</p>
 <div class="highlight-c#"><div class="highlight"><pre>// Extension method
 container.RegisterLazy&lt;T&gt;(this Container container) where T : class {
     Func&lt;T&gt; factory = () =&gt; container.GetInstance&lt;T&gt;();
@@ -222,7 +222,8 @@ public class MyService {
 }
 </pre></div>
 </div>
-<p>Note that instead of polluting the API of your application with <strong>Lazy&lt;T&gt;</strong> dependencies, it is usually cleaner to hide the <strong>Lazy&lt;T&gt;</strong> behind a proxy:</p>
+<div class="note container">
+<strong>Note</strong>: instead of polluting the API of your application with <strong>Lazy&lt;T&gt;</strong> dependencies, it is usually cleaner to hide the <strong>Lazy&lt;T&gt;</strong> behind a proxy:</div>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Proxy definition</span>
 <span class="k">public</span> <span class="k">class</span> <span class="nc">MyLazyServiceProxy</span> <span class="p">:</span> <span class="n">IMyService</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">Lazy</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;</span> <span class="n">wrapped</span><span class="p">;</span>
@@ -247,10 +248,10 @@ public class MyService {
 </div>
 <div class="section" id="resolve-instances-by-key">
 <span id="id2"></span><h2>Resolve instances by key<a class="headerlink" href="#resolve-instances-by-key" title="Permalink to this headline">¶</a></h2>
-<p>Resolving instances by a key is a feature that is deliberately left out of <em>Simple Injector</em>, because we feel it steers developers to a design were the application tends to have a dependency on the DI container itself. For resolving a keyed instance, you will often need to call into the container itself, which leads to the <a class="reference external" href="http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx">Service Locator anti-pattern</a>.</p>
-<p>This doesn’t mean however, that resolving instances by a key is never useful. Resolving instances by a key however, is much more a job for a specific factory than for a container itself. This makes the design much cleaner, saves you from having to take a dependency on the DI framework, and enables many scenarios that the DI container writer just didn’t consider.</p>
+<p>Resolving instances by a key is a feature that is deliberately left out of <em>Simple Injector</em>, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the <em>Container</em> instance and this leads to the <a class="reference external" href="http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx">Service Locator anti-pattern</a>.</p>
+<p>This doesn’t mean that resolving instances by a key is never useful. Resolving instances by a key is normally a job for a specific factory rather than the <em>Container</em>. This approach makes the design much cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn’t consider.</p>
 <div class="note container">
-<strong>Note</strong>: The need for keyed registration can be an indication of ambiguity in the application design. Take a good look if each keyed registration shouldn&#8217;t have its own unique interface, or perhaps each registration should implement each own version of a generic interface.</div>
+<strong>Note</strong>: The need for keyed registration can be an indication of ambiguity in the application design. Take a good look if each keyed registration shouldn&#8217;t have its own unique interface, or perhaps each registration should implement its own version of a generic interface.</div>
 <p>Take a look at the following scenario, where we want to retrieve instances of type <strong>IRequestHandler</strong> by a string key. There are of course several ways to achieve this, but here is a simple but effective way, by defining an <strong>IRequestHandlerFactory</strong>:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Definition</span>
 <span class="k">public</span> <span class="k">interface</span> <span class="n">IRequestHandlerFactory</span>
@@ -264,7 +265,7 @@ public class MyService {
 <span class="n">handler</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="n">requestContext</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>By inheriting from the BCL’s <strong>Dictionary&lt;TKey, TValue&gt;_, creating an **IRequestHandlerFactory</strong> implementation, is almost a one-liner:</p>
+<p>By inheriting from the BCL’s <strong>Dictionary&lt;TKey, TValue&gt;</strong>, creating an <strong>IRequestHandlerFactory</strong> implementation is almost a one-liner:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">RequestHandlerFactory</span> <span class="p">:</span> <span class="n">Dictionary</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="n">Func</span><span class="p">&lt;</span><span class="n">IRequestHandler</span><span class="p">&gt;&gt;,</span>
     <span class="n">IRequestHandlerFactory</span>
 <span class="p">{</span>
@@ -286,8 +287,8 @@ public class MyService {
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: this design will work with almost all DI containers, making this not only a design that is easy to follow, but making it very easy to migrate to another DI implementation.</div>
-<p>If you don’t like a design that uses <strong>Func&lt;T&gt;</strong> delegates this way, it can easily be changed to be a <em>Dictionary&lt;string, Type&gt;</em> instead. The <strong>RequestHandlerFactory</strong> can be implemented as follows:</p>
+<strong>Note</strong>: this design will work with almost all DI containers making the design easy to follow and also making it portable between DI libraries.</div>
+<p>If you don’t like a design that uses <strong>Func&lt;T&gt;</strong> delegates this way, it can easily be changed to be a <strong>Dictionary&lt;string, Type&gt;</strong> instead. The <strong>RequestHandlerFactory</strong> can be implemented as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">RequestHandlerFactory</span> <span class="p">:</span> <span class="n">Dictionary</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="n">Type</span><span class="p">&gt;,</span> <span class="n">IRequestHandlerFactory</span>
 <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
@@ -316,7 +317,7 @@ public class MyService {
 </div>
 <div class="note container">
 <strong>Note</strong>: Please remember the previous note about ambiguity in the application design. In the given example the design would probably be better af by using a generic <strong>IRequestHandler&lt;TRequest&gt;</strong> interface. This would allow the implementations to be <a class="reference internal" href="advanced.html#batch-registration"><em>batch registered using a single line of code</em></a>, saves you from using keys, and results in a configuration the is <a class="reference internal" href="#verify-configuration"><em>verifiable by the container</em></a>.</div>
-<p>A last option to do keyed registrations is to manually create registrations and store them in a dictionary. The following example shows previous <strong>RequestHandlerFactory</strong> with this approach:</p>
+<p>A final option for implementing keyed registrations is to manually create the registrations and store them in a dictionary. The following example shows the same <strong>RequestHandlerFactory</strong> using this approach:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">RequestHandlerFactory</span> <span class="p">:</span> <span class="n">IRequestHandlerFactory</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">Dictionary</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="n">InstanceProducer</span><span class="p">&gt;</span> <span class="n">producers</span> <span class="p">=</span>
         <span class="k">new</span> <span class="n">Dictionary</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="n">InstanceProducer</span><span class="p">&gt;(</span>
@@ -359,14 +360,14 @@ public class MyService {
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IRequestHandlerFactory</span><span class="p">&gt;(</span><span class="n">factory</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The advantage of this method is that it completely integrates with the container. For instance, decorators can be applied to individual returned instances, types can be registered multiple times if needed, and the registered handlers will can be analyzed using the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a>.</p>
+<p>The advantage of this method is that it completely integrates with the <em>Container</em>. <a class="reference internal" href="advanced.html#decorators"><em>Decorators</em></a> can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a>.</p>
 </div>
-<div class="section" id="resolve-array-and-lists">
-<span id="resolve-arrays-and-lists"></span><h2>Resolve array and lists<a class="headerlink" href="#resolve-array-and-lists" title="Permalink to this headline">¶</a></h2>
-<p><em>Simple Injector</em> allows registration of collections of elements using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm">RegisterAll</a> method overloads. Collections can be resolved by using one of the <em>GetAllInstances&lt;T&gt;()</em> method, by calling <em>GetInstance&lt;IEnumerable&lt;T&gt;&gt;()</em>, or by defining an <strong>IEnumerable&lt;T&gt;</strong> parameter in the constructor of a type that is created using automatic constructor injection.</p>
-<p>For Simple Injector 2.4 and up, the other collection types that are automatically resolved are <a class="reference external" href="https://msdn.microsoft.com/en-us/library/hh881542.aspx">IReadOnlyCollection&lt;T&gt;</a> and <a class="reference external" href="https://msdn.microsoft.com/en-us/library/hh192385.aspx">IReadOnlyList&lt;T&gt;</a>.</p>
+<div class="section" id="resolve-arrays-and-lists">
+<span id="id3"></span><h2>Resolve arrays and lists<a class="headerlink" href="#resolve-arrays-and-lists" title="Permalink to this headline">¶</a></h2>
+<p><em>Simple Injector</em> allows the registration of collections of elements using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm">RegisterAll</a> method overloads. Collections can be resolved by any of the <em>GetAllInstances&lt;T&gt;()</em> methods, by calling <em>GetInstance&lt;IEnumerable&lt;T&gt;&gt;()</em>, or by defining an <strong>IEnumerable&lt;T&gt;</strong> parameter in the constructor of a type that is created using automatic constructor injection.</p>
+<p>From <em>Simple Injector</em> 2.4 and up the other collection types that are automatically resolved are <a class="reference external" href="https://msdn.microsoft.com/en-us/library/hh881542.aspx">IReadOnlyCollection&lt;T&gt;</a> and <a class="reference external" href="https://msdn.microsoft.com/en-us/library/hh192385.aspx">IReadOnlyList&lt;T&gt;</a>.</p>
 <div class="note container">
-<strong>Note:</strong> IReadOnlyCollection&lt;T&gt; and IReadOnlyList&lt;T&gt; are new in .NET 4.5 and you need the .NET 4.5 build of Simple Injector. These interfaces are <em>not</em> supported by the PCL and .NET 4.0 versions of Simple Injector.</div>
+<strong>Note:</strong> IReadOnlyCollection&lt;T&gt; and IReadOnlyList&lt;T&gt; are new in .NET 4.5 and you need the .NET 4.5 build of Simple Injector. These interfaces are <em>not</em> supported by the PCL and .NET 4.0 versions of <em>Simple Injector</em>.</div>
 <p>Injection of other collection types, such as <strong>arrays of T</strong> or <strong>IList&lt;T&gt;</strong> into constructors is not supported out of the box. By hooking onto the unregistered type resolution event however, this functionality can be added. Look <a class="reference internal" href="CollectionRegistrationExtensions.html"><em>here</em></a> for an example extension method that allows this behavior for <strong>T[]</strong> types.</p>
 <p>Please take a look at your design if you think you need to work with a collection of items. Often you can succeed by creating a composite type that can be injected. Take the following interface for instance:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">ILogger</span> <span class="p">{</span>
@@ -393,7 +394,7 @@ public class MyService {
 <p>A composite allows you to remove this boilerplate iteration logic from the application, which makes the application cleaner and when changes have to be made to the way the collection of loggers is processed, only the composite has to be changed.</p>
 </div>
 <div class="section" id="register-multiple-interfaces-with-the-same-implementation">
-<span id="id3"></span><h2>Register multiple interfaces with the same implementation<a class="headerlink" href="#register-multiple-interfaces-with-the-same-implementation" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>Register multiple interfaces with the same implementation<a class="headerlink" href="#register-multiple-interfaces-with-the-same-implementation" title="Permalink to this headline">¶</a></h2>
 <p>To adhere to the <a class="reference external" href="http://en.wikipedia.org/wiki/Interface_segregation_principle">Interface Segregation Principle</a>, it is important to keep interfaces narrow. Although in most situations implementations implement a single interface, it can sometimes be beneficial to have multiple interfaces on a single implementation. Here is an example of how to register this:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Impl implements IInterface1, IInterface2 and IInterface3.</span>
 <span class="kt">var</span> <span class="n">registration</span> <span class="p">=</span>
@@ -415,9 +416,9 @@ public class MyService {
 <strong>Note:</strong> This is different from having three <em>RegisterSingle</em> registrations, since that will results three separate singletons.</div>
 </div>
 <div class="section" id="override-existing-registrations">
-<span id="id4"></span><h2>Override existing registrations<a class="headerlink" href="#override-existing-registrations" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>Override existing registrations<a class="headerlink" href="#override-existing-registrations" title="Permalink to this headline">¶</a></h2>
 <p>The default behavior of <em>Simple Injector</em> is to fail when a service is registered for a second time. Most of the time the developer didn&#8217;t intend to override a previous registration and allowing this would lead to a configuration that would pass the container&#8217;s verification, but doesn&#8217;t behave as expected.</p>
-<p>This behavior differs from most other IoC frameworks, where adding new registrations results in appending the collection of registrations for that abstraction. Registering collections in Simple Injector is done using one of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm">RegisterAll</a> method overloads.</p>
+<p>This design decision differs from most other IoC frameworks, where adding new registrations results in appending the collection of registrations for that abstraction. Registering collections in <em>Simple Injector</em> is an explicit action done using one of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm">RegisterAll</a> method overloads.</p>
 <p>There are certain scenarios however where overriding is useful. An example of such is a bootstrapper project for a business layer that is reused in multiple applications (in both a web application, web service, and Windows service for instance). Not having a business layer specific bootstrapper project would mean the complete DI configuration would be duplicated in the startup path of each application, which would lead to code duplication. In that situation the applications would roughly have the same configuration, with a few adjustments.</p>
 <p>Best is to start of by configuring all possible dependencies in the BL bootstrapper and leave out the service registrations where the implementation differs for each application. In other words, the BL bootstrapper would result in an incomplete configuration. After that, each application can finish the configuration by registering the missing dependencies. This way you still don&#8217;t need to override the existing configuration.</p>
 <p>In certain scenarios it can be beneficial to allow an application override an existing configuration. The container can be configured to allow overriding as follows:</p>
@@ -545,7 +546,7 @@ public class MyService {
 <li><a class="reference internal" href="#">How To</a><ul>
 <li><a class="reference internal" href="#register-factory-delegates">Register factory delegates</a></li>
 <li><a class="reference internal" href="#resolve-instances-by-key">Resolve instances by key</a></li>
-<li><a class="reference internal" href="#resolve-array-and-lists">Resolve array and lists</a></li>
+<li><a class="reference internal" href="#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li><a class="reference internal" href="#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li><a class="reference internal" href="#override-existing-registrations">Override existing registrations</a></li>
 <li><a class="reference internal" href="#verify-the-containers-configuration">Verify the container’s configuration</a></li>

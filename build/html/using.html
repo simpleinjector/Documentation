@@ -55,9 +55,9 @@
 <div class="note container">
 <strong>Note</strong>: this documentation is specific for <em>Simple Injector version 2.0</em> and up. Look <a class="reference external" href="https://simpleinjector.codeplex.com/wikipage?title=UsingtheSimpleInjector&amp;version=19">here</a> for 1.x specific documentation.</div>
 <p id="id2"><span id="id1"></span>Good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library (if ever required). The technique for keeping this dependency to a minimum can be achieved by designing the types in your application around the constructor injection pattern: Define all dependencies of a class in the single public constructor of that type; do this for all service types that need to be resolved and resolve only the top most types in the application directly (i.e. let the container build up the complete graph of dependent objects for you).</p>
-<p id="the-container">Simple Injector&#8217;s main type is the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm">Container</a> class. An instance of <em>Container</em> is used to register mappings between each abstraction (service) and implementation (component). Your application code should depend on abstractions and it is the role of the <em>Container</em> to supply the application with the right implementation. The easiest way to view the <em>Container</em> is as a big dictionary where the type of the abstraction is used as key, and each key&#8217;s related value is the definition of how to create that particular implementation. Each time the application requests for a service, a look up is made within the dictionary and the correct implementation is returned.</p>
+<p id="the-container"><em>Simple Injector</em>&#8216;s main type is the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm">Container</a> class. An instance of <em>Container</em> is used to register mappings between each abstraction (service) and its corresponding implementation (component). Your application code should depend on abstractions and it is the role of the <em>Container</em> to supply the application with the right implementation. The easiest way to view the <em>Container</em> is as a big dictionary where the type of the abstraction is used as key, and each key&#8217;s related value is the definition of how to create that particular implementation. Each time the application requests for a service, a look up is made within the dictionary and the correct implementation is returned.</p>
 <div class="note container">
-<strong>Tip</strong>: You should typically create a single <em>Container</em> instance for the whole application (one instance per app domain); <em>Container</em> instances are thread-safe</div>
+<strong>Tip</strong>: You should typically create a single <em>Container</em> instance for the whole application (one instance per app domain); <em>Container</em> instances are thread-safe.</div>
 <div class="note container">
 <strong>Warning</strong>: Registering types in a <em>Container</em> instance should be done from one single thread. Requesting instances from the <em>Container</em> is thread-safe but <a class="reference external" href="https://simpleinjector.codeplex.com/discussions/349908]">registration is not</a>.</div>
 <div class="note container">
@@ -245,7 +245,7 @@ By referencing the <em>Container</em> instance within the delegate, the <em>Cont
 <span class="n">Assert</span><span class="p">.</span><span class="n">IsTrue</span><span class="p">(</span><span class="n">handler2</span><span class="p">.</span><span class="n">ExecuteAsynchronously</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The <strong>Action&lt;T&gt;</strong> delegate that is registered by the <em>RegisterInitializer</em> method is called once the <em>Container</em> has created a new instance of <cite>T</cite> (or any instance that inherits from or implements <cite>T</cite> depending on exactly how you have configured that registration). In the example <strong>MoveCustomerHandler</strong> inherits from <strong>HandlerBase</strong> and because of this the <strong>Action&lt;HandlerBase&gt;</strong> delegate will be called with a reference to the newly created instance.</p>
+<p>The <strong>Action&lt;T&gt;</strong> delegate that is registered by the <em>RegisterInitializer</em> method is called once the <em>Container</em> has created a new instance of <cite>T</cite> (or any instance that inherits from or implements <cite>T</cite> depending on exactly how you have configured your registrations). In the example <strong>MoveCustomerHandler</strong> inherits from <strong>HandlerBase</strong> and because of this the <strong>Action&lt;HandlerBase&gt;</strong> delegate will be called with a reference to the newly created instance.</p>
 <div class="note container">
 <strong>Note</strong>: The <em>Ccontainer</em> will not be able to call an initializer delegate on a type that is manually constructed using the <em>new</em> operator. Use <a class="reference internal" href="#automatic-constructor-injection"><em>automatic constructor injection</em></a> whenever possible.</div>
 <div class="note container">
@@ -268,7 +268,7 @@ By referencing the <em>Container</em> instance within the delegate, the <em>Cont
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>:  When zero instances are registered using <em>RegisterAll</em>, the call to <em>Container.GetAllInstances</em> will always return an empty list.</div>
+<strong>Note</strong>:  When zero instances are registered using <em>RegisterAll</em>, each call to <em>Container.GetAllInstances</em> will return an empty list.</div>
 <p>Just as with normal types, <em>Simple Injector</em> can inject collections of instances into constructors:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Definition</span>
 <span class="k">public</span> <span class="k">class</span> <span class="nc">Service</span> <span class="p">:</span> <span class="n">IService</span> <span class="p">{</span>
@@ -374,15 +374,15 @@ By referencing the <em>Container</em> instance within the delegate, the <em>Cont
 <div class="note container">
 <strong>Note</strong>: Because <strong>UserService</strong> is a concrete type, calling <em>container.GetInstance&lt;UserService&gt;()</em> without registering it explicitly will work. This feature can significantly simplify the <em>Container</em>’s configuration for more complex scenarios. Alwasy keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.</div>
 </div>
-<div class="section" id="id4">
-<span id="more-information"></span><span id="id5"></span><h2>More information<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="more-information">
+<span id="id4"></span><h2>More information<a class="headerlink" href="#more-information" title="Permalink to this headline">¶</a></h2>
 <p>For more information about Simple Injector please visit the following links:</p>
 <ul class="simple">
-<li>The [Simple Injector and object lifetime management|ObjectLifestyleManagement] page explains how to configure lifestyles such as <strong>transient</strong>, <strong>singleton</strong>, and many others.</li>
-<li>See the [Integration Guide] for more information about how to integrate Simple Injector into your specific application framework.</li>
+<li>The <a class="reference internal" href="lifetimes.html"><em>Object Lifetime Management</em></a> page explains how to configure lifestyles such as <strong>transient</strong>, <strong>singleton</strong>, and many others.</li>
+<li>See the <a class="reference internal" href="integration.html"><em>Integration Guide</em></a> for more information about how to integrate Simple Injector into your specific application framework.</li>
 <li>For more information about <strong>dependency injection</strong> in general, please visit <a class="reference external" href="https://stackoverflow.com/tags/dependency-injection/info">this page on Stackoverflow</a>.</li>
-<li>If you have any questions about how to use Simple Injector or about <strong>dependency injection</strong> in general, the experts at <a class="reference external" href="https://stackoverflow.com/questions/ask?tags=simple-injector+%20ioc-container+dependency-injection+.net+c%23">Stackoverflow.com</a> are waiting for you.</li>
-<li>For all other Simple Injector related question and discussions, such as bug reports and feature requests, the <a class="reference external" href="https://simpleinjector.codeplex.com/discussions">Simple Injector discussion forum</a> will be the place to start.</li>
+<li>If you have any questions about how to use <em>Simple Injector</em> or about <strong>dependency injection</strong> in general, the experts at <a class="reference external" href="https://stackoverflow.com/questions/ask?tags=simple-injector+%20ioc-container+dependency-injection+.net+c%23">Stackoverflow.com</a> are waiting for you.</li>
+<li>For all other <em>Simple Injector</em> related question and discussions, such as bug reports and feature requests, the <a class="reference external" href="https://simpleinjector.codeplex.com/discussions">Simple Injector discussion forum</a> will be the place to start.</li>
 </ul>
 </div>
 </div>
@@ -400,7 +400,7 @@ By referencing the <em>Container</em> instance within the delegate, the <em>Cont
 <li><a class="reference internal" href="#configuring-simple-injector">Configuring Simple Injector</a></li>
 <li><a class="reference internal" href="#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
 <li><a class="reference internal" href="#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
-<li><a class="reference internal" href="#id4">More information</a></li>
+<li><a class="reference internal" href="#more-information">More information</a></li>
 </ul>
 </li>
 </ul>
