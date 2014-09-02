@@ -15,7 +15,7 @@ Good practice is to minimize the dependency between your application and the DI 
 
 .. _The-Container:
 
-Simple Injector's main type is the `Container <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm>`_ class. An instance of **Container** is used to register mappings between each abstraction (service) and implementation (component). Your application code should depend on abstractions and it is the role of the *Container* to supply the application with the right implementation. The easiest way to view the *Container* is as a big dictionary where the type of the abstraction is used as key, and each key's related value is the definition of how to create that particular implementation. Each time the application requests for a service, a look up is made within the dictionary and the correct implementation is returned.
+Simple Injector's main type is the `Container <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm>`_ class. An instance of *Container* is used to register mappings between each abstraction (service) and implementation (component). Your application code should depend on abstractions and it is the role of the *Container* to supply the application with the right implementation. The easiest way to view the *Container* is as a big dictionary where the type of the abstraction is used as key, and each key's related value is the definition of how to create that particular implementation. Each time the application requests for a service, a look up is made within the dictionary and the correct implementation is returned.
 
 .. container:: Note
 
@@ -82,7 +82,7 @@ The first four steps are performed only once at application startup. The last st
 
 In the case of MVC, the fifth step is the responsibility of the MVC framework. For each received web requests, the MVC framework will map that request to a **Controller** type and ask the application's **IDependencyResolver** to create an instance of that controller type. The registration of the **SimpleInjectorDependencyResolver** (part of the *SimpleInjector.Integration.Web.Mvc.dll*) will ensure that the request for creating an instance is forwarded on to *Simple Injector*. *Simple Injector* will create that controller with all of its nested dependencies.
 
-The example below is an very basic MVC Controller:
+The example below is a very basic MVC Controller:
 
 .. code-block:: c#
 
@@ -209,7 +209,12 @@ By supplying the service type and the created implementation as generic types, t
 
 **Configuring a new instance to be returned on each call using a delegate:**
 
-By supplying a delegate, types can be registered that can not be created by using :ref:`automatic constructor injection <Automatic-constructor-injection>`. By calling the *Container* inside the delegate, you can let the *Container* do as much as work for you as possible:
+By supplying a delegate, types can be registered that cannot be created by using :ref:`automatic constructor injection <Automatic-constructor-injection>`.
+
+
+.. container:: Note
+
+    By referencing the *Container* instance within the delegate, the *Container* can still manage as much of the object creation work as possible:
 
 .. code-block:: c#
 
@@ -253,7 +258,7 @@ For types that need to be injected we recommend that you define a single public 
     var handler2 = container.GetInstance<IHandler<ShipOrderCommand>>();
     Assert.IsTrue(handler2.ExecuteAsynchronously);
 
-The **Action<T>** delegate that is registered by the *RegisterInitializer* method is called once the *Container* has created a new instance of `T` (or inherits from or implements `T` depending on exactly how you have configured that registration). In the example **MoveCustomerHandler** inherits from **HandlerBase** and because of this the **Action<HandlerBase>** delegate will be called with a reference to the newly created instance.
+The **Action<T>** delegate that is registered by the *RegisterInitializer* method is called once the *Container* has created a new instance of `T` (or any instance that inherits from or implements `T` depending on exactly how you have configured that registration). In the example **MoveCustomerHandler** inherits from **HandlerBase** and because of this the **Action<HandlerBase>** delegate will be called with a reference to the newly created instance.
 
 .. container:: Note
 
@@ -328,9 +333,9 @@ The *RegisterAll* overloads that take a collection of **Type** instances rely on
 
     container.RegisterAll<ILogger>(typeof(MailLogger)), typeof(SqlLogger), typeof(ILogger));
 
-When the registered collection of **ILogger** instance is resolved, the *Container* will resolve each and every one of them applying all the rules of their configuration. When no such registration exists, the type is created with the **Transient** lifestyle (*transient* means that a new instance is created every time the returned collection is iterated). The **MailLogger** type however, has an explicit registration and since it is registered as **Singleton**, the resolved **ILogger** collections will always have the same instance.
+When the registered collection of **ILogger** instances are resolved the *Container* will resolve each and every one of them applying all the specific rules of their configuration. When no lifestyle registration exists, the type is created with the default **Transient** lifestyle (*transient* means that a new instance is created every time the returned collection is iterated). In the example, the **MailLogger** type is registered as **Singleton**, and so each resolved **ILogger** collection will always have the same instance of **MailLogger** in their collection.
 
-Since the creation is forwarded, abstract types can also be registered using *RegisterAll*. In the above example the **ILogger** type itself is registered using *RegisterAll*. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration, that is included in the collection of **ILogger** instances as well.
+Since the creation is forwarded, abstract types can also be registered using *RegisterAll*. In the above example the **ILogger** type itself is registered using *RegisterAll*. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of **ILogger** instances as well.
 
 While resolving collections is useful and also works with :ref:`automatic constructor injection <Automatic-constructor-injection>`, the registration of *Composites* is preferred over the use of collections as constructor arguments in application code. Register a composite whenever possible, as shown in the example below:
 
@@ -372,7 +377,7 @@ Verifying the container's configuration
 
 You can optionally call the *Verify* method of the *Container*. The *Verify* method provides a fail-fast mechanism to prevent your application from starting when the *Container* has been accidentaly misconfigured. The *Verify* method checks the entire configuration by creating an instance of each registered type.
 
-For more information about creating an application and container configuration that can be succesfully verified, please read the :ref:`How To Verify the container’s configuration `<Verify-Configuration>`.
+For more information about creating an application and container configuration that can be succesfully verified, please read the :ref:`How To Verify the container’s configuration <Verify-Configuration>`.
 
 .. _Automatic-Constructor-Injection:
 
@@ -385,7 +390,7 @@ Simple Injector uses the public constructor of a registered type and analyzes ea
 
 #. Each type to be created must be concrete (not abstract, an interface or an open generic type).
 #. The type *should* have one public constructor (this may be a default constructor and this requirement can be overridden).
-#. All the types of the arguments in that constructor can be resolved by the container.
+#. All the types of the arguments in that constructor must be resolvable by the *Container*.
 
 Simple Injector can create a type even if it hasn’t registered in the container by using constructor injection.
 
@@ -412,7 +417,7 @@ The following code shows an example of the use of automatic constructor injectio
 
 .. container:: Note
 
-    **Note**: Because **UserService** is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work as well. This can simplify the container’s configuration significantly for more complex scenarios. However, keep in mind that the best practice is to program to an interface, not a concrete type. Prevent using and depending on concrete types whenever possible.
+    **Note**: Because **UserService** is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can significantly simplify the *Container*’s configuration for more complex scenarios. Alwasy keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
 
 .. _More_information:
 .. _More-Information:

@@ -53,8 +53,8 @@
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>The goal of <em>Simple Injector</em> is to provide .NET application developers with an easy, flexible, and fast <a class="reference external" href="http://martinfowler.com/articles/injection.html">Inversion of Control library</a>, that promotes best practice to steer developers towards the pit of success.</p>
-<p>Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack features often required by large scale  developement projects. <em>Simple Injector</em> fills this gap by supplying a simple implementation with a carefully selected and complete set of features. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any <a class="reference internal" href="advanced.html"><em>advanced scenario</em></a>.</p>
+<p>The goal of <em>Simple Injector</em> is to provide .NET application developers with an easy, flexible, and fast <a class="reference external" href="http://martinfowler.com/articles/injection.html">Inversion of Control library</a> that promotes best practice to steer developers towards the pit of success.</p>
+<p>Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack features often required by large scale  development projects. <em>Simple Injector</em> fills this gap by supplying a simple implementation with a carefully selected and complete set of features. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any <a class="reference internal" href="advanced.html"><em>advanced scenario</em></a>.</p>
 <p>The following platforms are supported:</p>
 <ul class="simple">
 <li><em>.NET 4.0</em> and up.</li>
@@ -68,7 +68,8 @@
 </div>
 <div class="section" id="new-diagnostic-services-in-simple-injector-2">
 <h2>New Diagnostic Services in Simple Injector 2<a class="headerlink" href="#new-diagnostic-services-in-simple-injector-2" title="Permalink to this headline">¶</a></h2>
-<p>Simple Injector 2.0 adds the ability to warn about common misconfigurations while unit testing and/or debugging the application. Many Simple Injector users have already used this feature to diagnose their configuration and have successfully fixed problems that would have otherwise been difficult or even impossible to find. Here&#8217;s a quick visual example of this feature:</p>
+<p>Simple Injector 2.0 adds the ability to warn about common misconfigurations while unit testing and/or debugging your application. Many Simple Injector users have already used this feature to diagnose their configuration and have successfully fixed problems that would have otherwise been difficult or even impossible to find.</p>
+<p>Here&#8217;s a quick visual example of this feature:</p>
 <img alt="Diagnostics debugger view context menu" src="_images/diagnosticsdebuggerview.png" />
 <p>See the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a> page for more information.</p>
 </div>
@@ -111,7 +112,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <strong>UserController</strong> class depends on the <strong>IUserRepository</strong> and <strong>ILogger</strong> interfaces. By not depending on concrete implementations, we can test <strong>UserController</strong> in isolation. But ease of testing is just the beginning of all that Dependency Injection gives us. It also enables, for example,  us to design highly flexible systems that can be completely composed in one specific location (often the startup path) of the application.</p>
+<p>The <strong>UserController</strong> class depends on the <strong>IUserRepository</strong> and <strong>ILogger</strong> interfaces. By not depending on concrete implementations, we can test <strong>UserController</strong> in isolation. But ease of testing is only one of a number of things that Dependency Injection gives us. It also enables us, for example, to design highly flexible systems that can be completely composed in one specific location (often the startup path) of the application.</p>
 </div>
 <div class="section" id="introducing-simple-injector">
 <h3>Introducing Simple Injector<a class="headerlink" href="#introducing-simple-injector" title="Permalink to this headline">¶</a></h3>
@@ -142,7 +143,7 @@
 <p>The registration of the <strong>ILogger</strong> is a bit more complex though. It registers a delegate that knows how to create a new <strong>ILogger</strong> implementation, in this case <strong>CompositeLogger</strong> (which is an implementation of <strong>ILogger</strong>). The delegate itself calls back into the container and this allows the container to create the concrete <strong>DatabaseLogger</strong> and <strong>MailLogger</strong> and inject them into the <strong>CompositeLogger</strong>. While the type of registration that we’ve seen with the <strong>IUserRepository</strong> is much more common, the use of delegates allows many interesting scenarios.</p>
 <div class="note container">
 <strong>Note</strong>: We did not register the <strong>UserController</strong>, because the <strong>UserController</strong> is a concrete type, <em>Simple Injector</em> can implicitly create it (as long as its dependencies can be resolved).</div>
-<p>And this is all it takes to start using the <em>Simple Injector</em>. Design your classes around the dependency injection principle (which is actually the hard part) and configure them at the start up point in your application. Some frameworks (such as ASP.NET MVC) will do the rest for you, other frameworks (like ASP.NET Web Forms) will need a little bit more work. See the <a class="reference internal" href="integration.html"><em>Integration Guide</em></a> for examples of many common frameworks.</p>
+<p>And this is all it takes to start using <em>Simple Injector</em>. Design your classes around the dependency injection principle (which is actually the hard part) and configure them during application initialization. Some frameworks (such as ASP.NET MVC) will do the rest for you, other frameworks (like ASP.NET Web Forms) will need a little bit more work. See the <a class="reference internal" href="integration.html"><em>Integration Guide</em></a> for examples of many common frameworks.</p>
 <div class="note container">
 Please go to the <a class="reference internal" href="using.html"><em>Using Simple Injector</em></a> section in the documentation to see more examples.</div>
 </div>

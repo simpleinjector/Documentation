@@ -5,9 +5,9 @@ Quick Start
 Overview
 ========
 
-The goal of *Simple Injector* is to provide .NET application developers with an easy, flexible, and fast `Inversion of Control library <http://martinfowler.com/articles/injection.html>`_, that promotes best practice to steer developers towards the pit of success.
+The goal of *Simple Injector* is to provide .NET application developers with an easy, flexible, and fast `Inversion of Control library <http://martinfowler.com/articles/injection.html>`_ that promotes best practice to steer developers towards the pit of success.
 
-Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack features often required by large scale  developement projects. *Simple Injector* fills this gap by supplying a simple implementation with a carefully selected and complete set of features. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any :doc:`advanced scenario <advanced>`.
+Many of the existing IoC frameworks have a big complicated legacy API or are new, immature, and lack features often required by large scale  development projects. *Simple Injector* fills this gap by supplying a simple implementation with a carefully selected and complete set of features. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any :doc:`advanced scenario <advanced>`.
 
 The following platforms are supported:
 
@@ -24,7 +24,9 @@ The following platforms are supported:
 New Diagnostic Services in Simple Injector 2
 ============================================
 
-Simple Injector 2.0 adds the ability to warn about common misconfigurations while unit testing and/or debugging the application. Many Simple Injector users have already used this feature to diagnose their configuration and have successfully fixed problems that would have otherwise been difficult or even impossible to find. Here's a quick visual example of this feature:
+Simple Injector 2.0 adds the ability to warn about common misconfigurations while unit testing and/or debugging your application. Many Simple Injector users have already used this feature to diagnose their configuration and have successfully fixed problems that would have otherwise been difficult or even impossible to find. 
+
+Here's a quick visual example of this feature:
 
 .. image:: images/diagnosticsdebuggerview.png 
    :alt: Diagnostics debugger view context menu
@@ -76,7 +78,7 @@ The general idea behind *Simple Injector* (or any DI framework for that matter) 
         }
     }
 
-The **UserController** class depends on the **IUserRepository** and **ILogger** interfaces. By not depending on concrete implementations, we can test **UserController** in isolation. But ease of testing is just the beginning of all that Dependency Injection gives us. It also enables, for example,  us to design highly flexible systems that can be completely composed in one specific location (often the startup path) of the application.
+The **UserController** class depends on the **IUserRepository** and **ILogger** interfaces. By not depending on concrete implementations, we can test **UserController** in isolation. But ease of testing is only one of a number of things that Dependency Injection gives us. It also enables us, for example, to design highly flexible systems that can be completely composed in one specific location (often the startup path) of the application.
 
 Introducing Simple Injector
 ---------------------------
@@ -116,7 +118,7 @@ The registration of the **ILogger** is a bit more complex though. It registers a
 
     **Note**: We did not register the **UserController**, because the **UserController** is a concrete type, *Simple Injector* can implicitly create it (as long as its dependencies can be resolved).
 
-And this is all it takes to start using the *Simple Injector*. Design your classes around the dependency injection principle (which is actually the hard part) and configure them at the start up point in your application. Some frameworks (such as ASP.NET MVC) will do the rest for you, other frameworks (like ASP.NET Web Forms) will need a little bit more work. See the :doc:`integration` for examples of many common frameworks.
+And this is all it takes to start using *Simple Injector*. Design your classes around the dependency injection principle (which is actually the hard part) and configure them during application initialization. Some frameworks (such as ASP.NET MVC) will do the rest for you, other frameworks (like ASP.NET Web Forms) will need a little bit more work. See the :doc:`integration` for examples of many common frameworks.
 
 .. container:: Note
 

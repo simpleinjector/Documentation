@@ -55,7 +55,7 @@
 <div class="note container">
 <strong>Note</strong>: this documentation is specific for <em>Simple Injector version 2.0</em> and up. Look <a class="reference external" href="https://simpleinjector.codeplex.com/wikipage?title=UsingtheSimpleInjector&amp;version=19">here</a> for 1.x specific documentation.</div>
 <p id="id2"><span id="id1"></span>Good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library (if ever required). The technique for keeping this dependency to a minimum can be achieved by designing the types in your application around the constructor injection pattern: Define all dependencies of a class in the single public constructor of that type; do this for all service types that need to be resolved and resolve only the top most types in the application directly (i.e. let the container build up the complete graph of dependent objects for you).</p>
-<p id="the-container">Simple Injector&#8217;s main type is the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm">Container</a> class. An instance of <strong>Container</strong> is used to register mappings between each abstraction (service) and implementation (component). Your application code should depend on abstractions and it is the role of the <em>Container</em> to supply the application with the right implementation. The easiest way to view the <em>Container</em> is as a big dictionary where the type of the abstraction is used as key, and each key&#8217;s related value is the definition of how to create that particular implementation. Each time the application requests for a service, a look up is made within the dictionary and the correct implementation is returned.</p>
+<p id="the-container">Simple Injector&#8217;s main type is the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm">Container</a> class. An instance of <em>Container</em> is used to register mappings between each abstraction (service) and implementation (component). Your application code should depend on abstractions and it is the role of the <em>Container</em> to supply the application with the right implementation. The easiest way to view the <em>Container</em> is as a big dictionary where the type of the abstraction is used as key, and each key&#8217;s related value is the definition of how to create that particular implementation. Each time the application requests for a service, a look up is made within the dictionary and the correct implementation is returned.</p>
 <div class="note container">
 <strong>Tip</strong>: You should typically create a single <em>Container</em> instance for the whole application (one instance per app domain); <em>Container</em> instances are thread-safe</div>
 <div class="note container">
@@ -107,7 +107,7 @@
 </pre></div>
 </div>
 <p>In the case of MVC, the fifth step is the responsibility of the MVC framework. For each received web requests, the MVC framework will map that request to a <strong>Controller</strong> type and ask the application&#8217;s <strong>IDependencyResolver</strong> to create an instance of that controller type. The registration of the <strong>SimpleInjectorDependencyResolver</strong> (part of the <em>SimpleInjector.Integration.Web.Mvc.dll</em>) will ensure that the request for creating an instance is forwarded on to <em>Simple Injector</em>. <em>Simple Injector</em> will create that controller with all of its nested dependencies.</p>
-<p>The example below is an very basic MVC Controller:</p>
+<p>The example below is a very basic MVC Controller:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.Web.Mvc</span><span class="p">;</span>
 
@@ -206,7 +206,9 @@
 </pre></div>
 </div>
 <p><strong>Configuring a new instance to be returned on each call using a delegate:</strong></p>
-<p>By supplying a delegate, types can be registered that can not be created by using <a class="reference internal" href="#automatic-constructor-injection"><em>automatic constructor injection</em></a>. By calling the <em>Container</em> inside the delegate, you can let the <em>Container</em> do as much as work for you as possible:</p>
+<p>By supplying a delegate, types can be registered that cannot be created by using <a class="reference internal" href="#automatic-constructor-injection"><em>automatic constructor injection</em></a>.</p>
+<div class="note container">
+By referencing the <em>Container</em> instance within the delegate, the <em>Container</em> can still manage as much of the object creation work as possible:</div>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IHandler</span><span class="p">&lt;</span><span class="n">MoveCustomerCommand</span><span class="p">&gt;&gt;(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
     <span class="c1">// Get a new instance of the concrete MoveCustomerHandler class:</span>
@@ -243,7 +245,7 @@
 <span class="n">Assert</span><span class="p">.</span><span class="n">IsTrue</span><span class="p">(</span><span class="n">handler2</span><span class="p">.</span><span class="n">ExecuteAsynchronously</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The <strong>Action&lt;T&gt;</strong> delegate that is registered by the <em>RegisterInitializer</em> method is called once the <em>Container</em> has created a new instance of <cite>T</cite> (or inherits from or implements <cite>T</cite> depending on exactly how you have configured that registration). In the example <strong>MoveCustomerHandler</strong> inherits from <strong>HandlerBase</strong> and because of this the <strong>Action&lt;HandlerBase&gt;</strong> delegate will be called with a reference to the newly created instance.</p>
+<p>The <strong>Action&lt;T&gt;</strong> delegate that is registered by the <em>RegisterInitializer</em> method is called once the <em>Container</em> has created a new instance of <cite>T</cite> (or any instance that inherits from or implements <cite>T</cite> depending on exactly how you have configured that registration). In the example <strong>MoveCustomerHandler</strong> inherits from <strong>HandlerBase</strong> and because of this the <strong>Action&lt;HandlerBase&gt;</strong> delegate will be called with a reference to the newly created instance.</p>
 <div class="note container">
 <strong>Note</strong>: The <em>Ccontainer</em> will not be able to call an initializer delegate on a type that is manually constructed using the <em>new</em> operator. Use <a class="reference internal" href="#automatic-constructor-injection"><em>automatic constructor injection</em></a> whenever possible.</div>
 <div class="note container">
@@ -302,8 +304,8 @@
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="k">typeof</span><span class="p">(</span><span class="n">MailLogger</span><span class="p">)),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">SqlLogger</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">ILogger</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>When the registered collection of <strong>ILogger</strong> instance is resolved, the <em>Container</em> will resolve each and every one of them applying all the rules of their configuration. When no such registration exists, the type is created with the <strong>Transient</strong> lifestyle (<em>transient</em> means that a new instance is created every time the returned collection is iterated). The <strong>MailLogger</strong> type however, has an explicit registration and since it is registered as <strong>Singleton</strong>, the resolved <strong>ILogger</strong> collections will always have the same instance.</p>
-<p>Since the creation is forwarded, abstract types can also be registered using <em>RegisterAll</em>. In the above example the <strong>ILogger</strong> type itself is registered using <em>RegisterAll</em>. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration, that is included in the collection of <strong>ILogger</strong> instances as well.</p>
+<p>When the registered collection of <strong>ILogger</strong> instances are resolved the <em>Container</em> will resolve each and every one of them applying all the specific rules of their configuration. When no lifestyle registration exists, the type is created with the default <strong>Transient</strong> lifestyle (<em>transient</em> means that a new instance is created every time the returned collection is iterated). In the example, the <strong>MailLogger</strong> type is registered as <strong>Singleton</strong>, and so each resolved <strong>ILogger</strong> collection will always have the same instance of <strong>MailLogger</strong> in their collection.</p>
+<p>Since the creation is forwarded, abstract types can also be registered using <em>RegisterAll</em>. In the above example the <strong>ILogger</strong> type itself is registered using <em>RegisterAll</em>. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of <strong>ILogger</strong> instances as well.</p>
 <p>While resolving collections is useful and also works with <a class="reference internal" href="#automatic-constructor-injection"><em>automatic constructor injection</em></a>, the registration of <em>Composites</em> is preferred over the use of collections as constructor arguments in application code. Register a composite whenever possible, as shown in the example below:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Definition</span>
 <span class="k">public</span> <span class="k">class</span> <span class="nc">CompositeLogger</span> <span class="p">:</span> <span class="n">ILogger</span> <span class="p">{</span>
@@ -338,7 +340,7 @@
 <div class="section" id="verifying-the-container-s-configuration">
 <span id="verifying-container"></span><h2>Verifying the container&#8217;s configuration<a class="headerlink" href="#verifying-the-container-s-configuration" title="Permalink to this headline">¶</a></h2>
 <p>You can optionally call the <em>Verify</em> method of the <em>Container</em>. The <em>Verify</em> method provides a fail-fast mechanism to prevent your application from starting when the <em>Container</em> has been accidentaly misconfigured. The <em>Verify</em> method checks the entire configuration by creating an instance of each registered type.</p>
-<p>For more information about creating an application and container configuration that can be succesfully verified, please read the <a class="reference internal" href="howto.html#verify-configuration"><em>How To Verify the container’s configuration `</em></a>.</p>
+<p>For more information about creating an application and container configuration that can be succesfully verified, please read the <a class="reference internal" href="howto.html#verify-configuration"><em>How To Verify the container’s configuration</em></a>.</p>
 </div>
 <div class="section" id="automatic-constructor-injection-auto-wiring">
 <span id="automatic-constructor-injection"></span><h2>Automatic constructor injection / auto-wiring<a class="headerlink" href="#automatic-constructor-injection-auto-wiring" title="Permalink to this headline">¶</a></h2>
@@ -347,7 +349,7 @@
 <ol class="arabic simple">
 <li>Each type to be created must be concrete (not abstract, an interface or an open generic type).</li>
 <li>The type <em>should</em> have one public constructor (this may be a default constructor and this requirement can be overridden).</li>
-<li>All the types of the arguments in that constructor can be resolved by the container.</li>
+<li>All the types of the arguments in that constructor must be resolvable by the <em>Container</em>.</li>
 </ol>
 <p>Simple Injector can create a type even if it hasn’t registered in the container by using constructor injection.</p>
 <p>The following code shows an example of the use of automatic constructor injection. The example shows an <strong>IUserRepository</strong> interface with a concrete <strong>SqlUserRepository</strong> implementation and a concrete <strong>UserService</strong> class. The <strong>UserService</strong> class has one public constructor with an <strong>IUserRepository</strong> argument. Because the dependencies of the <strong>UserService</strong> are registered, Simple Injector is able to create a new <strong>UserService</strong> instance.</p>
@@ -370,7 +372,7 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: Because <strong>UserService</strong> is a concrete type, calling <em>container.GetInstance&lt;UserService&gt;()</em> without registering it explicitly will work as well. This can simplify the container’s configuration significantly for more complex scenarios. However, keep in mind that the best practice is to program to an interface, not a concrete type. Prevent using and depending on concrete types whenever possible.</div>
+<strong>Note</strong>: Because <strong>UserService</strong> is a concrete type, calling <em>container.GetInstance&lt;UserService&gt;()</em> without registering it explicitly will work. This feature can significantly simplify the <em>Container</em>’s configuration for more complex scenarios. Alwasy keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.</div>
 </div>
 <div class="section" id="id4">
 <span id="more-information"></span><span id="id5"></span><h2>More information<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
