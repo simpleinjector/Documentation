@@ -1,6 +1,8 @@
-================================
-Allowing the Simple Injector to resolve arrays and other list types
-================================
+=================================
+Collection Registration Extension
+=================================
+
+**Allowing the Simple Injector to resolve arrays and other list types.**
 
 The default behavior of the *Simple Injector* is to resolve collections of types through the *IEnumerable<T>* interface. Resolving a set of elements using other collection types is possible by registrering a mapping on a per type basis, such as can be seen the following example:
 

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>CollectionRegistrationExtensions &mdash; Simple Injector 2 documentation</title>
+    <title>Collection Registration Extension &mdash; Simple Injector 2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,7 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Simple Injector 2 documentation" href="index.html" /> 
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Appendix" href="appendix.html" />
+    <link rel="next" title="Context Dependent Extensions" href="ContextDependentExtensions.html" />
+    <link rel="prev" title="Interception Extensions" href="InterceptionExtensions.html" /> 
   </head>
   <body>
     <div class="related">
@@ -32,7 +35,14 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="ContextDependentExtensions.html" title="Context Dependent Extensions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="InterceptionExtensions.html" title="Interception Extensions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="appendix.html" accesskey="U">Appendix</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -41,94 +51,69 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="collectionregistrationextensions">
-<h1>CollectionRegistrationExtensions<a class="headerlink" href="#collectionregistrationextensions" title="Permalink to this headline">¶</a></h1>
-<p>!!! Allowing the Simple Injector to resolve arrays and other list types
-The default behavior of the <em>Simple Injector</em> is to resolve collections of types through the _IEnumerable&lt;T&gt;_ interface. Resolving a set of elements using other collection types is possible by registrering a mapping on a per type basis, such as can be seen the following example:</p>
-<p>{code:c#}
-container.RegisterAll&lt;IFilter&gt;(</p>
-<blockquote>
-<div>typeof(SqlFilter), typeof(XssFilter), typeof(SmartFilter));</div></blockquote>
-<dl class="docutils">
-<dt>container.Register&lt;IFilter[]&gt;(</dt>
-<dd>() =&gt; container.GetAllInstances&lt;IFilter&gt;().ToArray());</dd>
-</dl>
-<p>{code:c#}
-When having many collections of types that need to be resolved in this way, the registration can be come cumbersome. Alternatively you can revert to unregistered type resolution, as can be seen in the following example:</p>
-<p>{code:c#}
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;</p>
-<p>using SimpleInjector;</p>
-<p>public static class CollectionRegistrationExtensions
-{</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>public static void AllowToResolveArraysAndLists(</dt>
-<dd>this Container container)</dd>
-</dl>
-<dl class="docutils">
-<dt>{</dt>
-<dd><p class="first">container.ResolveUnregisteredType += (sender, e) =&gt;
-{</p>
-<blockquote>
-<div><p>var serviceType = e.UnregisteredServiceType;</p>
-<p>if (serviceType.IsArray)
-{</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>RegisterArrayResolver(e, container,</dt>
-<dd>serviceType.GetElementType());</dd>
-</dl>
-</div></blockquote>
-<p>}
-else if (serviceType.IsGenericType &amp;&amp;</p>
-<blockquote>
-<div>serviceType.GetGenericTypeDefinition() == typeof(IList&lt;&gt;))</div></blockquote>
-<dl class="docutils">
-<dt>{</dt>
-<dd><dl class="first last docutils">
-<dt>RegisterArrayResolver(e, container,</dt>
-<dd>serviceType.GetGenericArguments()[0]);</dd>
-</dl>
-</dd>
-</dl>
-<p>}</p>
-</div></blockquote>
-<p class="last">};</p>
-</dd>
-</dl>
-<p>}</p>
-<dl class="docutils">
-<dt>private static void RegisterArrayResolver(UnregisteredTypeEventArgs e,</dt>
-<dd>Container container, Type elementType)</dd>
-</dl>
-<dl class="docutils">
-<dt>{</dt>
-<dd><dl class="first docutils">
-<dt>var producer = container.GetRegistration(typeof(IEnumerable&lt;&gt;)</dt>
-<dd>.MakeGenericType(elementType));</dd>
-</dl>
-<p>var enumerableExpression = producer.BuildExpression();
-var arrayMethod = typeof(Enumerable).GetMethod(&#8220;ToArray&#8221;)</p>
-<blockquote>
-<div>.MakeGenericMethod(elementType);</div></blockquote>
-<dl class="docutils">
-<dt>var arrayExpression =</dt>
-<dd>Expression.Call(arrayMethod, enumerableExpression);</dd>
-</dl>
-<p class="last">e.Register(arrayExpression);</p>
-</dd>
-</dl>
-<p>}</p>
-</div></blockquote>
-<p>}
-{code:c#}
-After copying the previous code snippet to your project, you can allow mapping of array and _IList&lt;T&gt;_ types to _IEnumerable&lt;T&gt;_ for all registered collections, with the following lines:</p>
-<p>{code:c#}
-container.AllowToResolveArraysAndLists();
-{code:c#}</p>
+  <div class="section" id="collection-registration-extension">
+<h1>Collection Registration Extension<a class="headerlink" href="#collection-registration-extension" title="Permalink to this headline">¶</a></h1>
+<p><strong>Allowing the Simple Injector to resolve arrays and other list types.</strong></p>
+<p>The default behavior of the <em>Simple Injector</em> is to resolve collections of types through the <em>IEnumerable&lt;T&gt;</em> interface. Resolving a set of elements using other collection types is possible by registrering a mapping on a per type basis, such as can be seen the following example:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">IFilter</span><span class="p">&gt;(</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">SqlFilter</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">XssFilter</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">SmartFilter</span><span class="p">));</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IFilter</span><span class="p">[]&gt;(</span>
+
+    <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">&lt;</span><span class="n">IFilter</span><span class="p">&gt;().</span><span class="n">ToArray</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>When having many collections of types that need to be resolved in this way, the registration can be come cumbersome. Alternatively you can revert to unregistered type resolution, as can be seen in the following example:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq.Expressions</span><span class="p">;</span>
+
+<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">CollectionRegistrationExtensions</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">AllowToResolveArraysAndLists</span><span class="p">(</span>
+        <span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">ResolveUnregisteredType</span> <span class="p">+=</span> <span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">serviceType</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">UnregisteredServiceType</span><span class="p">;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">serviceType</span><span class="p">.</span><span class="n">IsArray</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">RegisterArrayResolver</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span>
+                    <span class="n">serviceType</span><span class="p">.</span><span class="n">GetElementType</span><span class="p">());</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">serviceType</span><span class="p">.</span><span class="n">IsGenericType</span> <span class="p">&amp;&amp;</span>
+                <span class="n">serviceType</span><span class="p">.</span><span class="n">GetGenericTypeDefinition</span><span class="p">()</span> <span class="p">==</span> <span class="k">typeof</span><span class="p">(</span><span class="n">IList</span><span class="p">&lt;&gt;))</span>
+            <span class="p">{</span>
+                <span class="n">RegisterArrayResolver</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span>
+                    <span class="n">serviceType</span><span class="p">.</span><span class="n">GetGenericArguments</span><span class="p">()[</span><span class="m">0</span><span class="p">]);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterArrayResolver</span><span class="p">(</span><span class="n">UnregisteredTypeEventArgs</span> <span class="n">e</span><span class="p">,</span>
+        <span class="n">Container</span> <span class="n">container</span><span class="p">,</span> <span class="n">Type</span> <span class="n">elementType</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">producer</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IEnumerable</span><span class="p">&lt;&gt;)</span>
+            <span class="p">.</span><span class="n">MakeGenericType</span><span class="p">(</span><span class="n">elementType</span><span class="p">));</span>
+        <span class="kt">var</span> <span class="n">enumerableExpression</span> <span class="p">=</span> <span class="n">producer</span><span class="p">.</span><span class="n">BuildExpression</span><span class="p">();</span>
+        <span class="kt">var</span> <span class="n">arrayMethod</span> <span class="p">=</span> <span class="k">typeof</span><span class="p">(</span><span class="n">Enumerable</span><span class="p">).</span><span class="n">GetMethod</span><span class="p">(</span><span class="s">&quot;ToArray&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">MakeGenericMethod</span><span class="p">(</span><span class="n">elementType</span><span class="p">);</span>
+        <span class="kt">var</span> <span class="n">arrayExpression</span> <span class="p">=</span>
+            <span class="n">Expression</span><span class="p">.</span><span class="n">Call</span><span class="p">(</span><span class="n">arrayMethod</span><span class="p">,</span> <span class="n">enumerableExpression</span><span class="p">);</span>
+
+        <span class="n">e</span><span class="p">.</span><span class="n">Register</span><span class="p">(</span><span class="n">arrayExpression</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>After copying the previous code snippet to your project, you can allow mapping of array and <em>IList&lt;T&gt;</em> types to <em>IEnumerable&lt;T&gt;</em> for all registered collections, with the following lines:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">AllowToResolveArraysAndLists</span><span class="p">();</span>
+</pre></div>
+</div>
 </div>
 
 
@@ -137,6 +122,12 @@ container.AllowToResolveArraysAndLists();
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="InterceptionExtensions.html"
+                        title="previous chapter">Interception Extensions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ContextDependentExtensions.html"
+                        title="next chapter">Context Dependent Extensions</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/CollectionRegistrationExtensions.txt"
@@ -165,7 +156,14 @@ container.AllowToResolveArraysAndLists();
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="ContextDependentExtensions.html" title="Context Dependent Extensions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="InterceptionExtensions.html" title="Interception Extensions"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="appendix.html" >Appendix</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

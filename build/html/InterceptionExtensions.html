@@ -1,0 +1,451 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Interception Extensions &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Appendix" href="appendix.html" />
+    <link rel="next" title="Collection Registration Extension" href="CollectionRegistrationExtensions.html" />
+    <link rel="prev" title="Runtime Decorators" href="RuntimeDecorators.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="CollectionRegistrationExtensions.html" title="Collection Registration Extension"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="RuntimeDecorators.html" title="Runtime Decorators"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="appendix.html" accesskey="U">Appendix</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="interception-extensions">
+<h1>Interception Extensions<a class="headerlink" href="#interception-extensions" title="Permalink to this headline">¶</a></h1>
+<p><strong>Adding interception abilities to the Simple Injector.</strong></p>
+<div class="highlight-c#"><div class="highlight"><pre>using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime.Remoting.Messaging;
+using System.Runtime.Remoting.Proxies;
+
+using SimpleInjector;
+
+public interface IInterceptor
+{
+    void Intercept(IInvocation invocation);
+}
+
+public interface IInvocation
+{
+    object InvocationTarget { get; }
+
+    object ReturnValue { get; set; }
+
+    void Proceed();
+
+    MethodBase GetConcreteMethod();
+}
+
+// Extension methods for interceptor registration
+// NOTE: These extension methods can only intercept interfaces, not abstract types.
+public static class InterceptorExtensions
+{
+    public static void InterceptWith&lt;TInterceptor&gt;(this Container container,
+        Func&lt;Type, bool&gt; predicate)
+        where TInterceptor : class, IInterceptor
+    {
+        RequiresIsNotNull(container, &quot;container&quot;);
+        RequiresIsNotNull(predicate, &quot;predicate&quot;);
+
+        container.Options.ConstructorResolutionBehavior.GetConstructor(typeof(TInterceptor),
+            typeof(TInterceptor));
+
+        var interceptWith = new InterceptionHelper(container)
+        {
+            BuildInterceptorExpression =
+                e =&gt; BuildInterceptorExpression&lt;TInterceptor&gt;(container),
+            Predicate = type =&gt; predicate(type)
+        };
+
+        container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
+    }
+
+    public static void InterceptWith(this Container container,
+        Func&lt;IInterceptor&gt; interceptorCreator,
+        Func&lt;Type, bool&gt; predicate)
+    {
+        RequiresIsNotNull(container, &quot;container&quot;);
+        RequiresIsNotNull(interceptorCreator, &quot;interceptorCreator&quot;);
+        RequiresIsNotNull(predicate, &quot;predicate&quot;);
+
+        var interceptWith = new InterceptionHelper(container)
+        {
+            BuildInterceptorExpression =
+                e =&gt; Expression.Invoke(Expression.Constant(interceptorCreator)),
+            Predicate = type =&gt; predicate(type)
+        };
+
+        container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
+    }
+
+    public static void InterceptWith(this Container container,
+        Func&lt;ExpressionBuiltEventArgs, IInterceptor&gt; interceptorCreator,
+        Func&lt;Type, bool&gt; predicate)
+    {
+        RequiresIsNotNull(container, &quot;container&quot;);
+        RequiresIsNotNull(interceptorCreator, &quot;interceptorCreator&quot;);
+        RequiresIsNotNull(predicate, &quot;predicate&quot;);
+
+        var interceptWith = new InterceptionHelper(container)
+        {
+            BuildInterceptorExpression = e =&gt; Expression.Invoke(
+                Expression.Constant(interceptorCreator),
+                Expression.Constant(e)),
+            Predicate = type =&gt; predicate(type)
+        };
+
+        container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
+    }
+
+    public static void InterceptWith(this Container container,
+        IInterceptor interceptor,
+        Func&lt;Type, bool&gt; predicate)
+    {
+        RequiresIsNotNull(container, &quot;container&quot;);
+        RequiresIsNotNull(interceptor, &quot;interceptor&quot;);
+        RequiresIsNotNull(predicate, &quot;predicate&quot;);
+
+        var interceptWith = new InterceptionHelper(container)
+        {
+            BuildInterceptorExpression = e =&gt; Expression.Constant(interceptor),
+            Predicate = predicate
+        };
+
+        container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
+    }
+
+    [DebuggerStepThrough]
+    private static Expression BuildInterceptorExpression&lt;TInterceptor&gt;(Container container)
+        where TInterceptor : class
+    {
+        var interceptorRegistration = container.GetRegistration(typeof(TInterceptor));
+
+        if (interceptorRegistration == null)
+        {
+            // This will throw an ActivationException
+            container.GetInstance&lt;TInterceptor&gt;();
+        }
+
+        return interceptorRegistration.BuildExpression();
+    }
+
+    private static void RequiresIsNotNull(object instance, string paramName)
+    {
+        if (instance == null)
+        {
+            throw new ArgumentNullException(paramName);
+        }
+    }
+
+    private class InterceptionHelper
+    {
+        private static readonly MethodInfo NonGenericInterceptorCreateProxyMethod = (
+            from method in typeof(Interceptor).GetMethods()
+            where method.Name == &quot;CreateProxy&quot;
+            where method.GetParameters().Length == 3
+            select method)
+            .Single();
+
+        public InterceptionHelper(Container container)
+        {
+            this.Container = container;
+        }
+
+        internal Container Container { get; private set; }
+
+        internal Func&lt;ExpressionBuiltEventArgs, Expression&gt; BuildInterceptorExpression { get; set; }
+
+        internal Func&lt;Type, bool&gt; Predicate { get; set; }
+
+        [DebuggerStepThrough]
+        public void OnExpressionBuilt(object sender,
+            ExpressionBuiltEventArgs e)
+        {
+            if (this.Predicate(e.RegisteredServiceType))
+            {
+                ThrowIfServiceTypeIsNotAnInterface(e);
+
+                e.Expression = this.BuildProxyExpression(e);
+            }
+        }
+
+        [DebuggerStepThrough]
+        private static void ThrowIfServiceTypeIsNotAnInterface(
+            ExpressionBuiltEventArgs e)
+        {
+            // NOTE: We can only handle interfaces, because
+            // System.Runtime.Remoting.Proxies.RealProxy
+            // only supports interfaces.
+            if (!e.RegisteredServiceType.IsInterface)
+            {
+                throw new NotSupportedException(
+                    &quot;Can&#39;t intercept type &quot; +
+                    e.RegisteredServiceType.Name +
+                    &quot; because it is not an interface.&quot;);
+            }
+        }
+
+        [DebuggerStepThrough]
+        private Expression BuildProxyExpression(ExpressionBuiltEventArgs e)
+        {
+            var interceptor = this.BuildInterceptorExpression(e);
+
+            // Create call to
+            // (ServiceType)Interceptor.CreateProxy(Type, IInterceptor, object)
+            var proxyExpression =
+                Expression.Convert(
+                    Expression.Call(NonGenericInterceptorCreateProxyMethod,
+                        Expression.Constant(e.RegisteredServiceType, typeof(Type)),
+                        interceptor,
+                        e.Expression),
+                    e.RegisteredServiceType);
+
+            if (e.Expression is ConstantExpression &amp;&amp; interceptor is ConstantExpression)
+            {
+                return Expression.Constant(CreateInstance(proxyExpression),
+                    e.RegisteredServiceType);
+            }
+
+            return proxyExpression;
+        }
+
+        [DebuggerStepThrough]
+        private static object CreateInstance(Expression expression)
+        {
+            var instanceCreator = Expression.Lambda&lt;Func&lt;object&gt;&gt;(expression,
+                new ParameterExpression[0])
+                .Compile();
+
+            return instanceCreator();
+        }
+    }
+}
+
+public static class Interceptor
+{
+    public static T CreateProxy&lt;T&gt;(IInterceptor interceptor, T realInstance)
+    {
+        return (T)CreateProxy(typeof(T), interceptor, realInstance);
+    }
+
+    [DebuggerStepThrough]
+    public static object CreateProxy(Type serviceType, IInterceptor interceptor,
+        object realInstance)
+    {
+        var proxy = new InterceptorProxy(serviceType, realInstance, interceptor);
+
+        return proxy.GetTransparentProxy();
+    }
+
+    private sealed class InterceptorProxy : RealProxy
+    {
+        private object realInstance;
+        private IInterceptor interceptor;
+
+        [DebuggerStepThrough]
+        public InterceptorProxy(Type classToProxy, object realInstance,
+            IInterceptor interceptor)
+            : base(classToProxy)
+        {
+            this.realInstance = realInstance;
+            this.interceptor = interceptor;
+        }
+
+        public override IMessage Invoke(IMessage msg)
+        {
+            if (msg is IMethodCallMessage)
+            {
+                return this.InvokeMethodCall((IMethodCallMessage)msg);
+            }
+
+            return msg;
+        }
+
+        private IMessage InvokeMethodCall(IMethodCallMessage message)
+        {
+            var invocation = new Invocation { Proxy = this, Message = message };
+
+            invocation.Proceeding += (s, e) =&gt;
+            {
+                invocation.ReturnValue = message.MethodBase.Invoke(
+                    this.realInstance, message.Args);
+            };
+
+            this.interceptor.Intercept(invocation);
+
+            return new ReturnMessage(invocation.ReturnValue, null, 0, null, message);
+        }
+
+        private class Invocation : IInvocation
+        {
+            public event EventHandler Proceeding;
+
+            public InterceptorProxy Proxy { get; set; }
+
+            public IMethodCallMessage Message { get; set; }
+
+            public object ReturnValue { get; set; }
+
+            public object InvocationTarget
+            {
+                get { return this.Proxy.realInstance; }
+            }
+
+            public void Proceed()
+            {
+                if (this.Proceeding != null)
+                {
+                    this.Proceeding(this, EventArgs.Empty);
+                }
+            }
+
+            public MethodBase GetConcreteMethod()
+            {
+                return this.Message.MethodBase;
+            }
+        }
+    }
+}
+</pre></div>
+</div>
+<p>After copying the previous code snippet to your project, you can add interception using the following lines of code:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Register a MonitoringInterceptor to intercept all interface</span>
+<span class="c1">// service types, which type name end with the text &#39;Service&#39;.</span>
+<span class="n">container</span><span class="p">.</span><span class="n">InterceptWith</span><span class="p">&lt;</span><span class="n">MonitoringInterceptor</span><span class="p">&gt;(</span>
+    <span class="n">serviceType</span> <span class="p">=&gt;</span> <span class="n">serviceType</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s">&quot;Service&quot;</span><span class="p">));</span>
+
+<span class="c1">// When the interceptor (and its dependencies) are thread-safe,</span>
+<span class="c1">// it can be registered as singleton to prevent a new instance</span>
+<span class="c1">// from being created and each call. When the intercepted service</span>
+<span class="c1">// and both the interceptor are both singletons, the returned</span>
+<span class="c1">// (proxy) instance will be a singleton as well.</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">MonitoringInterceptor</span><span class="p">&gt;();</span>
+
+<span class="c1">// Here is an example of an interceptor implementation.</span>
+<span class="c1">// NOTE: Interceptors must implement the IInterceptor interface:</span>
+<span class="k">private</span> <span class="k">class</span> <span class="nc">MonitoringInterceptor</span> <span class="p">:</span> <span class="n">IInterceptor</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span> <span class="n">logger</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">MonitoringInterceptor</span><span class="p">(</span><span class="n">ILogger</span> <span class="n">logger</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">logger</span> <span class="p">=</span> <span class="n">logger</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Intercept</span><span class="p">(</span><span class="n">IInvocation</span> <span class="n">invocation</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">watch</span> <span class="p">=</span> <span class="n">Stopwatch</span><span class="p">.</span><span class="n">StartNew</span><span class="p">();</span>
+
+        <span class="c1">// Calls the decorated instance.</span>
+        <span class="n">invocation</span><span class="p">.</span><span class="n">Proceed</span><span class="p">();</span>
+
+        <span class="kt">var</span> <span class="n">decoratedType</span> <span class="p">=</span> <span class="n">invocation</span><span class="p">.</span><span class="n">InvocationTarget</span><span class="p">.</span><span class="n">GetType</span><span class="p">();</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="n">logger</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="kt">string</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span><span class="s">&quot;{0} executed in {1} ms.&quot;</span><span class="p">,</span>
+            <span class="n">decoratedType</span><span class="p">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">watch</span><span class="p">.</span><span class="n">ElapsedMiliseconds</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="RuntimeDecorators.html"
+                        title="previous chapter">Runtime Decorators</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="CollectionRegistrationExtensions.html"
+                        title="next chapter">Collection Registration Extension</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/InterceptionExtensions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="CollectionRegistrationExtensions.html" title="Collection Registration Extension"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="RuntimeDecorators.html" title="Runtime Decorators"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="appendix.html" >Appendix</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -11,7 +11,6 @@ How To
 * How to :ref:`Work with dependency injection in multi-threaded applications <Multi-Threaded-Applications>`
 
 .. _Register-Factory-Delegates:
-.. _Register_Factory_Delegates:
 
 Register factory delegates
 ==========================
@@ -225,7 +224,6 @@ This way the application can simply depend on **IMyService** instead of **Lazy<I
     **Warning**: The same warning applies to the use of **Lazy<T>** as it does for the use of **Func<T>** delegates. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container’s configuration <Verify-Configuration>`.
 
 .. _Resolve-Instances-By-Key:
-.. _Resolve_Instances_By_Key:
 
 Resolve instances by key
 ========================
@@ -315,7 +313,7 @@ The registration will then look as follows:
 
 .. container:: Note
 
-    **Note**: Please remember the previous note about ambiguity in the application design. In the given example the design would probably be better af by using a generic **IRequestHandler<TRequest>** interface. This would allow the implementations to be :ref:`batch registered using a single line of code <Batch_Registration>`, saves you from using keys, and results in a configuration the is :ref:`verifiable by the container <Verify-Configuration>`.
+    **Note**: Please remember the previous note about ambiguity in the application design. In the given example the design would probably be better af by using a generic **IRequestHandler<TRequest>** interface. This would allow the implementations to be :ref:`batch registered using a single line of code <Batch-Registration>`, saves you from using keys, and results in a configuration the is :ref:`verifiable by the container <Verify-Configuration>`.
 
 A last option to do keyed registrations is to manually create registrations and store them in a dictionary. The following example shows previous **RequestHandlerFactory** with this approach:
 
@@ -367,7 +365,6 @@ The registration will then look as follows:
 The advantage of this method is that it completely integrates with the container. For instance, decorators can be applied to individual returned instances, types can be registered multiple times if needed, and the registered handlers will can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
 
 .. _Resolve-Arrays-And-Lists:
-.. _Resolve_Arrays_And_Lists:
 
 Resolve array and lists
 =======================
@@ -411,7 +408,6 @@ Instead of injecting a collection of dependencies, the consumer might not really
 A composite allows you to remove this boilerplate iteration logic from the application, which makes the application cleaner and when changes have to be made to the way the collection of loggers is processed, only the composite has to be changed.
 
 .. _Register-Multiple-Interfaces-With-The-Same-Implementation:
-.. _Register_Multiple_Interfaces_With_The_Same_Implementation:
 
 Register multiple interfaces with the same implementation
 =========================================================
@@ -441,7 +437,6 @@ The first line creates a **Registration** instance for the **Impl**, in this cas
     **Note:** This is different from having three *RegisterSingle* registrations, since that will results three separate singletons.
 
 .. _Override-Existing-Registrations:
-.. _Override_Existing_Registrations:
 
 Override existing registrations
 ===============================
@@ -485,7 +480,6 @@ The previous example created a *Container* instance that allows overriding. It i
     container.Register<IUserService, RealUserService>();
 
 .. _Verifying-Configuration:
-.. _Verifying_Configuration:
 .. _Verify-Configuration:
 
 Verify the container’s configuration
@@ -499,7 +493,7 @@ When starting to use a Dependency Injection container, many developers see their
 
 Calling the *Verify()* method however, is just part of the story. It is very easy to create a configuration that passes any verification, but still fails at runtime. Here are some tips to help building a verifiable configuration:
 
-#. Stay away from :ref:`implicit property injection <Implicit_Property_Injection>`, where the container is allowed to skip injecting the property if a corresponding or correctly registered dependency can't be found. This will disallow your application to fail fast and will result in *NullReferenceException*'s later on. Only use implicit property injection when the property is truly optional, omitting the dependency still keeps the configuration valid, and the application still runs correctly without that dependency. Truly optional dependencies should be very rare though, since most of the time you should prefer injecting empty implementations (a.k.a. the `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) instead of allowing dependencies to be a null reference. :ref:`Explicit property injection <Configuring_Property_Injection>` on the other hand is fine. With explicit property injection you force the container to inject a property and it will fail when it can't succeed. However, you should prefer constructor injection whenever possible. Note that the need for property injection is often an indication of problems in the design. If you revert to property injection because you otherwise have too many constructor arguments, you're probably violating the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_.
+#. Stay away from :ref:`implicit property injection <Implicit-Property-Injection>`, where the container is allowed to skip injecting the property if a corresponding or correctly registered dependency can't be found. This will disallow your application to fail fast and will result in *NullReferenceException*'s later on. Only use implicit property injection when the property is truly optional, omitting the dependency still keeps the configuration valid, and the application still runs correctly without that dependency. Truly optional dependencies should be very rare though, since most of the time you should prefer injecting empty implementations (a.k.a. the `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) instead of allowing dependencies to be a null reference. :ref:`Explicit property injection <Configuring-Property-Injection>` on the other hand is fine. With explicit property injection you force the container to inject a property and it will fail when it can't succeed. However, you should prefer constructor injection whenever possible. Note that the need for property injection is often an indication of problems in the design. If you revert to property injection because you otherwise have too many constructor arguments, you're probably violating the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_.
 
 #. Register all root objects explicitly if possible. For instance, register all ASP.NET MVC Controller instances explicitly in the container (Controller instances are requested directly and are therefore called 'root objects'). This way the container can check the complete dependency graph starting from the root object when you call *Verify()*. Prefer registering all root objects in an automated fashion, for instance by using reflection to find all root types. The `Simple Injector ASP.NET MVC Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Web.Mvc>`_ for instance, contains a `RegisterMvcControllers <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_SimpleInjectorMvcExtensions_RegisterMvcControllers.htm>`_ extension method that will do this for you and the `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ contains a `RegisterWcfServices <https://simpleinjector.org/ReferenceLibrary.v2/?topic=html/M_SimpleInjector_SimpleInjectorWcfExtensions_RegisterWcfServices.htm>`_ extension method for this purpose.
 #. If registering root objects is not possible or feasible, test the creation of each root object manually during start-up. With ASP.NET Web Form Page classes for instance, you will probably call the container (directly or indirectly) from within their constructor (since Page classes must unfortunately have a default constructor). The key here again is finding them all in once using reflection. By finding all Page classes using reflection and instantiating them, you'll find out (during app start-up or through automated testing) whether there is a problem with your DI configuration or not. The :doc:`Web Forms Integration <webformsintegration>` guide contains an example of how to verify page classes.
@@ -507,7 +501,6 @@ Calling the *Verify()* method however, is just part of the story. It is very eas
 #. But even when all registrations can be resolved succesfully by the container, that still doesn't mean your configuration is correct. It is very easy to accidentally misconfigure the container in a way that only shows up late in the development process. *Simple Injector* contains :doc:`Diagnostics Services <diagnostics>` to help you spot common configuration mistakes. It is advicable to analyze the container using these services from time to time or write an automated test that does this for you.
 
 .. _Multi-Threaded-Applications:
-.. _Multi_Threaded_Applications:
 
 Work with dependency injection in multi-threaded applications
 =============================================================
@@ -593,4 +586,4 @@ In the Composition Root, instead of registering the **MailSender**, we register 
     container.RegisterSingleDecorator(typeof(IMailSender),
         typeof(AsyncMailSenderProxy));
 
-In this case the container will ensure that when an **IMailSender** is requested, a single **AsyncMailSenderProxy** is returned with a **Func<IMailSender>** delegate that will create a new **RealMailSender** when requested. The `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ and `RegisterSingleDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterSingleDecorator.htm>`_ overloads natively understand how to handle **Func<Decoratee>** dependencies. The :ref:`Decorators <Generic_Decorators>` section of the :doc:`Advanced Scenarios <advanced>` wiki page explains more about registering decorators.
+In this case the container will ensure that when an **IMailSender** is requested, a single **AsyncMailSenderProxy** is returned with a **Func<IMailSender>** delegate that will create a new **RealMailSender** when requested. The `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ and `RegisterSingleDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterSingleDecorator.htm>`_ overloads natively understand how to handle **Func<Decoratee>** dependencies. The :ref:`Decorators <Decorators>` section of the :doc:`Advanced Scenarios <advanced>` wiki page explains more about registering decorators.

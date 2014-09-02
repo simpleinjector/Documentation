@@ -60,8 +60,8 @@
 <li>How to <a class="reference internal" href="#verify-configuration"><em>Verify the container&#8217;s configuration</em></a></li>
 <li>How to <a class="reference internal" href="#multi-threaded-applications"><em>Work with dependency injection in multi-threaded applications</em></a></li>
 </ul>
-<div class="section" id="id1">
-<span id="register-factory-delegates"></span><span id="id2"></span><h2>Register factory delegates<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="register-factory-delegates">
+<span id="id1"></span><h2>Register factory delegates<a class="headerlink" href="#register-factory-delegates" title="Permalink to this headline">¶</a></h2>
 <p><em>Simple Injector</em> allows you to register a <strong>Func&lt;T&gt;</strong> delegate for the creation of an instance. This is especially useful in scenarios where it is impossible for the container to create the instance. There are overloads of the <em>Register</em> method available that accept an <strong>Func&lt;T&gt;</strong> argument:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="n">SomeSubSystem</span><span class="p">.</span><span class="n">CreateMyService</span><span class="p">());</span>
 </pre></div>
@@ -245,8 +245,8 @@ public class MyService {
 <div class="note container">
 <strong>Warning</strong>: The same warning applies to the use of <strong>Lazy&lt;T&gt;</strong> as it does for the use of <strong>Func&lt;T&gt;</strong> delegates. For more information about creating an application and container configuration that can be successfully verified, please read the <a class="reference internal" href="#verify-configuration"><em>How To Verify the container’s configuration</em></a>.</div>
 </div>
-<div class="section" id="id3">
-<span id="resolve-instances-by-key"></span><span id="id4"></span><h2>Resolve instances by key<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="resolve-instances-by-key">
+<span id="id2"></span><h2>Resolve instances by key<a class="headerlink" href="#resolve-instances-by-key" title="Permalink to this headline">¶</a></h2>
 <p>Resolving instances by a key is a feature that is deliberately left out of <em>Simple Injector</em>, because we feel it steers developers to a design were the application tends to have a dependency on the DI container itself. For resolving a keyed instance, you will often need to call into the container itself, which leads to the <a class="reference external" href="http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx">Service Locator anti-pattern</a>.</p>
 <p>This doesn’t mean however, that resolving instances by a key is never useful. Resolving instances by a key however, is much more a job for a specific factory than for a container itself. This makes the design much cleaner, saves you from having to take a dependency on the DI framework, and enables many scenarios that the DI container writer just didn’t consider.</p>
 <div class="note container">
@@ -362,7 +362,7 @@ public class MyService {
 <p>The advantage of this method is that it completely integrates with the container. For instance, decorators can be applied to individual returned instances, types can be registered multiple times if needed, and the registered handlers will can be analyzed using the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a>.</p>
 </div>
 <div class="section" id="resolve-array-and-lists">
-<span id="id5"></span><span id="resolve-arrays-and-lists"></span><h2>Resolve array and lists<a class="headerlink" href="#resolve-array-and-lists" title="Permalink to this headline">¶</a></h2>
+<span id="resolve-arrays-and-lists"></span><h2>Resolve array and lists<a class="headerlink" href="#resolve-array-and-lists" title="Permalink to this headline">¶</a></h2>
 <p><em>Simple Injector</em> allows registration of collections of elements using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm">RegisterAll</a> method overloads. Collections can be resolved by using one of the <em>GetAllInstances&lt;T&gt;()</em> method, by calling <em>GetInstance&lt;IEnumerable&lt;T&gt;&gt;()</em>, or by defining an <strong>IEnumerable&lt;T&gt;</strong> parameter in the constructor of a type that is created using automatic constructor injection.</p>
 <p>For Simple Injector 2.4 and up, the other collection types that are automatically resolved are <a class="reference external" href="https://msdn.microsoft.com/en-us/library/hh881542.aspx">IReadOnlyCollection&lt;T&gt;</a> and <a class="reference external" href="https://msdn.microsoft.com/en-us/library/hh192385.aspx">IReadOnlyList&lt;T&gt;</a>.</p>
 <div class="note container">
@@ -392,8 +392,8 @@ public class MyService {
 </div>
 <p>A composite allows you to remove this boilerplate iteration logic from the application, which makes the application cleaner and when changes have to be made to the way the collection of loggers is processed, only the composite has to be changed.</p>
 </div>
-<div class="section" id="id6">
-<span id="register-multiple-interfaces-with-the-same-implementation"></span><span id="id7"></span><h2>Register multiple interfaces with the same implementation<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="register-multiple-interfaces-with-the-same-implementation">
+<span id="id3"></span><h2>Register multiple interfaces with the same implementation<a class="headerlink" href="#register-multiple-interfaces-with-the-same-implementation" title="Permalink to this headline">¶</a></h2>
 <p>To adhere to the <a class="reference external" href="http://en.wikipedia.org/wiki/Interface_segregation_principle">Interface Segregation Principle</a>, it is important to keep interfaces narrow. Although in most situations implementations implement a single interface, it can sometimes be beneficial to have multiple interfaces on a single implementation. Here is an example of how to register this:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Impl implements IInterface1, IInterface2 and IInterface3.</span>
 <span class="kt">var</span> <span class="n">registration</span> <span class="p">=</span>
@@ -414,8 +414,8 @@ public class MyService {
 <div class="note container">
 <strong>Note:</strong> This is different from having three <em>RegisterSingle</em> registrations, since that will results three separate singletons.</div>
 </div>
-<div class="section" id="id8">
-<span id="override-existing-registrations"></span><span id="id9"></span><h2>Override existing registrations<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="override-existing-registrations">
+<span id="id4"></span><h2>Override existing registrations<a class="headerlink" href="#override-existing-registrations" title="Permalink to this headline">¶</a></h2>
 <p>The default behavior of <em>Simple Injector</em> is to fail when a service is registered for a second time. Most of the time the developer didn&#8217;t intend to override a previous registration and allowing this would lead to a configuration that would pass the container&#8217;s verification, but doesn&#8217;t behave as expected.</p>
 <p>This behavior differs from most other IoC frameworks, where adding new registrations results in appending the collection of registrations for that abstraction. Registering collections in Simple Injector is done using one of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm">RegisterAll</a> method overloads.</p>
 <p>There are certain scenarios however where overriding is useful. An example of such is a bootstrapper project for a business layer that is reused in multiple applications (in both a web application, web service, and Windows service for instance). Not having a business layer specific bootstrapper project would mean the complete DI configuration would be duplicated in the startup path of each application, which would lead to code duplication. In that situation the applications would roughly have the same configuration, with a few adjustments.</p>
@@ -448,7 +448,7 @@ public class MyService {
 </div>
 </div>
 <div class="section" id="verify-the-containers-configuration">
-<span id="verify-configuration"></span><span id="id11"></span><span id="verifying-configuration"></span><h2>Verify the container’s configuration<a class="headerlink" href="#verify-the-containers-configuration" title="Permalink to this headline">¶</a></h2>
+<span id="verify-configuration"></span><span id="verifying-configuration"></span><h2>Verify the container’s configuration<a class="headerlink" href="#verify-the-containers-configuration" title="Permalink to this headline">¶</a></h2>
 <p>Dependency Injection promotes the concept of programming against abstractions. This makes your code much easier to test, easier to change and more maintainable. However, since the code itself isn&#8217;t responsible for maintaining the dependencies between implementations, the compiler will not be able to verify whether the dependency graph is correct.</p>
 <p>When starting to use a Dependency Injection container, many developers see their application fail when it is deployed in staging or sometimes even production, because of container misconfigurations. This makes developers often conclude that dependency injection is bad, since the dependency graph cannot be verified. This conclusion however, is incorrect. Although it is impossible for the compiler to verify the dependency graph, verifying the dependency graph is still possible and advisable.</p>
 <p><em>Simple Injector</em> contains a <em>Verify()</em> method, that will simply iterate over all registrations and resolve an instance for each registration. Calling this method directly after configuring the container, allows the application to fail during start-up, when the configuration is invalid.</p>
@@ -462,7 +462,7 @@ public class MyService {
 </ol>
 </div>
 <div class="section" id="work-with-dependency-injection-in-multi-threaded-applications">
-<span id="id12"></span><span id="multi-threaded-applications"></span><h2>Work with dependency injection in multi-threaded applications<a class="headerlink" href="#work-with-dependency-injection-in-multi-threaded-applications" title="Permalink to this headline">¶</a></h2>
+<span id="multi-threaded-applications"></span><h2>Work with dependency injection in multi-threaded applications<a class="headerlink" href="#work-with-dependency-injection-in-multi-threaded-applications" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 <strong>Note:</strong> Simple Injector is designed for use in highly-concurrent applications and the container <a class="reference external" href="https://simpleinjector.codeplex.com/discussions/349908">is thread-safe</a>. Its lock-free design allows it to scale linearly with the number of threads and processors in your system.</div>
 <p>Many applications and application frameworks are inherently multi-threaded. Working in multi-threaded applications forces developers to take special care. It is easy for a less experienced developer to introduce a race condition in the code. Even although some frameworks such as ASP.NET make it easy to write thread-safe code, introducing a simple static field could break thread-safety.</p>
@@ -530,7 +530,7 @@ public class MyService {
     <span class="k">typeof</span><span class="p">(</span><span class="n">AsyncMailSenderProxy</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>In this case the container will ensure that when an <strong>IMailSender</strong> is requested, a single <strong>AsyncMailSenderProxy</strong> is returned with a <strong>Func&lt;IMailSender&gt;</strong> delegate that will create a new <strong>RealMailSender</strong> when requested. The <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm">RegisterDecorator</a> and <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterSingleDecorator.htm">RegisterSingleDecorator</a> overloads natively understand how to handle <strong>Func&lt;Decoratee&gt;</strong> dependencies. The <a class="reference internal" href="advanced.html#generic-decorators"><em>Decorators</em></a> section of the <a class="reference internal" href="advanced.html"><em>Advanced Scenarios</em></a> wiki page explains more about registering decorators.</p>
+<p>In this case the container will ensure that when an <strong>IMailSender</strong> is requested, a single <strong>AsyncMailSenderProxy</strong> is returned with a <strong>Func&lt;IMailSender&gt;</strong> delegate that will create a new <strong>RealMailSender</strong> when requested. The <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm">RegisterDecorator</a> and <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterSingleDecorator.htm">RegisterSingleDecorator</a> overloads natively understand how to handle <strong>Func&lt;Decoratee&gt;</strong> dependencies. The <a class="reference internal" href="advanced.html#decorators"><em>Decorators</em></a> section of the <a class="reference internal" href="advanced.html"><em>Advanced Scenarios</em></a> wiki page explains more about registering decorators.</p>
 </div>
 </div>
 
@@ -543,11 +543,11 @@ public class MyService {
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">How To</a><ul>
-<li><a class="reference internal" href="#id1">Register factory delegates</a></li>
-<li><a class="reference internal" href="#id3">Resolve instances by key</a></li>
+<li><a class="reference internal" href="#register-factory-delegates">Register factory delegates</a></li>
+<li><a class="reference internal" href="#resolve-instances-by-key">Resolve instances by key</a></li>
 <li><a class="reference internal" href="#resolve-array-and-lists">Resolve array and lists</a></li>
-<li><a class="reference internal" href="#id6">Register multiple interfaces with the same implementation</a></li>
-<li><a class="reference internal" href="#id8">Override existing registrations</a></li>
+<li><a class="reference internal" href="#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
+<li><a class="reference internal" href="#override-existing-registrations">Override existing registrations</a></li>
 <li><a class="reference internal" href="#verify-the-containers-configuration">Verify the container’s configuration</a></li>
 <li><a class="reference internal" href="#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
 </ul>

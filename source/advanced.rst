@@ -427,7 +427,7 @@ The given context contains several properties that allows you to analyze whether
 
 .. container:: Note
 
-    **Tip**: :doc:`This extension method <Runtime-Decorators>` allows registering decorators that can be applied based on runtime conditions (such as the role of the current user).
+    **Tip**: :doc:`This extension method <RuntimeDecorators>` allows registering decorators that can be applied based on runtime conditions (such as the role of the current user).
 
 .. _Decorators-with-Func-factories:
 
@@ -553,7 +553,7 @@ Although this registration contains a list of singletons, the container has no w
 .. _Using-contextual-information-inside-decorators:
 
 Using contextual information inside decorators
---------------------------------
+----------------------------------------------
 
 As we shown before, you can apply a decorator conditionally based on a predicate you can supply to the **RegisterDecorator** overloads:
 
@@ -680,7 +680,6 @@ The current example doesn't add much compared to simply using a decorator. When 
     **Note**: Don't use interception for intercepting types that all implement the same generic interface, such as *ICommandHandler<T>* or *IValidator<T>*. Try using decorator classes instead, as shown in the :ref:`Decorators <Decorators>` section on this page.
 
 .. _Implicit-Property-Injection:
-.. _Property-Injection:
 
 Property injection
 ==================
@@ -703,7 +702,7 @@ Besides this, the use of property injection should be very exceptional and in ge
 
 **Enabling property injection**
 
-Simple Injector contains two ways to enable property injection. First of all the :ref:`RegisterInitializer\<T\> <Configuring_Property_Injection>` method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:
+Simple Injector contains two ways to enable property injection. First of all the :ref:`RegisterInitializer\<T\> <Configuring-Property-Injection>` method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:
 
 .. code-block:: c#
 

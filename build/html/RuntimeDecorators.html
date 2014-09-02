@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Runtime Decorators &mdash; Simple Injector 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Appendix" href="appendix.html" />
+    <link rel="next" title="Interception Extensions" href="InterceptionExtensions.html" />
+    <link rel="prev" title="Appendix" href="appendix.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="InterceptionExtensions.html" title="Interception Extensions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="appendix.html" title="Appendix"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="appendix.html" accesskey="U">Appendix</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="runtime-decorators">
+<h1>Runtime Decorators<a class="headerlink" href="#runtime-decorators" title="Permalink to this headline">¶</a></h1>
+<p><strong>Applying decorators at runtime using Simple Injector.</strong></p>
+<p>The <em>RegisterDecorator</em> extension methods contain overloads that allow you to apply a predicate (delegate) that allows you to conditionally apply a decorator.</p>
+<p>This predicate is meant to conditionally apply a decorator based on constant information. This can be compile time information such as type names, namespaces, configuration values etc. Because of this this predicate only be called once (or at most a few times) per closed generic type. Whether or not the decorator should be applied is after that point compiled in the delegate.</p>
+<p>Sometimes however, decorators must be applied based on some runtime conditions. Take for instance a authorization decorator that must conditionally be applied based on the role of the current user.</p>
+<p>The following example shows an extension method that allows registering a decorator using a runtime predicate:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq.Expressions</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Threading</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Extensions</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">RuntimeDecoratorExtensions</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterRuntimeDecorator</span><span class="p">(</span><span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">,</span> <span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span>
+        <span class="n">Type</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">Predicate</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;</span> <span class="n">runtimePredicate</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">RegisterRuntimeDecorator</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">,</span>
+            <span class="n">runtimePredicate</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterRuntimeDecorator</span><span class="p">(</span><span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">,</span> <span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span>
+        <span class="n">Type</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">Lifestyle</span> <span class="n">lifestyle</span><span class="p">,</span>
+        <span class="n">Predicate</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;</span> <span class="n">runtimePredicate</span><span class="p">,</span>
+        <span class="n">Predicate</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;</span> <span class="n">compileTimePredicate</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">localContext</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;();</span>
+
+        <span class="n">compileTimePredicate</span> <span class="p">=</span> <span class="n">compileTimePredicate</span> <span class="p">??</span> <span class="p">(</span><span class="n">context</span> <span class="p">=&gt;</span> <span class="k">true</span><span class="p">);</span>
+
+        <span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">lifestyle</span><span class="p">,</span> <span class="n">c</span> <span class="p">=&gt;</span>
+        <span class="p">{</span>
+            <span class="kt">bool</span> <span class="n">mustDecorate</span> <span class="p">=</span> <span class="n">compileTimePredicate</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+            <span class="n">localContext</span><span class="p">.</span><span class="n">Value</span> <span class="p">=</span> <span class="n">mustDecorate</span> <span class="p">?</span> <span class="n">c</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">mustDecorate</span><span class="p">;</span>
+        <span class="p">});</span>
+
+        <span class="n">container</span><span class="p">.</span><span class="n">ExpressionBuilt</span> <span class="p">+=</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span>
+        <span class="p">{</span>
+            <span class="kt">bool</span> <span class="n">isDecorated</span> <span class="p">=</span> <span class="n">localContext</span><span class="p">.</span><span class="n">Value</span> <span class="p">!=</span> <span class="k">null</span><span class="p">;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">isDecorated</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">Expression</span> <span class="n">decorator</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">Expression</span><span class="p">;</span>
+                <span class="n">Expression</span> <span class="n">original</span> <span class="p">=</span> <span class="n">localContext</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">Expression</span><span class="p">;</span>
+
+                <span class="n">Expression</span> <span class="n">shouldDecorate</span> <span class="p">=</span> <span class="n">Expression</span><span class="p">.</span><span class="n">Invoke</span><span class="p">(</span>
+                    <span class="n">Expression</span><span class="p">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">runtimePredicate</span><span class="p">),</span>
+                    <span class="n">Expression</span><span class="p">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">localContext</span><span class="p">.</span><span class="n">Value</span><span class="p">));</span>
+
+                <span class="n">e</span><span class="p">.</span><span class="n">Expression</span> <span class="p">=</span> <span class="n">Expression</span><span class="p">.</span><span class="n">Condition</span><span class="p">(</span><span class="n">shouldDecorate</span><span class="p">,</span>
+                    <span class="n">Expression</span><span class="p">.</span><span class="n">Convert</span><span class="p">(</span><span class="n">decorator</span><span class="p">,</span> <span class="n">e</span><span class="p">.</span><span class="n">RegisteredServiceType</span><span class="p">),</span>
+                    <span class="n">Expression</span><span class="p">.</span><span class="n">Convert</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">e</span><span class="p">.</span><span class="n">RegisteredServiceType</span><span class="p">));</span>
+
+                <span class="n">localContext</span><span class="p">.</span><span class="n">Value</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The following line shows an example of how to use this extension method:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterRuntimeDecorator</span><span class="p">(</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">AuthorizationHandlerDecorator</span><span class="p">&lt;&gt;),</span> <span class="n">context</span> <span class="p">=&gt;</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">userContext</span> <span class="p">=</span>
+            <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">&gt;();</span>
+        <span class="k">return</span> <span class="p">!</span><span class="n">userContext</span><span class="p">.</span><span class="n">UserInRole</span><span class="p">(</span><span class="s">&quot;Admin&quot;</span><span class="p">);</span>
+    <span class="p">});</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="appendix.html"
+                        title="previous chapter">Appendix</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="InterceptionExtensions.html"
+                        title="next chapter">Interception Extensions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/RuntimeDecorators.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="InterceptionExtensions.html" title="Interception Extensions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="appendix.html" title="Appendix"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="appendix.html" >Appendix</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

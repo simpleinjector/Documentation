@@ -31,7 +31,7 @@ Transient
 
 For each request (both for calls to *GetInstance<T>* and instances as part of an object graph), a new instance of the service type will be created.
 
-The next example instantiates a new **IService** implementation on each call, while leveraging the power of :ref:`automatic constructor injection <Automatic_constructor_injection>`.
+The next example instantiates a new **IService** implementation on each call, while leveraging the power of :ref:`automatic constructor injection <Automatic-constructor-injection>`.
 
 .. code-block:: c#
 

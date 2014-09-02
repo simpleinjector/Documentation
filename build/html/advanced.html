@@ -24,7 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
-    <link rel="prev" title="Using Simple Injector" href="using.html" /> 
+    <link rel="next" title="Integration Guide" href="integration.html" />
+    <link rel="prev" title="How To" href="howto.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,7 +35,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="using.html" title="Using Simple Injector"
+          <a href="integration.html" title="Integration Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="howto.html" title="How To"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
       </ul>
@@ -47,7 +51,7 @@
             
   <div class="section" id="advanced-scenarios">
 <h1>Advanced Scenarios<a class="headerlink" href="#advanced-scenarios" title="Permalink to this headline">¶</a></h1>
-<p>Although its name may not imply it, <em>Simple Injector</em> is capable of handling many advanced scenarios. Either through writing custom code, copying  code from this wiki, or via the extension points that can be found in the <em>SimpleInjector.Extensions</em> namespace of the core library.</p>
+<p>Although its name may not imply it, Simple Injector is capable of handling many advanced scenarios. Either through writing custom code, copying  code from this wiki, or via the extension points that can be found in the <em>SimpleInjector.Extensions</em> namespace of the core library.</p>
 <div class="note container">
 <strong>Note</strong>: this documentation is specific for <em>Simple Injector version 2.0</em> and up. Look <a class="reference external" href="https://simpleinjector.codeplex.com/wikipage?title=Advanced-scenarios&amp;version=48">here</a> for 1.x specific documentation.</div>
 <div class="note container">
@@ -55,14 +59,14 @@
 <p>This page discusses the following subjects:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#generics"><em>Generics</em></a></li>
-<li><a class="reference internal" href="#id2"><em>Batch registration / Automatic registration</em></a></li>
-<li><a class="reference internal" href="#id3"><em>Registration of open generic types</em></a></li>
-<li><a class="reference internal" href="#id5"><em>Unregistered type resolution</em></a></li>
-<li><a class="reference internal" href="#id7"><em>Context based injection / Contextual binding</em></a></li>
+<li><a class="reference internal" href="#batch-registration"><em>Batch registration / Automatic registration</em></a></li>
+<li><a class="reference internal" href="#registration-of-open-generic-types"><em>Registration of open generic types</em></a></li>
+<li><a class="reference internal" href="#unregistered-type-resolution"><em>Unregistered type resolution</em></a></li>
+<li><a class="reference internal" href="#context-based-injection"><em>Context based injection / Contextual binding</em></a></li>
 <li><a class="reference internal" href="#decorators"><em>Decorators</em></a></li>
 <li><a class="reference internal" href="#interception"><em>Interception</em></a></li>
-<li><a class="reference internal" href="#property-injection"><em>Property injection</em></a></li>
-<li><a class="reference internal" href="#id18"><em>Covariance and Contravariance</em></a></li>
+<li><a class="reference internal" href="extensibility.html#property-injection"><em>Property injection</em></a></li>
+<li><a class="reference internal" href="#covariance-contravariance"><em>Covariance and Contravariance</em></a></li>
 <li><a class="reference internal" href="#plugins"><em>Registering plugins dynamically</em></a></li>
 </ul>
 <div class="section" id="generics">
@@ -70,14 +74,14 @@
 <p>.NET has superior support for generic programming and Simple Injector has been designed to make full use of it. Simple Injector arguably has the most advanced support for generics of all DI libraries. Simple Injector can handle any generic type and implementing patterns such as decorator, mediator, strategy and chain of responsibility is simple.</p>
 <p>Aspect Oriented Programming is easy with Simple Injector&#8217;s advanced support for generics. Generic decorators with generic type constraints can be registered with a single line of code and can be applied conditionally using predicates. Simple Injector can handle open generic types, closed generic types and partially-closed generic types. The sections below provides more detail on Simple Injector&#8217;s support for generic typing:</p>
 <ul class="simple">
-<li><a class="reference internal" href="#id2"><em>Batch registration of non-generic types based on an open-generic interface</em></a></li>
-<li><a class="reference internal" href="#id3"><em>Registering open generic types and working with partially-closed types</em></a></li>
+<li><a class="reference internal" href="#batch-registration"><em>Batch registration of non-generic types based on an open-generic interface</em></a></li>
+<li><a class="reference internal" href="#registration-of-open-generic-types"><em>Registering open generic types and working with partially-closed types</em></a></li>
 <li><a class="reference internal" href="#decorators"><em>Registration of generic decorators</em></a></li>
-<li><a class="reference internal" href="#id18"><em>Resolving Covariant/Contravariant types</em></a></li>
+<li><a class="reference internal" href="#covariance-contravariance"><em>Resolving Covariant/Contravariant types</em></a></li>
 </ul>
 </div>
 <div class="section" id="batch-automatic-registration">
-<span id="id2"></span><span id="batch-registration"></span><h2>Batch / Automatic registration<a class="headerlink" href="#batch-automatic-registration" title="Permalink to this headline">¶</a></h2>
+<span id="batch-registration"></span><h2>Batch / Automatic registration<a class="headerlink" href="#batch-automatic-registration" title="Permalink to this headline">¶</a></h2>
 <p>Batch or automatic registration is a way of registering a set of related types in one go based on some convention. This features removes the need to constantly update the containers configuration each and every time a new type is added. The following example show a series of manually registered repositories:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ICustomerRepository</span><span class="p">,</span> <span class="n">SqlCustomerRepository</span><span class="p">&gt;();</span>
@@ -126,19 +130,19 @@
     <span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>By default <em>RegisterManyForOpenGeneric</em> searches the supplied assembly for all public types that implement the <strong>IValidator&lt;T&gt;</strong> interface and registers each type by their specific (closed generic) interface. It even works for types that implement multiple closed versions of the given interface.</p>
+<p>By default <strong>RegisterManyForOpenGeneric</strong> searches the supplied assembly for all public types that implement the <em>IValidator&lt;T&gt;</em> interface and registers each type by their specific (closed generic) interface. It even works for types that implement multiple closed versions of the given interface.</p>
 <div class="note container">
-<strong>Note</strong>: There are numerous <em>RegisterManyForOpenGeneric</em> <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_OpenGenericBatchRegistrationExtensions_RegisterManyForOpenGeneric.htm">overloads</a> available that take a list of <em>System.Type</em>&#8216;s, instead a list of <em>Assembly</em>&#8216;s.</div>
-<p>Above are a couple of examples of the things you can do with batch registration. A more advanced scenario could be the registration of multiple implementations of the same closed generic type to a common interface, i.e. a set of types that all implement the same interface. There are so many possible variations of this scenario that <em>Simple Injector</em> does not contain an explicit method to handle this. What it does contain, however, are multiple overloads of the <em>RegisterManyForOpenGeneric</em> method that allow you to supply a callback delegate that enables you make the registrations yourself.</p>
-<p>As an example, imagine the scenario where you have a <strong>CustomerValidator</strong> type and a <strong>GoldCustomerValidator</strong> type and they both implement <strong>IValidator&lt;Customer&gt;</strong> and you want to register them both at the same time. The earlier registration methods would throw an exception alerting you to the fact that you have multiple types implementing the same closed generic type. The following registration however, does enable this scenario:</p>
+<strong>Note</strong>: There are numerous <strong>RegisterManyForOpenGeneric</strong> <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_OpenGenericBatchRegistrationExtensions_RegisterManyForOpenGeneric.htm">overloads</a> available that take a list of <em>System.Type</em> instances, instead a list of <em>Assembly</em> instances.</div>
+<p>Above are a couple of examples of the things you can do with batch registration. A more advanced scenario could be the registration of multiple implementations of the same closed generic type to a common interface, i.e. a set of types that all implement the same interface. There are so many possible variations of this scenario that Simple Injector does not contain an explicit method to handle this. What it does contain, however, are multiple overloads of the <strong>RegisterManyForOpenGeneric</strong> method that allow you to supply a callback delegate that enables you make the registrations yourself.</p>
+<p>As an example, imagine the scenario where you have a <em>CustomerValidator</em> type and a <em>GoldCustomerValidator</em> type and they both implement <em>IValidator&lt;Customer&gt;</em> and you want to register them both at the same time. The earlier registration methods would throw an exception alerting you to the fact that you have multiple types implementing the same closed generic type. The following registration however, does enable this scenario:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterManyForOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span>
     <span class="n">AccessibilityOption</span><span class="p">.</span><span class="n">PublicTypesOnly</span><span class="p">,</span>
     <span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">implTypes</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">implTypes</span><span class="p">),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The code snippet registers all types from the given assembly that implement <strong>IValidator&lt;T&gt;</strong>. As we now have multiple implementations the container cannot inject a single instance of <strong>IValidator&lt;T&gt;</strong> and we can no longer call <em>container.GetInstance&lt;IValidator&lt;T&gt;&gt;()</em>. Instead instances can be retrieved by having an <strong>IEnumerable&lt;IValidator&lt;T&gt;&gt;</strong> constructor argument or by calling <em>container.GetAllInstances&lt;IValidator&lt;T&gt;&gt;()</em>.</p>
-<p>It is not generally regarded as best practice to have an <strong>IEnumerable&lt;IValidator&lt;T&gt;&gt;</strong> dependency in multiple class constructors (or accessed from the  container directly). Depending on a set of types complicates your application design and can often be simplified with an alternate configuration. A better way is to have a single composite type that wraps <strong>IEnumerable&lt;IValidator&lt;T&gt;&gt;</strong> and presents it to the consumer as a single instance, in this case a <strong>CompositeValidator&lt;T&gt;</strong>:</p>
+<p>The code snippet registers all types from the given assembly that implement <em>IValidator&lt;T&gt;</em>. As we now have multiple implementations the container cannot inject a single instance of <em>IValidator&lt;T&gt;</em> and we can no longer call <em>container.GetInstance&lt;IValidator&lt;T&gt;&gt;()</em>. Instead instances can be retrieved by having an <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> constructor argument or by calling <em>container.GetAllInstances&lt;IValidator&lt;T&gt;&gt;()</em>.</p>
+<p>It is not generally regarded as best practice to have an <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> dependency in multiple class constructors (or accessed from the  container directly). Depending on a set of types complicates your application design and can often be simplified with an alternate configuration. A better way is to have a single composite type that wraps <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> and presents it to the consumer as a single instance, in this case a <em>CompositeValidator&lt;T&gt;</em>:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">CompositeValidator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IValidator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">IValidator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">validators</span><span class="p">;</span>
 
@@ -159,18 +163,18 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>This <strong>CompositeValidator&lt;T&gt;</strong> can be registered as follows:</p>
+<p>This <em>CompositeValidator&lt;T&gt;</em> can be registered as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidate</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">CompositeValidator</span><span class="p">&lt;&gt;));</span>
 </pre></div>
 </div>
-<p>This registration maps the open generic <strong>IValidator&lt;T&gt;</strong> interface to the open generic <strong>CompositeValidator&lt;T&gt;</strong> implementation. Because the <strong>CompositeValidator&lt;T&gt;</strong> contains an <strong>IEnumerable&lt;IValidator&lt;T&gt;&gt;</strong> dependency, the registered types will be injected into its constructor. This allows you to let the rest of the application simply depend on the <strong>IValidator&lt;T&gt;</strong>, while registering a collection of <strong>IValidator&lt;T&gt;</strong> implementations under the covers.</p>
+<p>This registration maps the open generic <em>IValidator&lt;T&gt;</em> interface to the open generic <em>CompositeValidator&lt;T&gt;</em> implementation. Because the <em>CompositeValidator&lt;T&gt;</em> contains an <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> dependency, the registered types will be injected into its constructor. This allows you to let the rest of the application simply depend on the <em>IValidator&lt;T&gt;</em>, while registering a collection of <em>IValidator&lt;T&gt;</em> implementations under the covers.</p>
 <div class="note container">
-<strong>Note</strong>: <em>Simple Injector</em> preserves the lifestyle of instances that are returned from an injected <strong>IEnumerable&lt;T&gt;</strong> instance. In reality you should not see the the injected <strong>IEnumerable&lt;IValidator&lt;T&gt;&gt;</strong> as a collection of implementations, you should consider it a <strong>stream</strong> of instances. Simple Injector will always inject a reference to the same stream (the <strong>IEnumerable&lt;T&gt;</strong> itself is a <em>Singleton</em>) and each time you iterate the <strong>IEnumerable&lt;T&gt;</strong>, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the <strong>CompositeValidator&lt;T&gt;</strong> is registered as singleton the validators it wraps will each have their own specific lifestyle.</div>
-<p>The next section will explain mapping of open generic types (just like <strong>CompositeValidator&lt;&gt;</strong> seen above).</p>
+<strong>Note</strong>: Simple Injector preserves the lifestyle of instances that are returned from an injected <em>IEnumerable&lt;T&gt;</em> instance. In reality you should not see the the injected <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> as a collection of implementations, you should consider it a <em>stream</em> of instances. Simple Injector will always inject a reference to the same stream (the <em>IEnumerable&lt;T&gt;</em> itself is a singleton) and each time you iterate the <em>IEnumerable&lt;T&gt;</em>, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the <em>CompositeValidator&lt;T&gt;</em> is registered as singleton the validators it wraps will each have their own specific lifestyle.</div>
+<p>The next section will explain mapping of open generic types (just like <em>CompositeValidator&lt;&gt;</em> seen above).</p>
 </div>
-<div class="section" id="id3">
-<span id="registration-of-open-generic-types"></span><span id="id4"></span><h2>Registration of open generic types<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="registration-of-open-generic-types">
+<span id="id2"></span><h2>Registration of open generic types<a class="headerlink" href="#registration-of-open-generic-types" title="Permalink to this headline">¶</a></h2>
 <p>When working with generic interfaces, we will often see numerous implementations of that interface being registered:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IValidate</span><span class="p">&lt;</span><span class="n">Customer</span><span class="p">&gt;,</span> <span class="n">CustomerValidator</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IValidate</span><span class="p">&lt;</span><span class="n">Employee</span><span class="p">&gt;,</span> <span class="n">EmployeeValidator</span><span class="p">&gt;();</span>
@@ -184,7 +188,7 @@
     <span class="k">typeof</span><span class="p">(</span><span class="n">IValidate</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Sometimes you&#8217;ll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The <strong>IValidate&lt;T&gt;</strong> is a good example, it is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this we would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:</p>
+<p>Sometimes you&#8217;ll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The <em>IValidate&lt;T&gt;</em> is a good example, it is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this we would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Implementation of the Null Object pattern.</span>
 <span class="k">class</span> <span class="nc">NullValidator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IValidate</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">public</span> <span class="n">ValidationResults</span> <span class="nf">Validate</span><span class="p">(</span><span class="n">T</span> <span class="n">instance</span><span class="p">)</span> <span class="p">{</span>
@@ -193,7 +197,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>We could configure the container to use this <strong>NullValidator&lt;T&gt;</strong> for any entity that does not need validation:</p>
+<p>We could configure the container to use this <em>NullValidator&lt;T&gt;</em> for any entity that does not need validation:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IValidate</span><span class="p">&lt;</span><span class="n">OrderLine</span><span class="p">&gt;,</span> <span class="n">NullValidator</span><span class="p">&lt;</span><span class="n">OrderLine</span><span class="p">&gt;&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IValidate</span><span class="p">&lt;</span><span class="n">Address</span><span class="p">&gt;,</span> <span class="n">NullValidator</span><span class="p">&lt;</span><span class="n">Address</span><span class="p">&gt;&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IValidate</span><span class="p">&lt;</span><span class="n">UploadImage</span><span class="p">&gt;,</span> <span class="n">NullValidator</span><span class="p">&lt;</span><span class="n">UploadImage</span><span class="p">&gt;&gt;();</span>
@@ -201,15 +205,15 @@
 <span class="c1">// and the list goes on...</span>
 </pre></div>
 </div>
-<p>This repeated registration is, of course, not very practical. Falling back to such a default implementation is a good example for <strong>unregistered type resolution</strong>. <em>Simple Injector</em> contains an event that you can hook into that allows you to fallback to a default implementation. The <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Methods_T_SimpleInjector_Extensions_OpenGenericRegistrationExtensions.htm">RegisterOpenGeneric</a> extension method is defined to handle this registration. The <strong>NullValidator&lt;&gt;</strong> would be registered as follows:</p>
+<p>This repeated registration is, of course, not very practical. Falling back to such a default implementation is a good example for <em>unregistered type resolution</em>. Simple Injector contains an event that you can hook into that allows you to fallback to a default implementation. The <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Methods_T_SimpleInjector_Extensions_OpenGenericRegistrationExtensions.htm">RegisterOpenGeneric</a> extension method is defined to handle this registration. The <em>NullValidator&lt;T&gt;</em> would be registered as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Extensions;</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidate</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">NullValidator</span><span class="p">&lt;&gt;));</span>
 </pre></div>
 </div>
-<p>The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for <strong>IValidate&lt;Department&gt;</strong>, for example, will return a single <strong>NullValidator&lt;Department&gt;</strong> instance each time.</p>
+<p>The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for <em>IValidate&lt;Department&gt;</em>, for example, will return a single <em>NullValidator&lt;Department&gt;</em> instance each time.</p>
 <div class="note container">
-<strong>Note</strong>: Because the use of unregistered type resolution will only get called for types that are not explicitly registered this allows for the default implementation to be overridden with specific implementations. The <em>RegisterManyForOpenGeneric</em> method covered above does not use unregistered type resolution, it registers all the concrete types it finds in the given assemblies. Those types will therefore always be returned, giving a very convenient and easy to grasp mix.</div>
-<p>There&#8217;s an advanced version of <em>RegisterOpenGeneric</em> overload that allows applying the open generic type conditionally, based on a supplied predicate. Example:</p>
+<strong>Note</strong>: Because the use of unregistered type resolution will only get called for types that are not explicitly registered this allows for the default implementation to be overridden with specific implementations. The <strong>RegisterManyForOpenGeneric</strong> method covered above does not use unregistered type resolution, it registers all the concrete types it finds in the given assemblies. Those types will therefore always be returned, giving a very convenient and easy to grasp mix.</div>
+<p>There&#8217;s an advanced version of <strong>RegisterOpenGeneric</strong> overload that allows applying the open generic type conditionally, based on a supplied predicate. Example:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">LeftValidator</span><span class="p">&lt;&gt;),</span>
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">.</span><span class="n">GetGenericArguments</span><span class="p">().</span><span class="n">Single</span><span class="p">().</span><span class="n">Namespace</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s">&quot;Left&quot;</span><span class="p">));</span>
 
@@ -217,42 +221,40 @@
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">.</span><span class="n">GetGenericArguments</span><span class="p">().</span><span class="n">Single</span><span class="p">().</span><span class="n">Namespace</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s">&quot;Right&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
-<p><em>Simple Injector</em> protects you from defining invalid registrations by ensuring that given the registrations do not overlap. Building on the last code snippet, imagine accidentally defining a type in the namespace &#8220;MyCompany.LeftRight&#8221;. In this case both open-generic implementations would apply, but <em>Simple Injector</em> will never silently pick one. It will throw an exception instead.</p>
+<p>Simple Injector protects you from defining invalid registrations by ensuring that given the registrations do not overlap. Building on the last code snippet, imagine accidentally defining a type in the namespace &#8220;MyCompany.LeftRight&#8221;. In this case both open-generic implementations would apply, but Simple Injector will never silently pick one. It will throw an exception instead.</p>
 <p>There are some instance where want to have a fallback implementation in the case that no other implementation was applied and this can be achieved by checking the <strong>Handled</strong> property of the predicate&#8217;s <strong>OpenGenericPredicateContext</strong> object:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IRepository</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">ReadOnlyRepository</span><span class="p">&lt;&gt;),</span>
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="k">typeof</span><span class="p">(</span><span class="n">IReadOnlyEntity</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">.</span><span class="n">GetGenericArguments</span><span class="p">().</span><span class="n">Single</span><span class="p">()));</span>
 
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IRepository</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">ReadWriteRepository</span><span class="p">&lt;&gt;),</span>
-    <span class="n">c</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">c</span><span class="p">.</span><span class="n">Handled</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IRepository</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">ReadWriteRepository</span><span class="p">&lt;&gt;),</span> <span class="n">c</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">c</span><span class="p">.</span><span class="n">Handled</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In the case where the open generic implementation contains generic type constraints <em>Simple Injector</em> will automatically apply the type conditionally based on its generic type constraints:</p>
+<p>In the case where the open generic implementation contains generic type constraints Simple Injector will automatically apply the type conditionally based on its generic type constraints:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ReadOnlyRepository</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IRepository</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="k">where</span> <span class="n">T</span> <span class="p">:</span> <span class="n">IReadOnlyEntity</span> <span class="p">{</span> <span class="p">}</span>
 
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IRepository</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">ReadOnlyRepository</span><span class="p">&lt;&gt;));</span>
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IRepository</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">ReadWriteRepository</span><span class="p">&lt;&gt;),</span>
-    <span class="n">c</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">c</span><span class="p">.</span><span class="n">Handled</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IRepository</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">ReadWriteRepository</span><span class="p">&lt;&gt;),</span> <span class="n">c</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">c</span><span class="p">.</span><span class="n">Handled</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The final option in <em>Simple Injector</em> is to supply the <em>RegisterOpenGeneric</em> method with a partially-closed generic type:</p>
+<p>The final option in Simple Injector is to supply the <strong>RegisterOpenGeneric</strong> method with a partially-closed generic type:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// SomeValidator&lt;List&lt;T&gt;&gt;</span>
 <span class="kt">var</span> <span class="n">partiallyClosedType</span> <span class="p">=</span> <span class="k">typeof</span><span class="p">(</span><span class="n">SomeValidator</span><span class="p">&lt;&gt;).</span><span class="n">MakeGenericType</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">List</span><span class="p">&lt;&gt;));</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span> <span class="n">partiallyClosedType</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The type <strong>SomeValidator&lt;List&lt;T&gt;&gt;</strong> is called <strong>partially-closed</strong>, since although its generic type argument has been filled in with a type, it still contains a generic type argument. <em>Simple Injector</em> will be able to apply these constraints, just as it handles any other generic type constraints.</p>
+<p>The type <em>SomeValidator&lt;List&lt;T&gt;&gt;</em> is called <em>partially-closed</em>, since although its generic type argument has been filled in with a type, it still contains a generic type argument. Simple Injector will be able to apply these constraints, just as it handles any other generic type constraints.</p>
 </div>
-<div class="section" id="id5">
-<span id="unregistered-type-resolution"></span><span id="id6"></span><h2>Unregistered type resolution<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
-<p>Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the change of registering that type. <em>Simple Injector</em> supports this scenario with the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm">ResolveUnregisteredType</a> event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the <a class="reference internal" href="#registration-of-open-generic-types"><em>registration of open generic types</em></a>. Other examples of possible scenarios that can be built on top of this event are <em class="xref std std-ref">resolving array and lists</em> and <a class="reference internal" href="#id18"><em>covariance and contravariance</em></a>. Those scenarios are described here in the advanced scenarios page.</p>
+<div class="section" id="unregistered-type-resolution">
+<span id="id3"></span><h2>Unregistered type resolution<a class="headerlink" href="#unregistered-type-resolution" title="Permalink to this headline">¶</a></h2>
+<p>Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the change of registering that type. Simple Injector supports this scenario with the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm">ResolveUnregisteredType</a> event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the <a class="reference internal" href="#registration-of-open-generic-types"><em>registration of open generic types</em></a>. Other examples of possible scenarios that can be built on top of this event are <a class="reference internal" href="howto.html#resolve-arrays-and-lists"><em>resolving array and lists</em></a> and <a class="reference internal" href="#covariance-contravariance"><em>covariance and contravariance</em></a>. Those scenarios are described here in the advanced scenarios page.</p>
 <p>For more information about how to use this event, please take a look at the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm">ResolveUnregisteredType event documentation</a> in the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">reference library</a>.</p>
 </div>
-<div class="section" id="id7">
-<span id="contextual-binding"></span><span id="context-based-injection"></span><span id="id8"></span><h2>Context based injection<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
-<p>Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don’t. <em>Simple Injector</em> does <strong>not</strong> contain such a feature out of the box, but this ability can easily be added by using the [context based injection extension method|ContextDependentExtensions] code snippet.</p>
+<div class="section" id="context-based-injection">
+<span id="id4"></span><h2>Context based injection<a class="headerlink" href="#context-based-injection" title="Permalink to this headline">¶</a></h2>
+<p>Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don’t. Simple Injector does <em>not</em> contain such a feature out of the box, but this ability can easily be added by using the <a class="reference internal" href="ContextDependentExtensions.html"><em>context based injection extension method</em></a> code snippet.</p>
 <div class="note container">
 <strong>Note</strong>: In many cases context based injection is not the best solution, and the design should be reevaluated. In some narrow cases however it can make sense.</div>
-<p>The most common scenario is to base the type of the injected dependency on the type of the consumer. Take for instance the following <strong>ILogger</strong> interface with a generic <strong>Logger&lt;T&gt;</strong> class that needs to be injected into several consumers.</p>
+<p>The most common scenario is to base the type of the injected dependency on the type of the consumer. Take for instance the following <em>ILogger</em> interface with a generic <em>Logger&lt;T&gt;</em> class that needs to be injected into several consumers.</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">ILogger</span> <span class="p">{</span>
     <span class="k">void</span> <span class="nf">Log</span><span class="p">(</span><span class="kt">string</span> <span class="n">message</span><span class="p">);</span>
 <span class="p">}</span>
@@ -270,7 +272,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In this case we want to inject a <strong>Logger&lt;Consumer1&gt;</strong> into <strong>Consumer1</strong> and a <strong>Logger&lt;Consumer2&gt;</strong> into <strong>Consumer2</strong>. By using the previous [extension method|ContextDependentExtensions], we can accomplish this as follows:</p>
+<p>In this case we want to inject a <em>Logger&lt;Consumer1&gt;</em> into <em>Consumer1</em> and a <em>Logger&lt;Consumer2&gt;</em> into <em>Consumer2</em>. By using the previous <a class="reference internal" href="ContextDependentExtensions.html"><em>context based injection extension method</em></a>, we can accomplish this as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterWithContext</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="n">dependencyContext</span> <span class="p">=&gt;</span> <span class="p">{</span>
     <span class="kt">var</span> <span class="n">type</span> <span class="p">=</span> <span class="k">typeof</span><span class="p">(</span><span class="n">Logger</span><span class="p">&lt;&gt;).</span><span class="n">MakeGenericType</span><span class="p">(</span>
         <span class="n">dependencyContext</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">);</span>
@@ -279,19 +281,19 @@
 <span class="p">});</span>
 </pre></div>
 </div>
-<p>In the previous code snippet we registered a <strong>Func&lt;DependencyContext, ILogger&gt;</strong> delegate, that will get called each time a <strong>ILogger</strong> dependency gets resolved. The <strong>DependencyContext</strong> instance that gets supplied to that instance, contains the <strong>ServiceType</strong> and <strong>ImplementationType</strong> into which the <strong>ILogger</strong> is getting injected.</p>
+<p>In the previous code snippet we registered a <em>Func&lt;DependencyContext, ILogger&gt;</em> delegate, that will get called each time a <em>ILogger</em> dependency gets resolved. The <em>DependencyContext</em> instance that gets supplied to that instance, contains the <em>ServiceType</em> and <em>ImplementationType</em> into which the <em>ILogger</em> is getting injected.</p>
 <div class="note container">
-<strong>Note</strong>: Although building a generic type using MakeGenericType is relatively slow, the call to the <strong>Func&lt;DependencyContext, TService&gt;</strong> delegate itself is about as cheap as calling a <strong>Func&lt;TService&gt;</strong> delegate. If performance of the MakeGenericType gets a problem, you can always cache the generated types, cache <strong>InstanceProducer</strong> instances, or cache <strong>ILogger</strong> instances (note that caching the <strong>ILogger</strong> instances will make them singletons).</div>
+<strong>Note</strong>: Although building a generic type using MakeGenericType is relatively slow, the call to the <em>Func&lt;DependencyContext, TService&gt;</em> delegate itself is about as cheap as calling a <em>Func&lt;TService&gt;</em> delegate. If performance of the MakeGenericType gets a problem, you can always cache the generated types, cache <strong>InstanceProducer</strong> instances, or cache <em>ILogger</em> instances (note that caching the <em>ILogger</em> instances will make them singletons).</div>
 <div class="note container">
-<strong>Note</strong>: Even though the use of a generic <strong>Logger&lt;T&gt;</strong> is a common design (with log4net as the grand godfather of this design), doesn&#8217;t always make it a good design. The need for having the logger contain information about its parent type, might indicate design problems. If you&#8217;re doing this, please take a look at <a class="reference external" href="https://stackoverflow.com/a/9915056/264697">this Stackoverflow answer</a>. It talks about logging in conjunction with the SOLID design principles.</div>
+<strong>Note</strong>: Even though the use of a generic <em>Logger&lt;T&gt;</em> is a common design (with log4net as the grand godfather of this design), doesn&#8217;t always make it a good design. The need for having the logger contain information about its parent type, might indicate design problems. If you&#8217;re doing this, please take a look at <a class="reference external" href="https://stackoverflow.com/a/9915056/264697">this Stackoverflow answer</a>. It talks about logging in conjunction with the SOLID design principles.</div>
 </div>
-<div class="section" id="generic-decorators">
-<span id="decorators"></span><span id="id9"></span><h2>Decorators<a class="headerlink" href="#generic-decorators" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="decorators">
+<span id="id5"></span><h2>Decorators<a class="headerlink" href="#decorators" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="https://en.wikipedia.org/wiki/SOLID">SOLID</a> principles give us important guidance when it comes to writing maintainable software. The &#8216;O&#8217; of the &#8216;SOLID&#8217; acronym stands for the <a class="reference external" href="https://en.wikipedia.org/wiki/Open/closed_principle">Open/closed Principle</a> which states that classes should be open for extension, but closed for modification. Designing systems around the Open/closed principle means that new behavior can be plugged into the system, without the need to change any existing parts, making the change of breaking existing code much smaller.</p>
-<p>One of the ways to add new functionality (such as <a class="reference external" href="https://en.wikipedia.org/wiki/Cross-cutting_concern">cross-cutting concerns</a>) to classes is by the use of the <a class="reference external" href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a>. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the <a class="reference internal" href="#registration-of-open-generic-types"><em>Registration of open generic types</em></a> section of this page or for instance the use of an generic <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.</p>
+<p>One of the ways to add new functionality (such as <a class="reference external" href="https://en.wikipedia.org/wiki/Cross-cutting_concern">cross-cutting concerns</a>) to classes is by the use of the <a class="reference external" href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a>. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the <a class="reference internal" href="#registration-of-open-generic-types"><em>Registration of open generic types</em></a> section of this page or for instance the use of an generic <em>ICommandHandler&lt;TCommand&gt;</em> interface.</p>
 <div class="note container">
-<strong>Tip</strong>: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91">This article</a> describes an architecture based on the use of the <strong>ICommandHandler&lt;TCommand&gt;</strong> interface.</div>
-<p>Take the plausible scenario where we want to validate all commands that get executed by an <strong>ICommandHandler&lt;TCommand&gt;</strong> implementation. The Open/Closed principle states that we want to do this, without having to alter each and every implementation. We can do this using a (single) decorator:</p>
+<strong>Tip</strong>: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91">This article</a> describes an architecture based on the use of the <em>ICommandHandler&lt;TCommand&gt;</em> interface.</div>
+<p>Take the plausible scenario where we want to validate all commands that get executed by an <em>ICommandHandler&lt;TCommand&gt;</em> implementation. The Open/Closed principle states that we want to do this, without having to alter each and every implementation. We can do this using a (single) decorator:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">ValidationCommandHandlerDecorator</span><span class="p">&lt;</span><span class="n">TCommand</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">TCommand</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">IValidator</span> <span class="n">validator</span><span class="p">;</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">TCommand</span><span class="p">&gt;</span> <span class="n">handler</span><span class="p">;</span>
@@ -306,15 +308,14 @@
         <span class="c1">// validate the supplied command (throws when invalid).</span>
         <span class="k">this</span><span class="p">.</span><span class="n">validator</span><span class="p">.</span><span class="n">ValidateObject</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
 
-        <span class="c1">// forward the (valid) command to the real</span>
-        <span class="c1">// command handler.</span>
+        <span class="c1">// forward the (valid) command to the real command handler.</span>
         <span class="k">this</span><span class="p">.</span><span class="n">handler</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <strong>ValidationCommandHandlerDecorator&lt;TCommand&gt;</strong> class is an implementation of the <strong>ICommandHandler&lt;TCommand&gt;</strong> interface, but it also wraps / decorates an <strong>ICommandHandler&lt;TCommand&gt;</strong> instance. Instead of injecting the real implementation directly into a consumer, we can (let Simple Injector) inject a validator decorator that wraps the real implementation.</p>
-<p>The <strong>ValidationCommandHandlerDecorator&lt;TCommand&gt;</strong> depends on an <strong>IValidator</strong> interface. An implementation that used Microsoft Data Annotations might look like this:</p>
+<p>The <em>ValidationCommandHandlerDecorator&lt;TCommand&gt;</em> class is an implementation of the <strong>ICommandHandler&lt;TCommand&gt;</strong> interface, but it also wraps / decorates an <em>ICommandHandler&lt;TCommand&gt;</em> instance. Instead of injecting the real implementation directly into a consumer, we can (let Simple Injector) inject a validator decorator that wraps the real implementation.</p>
+<p>The <em>ValidationCommandHandlerDecorator&lt;TCommand&gt;</em> depends on an <em>IValidator</em> interface. An implementation that used Microsoft Data Annotations might look like this:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System.ComponentModel.DataAnnotations</span><span class="p">;</span>
 
 <span class="k">public</span> <span class="k">class</span> <span class="nc">DataAnnotationsValidator</span> <span class="p">:</span> <span class="n">IValidator</span> <span class="p">{</span>
@@ -328,13 +329,14 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The implementations of the <strong>ICommandHandler&lt;T&gt;</strong> interface can be registered using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_OpenGenericBatchRegistrationExtensions_RegisterManyForOpenGeneric.htm">RegisterManyForOpenGeneric</a> extension method:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterManyForOpenGeneric</span><span class="p">(</span>
+<p>The implementations of the <em>ICommandHandler&lt;T&gt;</em> interface can be registered using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_OpenGenericBatchRegistrationExtensions_RegisterManyForOpenGeneric.htm">RegisterManyForOpenGeneric</a> extension method:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Extensions;</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterManyForOpenGeneric</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>By using the following extension method, you can wrap the <strong>ValidationCommandHandlerDecorator&lt;TCommand&gt;</strong> around each and every <strong>ICommandHandler&lt;TCommand&gt;</strong> implementation:</p>
+<p>By using the following extension method, you can wrap the <em>ValidationCommandHandlerDecorator&lt;TCommand&gt;</em> around each and every <em>ICommandHandler&lt;TCommand&gt;</em> implementation:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Extensions;</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
@@ -359,22 +361,22 @@
     <span class="k">typeof</span><span class="p">(</span><span class="n">ValidationCommandHandlerDecorator</span><span class="p">&lt;&gt;));</span>
 </pre></div>
 </div>
-<p>The decorators are applied in the order in which they are registered, which means that the first decorator (<strong>TransactionCommandHandlerDecorator&lt;T&gt;</strong> in this case) wraps the real instance, the second decorator (<strong>DeadlockRetryCommandHandlerDecorator&lt;T&gt;</strong> in this case) wraps the first decorator, and so on.</p>
-<p>There&#8217;s an overload of the <em>RegisterDecorator</em> available that allows you to supply a predicate to determine whether that decorator should be applied to a specific service type. Using a given context you can determine whether the decorator should be applied. Here is an example:</p>
+<p>The decorators are applied in the order in which they are registered, which means that the first decorator (<em>TransactionCommandHandlerDecorator&lt;T&gt;</em> in this case) wraps the real instance, the second decorator (<em>DeadlockRetryCommandHandlerDecorator&lt;T&gt;</em> in this case) wraps the first decorator, and so on.</p>
+<p>There&#8217;s an overload of the <strong>RegisterDecorator</strong> available that allows you to supply a predicate to determine whether that decorator should be applied to a specific service type. Using a given context you can determine whether the decorator should be applied. Here is an example:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">AccessValidationCommandHandlerDecorator</span><span class="p">&lt;&gt;),</span>
     <span class="n">context</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">context</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Namespace</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s">&quot;Admins&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>The given context contains several properties that allows you to analyze whether a decorator should be applied to a given service type, such as the current closed generic service type (using the <strong>ServiceType</strong> property) and the concrete type that will be created (using the <strong>ImplementationType</strong> property). The predicate will (under normal circumstances) be called only once per generic type, so there is no performance penalty for using it.</p>
+<p>The given context contains several properties that allows you to analyze whether a decorator should be applied to a given service type, such as the current closed generic service type (using the <em>ServiceType</em> property) and the concrete type that will be created (using the <em>ImplementationType</em> property). The predicate will (under normal circumstances) be called only once per generic type, so there is no performance penalty for using it.</p>
 <div class="note container">
-<strong>Tip</strong>: [This extension method|Runtime-Decorators] allows registering decorators that can be applied based on runtime conditions (such as the role of the current user).</div>
+<strong>Tip</strong>: <a class="reference internal" href="RuntimeDecorators.html"><em>This extension method</em></a> allows registering decorators that can be applied based on runtime conditions (such as the role of the current user).</div>
 <div class="section" id="decorators-with-func-t-factories">
-<span id="id10"></span><span id="decorators-with-func-factories"></span><h3>Decorators with Func&lt;T&gt; factories<a class="headerlink" href="#decorators-with-func-t-factories" title="Permalink to this headline">¶</a></h3>
-<p>In certain scenarios, it is needed to postpone building part of the object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be [executed on a different thread|How-to#Multi_Threaded_Applications], or when instances need to be created in a certain [scope|ObjectLifestyleManagement#Scoped] or (security) context.</p>
-<p>When building a &#8216;normal&#8217; object graph with dependencies, you can easily delay building a part of the graph by letting a service depend on a factory. This allows building that part of the object graph to be postponed until the time the type starts using the factory. When working with decorators however, injecting a factory to postpone the creation of the decorated instance will not work. Take for instance a <strong>AsyncCommandHandlerDecorator&lt;T&gt;</strong> that allows executing a command handler on a different thread. We could let the <strong>AsyncCommandHandlerDecorator&lt;T&gt;</strong> depend on a <strong>CommandHandlerFactory&lt;T&gt;</strong>, and let this factory call back into the container to retrieve a new <strong>ICommandHandler&lt;T&gt;</strong>. Unfortunately this would fail, since requesting an <strong>ICommandHandler&lt;T&gt;</strong> would again wrap this instance with a new <strong>AsyncCommandHandlerDecorator&lt;T&gt;</strong>, and we&#8217;d end up recursively creating the same instance and causing a stack overflow.</p>
-<p>Since this is a scenario that is really hard to solve without library support, <em>Simple Injector</em> allows injecting a <strong>Func&lt;T&gt;</strong> delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance. Taking the <strong>AsyncCommandHandlerDecorator&lt;T&gt;</strong> as example, it could be implemented as follows:</p>
+<span id="decorators-with-func-factories"></span><h3>Decorators with Func&lt;T&gt; factories<a class="headerlink" href="#decorators-with-func-t-factories" title="Permalink to this headline">¶</a></h3>
+<p>In certain scenarios, it is needed to postpone building part of the object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be <a class="reference internal" href="howto.html#multi-threaded-applications"><em>executed on a different thread</em></a>, or when instances need to be created in a certain <a class="reference internal" href="lifetimes.html#scoped"><em>scope</em></a> or (security) context.</p>
+<p>When building a &#8216;normal&#8217; object graph with dependencies, you can easily delay building a part of the graph by letting a service depend on a factory. This allows building that part of the object graph to be postponed until the time the type starts using the factory. When working with decorators however, injecting a factory to postpone the creation of the decorated instance will not work. Take for instance a <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> that allows executing a command handler on a different thread. We could let the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> depend on a <em>CommandHandlerFactory&lt;T&gt;</em>, and let this factory call back into the container to retrieve a new <em>ICommandHandler&lt;T&gt;</em>. Unfortunately this would fail, since requesting an <em>ICommandHandler&lt;T&gt;</em> would again wrap this instance with a new <em>AsyncCommandHandlerDecorator&lt;T&gt;</em>, and we&#8217;d end up recursively creating the same instance and causing a stack overflow.</p>
+<p>Since this is a scenario that is really hard to solve without library support, Simple Injector allows injecting a <em>Func&lt;T&gt;</em> delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance. Taking the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> as example, it could be implemented as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">AsyncCommandHandlerDecorator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">Func</span><span class="p">&lt;</span><span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">factory</span><span class="p">;</span>
 
@@ -384,10 +386,15 @@
 
     <span class="k">public</span> <span class="k">void</span> <span class="nf">Handle</span><span class="p">(</span><span class="n">T</span> <span class="n">command</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Execute on different thread.</span>
-        <span class="n">ThreadPool</span><span class="p">.</span><span class="n">QueueUserWorkItem</span><span class="p">(**</span> <span class="p">=&gt;</span> <span class="p">{</span>
-            <span class="c1">// Create new handler in this thread.</span>
-            <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">factory</span><span class="p">.</span><span class="n">Invoke</span><span class="p">();</span>
-            <span class="n">handler</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="n">ThreadPool</span><span class="p">.</span><span class="n">QueueUserWorkItem</span><span class="p">(</span><span class="n">state</span> <span class="p">=&gt;</span> <span class="p">{</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="c1">// Create new handler in this thread.</span>
+                <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">factory</span><span class="p">.</span><span class="n">Invoke</span><span class="p">();</span>
+                <span class="n">handler</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">catch</span> <span class="p">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// log the exception</span>
+            <span class="p">}</span>
         <span class="p">});</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -400,7 +407,7 @@
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">StartsWith</span><span class="p">(</span><span class="s">&quot;Async&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>However, since the <strong>AsyncCommandHandlerDecorator&lt;T&gt;</strong> solely has singleton dependencies (the <strong>Func&lt;T&gt;</strong> is a singleton), and creates a new decorated instance each time it’s called, we can even register it as a singleton itself:</p>
+<p>However, since the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> solely has singleton dependencies (the <em>Func&lt;T&gt;</em> is a singleton), and creates a new decorated instance each time it’s called, we can even register it as a singleton itself:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">AsyncCommandHandlerDecorator</span><span class="p">&lt;&gt;),</span>
@@ -430,11 +437,11 @@
     <span class="k">typeof</span><span class="p">(</span><span class="n">ValidationCommandHandlerDecorator</span><span class="p">&lt;&gt;));</span>
 </pre></div>
 </div>
-<p>This configuration has an interesting mix of decorator registrations. The registration of the <strong>AsyncCommandHandlerDecorator&lt;T&gt;</strong> allows (some of) the command handlers to be executed on the background (while others -who&#8217;s name does not start with &#8216;Async&#8217;- still run synchronously), but before execution, all commands are validated synchronously (to allow communicating validation errors to the caller). And all handlers (even the asynchronous ones) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock).</p>
+<p>This configuration has an interesting mix of decorator registrations. The registration of the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> allows (some of) the command handlers to be executed on the background (while others -who&#8217;s name does not start with &#8216;Async&#8217;- still run synchronously), but before execution, all commands are validated synchronously (to allow communicating validation errors to the caller). And all handlers (even the asynchronous ones) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock).</p>
 </div>
-<div class="section" id="id11">
-<span id="decorated-collections"></span><span id="id12"></span><h3>Decorated collections<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<p>When registering a decorator, <em>Simple Injector</em> will automatically decorate any collection with elements of that service type:</p>
+<div class="section" id="decorated-collections">
+<span id="id6"></span><h3>Decorated collections<a class="headerlink" href="#decorated-collections" title="Permalink to this headline">¶</a></h3>
+<p>When registering a decorator, Simple Injector will automatically decorate any collection with elements of that service type:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedEvent</span><span class="p">&gt;&gt;(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">CustomerMovedEventHandler</span><span class="p">),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">NotifyStaffWhenCustomerMovedEventHandler</span><span class="p">));</span>
@@ -445,8 +452,8 @@
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">SomeCondition</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The previous registration registers a collection of <strong>IEventHandler&lt;CustomerMovedEvent&gt;</strong> services. Those services are decorated with a <strong>ValidationEventHandlerDecorator&lt;TEvent&gt;</strong> when the supplied predicate holds.</p>
-<p>For collections of elements that are created by the container (container controlled), the predicate is checked for each element in the collection. For collections of uncontrolled elements (a list of items that is not created by the container), the predicate is checked once for the whole collection. This means that controlled collections can be partially decorated. Taking the previous example for instance, you could let the <strong>CustomerMovedEventHandler</strong> be decorated, while leaving the <strong>NotifyStaffWhenCustomerMovedEventHandler</strong> undecorated (determined by the supplied predicate).</p>
+<p>The previous registration registers a collection of <em>IEventHandler&lt;CustomerMovedEvent&gt;</em> services. Those services are decorated with a <em>ValidationEventHandlerDecorator&lt;TEvent&gt;</em> when the supplied predicate holds.</p>
+<p>For collections of elements that are created by the container (container controlled), the predicate is checked for each element in the collection. For collections of uncontrolled elements (a list of items that is not created by the container), the predicate is checked once for the whole collection. This means that controlled collections can be partially decorated. Taking the previous example for instance, you could let the <em>CustomerMovedEventHandler</em> be decorated, while leaving the <em>NotifyStaffWhenCustomerMovedEventHandler</em> undecorated (determined by the supplied predicate).</p>
 <p>When a collection is uncontrolled, it means that the lifetime of its elements are unknown to the container. The following registration is an example of an uncontrolled collection:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedEvent</span><span class="p">&gt;&gt;</span> <span class="n">handlers</span> <span class="p">=</span>
     <span class="k">new</span> <span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedEvent</span><span class="p">&gt;[]</span>
@@ -458,13 +465,51 @@
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedEvent</span><span class="p">&gt;&gt;(</span><span class="n">handlers</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Although this registration contains a list of singletons, the container has no way of knowing this. The collection could easily have been a dynamic (an ever changing) collection. In this case, the container calls the registered predicate once (and supplies the predicate with the <strong>IEventHandler&lt;CusotmerMovedEvent&gt;</strong> type) and if the predicate returns true, each element in the collection is decorated with a decorator instance.</p>
+<p>Although this registration contains a list of singletons, the container has no way of knowing this. The collection could easily have been a dynamic (an ever changing) collection. In this case, the container calls the registered predicate once (and supplies the predicate with the <em>IEventHandler&lt;CusotmerMovedEvent&gt;</em> type) and if the predicate returns true, each element in the collection is decorated with a decorator instance.</p>
 <div class="note container">
-<strong>Warning</strong>: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can&#8217;t help you in doing [diagnostics|Diagnostics]. Since the lifetime of those items is unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the <em>RegisterAll</em> overloads that take a collection of <em>System.Type</em> instances.</div>
+<strong>Warning</strong>: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can&#8217;t help you in doing <a class="reference internal" href="diagnostics.html"><em>diagnostics</em></a>. Since the lifetime of those items is unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the <strong>RegisterAll</strong> overloads that take a collection of <em>System.Type</em> instances.</div>
+</div>
+<div class="section" id="using-contextual-information-inside-decorators">
+<span id="id7"></span><h3>Using contextual information inside decorators<a class="headerlink" href="#using-contextual-information-inside-decorators" title="Permalink to this headline">¶</a></h3>
+<p>As we shown before, you can apply a decorator conditionally based on a predicate you can supply to the <strong>RegisterDecorator</strong> overloads:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">(</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">AsyncCommandHandlerDecorator</span><span class="p">&lt;&gt;),</span>
+    <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">StartsWith</span><span class="p">(</span><span class="s">&quot;Async&quot;</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Sometimes however you might want to apply a decorator unconditionally, but let the decorator act at runtime based on this contextual information. You can do this by injecting the <strong>DecoratorContext</strong> into the decorator&#8217;s constructor as cam be seem in the following example:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">TransactionCommandHandlerDecorator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">DecoratorContext</span> <span class="n">decoratorContext</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">decoratee</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ITransactionBuilder</span> <span class="n">transactionBuilder</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">TransactionCommandHandlerDecorator</span><span class="p">(</span><span class="n">DecoratorContext</span> <span class="n">decoratorContext</span><span class="p">,</span>
+        <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">decoratee</span><span class="p">,</span> <span class="n">ITransactionBuilder</span> <span class="n">transactionBuilder</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">decoratorContext</span> <span class="p">=</span> <span class="n">decoratorContext</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">decoratee</span> <span class="p">=</span> <span class="n">decoratee</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">transactionBuilder</span> <span class="p">=</span> <span class="n">transactionBuilder</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Handle</span><span class="p">(</span><span class="n">T</span> <span class="n">command</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">TransactionType</span> <span class="n">transactionType</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">decoratorContext</span><span class="p">.</span><span class="n">ImplementationType</span>
+            <span class="p">.</span><span class="n">GetCustomAttribute</span><span class="p">&lt;</span><span class="n">TransactionAttribute</span><span class="p">&gt;()</span>
+            <span class="p">.</span><span class="n">TransactionType</span><span class="p">;</span>
+
+        <span class="k">using</span> <span class="p">(</span><span class="kt">var</span> <span class="n">transaction</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">transactionBuilder</span><span class="p">.</span><span class="n">BeginTransaction</span><span class="p">(</span><span class="n">transactionType</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="n">decoratee</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The previous code snippet shows a decorator that applies a transaction behavior to command handlers. The decorator is injected with the <strong>DecoratorContext</strong> class which supplies the decorator with contextual information about the other decorators in the chain and the actual implementation type. In this example the decorator expects a <em>TransactionAttribute</em> to be applied to the wrapped command handler implementation and it starts the correct transaction type based on this information.</p>
+<p>If the attribute was applied to the command class instead of the command handler, this decorator would been able to gather this information without the use of the <strong>DecoratorContext</strong>. This would however leak implementation details into the command, since which type of transaction a handler should run is clearly an implementation detail and is of no concern to the consumer of that command. Placing that attribute on the handler instead of the command is therefore a much more reasonable thing to do.</p>
+<p>The decorator would also be able to get the attribute by using the injected decoratee, but this would only work when the decorator would directly wrap the handler. This would make the system quite fragile, since it would break once you start placing other decorator in between this decorator and the handler, which is a very likely thing to happen.</p>
 </div>
 <div class="section" id="decorator-registration-factories">
-<span id="id13"></span><h3>Decorator registration factories<a class="headerlink" href="#decorator-registration-factories" title="Permalink to this headline">¶</a></h3>
-<p>In some advanced scenarios, it can be useful to depend the actual decorator type based on some contextual information. <em>Simple Injector</em> contains a <em>RegisterDecorator</em> overload that accepts a factory delegate that allows building the exact decorator type based on the actual type being decorated.</p>
+<span id="id8"></span><h3>Decorator registration factories<a class="headerlink" href="#decorator-registration-factories" title="Permalink to this headline">¶</a></h3>
+<p>In some advanced scenarios, it can be useful to depend the actual decorator type based on some contextual information. Simple Injector contains a <strong>RegisterDecorator</strong> overload that accepts a factory delegate that allows building the exact decorator type based on the actual type being decorated.</p>
 <p>Take the following registration for instance:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">IEventHandler</span><span class="p">&lt;&gt;),</span>
@@ -475,13 +520,13 @@
     <span class="n">predicateContext</span> <span class="p">=&gt;</span> <span class="k">true</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>This example registers a decorator for the <strong>IEventHandler&lt;TEvent&gt;</strong> abstraction. The decorator to be used is the <strong>LoggingEventHandlerDecorator&lt;TEvent, TLogTarget&gt;</strong> type. The supplied factory delegate builds up a partially-closed open-generic type by filling in the <strong>TLogTarget</strong> argument with the actual wrapped event handler implementation type. Simple Injector will fill in the generic type argument <strong>TEvent</strong>.</p>
+<p>This example registers a decorator for the <em>IEventHandler&lt;TEvent&gt;</em> abstraction. The decorator to be used is the <em>LoggingEventHandlerDecorator&lt;TEvent, TLogTarget&gt;</em> type. The supplied factory delegate builds up a partially-closed open-generic type by filling in the <em>TLogTarget</em> argument with the actual wrapped event handler implementation type. Simple Injector will fill in the generic type argument <em>TEvent</em>.</p>
 </div>
 </div>
 <div class="section" id="interception">
-<span id="id14"></span><h2>Interception<a class="headerlink" href="#interception" title="Permalink to this headline">¶</a></h2>
+<span id="id9"></span><h2>Interception<a class="headerlink" href="#interception" title="Permalink to this headline">¶</a></h2>
 <p>Interception is the ability to intercept a call from a consumer to a service, and add or change behavior. The <a class="reference external" href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a> describes a form of interception, but when it comes to applying cross-cutting concerns, you might end up writing decorators for many service interfaces, but with the exact same code. If this is happening, it is time to explore the possibilities of interception.</p>
-<p>Using the [Interception extensions|InterceptionExtensions] code snippets, you can add the ability to do interception with <em>Simple Injector</em>. Using the given code, you can for instance define a <strong>MonitoringInterceptor</strong> that allows logging the execution time of the called service method:</p>
+<p>Using the <a class="reference internal" href="InterceptionExtensions.html"><em>Interception extensions</em></a> code snippets, you can add the ability to do interception with Simple Injector. Using the given code, you can for instance define a <em>MonitoringInterceptor</em> that allows logging the execution time of the called service method:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">private</span> <span class="k">class</span> <span class="nc">MonitoringInterceptor</span> <span class="p">:</span> <span class="n">IInterceptor</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span> <span class="n">logger</span><span class="p">;</span>
 
@@ -511,38 +556,38 @@
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">InterceptWith</span><span class="p">&lt;</span><span class="n">MonitoringInterceptor</span><span class="p">&gt;(</span><span class="n">type</span> <span class="p">=&gt;</span> <span class="n">type</span> <span class="p">==</span> <span class="k">typeof</span><span class="p">(</span><span class="n">IUserRepository</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>This registration ensures that every time an <strong>IUserRepository</strong> interface is requested, an interception proxy is returned that wraps that instance and uses the <strong>MonitoringInterceptor</strong> to extend the behavior.</p>
+<p>This registration ensures that every time an <em>IUserRepository</em> interface is requested, an interception proxy is returned that wraps that instance and uses the <em>MonitoringInterceptor</em> to extend the behavior.</p>
 <p>The current example doesn&#8217;t add much compared to simply using a decorator. When having many interface service types that need to be decorated with the same behavior however, it gets different:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">InterceptWith</span><span class="p">&lt;</span><span class="n">MonitoringInterceptor</span><span class="p">&gt;(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s">&quot;Repository&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: The [Interception extensions|InterceptionExtensions] code snippets use .NET&#8217;s <strong>System.Runtime.Remoting.Proxies.RealProxy</strong> class to generate interception proxies. The <strong>RealProxy</strong> only allows to proxy interfaces.</div>
+<strong>Note</strong>: The <a class="reference internal" href="InterceptionExtensions.html"><em>Interception extensions</em></a> code snippets use .NET&#8217;s <em>System.Runtime.Remoting.Proxies.RealProxy</em> class to generate interception proxies. The <em>RealProxy</em> only allows to proxy interfaces.</div>
 <div class="note container">
-<strong>Note</strong>: the interfaces in the given [Interception extensions|InterceptionExtensions] code snippets are a simplified version of the Castle Project interception facility. If you need to create lots different interceptors, you might benefit from using the interception abilities of the Castle Project. Also please note that the given snippets use dynamic proxies to do the interception, while Castle uses lightweight code generation (LCG). LCG allows much better performance than the use of dynamic proxies.</div>
+<strong>Note</strong>: the interfaces in the given <a class="reference internal" href="InterceptionExtensions.html"><em>Interception extensions</em></a> code snippets are a simplified version of the Castle Project interception facility. If you need to create lots different interceptors, you might benefit from using the interception abilities of the Castle Project. Also please note that the given snippets use dynamic proxies to do the interception, while Castle uses lightweight code generation (LCG). LCG allows much better performance than the use of dynamic proxies. Please see <a class="reference external" href="https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor">this stackoverflow q/a</a> for an Castle implementation.</div>
 <div class="note container">
-<strong>Note</strong>: Don&#8217;t use interception for intercepting types that all implement the same generic interface, such as <strong>ICommandHandler&lt;T&gt;</strong> or <strong>IValidator&lt;T&gt;</strong>. Try using decorator classes instead, as shown in the <a class="reference internal" href="#decorators"><em>Decorators</em></a> section on this page.</div>
+<strong>Note</strong>: Don&#8217;t use interception for intercepting types that all implement the same generic interface, such as <em>ICommandHandler&lt;T&gt;</em> or <em>IValidator&lt;T&gt;</em>. Try using decorator classes instead, as shown in the <a class="reference internal" href="#decorators"><em>Decorators</em></a> section on this page.</div>
 </div>
 <div class="section" id="property-injection">
-<span id="id16"></span><span id="implicit-property-injection"></span><span id="id17"></span><h2>Property injection<a class="headerlink" href="#property-injection" title="Permalink to this headline">¶</a></h2>
+<span id="implicit-property-injection"></span><h2>Property injection<a class="headerlink" href="#property-injection" title="Permalink to this headline">¶</a></h2>
 <p>Simple Injector does not inject any properties into types that get resolved by the container. In general there are two ways of doing property injection, and both are not enabled by default for reasons explained below.</p>
-<p><em>Implicit property injection</em>
-Some containers (such as Castle Windsor) implicitly inject public writable properties by default for any instance you resolve. They do this by mapping those properties to configured types. When no such registration exists, or when the property doesn’t have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that <strong>implicit property injection</strong> is simply too uuhh...  implicit :-). Silently skipping properties that can&#8217;t be mapped can lead to a DI configuration that can&#8217;t be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified.</p>
-<p><em>Explicit property injection</em>
-We strongly feel that explicit property injection is a much better way to go. With explicit property injection the container is forced to inject a property and the process will fail immediately when a property can&#8217;t be mapped or injected. Some containers (such as Unity and Ninject) allow explicit property injection by allowing properties to be decorated with attributes that are defined by the DI library. Problem with this is that this forces the application to take a dependency on the library, which is something that should be prevented.</p>
-<p>Because <em>Simple Injector</em> does not encourage its users to take a dependency on the container (except for the startup path of course), <em>Simple Injector</em> does not contain any attributes that allow explicit property injection and it can therefore not explicitly inject properties out-of-the-box.</p>
+<p><strong>Implicit property injection</strong></p>
+<p>Some containers (such as Castle Windsor) implicitly inject public writable properties by default for any instance you resolve. They do this by mapping those properties to configured types. When no such registration exists, or when the property doesn’t have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that <strong>implicit property injection</strong> is simply too uuhh...  implicit :-). Silently skipping properties that can&#8217;t be mapped can lead to a DI configuration that can&#8217;t be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified.</p>
+<p id="explicit-property-injection"><strong>Explicit property injection</strong></p>
+<p>We strongly feel that explicit property injection is a much better way to go. With explicit property injection the container is forced to inject a property and the process will fail immediately when a property can&#8217;t be mapped or injected. Some containers (such as Unity and Ninject) allow explicit property injection by allowing properties to be decorated with attributes that are defined by the DI library. Problem with this is that this forces the application to take a dependency on the library, which is something that should be prevented.</p>
+<p>Because Simple Injector does not encourage its users to take a dependency on the container (except for the startup path of course), Simple Injector does not contain any attributes that allow explicit property injection and it can therefore not explicitly inject properties out-of-the-box.</p>
 <p>Besides this, the use of property injection should be very exceptional and in general constructor injection should be used in the majority of cases. If a constructor gets too many parameters (constructor over-injection anti-pattern), it is an indication of a violation of the <a class="reference external" href="https://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> (SRP). SRP violations often lead to maintainability issues. So instead of patching constructor over-injection with property injection, the root cause should be analyzed and the type should be refactored, probably with <a class="reference external" href="http://blog.ploeh.dk/2010/02/02/RefactoringtoAggregateServices/">Facade Services</a>. Another common reason to use properties is because those dependencies are optional. Instead of using optional property dependencies, best practice is to inject empty implementations (a.k.a. <a class="reference external" href="https://en.wikipedia.org/wiki/Null_Object_pattern">Null Object pattern</a>) into the constructor.</p>
-<p><em>Enabling property injection</em>
-<em>Simple Injector</em> contains two ways to enable property injection. First of all the <a class="reference internal" href="using.html#configuring-property-injection"><em>RegisterInitializer&lt;T&gt;</em></a> method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:</p>
+<p><strong>Enabling property injection</strong></p>
+<p>Simple Injector contains two ways to enable property injection. First of all the <a class="reference internal" href="using.html#configuring-property-injection"><em>RegisterInitializer&lt;T&gt;</em></a> method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">HandlerBase</span><span class="p">&gt;(</span><span class="n">handlerToInitialize</span> <span class="p">=&gt;</span> <span class="p">{</span>
     <span class="n">handlerToInitialize</span><span class="p">.</span><span class="n">ExecuteAsynchronously</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
 <span class="p">});</span>
 </pre></div>
 </div>
-<p>In the previous example an <strong>Action&lt;T&gt;</strong> delegate is registered that will be called every time the container creates a type that inherits from <strong>HandlerBase</strong>. In this case, the handler will set a configuration value on that class.</p>
+<p>In the previous example an <em>Action&lt;T&gt;</em> delegate is registered that will be called every time the container creates a type that inherits from <em>HandlerBase</em>. In this case, the handler will set a configuration value on that class.</p>
 <div class="note container">
-<strong>Note</strong>: although this method can also be used injecting services, please note that the [Diagnostic Services|Diagnostics] will be unable to see and analyze that dependency.</div>
-<p id="importpropertyselectionbehavior">The second way to inject properties is by implementing a custom <em>IPropertySelectionBehavior</em>. The <strong>property selection behavior</strong> is a general extension point provided by the container, to override the library&#8217;s default behavior (which is to <strong>not</strong> inject properties). The following example enables explicit property injection using attributes, using the <strong>ImportAttribute</strong> from the <strong>System.ComponentModel.Composition.dll</strong>:</p>
+<strong>Note</strong>: although this method can also be used injecting services, please note that the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a> will be unable to see and analyze that dependency.</div>
+<p id="importpropertyselectionbehavior">The second way to inject properties is by implementing a custom <strong>IPropertySelectionBehavior</strong>. The <em>property selection behavior</em> is a general extension point provided by the container, to override the library&#8217;s default behavior (which is to <em>not</em> inject properties). The following example enables explicit property injection using attributes, using the <em>ImportAttribute</em> from the <em>System.ComponentModel.Composition.dll</em>:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.ComponentModel.Composition</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
@@ -564,16 +609,16 @@ We strongly feel that explicit property injection is a much better way to go. Wi
 </div>
 <p>This enables explicit property injection on all properties that are marked with the [Import] attribute and an exception will be thrown when the property cannot be injected for whatever reason.</p>
 <div class="note container">
-<strong>Tip</strong>: Properties injected by the container through the <strong>IPropertySelectionBehavior</strong> will be analyzed by the [Diagnostic Services|Diagnostics].</div>
+<strong>Tip</strong>: Properties injected by the container through the <strong>IPropertySelectionBehavior</strong> will be analyzed by the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a>.</div>
 <div class="note container">
 <strong>Note</strong>: The <strong>IPropertySelectionBehavior</strong> extension mechanism can also be used to implement implicit property injection. There&#8217;s <a class="reference external" href="https://simpleinjector.codeplex.com/SourceControl/latest#SimpleInjector.CodeSamples/ImplicitPropertyInjectionExtensions.cs">an example of this</a> in the source code. Doing so however is not advised because of the reasons given above.</div>
 </div>
 <div class="section" id="covariance-and-contravariance">
-<span id="id18"></span><span id="covariance-contravariance"></span><h2>Covariance and Contravariance<a class="headerlink" href="#covariance-and-contravariance" title="Permalink to this headline">¶</a></h2>
-<p>Since version 4.0 of the .NET framework, the type system allows <a class="reference external" href="https://msdn.microsoft.com/en-us/library/dd799517.aspx">Covariance and Contravariance in Generics</a> (especially interfaces and delegates). This allows for instance, to use a <strong>IEnumerable&lt;string&gt;</strong> as an <strong>IEnumerable&lt;object&gt;</strong> (covariance), or to use an <strong>Action&lt;object&gt;</strong> as an <strong>Action&lt;string&gt;</strong> (contravariance).</p>
-<p>In some circumstances, the application design can benefit from the use of covariance and contravariance (or variance for short) and it would be beneficial when the IoC container returns services that are &#8216;compatible&#8217; to the requested service, even although the requested service is not registered. To stick with the previous example, the container could return an <strong>IEnumerable&lt;string&gt;</strong> even when an <strong>IEnumerable&lt;object&gt;</strong> is requested.</p>
-<p>By default, <em>Simple Injector</em> does not return variant implementations of given services, but Simple Injector can be extended to behave this way. The actual way to write this extension depends on the requirements of the application.</p>
-<p>Take a look at the following application design around the <strong>IEventHandler&lt;in TEvent&gt;</strong> interface:</p>
+<span id="covariance-contravariance"></span><h2>Covariance and Contravariance<a class="headerlink" href="#covariance-and-contravariance" title="Permalink to this headline">¶</a></h2>
+<p>Since version 4.0 of the .NET framework, the type system allows <a class="reference external" href="https://msdn.microsoft.com/en-us/library/dd799517.aspx">Covariance and Contravariance in Generics</a> (especially interfaces and delegates). This allows for instance, to use a <em>IEnumerable&lt;string&gt;</em> as an <em>IEnumerable&lt;object&gt;</em> (covariance), or to use an <em>Action&lt;object&gt;</em> as an <em>Action&lt;string&gt;</em> (contravariance).</p>
+<p>In some circumstances, the application design can benefit from the use of covariance and contravariance (or variance for short) and it would be beneficial when the IoC container returns services that are &#8216;compatible&#8217; to the requested service, even although the requested service is not registered. To stick with the previous example, the container could return an <em>IEnumerable&lt;string&gt;</em> even when an <em>IEnumerable&lt;object&gt;</em> is requested.</p>
+<p>By default, Simple Injector does not return variant implementations of given services, but Simple Injector can be extended to behave this way. The actual way to write this extension depends on the requirements of the application.</p>
+<p>Take a look at the following application design around the <em>IEventHandler&lt;in TEvent&gt;</em> interface:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">IEventHandler</span><span class="p">&lt;</span><span class="k">in</span> <span class="n">TEvent</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">void</span> <span class="nf">Handle</span><span class="p">(</span><span class="n">TEvent</span> <span class="n">e</span><span class="p">);</span>
 <span class="p">}</span>
@@ -592,8 +637,8 @@ We strongly feel that explicit property injection is a much better way to go. Wi
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The design contains two event classes <strong>CustomerMovedEvent</strong> and <strong>CustomerMovedAbroadEvent</strong> (where <strong>CustomerMovedAbroadEvent</strong> inherits from <strong>CustomerMovedEvent</strong>) one concrete event handler <strong>CustomerMovedEventHandler</strong> and a generic interface for event handlers.</p>
-<p>We can configure the container in such way that not only a request for <strong>IEventHandler&lt;CustomerMovedEvent&gt;</strong> results in a <strong>CustomerMovedEventHandler,</strong> but also a request for <strong>IEventHandler&lt;CustomerMovedAbroadEvent&gt;</strong> results in that same <strong>CustomerMovedEventHandler</strong> (because <strong>CustomerMovedEventHandler</strong> also accepts <strong>CustomerMovedAbroadEvents</strong>).</p>
+<p>The design contains two event classes <em>CustomerMovedEvent</em> and <em>CustomerMovedAbroadEvent</em> (where <em>CustomerMovedAbroadEvent</em> inherits from <em>CustomerMovedEvent</em>) one concrete event handler <em>CustomerMovedEventHandler</em> and a generic interface for event handlers.</p>
+<p>We can configure the container in such way that not only a request for <em>IEventHandler&lt;CustomerMovedEvent&gt;</em> results in a <em>CustomerMovedEventHandler,</em> but also a request for <em>IEventHandler&lt;CustomerMovedAbroadEvent&gt;</em> results in that same <em>CustomerMovedEventHandler</em> (because <em>CustomerMovedEventHandler</em> also accepts <em>CustomerMovedAbroadEvents</em>).</p>
 <p>There are multiple ways to achieve this. Here&#8217;s one:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">CustomerMovedEventHandler</span><span class="p">&gt;();</span>
 
@@ -601,7 +646,7 @@ We strongly feel that explicit property injection is a much better way to go. Wi
     <span class="k">typeof</span><span class="p">(</span><span class="n">ContravarianceEventHandler</span><span class="p">&lt;&gt;));</span>
 </pre></div>
 </div>
-<p>This registration depends on the custom <strong>ContravarianceEventHandler&lt;TEvent&gt;</strong> that should be placed close to the registration itself:</p>
+<p>This registration depends on the custom <em>ContravarianceEventHandler&lt;TEvent&gt;</em> that should be placed close to the registration itself:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">ContravarianceEventHandler</span><span class="p">&lt;</span><span class="n">TEvent</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">TEvent</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">private</span> <span class="n">Registration</span> <span class="n">registration</span><span class="p">;</span>
 
@@ -623,12 +668,12 @@ We strongly feel that explicit property injection is a much better way to go. Wi
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The registration ensures that every time an <strong>IEventHandler&lt;TEvent&gt;</strong> is requested, a <strong>ContravarianceEventHandler&lt;TEvent&gt;</strong> is returned. The <strong>ContravarianceEventHandler&lt;TEvent&gt;</strong> will on creation query the container for a single service type that implements the specified <strong>IEventHandler&lt;TEvent&gt;</strong>. Because the <strong>CustomerMovedEventHandler</strong> is the only registered event handler for <strong>IEventHandler&lt;CustomerMovedEvent&gt;</strong>, the <strong>ContravarianceEventHandler&lt;CustomerMovedEvent&gt;</strong> will find that type and call it.</p>
+<p>The registration ensures that every time an <em>IEventHandler&lt;TEvent&gt;</em> is requested, a <em>ContravarianceEventHandler&lt;TEvent&gt;</em> is returned. The <em>ContravarianceEventHandler&lt;TEvent&gt;</em> will on creation query the container for a single service type that implements the specified <em>IEventHandler&lt;TEvent&gt;</em>. Because the <em>CustomerMovedEventHandler</em> is the only registered event handler for <em>IEventHandler&lt;CustomerMovedEvent&gt;</em>, the <em>ContravarianceEventHandler&lt;CustomerMovedEvent&gt;</em> will find that type and call it.</p>
 <p>This is just one example and one way of adding variance support. For a more elaborate discussion on this subject, please read the following article: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=90">Adding Covariance and Contravariance to Simple Injector</a>.</p>
 </div>
 <div class="section" id="registering-plugins-dynamically">
 <span id="plugins"></span><h2>Registering plugins dynamically<a class="headerlink" href="#registering-plugins-dynamically" title="Permalink to this headline">¶</a></h2>
-<p>Applications with a plugin architecture often allow special plugin assemblies to be dropped in a special folder and to be picked up by the application, without the need of a recompile. Although <em>Simple Injector</em> has no out of the box support for this, registering plugins from dynamically loaded assemblies can be implemented in a few lines of code. Here is an example:</p>
+<p>Applications with a plugin architecture often allow special plugin assemblies to be dropped in a special folder and to be picked up by the application, without the need of a recompile. Although Simple Injector has no out of the box support for this, registering plugins from dynamically loaded assemblies can be implemented in a few lines of code. Here is an example:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">string</span> <span class="n">pluginDirectory</span> <span class="p">=</span>
     <span class="n">Path</span><span class="p">.</span><span class="n">Combine</span><span class="p">(</span><span class="n">AppDomain</span><span class="p">.</span><span class="n">CurrentDomain</span><span class="p">.</span><span class="n">BaseDirectory</span><span class="p">,</span> <span class="s">&quot;Plugins&quot;</span><span class="p">);</span>
 
@@ -648,7 +693,7 @@ We strongly feel that explicit property injection is a much better way to go. Wi
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">IPlugin</span><span class="p">&gt;(</span><span class="n">pluginTypes</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The given example makes use of an <strong>IPlugin</strong> interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement <strong>IPlugin</strong>, and all publicly exposed concrete types that implements <strong>IPlugin</strong> will be registered using the <strong>RegisterAll</strong> method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using <strong>container.GetAllInstances&lt;IPlugin&gt;()</strong> or by adding an <strong>IEnumerable&lt;IPlugin&gt;</strong> argument to a constructor.</p>
+<p>The given example makes use of an <em>IPlugin</em> interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement <em>IPlugin</em>, and all publicly exposed concrete types that implements <em>IPlugin</em> will be registered using the <strong>RegisterAll</strong> method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using <em>container.GetAllInstances&lt;IPlugin&gt;()</em> or by adding an <em>IEnumerable&lt;IPlugin&gt;</em> argument to a constructor.</p>
 </div>
 </div>
 
@@ -663,12 +708,13 @@ We strongly feel that explicit property injection is a much better way to go. Wi
 <li><a class="reference internal" href="#">Advanced Scenarios</a><ul>
 <li><a class="reference internal" href="#generics">Generics</a></li>
 <li><a class="reference internal" href="#batch-automatic-registration">Batch / Automatic registration</a></li>
-<li><a class="reference internal" href="#id3">Registration of open generic types</a></li>
-<li><a class="reference internal" href="#id5">Unregistered type resolution</a></li>
-<li><a class="reference internal" href="#id7">Context based injection</a></li>
-<li><a class="reference internal" href="#generic-decorators">Decorators</a><ul>
+<li><a class="reference internal" href="#registration-of-open-generic-types">Registration of open generic types</a></li>
+<li><a class="reference internal" href="#unregistered-type-resolution">Unregistered type resolution</a></li>
+<li><a class="reference internal" href="#context-based-injection">Context based injection</a></li>
+<li><a class="reference internal" href="#decorators">Decorators</a><ul>
 <li><a class="reference internal" href="#decorators-with-func-t-factories">Decorators with Func&lt;T&gt; factories</a></li>
-<li><a class="reference internal" href="#id11">Decorated collections</a></li>
+<li><a class="reference internal" href="#decorated-collections">Decorated collections</a></li>
+<li><a class="reference internal" href="#using-contextual-information-inside-decorators">Using contextual information inside decorators</a></li>
 <li><a class="reference internal" href="#decorator-registration-factories">Decorator registration factories</a></li>
 </ul>
 </li>
@@ -681,8 +727,11 @@ We strongly feel that explicit property injection is a much better way to go. Wi
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="using.html"
-                        title="previous chapter">Using Simple Injector</a></p>
+  <p class="topless"><a href="howto.html"
+                        title="previous chapter">How To</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="integration.html"
+                        title="next chapter">Integration Guide</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/advanced.txt"
@@ -712,7 +761,10 @@ We strongly feel that explicit property injection is a much better way to go. Wi
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="using.html" title="Using Simple Injector"
+          <a href="integration.html" title="Integration Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="howto.html" title="How To"
              >previous</a> |</li>
         <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li> 
       </ul>

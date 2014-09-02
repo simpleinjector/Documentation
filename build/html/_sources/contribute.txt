@@ -2,7 +2,7 @@
 How to Contribute
 =================
 
-For any contributions to be accepted you first need to print, sign, scan and email a copy of the `file:CLA <Simple Injector Contributor License Agreement.pdf>`_ to `mailto:cla@simpleinjector.org <mailto:cla@simpleinjector.org>`_
+For any contributions to be accepted you first need to print, sign, scan and email a copy of the `CLA <https://www.codeplex.com/Download?ProjectName=simpleinjector&DownloadId=835772>`_ to `mailto:cla@simpleinjector.org <mailto:cla@simpleinjector.org>`_
 
 For the moment we request that changes are only made after a `discussion <https://simpleinjector.codeplex.com/discussions>`_ and that each change has a related and approved `issue <https://simpleinjector.codeplex.com/workitem/list/basic>`_. Changes that do not relate to an approved issue may not be accepted.
 

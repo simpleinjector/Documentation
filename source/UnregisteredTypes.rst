@@ -72,4 +72,4 @@ Instead of depending directly on **SqlUserRepository**, **HomeController** can b
 
 .. container:: Note
 
-    **Tip**: It would probably be better to define a generic *IRepository<T>* abstraction. This makes easy to :ref:`batch registration <Batch_Registration>` implementations and allows cross-cutting concerns to be added using :ref:`decorators <Generic_Decorators>`.
+    **Tip**: It would probably be better to define a generic *IRepository<T>* abstraction. This makes easy to :ref:`batch registration <Batch-Registration>` implementations and allows cross-cutting concerns to be added using :ref:`decorators <Decorators>`.
