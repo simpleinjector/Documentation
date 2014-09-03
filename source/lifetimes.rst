@@ -8,6 +8,22 @@ Object Lifetime Management is the concept of controlling the number of instances
 
 	**Note**: this documentation is specific for *Simple Injector version 2.5* and up. Look `here <https://simpleinjector.codeplex.com/wikipage?title=ObjectLifestyleManagement&version=59>`_ for documentation specific to lower versions.
 
+Below is a list of the most common lifestyles with code examples of how to configure them using *Simple Injector*:
+
+* :ref:`Transient <Transient>`
+* :ref:`Singleton <Singleton>`
+* :ref:`Scoped <Scoped>`
+* :ref:`Per Web Request <PerWebRequest>`
+* :ref:`Per Web API Request <PerWebAPIRequest>`
+* :ref:`Per WCF Operation <PerWcfOperation>`
+* :ref:`Per Lifetime Scope <PerLifetimeScope>`
+* :ref:`Per Execution Context Scope (async/await) <PerExecutionContextScope>`
+* :ref:`Per Graph <PerGraph>`
+* :ref:`Per Thread <PerThread>`
+* :ref:`Per HTTP Session <PerHttpSession>`
+* :ref:`Hybrid <Hybrid>`
+* :ref:`Developing a Custom Lifestyle <CustomLifestyles>`
+
 .. _Transient:
 
 Transient
