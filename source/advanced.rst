@@ -6,10 +6,6 @@ Although its name may not imply it, Simple Injector is capable of handling many 
 
 .. container:: Note
 
-    **Note**: this documentation is specific for *Simple Injector version 2.0* and up. Look `here <https://simpleinjector.codeplex.com/wikipage?title=Advanced-scenarios&version=48>`_ for 1.x specific documentation.
-
-.. container:: Note
-
     **Note**: After including the *SimpleInjector.dll* in your project, you will have to add the *SimpleInjector.Extensions* namespace to your code to be able to use the majority of features that are presented in this wiki page.
 
 This page discusses the following subjects:

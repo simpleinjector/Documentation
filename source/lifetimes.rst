@@ -4,10 +4,6 @@ Object Lifetime Management
 
 Object Lifetime Management is the concept of controlling the number of instances a configured service will have and the duration of the lifetime of those instances. In other words, it allows you to determine how returned instances are cached. Most IoC frameworks have sophisticated mechanisms for lifestyle management, and *Simple Injector* has built-in support for the most common lifestyles. The two default lifestyles (transient and singleton) are part of the core library, and other lifestyles are part of some of the extension and integration packages. These built-in lifestyles should fit for about 99% of the cases. For other cases, custom lifestyles can be created.
 
-.. container:: Note
-
-	**Note**: this documentation is specific for *Simple Injector version 2.5* and up. Look `here <https://simpleinjector.codeplex.com/wikipage?title=ObjectLifestyleManagement&version=59>`_ for documentation specific to lower versions.
-
 Below is a list of the most common lifestyles with code examples of how to configure them using *Simple Injector*. This page discusses the following lifestyles:
 
 * :ref:`Transient <Transient>`

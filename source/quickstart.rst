@@ -38,17 +38,17 @@ The easiest way to get started is by using  `the available NuGet packages <https
 #. Unpack the downloaded .zip file;
 #. Add the **SimpleInjector.dll** to your start-up project by right-clicking on a project in the Visual Studio solution explorer and selecting 'Add Reference...'.
 #. Add the **using SimpleInjector;** directive on the top of the code file where you wish to configure the application.
-#. Look at the :doc:`Usage <using>` section in the documentation on how to configure and use the *Simple Injector*.
+#. Look at the :doc:`Usage <using>` section in the documentation on how to configure and use *Simple Injector*.
 #. Look at the [More information|#More_information] section if you want to learn more or have any questions.
 
 A Quick Example
 ===============
 
-The general idea behind the *Simple Injector* (or any DI framework for that matter) is that you design your application around loosely coupled components using the `dependency injection pattern <https://en.wikipedia.org/wiki/Dependency**injection>`_. Take for instance the following **UserController** class in the context of an ASP.NET MVC application:
+The general idea behind *Simple Injector* (or any DI framework for that matter) is that you design your application around loosely coupled components using the `dependency injection pattern <https://en.wikipedia.org/wiki/Dependency**injection>`_. Take for instance the following **UserController** class in the context of an ASP.NET MVC application:
 
 .. container:: Note
 
-    **Note:** *Simple Injector* works for many different technologies, not only for MVC. Please look at the [Integration Guide] for help using the *Simple Injector* with your technology of choice.
+    **Note:** *Simple Injector* works for many different technologies, not only for MVC. Please look at the [Integration Guide] for help using *Simple Injector* with your technology of choice.
 
 .. code-block:: c#
 
@@ -108,7 +108,7 @@ The registration of the **ILogger** is a bit more complex though. It registers a
 
     **Note**: We did not register the **UserController**, because the **UserController** is a concrete type, *Simple Injector* can implicitly create it (as long as its dependencies can be resolved).
 
-This is in fact all it takes to start using the *Simple Injector*. Design your classes around the dependency injection principle (which is actually the hard part) and configure them in the top of your application. Some frameworks (such as ASP.NET MVC) will do the rest for you. Other frameworks (like ASP.NET Web Forms) will need a little bit more work to get this done. See the [Integration Guide] for examples of your framework of choice.
+This is in fact all it takes to start using *Simple Injector*. Design your classes around the dependency injection principle (which is actually the hard part) and configure them in the top of your application. Some frameworks (such as ASP.NET MVC) will do the rest for you. Other frameworks (like ASP.NET Web Forms) will need a little bit more work to get this done. See the [Integration Guide] for examples of your framework of choice.
 
 .. container:: Note
 
@@ -119,7 +119,7 @@ More information
 
 For more information about *Simple Injector* please visit the following links: 
 
-* :doc:`Using Simple Injector <using>` will guide you through the *Simple Injector* basics.
+* :doc:`Using Simple Injector <using>` will guide you through *Simple Injector* basics.
 * The [Simple Injector and object lifetime management|ObjectLifestyleManagement] page explains how to configure lifestyles such as **transient**, **singleton**, and many others.
 * See the `Reference library <https://simpleinjector.org/ReferenceLibrary/>`_ for the complete API documentation.
 * See the [Integration Guide] for more information about how to integrate *Simple Injector* into your specific application framework.

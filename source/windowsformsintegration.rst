@@ -6,7 +6,7 @@ Windows Forms was never designed with dependency injection in mind. Although it 
 
 Instead of doing constructor injection, there are alternatives. The simplest thing is to store the container in the **Program** class and let the default constructors of your form classes request the dependencies it needs..
 
-The following code snippet is an example of how to register the *Simple Injector* container in the **Program** class:
+The following code snippet is an example of how to register *Simple Injector* container in the **Program** class:
 
 .. code-block:: c#
 
