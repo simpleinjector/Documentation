@@ -19,7 +19,7 @@ The following platforms are supported:
 
 .. container:: Note
 
-*Simple Injector* is carefully designed to run in **partial / medium trust**, and it is fast; `blazingly fast <https://simpleinjector.codeplex.com/discussions/326621>`_.
+    *Simple Injector* is carefully designed to run in **partial / medium trust**, and it is fast; `blazingly fast <https://simpleinjector.codeplex.com/discussions/326621>`_.
 
 New Diagnostic Services in Simple Injector 2
 ============================================

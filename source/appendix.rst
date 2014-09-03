@@ -9,3 +9,4 @@ Appendix
 	Interception Extensions <InterceptionExtensions>
 	Collection Registration Extensions <CollectionRegistrationExtensions>
 	Context Dependent Extensions <ContextDependentExtensions>
+	T4MVC <t4mvc>
