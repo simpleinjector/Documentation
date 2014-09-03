@@ -56,22 +56,22 @@
 <strong>Note</strong>: this documentation is specific for <em>Simple Injector version 2.5</em> and up. Look <a class="reference external" href="https://simpleinjector.codeplex.com/wikipage?title=ObjectLifestyleManagement&amp;version=59">here</a> for documentation specific to lower versions.</div>
 <p>Below is a list of the most common lifestyles with code examples of how to configure them using <em>Simple Injector</em>:</p>
 <ul class="simple">
-<li><a class="reference internal" href="#lifestyle-transient"><em>Transient</em></a></li>
-<li><a class="reference internal" href="#lifestyle-singleton"><em>Singleton</em></a></li>
-<li><a class="reference internal" href="#lifestyle-scoped"><em>Scoped</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perwebrequest"><em>Per Web Request</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perwebapirequest"><em>Per Web API Request</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perwcfoperation"><em>Per WCF Operation</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perlifetimescope"><em>Per Lifetime Scope</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perexecutioncontextscope"><em>Per Execution Context Scope (async/await)</em></a></li>
-<li><a class="reference internal" href="#lifestyle-pergraph"><em>Per Graph</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perthread"><em>Per Thread</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perhttpsession"><em>Per HTTP Session</em></a></li>
-<li><a class="reference internal" href="#lifestyle-hybrid"><em>Hybrid</em></a></li>
-<li><a class="reference internal" href="#lifestyle-customlifestyles"><em>Developing a Custom Lifestyle</em></a></li>
+<li><a class="reference internal" href="#transient"><em>Transient</em></a></li>
+<li><a class="reference internal" href="#singleton"><em>Singleton</em></a></li>
+<li><a class="reference internal" href="#scoped"><em>Scoped</em></a></li>
+<li><a class="reference internal" href="#perwebrequest"><em>Per Web Request</em></a></li>
+<li><a class="reference internal" href="#perwebapirequest"><em>Per Web API Request</em></a></li>
+<li><a class="reference internal" href="#perwcfoperation"><em>Per WCF Operation</em></a></li>
+<li><a class="reference internal" href="#perlifetimescope"><em>Per Lifetime Scope</em></a></li>
+<li><a class="reference internal" href="#perexecutioncontextscope"><em>Per Execution Context Scope (async/await)</em></a></li>
+<li><a class="reference internal" href="#pergraph"><em>Per Graph</em></a></li>
+<li><a class="reference internal" href="#perthread"><em>Per Thread</em></a></li>
+<li><a class="reference internal" href="#perhttpsession"><em>Per HTTP Session</em></a></li>
+<li><a class="reference internal" href="#hybrid"><em>Hybrid</em></a></li>
+<li><a class="reference internal" href="#customlifestyles"><em>Developing a Custom Lifestyle</em></a></li>
 </ul>
 <div class="section" id="transient">
-<span id="lifestyle-transient"></span><h2>Transient<a class="headerlink" href="#transient" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2>Transient<a class="headerlink" href="#transient" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 A new instance of the service type will be created for each request (both for calls to <em>GetInstance&lt;T&gt;</em> and instances as part of an object graph).</div>
 <p>This example instantiates a new <strong>IService</strong> implementation for each call, while leveraging the power of <a class="reference internal" href="using.html#automatic-constructor-injection"><em>automatic constructor injection</em></a>.</p>
@@ -102,7 +102,7 @@ A new instance of the service type will be created for each request (both for ca
 <p>The given configuration calls the delegate after the creation of each type that implements <strong>ICommand</strong> and will set the <strong>ExecuteAsynchroniously</strong> property to <strong>true</strong>. This is a powerful mechanism that enables attribute-free property injection.</p>
 </div>
 <div class="section" id="singleton">
-<span id="lifestyle-singleton"></span><h2>Singleton<a class="headerlink" href="#singleton" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>Singleton<a class="headerlink" href="#singleton" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 There will be only one instance of the registered service type during the lifetime of that container instance. Clients will always receive that same instance.</div>
 <p>There are multiple ways to register singletons. The most simple and common way to do this is by specifying both the service type and the implementation as generic type arguments. This allows the implementation type to be constructed using automatic constructor injection:</p>
@@ -135,22 +135,22 @@ There will be only one instance of the registered service type during the lifeti
 <p>Registration for concrete singletons is necessarily, because unregistered concrete types will be treated as transient.</p>
 </div>
 <div class="section" id="scoped">
-<span id="lifestyle-scoped"></span><h2>Scoped<a class="headerlink" href="#scoped" title="Permalink to this headline">¶</a></h2>
+<span id="id3"></span><h2>Scoped<a class="headerlink" href="#scoped" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 For every request within an implicitly or explicitly defined scope, a single instance of the service will be returned and that instance will (optionally) be disposed when the scope ends.</div>
 <p><em>Simple Injector</em> contains five scoped lifestyles:</p>
 <ul class="simple">
-<li><a class="reference internal" href="#lifestyle-perwebrequest"><em>Per Web Request</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perwebapirequest"><em>Per Web API Request</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perwcfoperation"><em>Per WCF Operation</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perlifetimescope"><em>Per Lifetime Scope</em></a></li>
-<li><a class="reference internal" href="#lifestyle-perexecutioncontextscope"><em>Per Execution Context Scope</em></a></li>
+<li><a class="reference internal" href="#perwebrequest"><em>Per Web Request</em></a></li>
+<li><a class="reference internal" href="#perwebapirequest"><em>Per Web API Request</em></a></li>
+<li><a class="reference internal" href="#perwcfoperation"><em>Per WCF Operation</em></a></li>
+<li><a class="reference internal" href="#perlifetimescope"><em>Per Lifetime Scope</em></a></li>
+<li><a class="reference internal" href="#perexecutioncontextscope"><em>Per Execution Context Scope</em></a></li>
 </ul>
 <p>Both <em>Per Web Request</em> and <em>Per WCF Operation</em> implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The <em>Container</em> does this for you. With the <em>Per Lifetime Scope</em> lifestyle on the other hand, you explicitly define a scope (just like you would do with .NET&#8217;s TransactionScope class).</p>
-<p>The default behavior of <em>Simple Injector</em> is to <strong>not</strong> keep track of instances and to <strong>not</strong> dispose them. The scoped lifestyles on the other hand are the exceptions to this rule. Although most of your services should be registered either as <a class="reference internal" href="#lifestyle-transient"><em>Transient</em></a> or <a class="reference internal" href="#lifestyle-singleton"><em>Singleton</em></a>, scoped lifestyles are especially useful for implementing patterns such as the <a class="reference external" href="http://martinfowler.com/eaaCatalog/unitOfWork.html">Unit of Work</a>.</p>
+<p>The default behavior of <em>Simple Injector</em> is to <strong>not</strong> keep track of instances and to <strong>not</strong> dispose them. The scoped lifestyles on the other hand are the exceptions to this rule. Although most of your services should be registered either as <a class="reference internal" href="#transient"><em>Transient</em></a> or <a class="reference internal" href="#singleton"><em>Singleton</em></a>, scoped lifestyles are especially useful for implementing patterns such as the <a class="reference external" href="http://martinfowler.com/eaaCatalog/unitOfWork.html">Unit of Work</a>.</p>
 </div>
 <div class="section" id="per-web-request">
-<span id="lifestyle-webrequest"></span><span id="lifestyle-perwebrequest"></span><h2>Per Web Request<a class="headerlink" href="#per-web-request" title="Permalink to this headline">¶</a></h2>
+<span id="webrequest"></span><span id="perwebrequest"></span><h2>Per Web Request<a class="headerlink" href="#per-web-request" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 Only one instance will be created by the container per web request and the instance will be disposed when the web request ends (unless specified otherwise).</div>
 <p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Web">ASP.NET Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Web.dll</strong> in the default download here on CodePlex) contains <em>RegisterPerWebRequest</em> extension methods and a <em>WebRequestLifestyle</em> class that enable easy <em>Per Web Request</em> registrations:</p>
@@ -185,7 +185,7 @@ Only one instance will be created by the container per web request and the insta
 <strong>Note</strong>: Be careful to not register any services for disposal that will outlive the web request (such as services registered as singleton), since a service cannot be used once it has been disposed.</div>
 </div>
 <div class="section" id="per-web-api-request">
-<span id="lifestyle-webapirequest"></span><span id="lifestyle-perwebapirequest"></span><h2>Per Web API Request<a class="headerlink" href="#per-web-api-request" title="Permalink to this headline">¶</a></h2>
+<span id="webapirequest"></span><span id="perwebapirequest"></span><h2>Per Web API Request<a class="headerlink" href="#per-web-api-request" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 Only one instance will be created by the container per request in a ASP.NET Web API application and the instance will be disposed when that request ends (unless specified otherwise).</div>
 <p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.WebApi">ASP.NET Web API Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.WebApi.dll</strong> in the default download here on CodePlex) contains <em>RegisterWebApiRequest</em> extension methods and a <em>WebApiRequestLifestyle</em> class that enable easy <em>Per Web API Request</em> registrations:</p>
@@ -221,7 +221,7 @@ Only one instance will be created by the container per request in a ASP.NET Web 
 SynchronizationContext</a>.</p>
 </div>
 <div class="section" id="per-wcf-operation">
-<span id="lifestyle-wcfoperation"></span><span id="lifestyle-perwcfoperation"></span><h2>Per WCF Operation<a class="headerlink" href="#per-wcf-operation" title="Permalink to this headline">¶</a></h2>
+<span id="wcfoperation"></span><span id="perwcfoperation"></span><h2>Per WCF Operation<a class="headerlink" href="#per-wcf-operation" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 Only one instance will be created by the container per call to a WCF operation and the instance will be disposed when the operation ends (unless specified otherwise).</div>
 <p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">WCF Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Wcf.dll</strong> in the default download here on CodePlex) contains <em>RegisterPerWcfOperation</em> extension methods and a <em>WcfOperationLifestyle</em> class that enable easy <em>Per WCF Operation</em> registrations:</p>
@@ -261,7 +261,7 @@ Only one instance will be created by the container per call to a WCF operation a
 <strong>Note</strong>: Be careful to not register any services for disposal that will outlive the WCF operation (such as services registered as singleton), since a service cannot be used once it has been disposed.</div>
 </div>
 <div class="section" id="per-lifetime-scope">
-<span id="lifestyle-lifetimescope"></span><span id="lifestyle-perlifetimescope"></span><h2>Per Lifetime Scope<a class="headerlink" href="#per-lifetime-scope" title="Permalink to this headline">¶</a></h2>
+<span id="lifetimescope"></span><span id="perlifetimescope"></span><h2>Per Lifetime Scope<a class="headerlink" href="#per-lifetime-scope" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 Within a certain (explicitly defined) scope, there will be only one instance of a given service type and the instance will be disposed when the scope ends (unless specified otherwise).</div>
 <p>Lifetime Scoping is supported as an extension package for <em>Simple Injector</em>. It is available as <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Extensions.LifetimeScoping">Lifetime Scoping Extensions NuGet package</a> and is part of the default download on CodePlex as <em>SimpleInjector.Extensions.LifetimeScoping.dll</em>. The extension package adds multiple <em>RegisterLifetimeScope</em> extension method overloads and a <em>LifetimeScopeLifestyle</em> class, which allow to register services with the <strong>Lifetime Scope</strong> lifestyle:</p>
@@ -319,7 +319,7 @@ Within a certain (explicitly defined) scope, there will be only one instance of 
 <strong>Note</strong>: Be careful to not register any services for disposal that will outlive the scope itself (such as services registered as singleton), since a service cannot be used once it has been disposed.</div>
 </div>
 <div class="section" id="per-execution-context-scope">
-<span id="lifestyle-executioncontextscope"></span><span id="lifestyle-perexecutioncontextscope"></span><h2>Per Execution Context Scope<a class="headerlink" href="#per-execution-context-scope" title="Permalink to this headline">¶</a></h2>
+<span id="executioncontextscope"></span><span id="perexecutioncontextscope"></span><h2>Per Execution Context Scope<a class="headerlink" href="#per-execution-context-scope" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends (unless specified otherwise).</div>
 <p>This scope will automatically flow with the logical flow of control of asynchronous methods. This lifestyle is especially suited for client applications that work with the new asynchronous programming model. For Web API there&#8217;s a <cite>separate lifestyle &lt;PerWebAPIRequest&gt;</cite> (which actually uses this Execution Context Scope lifestyle under the covers).</p>
@@ -386,25 +386,25 @@ There will be only one instance of a given service type within a certain (explic
 <strong>Note</strong>: Be careful to not register any services for disposal that will outlive the scope itself (such as services registered as singleton), since a service cannot be used once it has been disposed.</div>
 </div>
 <div class="section" id="per-graph">
-<span id="lifestyle-graph"></span><span id="lifestyle-request"></span><span id="lifestyle-pergraph"></span><span id="lifestyle-perrequest"></span><h2>Per Graph<a class="headerlink" href="#per-graph" title="Permalink to this headline">¶</a></h2>
+<span id="graph"></span><span id="request"></span><span id="pergraph"></span><span id="perrequest"></span><h2>Per Graph<a class="headerlink" href="#per-graph" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 For each explicit call to <em>Container.GetInstance&lt;T&gt;</em> a new instance of the service type will be created, but the instance will be reused within the object graph that gets constructed.</div>
 <p>Compared to <em>Transient</em>, there will be just a single instance per explicit call to the container, while <em>Transient</em> services can have multiple new instances per explicit call to the container. This lifestyle can be simulated by using one of the <cite>Scoped &lt;Scoped&gt;</cite> lifestyles.</p>
 </div>
 <div class="section" id="per-thread">
-<span id="lifestyle-thread"></span><span id="lifestyle-perthread"></span><h2>Per Thread<a class="headerlink" href="#per-thread" title="Permalink to this headline">¶</a></h2>
+<span id="thread"></span><span id="perthread"></span><h2>Per Thread<a class="headerlink" href="#per-thread" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 There will be one instance of the registered service type per thread.</div>
 <p>This lifestyle is deliberately left out of <em>Simple Injector</em> because <a class="reference external" href="https://stackoverflow.com/a/14592419/264697">it is considered to be harmful</a>. Instead of using Per Thread lifestyle, you will usually be better of using one of the <cite>Scoped lifestyles &lt;Scoped&gt;</cite>.</p>
 </div>
 <div class="section" id="per-http-session">
-<span id="lifestyle-perhttpsession"></span><h2>Per HTTP Session<a class="headerlink" href="#per-http-session" title="Permalink to this headline">¶</a></h2>
+<span id="perhttpsession"></span><h2>Per HTTP Session<a class="headerlink" href="#per-http-session" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 There will be one instance of the registered session per (user) session in a ASP.NET web application.</div>
 <p>This lifestyle is deliberately left out of <em>Simple Injector</em> because <a class="reference external" href="https://stackoverflow.com/questions/17702546">it is be used with care</a>. Instead of using Per HTTP Session lifestyle, you will usually be better of by writing a stateless service that can be registered as singleton and let it communicate with the ASP.NET Session cache to handle cached user-specific data.</p>
 </div>
 <div class="section" id="hybrid">
-<span id="lifestyle-hybrid"></span><h2>Hybrid<a class="headerlink" href="#hybrid" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>Hybrid<a class="headerlink" href="#hybrid" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 A hybrid lifestyle is a mix between two or more lifestyles where the the developer defines the context for which the wrapped lifestyles hold.</div>
 <p><em>Simple Injector</em> has no built-in hybrid lifestyles, but has a simple mechanism for defining them:</p>
@@ -418,7 +418,7 @@ A hybrid lifestyle is a mix between two or more lifestyles where the the develop
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ICustomerRepository</span><span class="p">,</span> <span class="n">SqlCustomerRepository</span><span class="p">&gt;(</span><span class="n">hybridLifestyle</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In the example a hybrid lifestyle is defined wrapping the <a class="reference internal" href="#lifestyle-webrequest"><em>Web Request</em></a> lifestyle and the <a class="reference internal" href="#lifestyle-perlifetimescope"><em>Per Lifetime Scope</em></a> lifestyle. The supplied <strong>lifestyleSelector</strong> predicate returns <strong>true</strong> when the container should use the <strong>Web Request</strong> lifestyle and <strong>false</strong> when the <strong>Per Lifetime Scope</strong> lifestyle should be selected.</p>
+<p>In the example a hybrid lifestyle is defined wrapping the <a class="reference internal" href="#webrequest"><em>Web Request</em></a> lifestyle and the <a class="reference internal" href="#perlifetimescope"><em>Per Lifetime Scope</em></a> lifestyle. The supplied <strong>lifestyleSelector</strong> predicate returns <strong>true</strong> when the container should use the <strong>Web Request</strong> lifestyle and <strong>false</strong> when the <strong>Per Lifetime Scope</strong> lifestyle should be selected.</p>
 <p>A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations run outside the context of an <strong>HttpContext</strong> (in a background thread for instance). Please note though that when the lifestyle doesn&#8217;t have to change throughout the lifetime of the application, a hybrid lifestyle is not needed. A normal lifestyle can be registered instead:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">lifestyle</span> <span class="p">=</span> <span class="n">RunsOnWebServer</span> <span class="p">?</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">()</span> <span class="p">:</span> <span class="k">new</span> <span class="n">LifetimeScopeLifestyle</span><span class="p">();</span>
 
@@ -428,8 +428,8 @@ A hybrid lifestyle is a mix between two or more lifestyles where the the develop
 </div>
 </div>
 <div class="section" id="developing-a-custom-lifestyle">
-<span id="lifestyle-customlifestyles"></span><h2>Developing a Custom Lifestyle<a class="headerlink" href="#developing-a-custom-lifestyle" title="Permalink to this headline">¶</a></h2>
-<p>The lifestyles supplied by the framework should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm">Lifestyle</a> and let it return <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm">Custom Lifestyle</a> instances. This however is a lot of work, and a shortcut is available in the form of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_LifeStyle-CreateCustom.htm">Lifestyle.CreateCustom</a>. Please take a look at the example given on the <em>CreateCustom</em> documentation for more information.</p>
+<span id="customlifestyles"></span><h2>Developing a Custom Lifestyle<a class="headerlink" href="#developing-a-custom-lifestyle" title="Permalink to this headline">¶</a></h2>
+<p>The lifestyles supplied by the framework should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm">Lifestyle</a> and let it return <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm">Custom Lifestyle</a> instances. This however is a lot of work, and a shortcut is available in the form of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_CreateCustom.htm">Lifestyle.CreateCustom</a>. Please take a look at the example given on the <em>CreateCustom</em> documentation for more information.</p>
 </div>
 </div>
 

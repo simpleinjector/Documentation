@@ -56,7 +56,7 @@
 <li><a class="reference internal" href="#overriding-parameter-injection-behavior"><em>Overriding Parameter Injection Behavior</em></a></li>
 <li><a class="reference internal" href="#property-injection"><em>Property Injection</em></a></li>
 <li><a class="reference internal" href="#overriding-parameter-injection-behavior"><em>Overriding Parameter Injection Behavior</em></a></li>
-<li><a class="reference internal" href="#overriding-lifestyle-selection-behavior"><em>Overriding Lifestyle Selection Behavior</em></a></li>
+<li><a class="reference internal" href="#overriding-selection-behavior"><em>Overriding Lifestyle Selection Behavior</em></a></li>
 <li><a class="reference internal" href="#intercepting-the-creation-of-types"><em>Intercepting the Creation of Types</em></a></li>
 </ul>
 <div class="section" id="overriding-constructor-resolution-behavior">
@@ -245,7 +245,7 @@
 <p>For more information about how to use this event, please look at the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm">ResolveUnregisteredType event documentation</a> in the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">reference library</a>.</p>
 </div>
 <div class="section" id="overriding-lifestyle-selection-behavior">
-<span id="id5"></span><h2>Overriding Lifestyle Selection Behavior<a class="headerlink" href="#overriding-lifestyle-selection-behavior" title="Permalink to this headline">¶</a></h2>
+<span id="overriding-selection-behavior"></span><h2>Overriding Lifestyle Selection Behavior<a class="headerlink" href="#overriding-lifestyle-selection-behavior" title="Permalink to this headline">¶</a></h2>
 <p>By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the <em>Transient</em> lifestyle. Since <em>Simple Injector 2.6</em>, this behavior can be overridden and this is especially useful in batch-registration scenarios.</p>
 <p>Here are some examples of registration calls that all register types as <em>transient</em>:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">,</span> <span class="n">AspNetUserContext</span><span class="p">&gt;();</span>
@@ -348,7 +348,7 @@
 </div>
 </div>
 <div class="section" id="intercepting-the-creation-of-types">
-<span id="id6"></span><h2>Intercepting the Creation of Types<a class="headerlink" href="#intercepting-the-creation-of-types" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>Intercepting the Creation of Types<a class="headerlink" href="#intercepting-the-creation-of-types" title="Permalink to this headline">¶</a></h2>
 <p>Interception the creation of types allows registrations to be modified. This enables all sorts of advanced scenarios where the creation of a single type or whole object graphs gets altered. Simple Injector contains two events that allow altering the type&#8217;s creation: <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm">ExpressionBuilding</a> and <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm">ExpressionBuilt</a>. Both events are quite similar but are called in different stages of the <a class="reference internal" href="pipeline.html#resolve-pipeline"><em>building process</em></a>.</p>
 <p>The <em>ExpressionBuilding</em> event gets called just after the registrations expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for <a class="reference internal" href="advanced.html#context-based-injection"><em>Context based injection</em></a>.</p>
 <p>The <em>ExpressionBuilt</em> event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time <em>ExpressionBuilding</em> was called, is gone. While <em>ExpressionBuilding</em> is especially suited for changing the relationship between the resolved type and its dependencies, <em>ExpressionBuilt</em> is especially useful for applying decorators or <a class="reference internal" href="advanced.html#interception"><em>applying interceptors</em></a>. Note that Simple Injector has built-in support for <a class="reference internal" href="advanced.html#decorators"><em>applying decorators</em></a> using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm">RegisterDecorator</a> extension methods. These methods internally use the <em>ExpressionBuilt</em> event.</p>

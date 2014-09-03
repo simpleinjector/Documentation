@@ -14,13 +14,13 @@ In general, components should only depend on other components that are configure
 
 The *Diagnostic Services* detect this kind of misconfiguration and report it. The container will be able to compare all built-in lifestyles (and sometimes even custom lifestyles). Here is an overview of the built-in lifestyles ordered by their length:
 
-* :ref:`Transient <LifeStyle-Transient>`
-* :ref:`Lifetime Scope <LifeStyle-PerLifetimeScope>`
-* :ref:`Execution Context Scope <LifeStyle-ExecutionContextScope>`
-* :ref:`WCF Operation <LifeStyle-PerWcfOperation>`
-* :ref:`Web Request <LifeStyle-PerWebRequest>`
-* :ref:`Web API Request <LifeStyle-PerWebAPIRequest>`
-* :ref:`Singleton <LifeStyle-Singleton>`
+* :ref:`Transient <Transient>`
+* :ref:`Lifetime Scope <PerLifetimeScope>`
+* :ref:`Execution Context Scope <ExecutionContextScope>`
+* :ref:`WCF Operation <PerWcfOperation>`
+* :ref:`Web Request <PerWebRequest>`
+* :ref:`Web API Request <PerWebAPIRequest>`
+* :ref:`Singleton <Singleton>`
 
 .. container:: Note
 
@@ -91,7 +91,7 @@ The following example shows how to query the Diagnostic API for Potential Lifeti
 What about Hybrid lifestyles?
 =============================
 
-A :ref:`Hybrid lifestyle <LifeStyle-Hybrid>` is a mix between two or more other lifestyles. Here is an example of a custom lifestyle that mixes the *Transient* and *Singleton* lifestyles together:
+A :ref:`Hybrid lifestyle <Hybrid>` is a mix between two or more other lifestyles. Here is an example of a custom lifestyle that mixes the *Transient* and *Singleton* lifestyles together:
 
 .. code-block:: c#
 

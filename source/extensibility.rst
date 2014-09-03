@@ -6,7 +6,7 @@ Extensibility Points
 * :ref:`Overriding Parameter Injection Behavior <Overriding-Parameter-Injection-Behavior>`
 * :ref:`Property Injection <Property-Injection>`
 * :ref:`Overriding Parameter Injection Behavior <Overriding-Parameter-Injection-Behavior>`
-* :ref:`Overriding Lifestyle Selection Behavior <Overriding-Lifestyle-Selection-Behavior>`
+* :ref:`Overriding Lifestyle Selection Behavior <Overriding-Selection-Behavior>`
 * :ref:`Intercepting the Creation of Types <Intercepting-the-Creation-of-Types>`
 
 .. _Overriding-Constructor-Resolution-Behavior:
@@ -231,7 +231,7 @@ Unregistered type resolution is the ability to get notified by the container whe
 
 For more information about how to use this event, please look at the `ResolveUnregisteredType event documentation <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ in the `reference library <https://simpleinjector.org/ReferenceLibrary/>`_.
 
-.. _Overriding-Lifestyle-Selection-Behavior:
+.. _Overriding-Selection-Behavior:
 
 Overriding Lifestyle Selection Behavior
 =======================================
