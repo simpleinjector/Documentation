@@ -449,7 +449,7 @@ public class MyService {
 </div>
 </div>
 <div class="section" id="verify-the-containers-configuration">
-<span id="verify-configuration"></span><span id="verifying-configuration"></span><h2>Verify the container’s configuration<a class="headerlink" href="#verify-the-containers-configuration" title="Permalink to this headline">¶</a></h2>
+<span id="verify-configuration"></span><h2>Verify the container’s configuration<a class="headerlink" href="#verify-the-containers-configuration" title="Permalink to this headline">¶</a></h2>
 <p>Dependency Injection promotes the concept of programming against abstractions. This makes your code much easier to test, easier to change and more maintainable. However, since the code itself isn&#8217;t responsible for maintaining the dependencies between implementations, the compiler will not be able to verify whether the dependency graph is correct.</p>
 <p>When starting to use a Dependency Injection container, many developers see their application fail when it is deployed in staging or sometimes even production, because of container misconfigurations. This makes developers often conclude that dependency injection is bad, since the dependency graph cannot be verified. This conclusion however, is incorrect. Although it is impossible for the compiler to verify the dependency graph, verifying the dependency graph is still possible and advisable.</p>
 <p><em>Simple Injector</em> contains a <em>Verify()</em> method, that will simply iterate over all registrations and resolve an instance for each registration. Calling this method directly after configuring the container, allows the application to fail during start-up, when the configuration is invalid.</p>

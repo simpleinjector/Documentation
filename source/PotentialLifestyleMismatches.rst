@@ -16,7 +16,7 @@ The *Diagnostic Services* detect this kind of misconfiguration and report it. Th
 
 * :ref:`Transient <Transient>`
 * :ref:`Lifetime Scope <PerLifetimeScope>`
-* :ref:`Execution Context Scope <ExecutionContextScope>`
+* :ref:`Execution Context Scope <PerExecutionContextScope>`
 * :ref:`WCF Operation <PerWcfOperation>`
 * :ref:`Web Request <PerWebRequest>`
 * :ref:`Web API Request <PerWebAPIRequest>`

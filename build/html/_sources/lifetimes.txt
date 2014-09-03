@@ -138,7 +138,6 @@ Both *Per Web Request* and *Per WCF Operation* implement scoping implicitly, whi
 The default behavior of *Simple Injector* is to **not** keep track of instances and to **not** dispose them. The scoped lifestyles on the other hand are the exceptions to this rule. Although most of your services should be registered either as :ref:`Transient <Transient>` or :ref:`Singleton <Singleton>`, scoped lifestyles are especially useful for implementing patterns such as the `Unit of Work <http://martinfowler.com/eaaCatalog/unitOfWork.html>`_.
 
 .. _PerWebRequest:
-.. _WebRequest:
 
 Per Web Request
 ===============
@@ -190,7 +189,6 @@ This ensures that each time a **ServiceImp** is created by the container, it is 
 	**Note**: Be careful to not register any services for disposal that will outlive the web request (such as services registered as singleton), since a service cannot be used once it has been disposed.
 
 .. _PerWebAPIRequest:
-.. _WebAPIRequest:
 
 Per Web API Request
 ===================
@@ -242,7 +240,6 @@ For more information, check out the blog entry of Stephen Toub regarding the `di
 SynchronizationContext <https://vegetarianprogrammer.blogspot.de/2012/12/understanding-synchronizationcontext-in.html>`_.
 
 .. _PerWcfOperation:
-.. _WcfOperation:
 
 Per WCF Operation
 =================
@@ -302,7 +299,6 @@ This ensures that each time a **ServiceImp** is created by the container, it is 
 	**Note**: Be careful to not register any services for disposal that will outlive the WCF operation (such as services registered as singleton), since a service cannot be used once it has been disposed.
 
 .. _PerLifetimeScope:
-.. _LifetimeScope:
 
 Per Lifetime Scope
 ==================
@@ -382,7 +378,6 @@ This ensures that each time a **ServiceImp** is created by the container, it is 
 	**Note**: Be careful to not register any services for disposal that will outlive the scope itself (such as services registered as singleton), since a service cannot be used once it has been disposed.
 
 .. _PerExecutionContextScope:
-.. _ExecutionContextScope:
 
 Per Execution Context Scope
 ===========================
@@ -471,10 +466,7 @@ This ensures that each time a **ServiceImp** is created by the container, it is 
 
 	**Note**: Be careful to not register any services for disposal that will outlive the scope itself (such as services registered as singleton), since a service cannot be used once it has been disposed.
 
-.. _PerRequest:
 .. _PerGraph:
-.. _Request:
-.. _Graph:
 
 Per Graph
 =========
@@ -486,7 +478,6 @@ Per Graph
 Compared to *Transient*, there will be just a single instance per explicit call to the container, while *Transient* services can have multiple new instances per explicit call to the container. This lifestyle can be simulated by using one of the `Scoped <Scoped>` lifestyles.
 
 .. _PerThread:
-.. _Thread:
 
 Per Thread
 ==========
@@ -530,7 +521,7 @@ Hybrid
 	container.Register<IUserRepository, SqlUserRepository>(hybridLifestyle);
 	container.Register<ICustomerRepository, SqlCustomerRepository>(hybridLifestyle);
 
-In the example a hybrid lifestyle is defined wrapping the :ref:`Web Request <WebRequest>` lifestyle and the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle. The supplied **lifestyleSelector** predicate returns **true** when the container should use the **Web Request** lifestyle and **false** when the **Per Lifetime Scope** lifestyle should be selected.
+In the example a hybrid lifestyle is defined wrapping the :ref:`Web Request <PerWebRequest>` lifestyle and the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle. The supplied **lifestyleSelector** predicate returns **true** when the container should use the **Web Request** lifestyle and **false** when the **Per Lifetime Scope** lifestyle should be selected.
 
 A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations run outside the context of an **HttpContext** (in a background thread for instance). Please note though that when the lifestyle doesn't have to change throughout the lifetime of the application, a hybrid lifestyle is not needed. A normal lifestyle can be registered instead:
 

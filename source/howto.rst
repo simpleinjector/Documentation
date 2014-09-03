@@ -481,7 +481,6 @@ The previous example created a *Container* instance that allows overriding. It i
     // Replaces the previous registration
     container.Register<IUserService, RealUserService>();
 
-.. _Verifying-Configuration:
 .. _Verify-Configuration:
 
 Verify the container’s configuration

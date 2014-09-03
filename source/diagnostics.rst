@@ -107,4 +107,4 @@ The *Diagnostic Services* cannot analyze the following:
 
 .. container:: Note
 
-    **Tip**: Try to prevent depending on any framework features listed above because they all prevent you from having a :ref:`verifiable configuration <Verifying-Configuration>` and trustworthy diagnostic results.
+    **Tip**: Try to prevent depending on any framework features listed above because they all prevent you from having a :ref:`verifiable configuration <Verify-Configuration>` and trustworthy diagnostic results.
