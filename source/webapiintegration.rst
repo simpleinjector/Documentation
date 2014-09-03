@@ -48,7 +48,7 @@ With this configuration, ASP.NET Web API will create new **IHttpController** ins
 
 .. container:: Note
 
-    **Note**: For Web API applications the use of the *WebApiRequestLifestyle* is adviced over the *WebRequestLifestyle*. Please take a look at the :ref:`Web API Request Object Lifestyle Management wiki page <WebAPIRequest_vs_WebRequest>` for more information.
+    **Note**: For Web API applications the use of the *WebApiRequestLifestyle* is advised over the *WebRequestLifestyle*. Please take a look at the :ref:`Web API Request Object Lifestyle Management wiki page <WebAPIRequest-vs-WebRequest>` for more information.
 
 Given the configuration above, an actual controller could look like this:
 

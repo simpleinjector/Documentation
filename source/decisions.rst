@@ -90,7 +90,7 @@ Never force users to release what they resolve
 
 The `Register Resolve Release <http://blog.ploeh.dk/2010/09/29/TheRegisterResolveReleasepattern/>`_ (RRR) pattern is a common pattern that DI containers implement. In general terms the pattern describes that you should tell the container how to build each object  graph (Register) during application start-up, ask the container for an object graph (Resolve) at the beginning of a request, and tell the container when you’re done with that object graph (Release) after the request.
 
-Although this pattern applies to Simple Injector, we never force users to have to explicitly release any service once they have finished with it. With Simple Injector your components are automatically released when the web request finishes, or when you dispose of your :ref:`Lifetime Scope <PerLifetimeScope>` or :ref:`Execution Context Scope <PerExecutionContextScope>`. By not forcing users to release what they resolve, we adhere to the following design principles:
+Although this pattern applies to Simple Injector, we never force users to have to explicitly release any service once they have finished with it. With Simple Injector your components are automatically released when the web request finishes, or when you dispose of your :ref:`Lifetime Scope <LifeStyle-PerLifetimeScope>` or :ref:`Execution Context Scope <LifeStyle-PerExecutionContextScope>`. By not forcing users to release what they resolve, we adhere to the following design principles:
 
 * :ref:`Never fail silently <Never-fail-silently>`
 * :ref:`Features should be intuitive <Features-should-be-intuitive>`
@@ -102,7 +102,7 @@ A container that expects the user to release the instances they resolve will fai
 Don’t allow resolving scoped instances outside an active scope
 ==============================================================
 
-When you register a component in Simple Injector with a :ref:`scoped lifestyle <Scoped>`, you can only resolve an instance when there is an active instance of that specified scope. For instance, when you register your *DbContext* per Web Request Lifestyle, resolving that instance on a background thread will fail in Simple Injector. This design is chosen because we want to:
+When you register a component in Simple Injector with a :ref:`scoped lifestyle <LifeStyle-Scoped>`, you can only resolve an instance when there is an active instance of that specified scope. For instance, when you register your *DbContext* per Web Request Lifestyle, resolving that instance on a background thread will fail in Simple Injector. This design is chosen because we want to:
 
 * :ref:`Never fail silently <Never-fail-silently>`
 
@@ -110,7 +110,7 @@ The reason is simple - resolving an instance outside of the context of a scope i
 
 Because there is not a standard logical default for Simple Injector to return when you request an instance outside of the context of an active scope, the right thing to do is throwing an exception. Returning a transient or singleton is a form of failing silently.
 
-That doesn’t mean that you’re lost when you really need the option of per request and transient or singleton, you are required to configure such a scope explicitly by defining a :ref:`Hybrid <Hybrid>` lifestyle. We :ref:`Make simple use cases easy, and complex use cases possible <Make-simple-use-cases-easy>`.
+That doesn’t mean that you’re lost when you really need the option of per request and transient or singleton, you are required to configure such a scope explicitly by defining a :ref:`Hybrid <LifeStyle-Hybrid>` lifestyle. We :ref:`Make simple use cases easy, and complex use cases possible <Make-simple-use-cases-easy>`.
 
 .. _No-property-injection:
 

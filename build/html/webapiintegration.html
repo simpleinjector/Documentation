@@ -89,7 +89,7 @@
 </div>
 <p>With this configuration, ASP.NET Web API will create new <strong>IHttpController</strong> instances through the container. Because controllers are concrete classes, the container will be able to create them without any registration. However, to be able to <a class="reference internal" href="diagnostics.html"><em>diagnose</em></a> and <a class="reference internal" href="howto.html#verify-configuration"><em>verify</em></a> the container&#8217;s configuration, it is important to register all root types explicitly.</p>
 <div class="note container">
-<strong>Note</strong>: For Web API applications the use of the <em>WebApiRequestLifestyle</em> is adviced over the <em>WebRequestLifestyle</em>. Please take a look at the <a class="reference internal" href="lifetimes.html#webapirequest-vs-webrequest"><em>Web API Request Object Lifestyle Management wiki page</em></a> for more information.</div>
+<strong>Note</strong>: For Web API applications the use of the <em>WebApiRequestLifestyle</em> is advised over the <em>WebRequestLifestyle</em>. Please take a look at the <a class="reference internal" href="lifetimes.html#webapirequest-vs-webrequest"><em>Web API Request Object Lifestyle Management wiki page</em></a> for more information.</div>
 <p>Given the configuration above, an actual controller could look like this:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">UserController</span> <span class="p">:</span> <span class="n">ApiController</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">;</span>

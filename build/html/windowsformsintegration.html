@@ -55,7 +55,7 @@
 <h1>Windows Forms Integration Guide<a class="headerlink" href="#windows-forms-integration-guide" title="Permalink to this headline">¶</a></h1>
 <p>Windows Forms was never designed with dependency injection in mind. Although it is possible to use constructor injection on the <strong>Form</strong> classes that are manually created in the <strong>Main</strong> method, code for the <strong>UserControl</strong> instances that are used in our forms is generated and will therefore need a default constructor.</p>
 <p>Instead of doing constructor injection, there are alternatives. The simplest thing is to store the container in the <strong>Program</strong> class and let the default constructors of your form classes request the dependencies it needs..</p>
-<p>The following code snippet is an example of how to register the <em>Simple Injector</em> container in the <strong>Program</strong> class:</p>
+<p>The following code snippet is an example of how to register <em>Simple Injector</em> container in the <strong>Program</strong> class:</p>
 <div class="highlight-c#"><div class="highlight"><pre>using System;
 using System.Windows.Forms;
 using SimpleInjector;

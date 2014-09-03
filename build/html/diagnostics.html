@@ -62,12 +62,12 @@
 </div>
 <div class="section" id="how-to-view-diagnostic-results">
 <h2>How to view diagnostic results<a class="headerlink" href="#how-to-view-diagnostic-results" title="Permalink to this headline">¶</a></h2>
-<p>There are two ways to view the diagnostic results. Diagnostic results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.</p>
-<p>Diagnostic results are available during debugging in Visual Studio after calling <em>Container.Verify()</em>. You simply set a breakpoint after the line that calls  <strong>Verify()</strong> and when the breakpoint hits, you hover over the <strong>Container</strong> instance with the mouse. After the debugger context menu appears for the container variable you can unfold it and see the diagnostic results. This might look like this:</p>
+<p>There are two ways to view the diagnostic results - results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.</p>
+<p>Diagnostic results are available during debugging in Visual Studio after calling <em>Container.Verify()</em>. Set a breakpoint after the line that calls <em>Verify()</em> and when the breakpoint breaks, hover over the <em>Container</em> instance with the mouse. The debugger context menu will appear for the <em>Container</em> variable which you can unfold to view the diagnostic results. This might look like this:</p>
 <img alt="Diagnostics debugger view context menu" src="_images/diagnosticsdebuggerview.png" />
 <p>Another option is to add the <strong>container</strong> variable to the Visual Studio watch window by right clicking on the variable and selecting &#8216;Add Watch&#8217; in the context menu:</p>
 <img alt="Diagnostics debugger view watch window" src="_images/diagnostics2.png" />
-<p>These same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the <em>SimpleInjector.Diagnostics.dll</em>. This dll is part of the core NuGet package. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:</p>
+<p>These same information can be requested programmatically by using the <em>Diagnostic API</em>. The <em>Diagnostic API</em> is located in the <em>SimpleInjector.Diagnostics.dll</em>. This dll is part of the core NuGet package. Interacting with the <em>Diagnostic API</em> is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="na">[TestMethod]</span>
 <span class="k">public</span> <span class="k">void</span> <span class="nf">Container_Always_ContainsNoDiagnosticWarnings</span><span class="p">()</span>
 <span class="p">{</span>
@@ -87,21 +87,21 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: The Diagnostic API is new in <em>Simple Injector v2.4</em>.</div>
+<strong>Note</strong>: The <em>Diagnostic API</em> is new in <em>Simple Injector v2.4</em>.</div>
 </div>
 <div class="section" id="limitations">
 <h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
-<strong>Warning</strong>: Although the container can spot several configuration mistakes, be aware that there will always be ways to make configuration errors that the Diagnostic Services won&#8217;t spot. Wiring your dependencies is a delicate matter and should be done with care. Always follow best practices.</div>
-<p>The <em>Diagnostic Services</em> work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as analyzing constructor arguments) can be analyzed. The container is able to use the following information for analysis:</p>
+<strong>Warning</strong>: Although the <em>Container</em> can spot several configuration mistakes, be aware that there will always be ways to make configuration errors that the <em>Diagnostic Services</em> cannot identify. Wiring your dependencies is a delicate matter and should be done with care. Always follow best practices.</div>
+<p>The <em>Diagnostic Services</em> work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as analyzing constructor arguments) can be analyzed. The <em>Container</em> uses the following information for analysis:</p>
 <ul class="simple">
 <li>Constructor arguments of types that are created by the container (auto-wired types).</li>
-<li>Dependencies added by [registered decorators|Advanced-scenarios#Decorators].</li>
+<li>Dependencies added by <a class="reference internal" href="advanced.html#decorators"><em>Decorators</em></a>.</li>
 <li>Dependencies that are not registered explicitly but are referenced as constructor argument (this included types that got created through unregistered type resolution).</li>
 </ul>
-<p>The analyzer however <strong>won&#8217;t</strong> be able to analyze the following:</p>
+<p>The <em>Diagnostic Services</em> cannot analyze the following:</p>
 <ul class="simple">
-<li>Types that are completely unknown to the container, because they are not registered explicitly and no registered type depends on them. In general you should register all root types (types that are requested directly by calling <em>GetInstance&lt;T&gt;()</em>, such as MVC Controllers) explicitly.</li>
+<li>Types that are completely unknown, because these types are not registered explicitly and no registered type depends on them. In general you should register all root types (types that are requested directly by calling <em>GetInstance&lt;T&gt;()</em>, such as MVC Controllers) explicitly.</li>
 <li>Dependencies added using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> method:</li>
 </ul>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(</span><span class="n">service</span> <span class="p">=&gt;</span>
@@ -122,8 +122,8 @@
 </pre></div>
 </div>
 <ul class="simple">
-<li>Dependencies that got injected using the (legacy) <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_InjectProperties.htm">InjectProperties</a> method will not be spotted as dependencies of the type they are injected into.</li>
-<li>Dependencies that are resolved by requesting them manually from the container, for instance by injecting the <strong>Container</strong> into a constructor and calling <em>container.GetInstance&lt;T&gt;()</em> from within the container:</li>
+<li>Any dependencies that are injected using the (now legacy) <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_InjectProperties.htm">InjectProperties</a> method will not be seen as dependencies of the type they are injected into.</li>
+<li>Dependencies that are resolved by requesting them manually from the <em>Container</em>, for instance by injecting the <em>Container</em> into a class and then calling <em>container.GetInstance&lt;T&gt;()</em> from within that class:</li>
 </ul>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span> <span class="p">:</span> <span class="n">IService</span>
 <span class="p">{</span>
@@ -139,7 +139,7 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Tip</strong>: Try to prevent depending on framework features in the list above, because they prevent you getting a [verifiable configuration|How-to#Verifying_Configuration] and prevent you from getting trustworthy diagnostic results.</div>
+<strong>Tip</strong>: Try to prevent depending on any framework features listed above because they all prevent you from having a <a class="reference internal" href="howto.html#verifying-configuration"><em>verifiable configuration</em></a> and trustworthy diagnostic results.</div>
 </div>
 </div>
 

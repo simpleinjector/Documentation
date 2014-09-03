@@ -4,24 +4,27 @@ Object Lifetime Management
 
 Object Lifetime Management is the concept of controlling the number of instances a configured service will have and the duration of the lifetime of those instances. In other words, it allows you to determine how returned instances are cached. Most IoC frameworks have sophisticated mechanisms for lifestyle management, and *Simple Injector* is no exception with built-in support for the most common lifestyles. The two default lifestyles (transient and singleton) are part of the core library, while other lifestyles can be found within some of the extension and integration packages. The built-in lifestyles will suit about 99% of cases. For anything else custom lifestyles can be used.
 
+.. container:: Note
+
+	**Note**: this documentation is specific for *Simple Injector version 2.5* and up. Look `here <https://simpleinjector.codeplex.com/wikipage?title=ObjectLifestyleManagement&version=59>`_ for documentation specific to lower versions.
 
 Below is a list of the most common lifestyles with code examples of how to configure them using *Simple Injector*:
 
-* :ref:`Transient <_Transient>`
-* :ref:`Singleton <_Singleton>`
-* :ref:`Scoped <_Scoped>`
-* :ref:`Per Web Request <_PerWebRequest>`
-* :ref:`Per Web API Request <_PerWebAPIRequest>`
-* :ref:`Per WCF Operation <_PerWcfOperation>`
-* :ref:`Per Lifetime Scope <_PerLifetimeScope>`
-* :ref:`Per Execution Context Scope (async/await) <_PerExecutionContextScope>`
-* :ref:`Per Graph <_PerGraph>`
-* :ref:`Per Thread <_PerThread>`
-* :ref:`Per HTTP Session <_PerHttpSession>`
-* :ref:`Hybrid <Hybrid>`
-* :ref:`Developing a Custom Lifestyle <_CustomLifestyles>`
+* :ref:`Transient <LifeStyle-Transient>`
+* :ref:`Singleton <LifeStyle-Singleton>`
+* :ref:`Scoped <LifeStyle-Scoped>`
+* :ref:`Per Web Request <LifeStyle-PerWebRequest>`
+* :ref:`Per Web API Request <LifeStyle-PerWebAPIRequest>`
+* :ref:`Per WCF Operation <LifeStyle-PerWcfOperation>`
+* :ref:`Per Lifetime Scope <LifeStyle-PerLifetimeScope>`
+* :ref:`Per Execution Context Scope (async/await) <LifeStyle-PerExecutionContextScope>`
+* :ref:`Per Graph <LifeStyle-PerGraph>`
+* :ref:`Per Thread <LifeStyle-PerThread>`
+* :ref:`Per HTTP Session <LifeStyle-PerHttpSession>`
+* :ref:`Hybrid <LifeStyle-Hybrid>`
+* :ref:`Developing a Custom Lifestyle <LifeStyle-CustomLifestyles>`
 
-.. __Transient:
+.. _LifeStyle-Transient:
 
 Transient
 =========
@@ -67,7 +70,7 @@ When you have a type that you want to be created using automatic constructor inj
 
 The given configuration calls the delegate after the creation of each type that implements **ICommand** and will set the **ExecuteAsynchroniously** property to **true**. This is a powerful mechanism that enables attribute-free property injection.
 
-.. __Singleton:
+.. _LifeStyle-Singleton:
 
 Singleton
 =========
@@ -113,7 +116,7 @@ Alternatively, when needing to register a concrete type as singleton, you can us
 
 Registration for concrete singletons is necessarily, because unregistered concrete types will be treated as transient.
 
-.. __Scoped:
+.. _LifeStyle-Scoped:
 
 Scoped
 ======
@@ -124,18 +127,18 @@ Scoped
 
 *Simple Injector* contains five scoped lifestyles:
 
-* :ref:`Per Web Request <PerWebRequest>`
-* :ref:`Per Web API Request <PerWebAPIRequest>`
-* :ref:`Per WCF Operation <PerWcfOperation>`
-* :ref:`Per Lifetime Scope <PerLifetimeScope>`
-* :ref:`Per Execution Context Scope <PerExecutionContextScope>`
+* :ref:`Per Web Request <LifeStyle-PerWebRequest>`
+* :ref:`Per Web API Request <LifeStyle-PerWebAPIRequest>`
+* :ref:`Per WCF Operation <LifeStyle-PerWcfOperation>`
+* :ref:`Per Lifetime Scope <LifeStyle-PerLifetimeScope>`
+* :ref:`Per Execution Context Scope <LifeStyle-PerExecutionContextScope>`
 
 Both *Per Web Request* and *Per WCF Operation* implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The *Container* does this for you. With the *Per Lifetime Scope* lifestyle on the other hand, you explicitly define a scope (just like you would do with .NET's TransactionScope class).
 
-The default behavior of *Simple Injector* is to **not** keep track of instances and to **not** dispose them. The scoped lifestyles on the other hand are the exceptions to this rule. Although most of your services should be registered either as :ref:`Transient <Transient>` or :ref:`Singleton <Singleton>`, scoped lifestyles are especially useful for implementing patterns such as the `Unit of Work <http://martinfowler.com/eaaCatalog/unitOfWork.html>`_.
+The default behavior of *Simple Injector* is to **not** keep track of instances and to **not** dispose them. The scoped lifestyles on the other hand are the exceptions to this rule. Although most of your services should be registered either as :ref:`Transient <LifeStyle-Transient>` or :ref:`Singleton <LifeStyle-Singleton>`, scoped lifestyles are especially useful for implementing patterns such as the `Unit of Work <http://martinfowler.com/eaaCatalog/unitOfWork.html>`_.
 
-.. __PerWebRequest:
-.. __WebRequest:
+.. _LifeStyle-PerWebRequest:
+.. _LifeStyle-WebRequest:
 
 Per Web Request
 ===============
@@ -186,8 +189,8 @@ This ensures that each time a **ServiceImp** is created by the container, it is 
 
 	**Note**: Be careful to not register any services for disposal that will outlive the web request (such as services registered as singleton), since a service cannot be used once it has been disposed.
 
-.. __PerWebAPIRequest:
-.. __WebAPIRequest:
+.. _LifeStyle-PerWebAPIRequest:
+.. _LifeStyle-WebAPIRequest:
 
 Per Web API Request
 ===================
@@ -219,7 +222,7 @@ In contrast to the default behavior of Simple Injector, these extension methods 
 
 	**Tip**: There's a `Simple Injector Web API Integration Quick Start <https://nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_ NuGet Package available that helps you get started with Simple Injector in Web API applications quickly.
 
-.. __WebAPIRequest_vs_WebRequest:
+.. _WebAPIRequest-vs-WebRequest:
 
 Web API Request lifestyle vs. Web Request lifestyle
 ===================================================
@@ -238,8 +241,8 @@ The recommendation is therefore to use *WebApiRequestLifestyle* for services tha
 For more information, check out the blog entry of Stephen Toub regarding the `difference between ExecutionContext and 
 SynchronizationContext <https://vegetarianprogrammer.blogspot.de/2012/12/understanding-synchronizationcontext-in.html>`_.
 
-.. __PerWcfOperation:
-.. __WcfOperation:
+.. _LifeStyle-PerWcfOperation:
+.. _LifeStyle-WcfOperation:
 
 Per WCF Operation
 =================
@@ -298,8 +301,8 @@ This ensures that each time a **ServiceImp** is created by the container, it is 
 
 	**Note**: Be careful to not register any services for disposal that will outlive the WCF operation (such as services registered as singleton), since a service cannot be used once it has been disposed.
 
-.. __PerLifetimeScope:
-.. __LifetimeScope:
+.. _LifeStyle-PerLifetimeScope:
+.. _LifeStyle-LifetimeScope:
 
 Per Lifetime Scope
 ==================
@@ -378,8 +381,8 @@ This ensures that each time a **ServiceImp** is created by the container, it is 
 
 	**Note**: Be careful to not register any services for disposal that will outlive the scope itself (such as services registered as singleton), since a service cannot be used once it has been disposed.
 
-.. __PerExecutionContextScope:
-.. __ExecutionContextScope:
+.. _LifeStyle-PerExecutionContextScope:
+.. _LifeStyle-ExecutionContextScope:
 
 Per Execution Context Scope
 ===========================
@@ -468,10 +471,10 @@ This ensures that each time a **ServiceImp** is created by the container, it is 
 
 	**Note**: Be careful to not register any services for disposal that will outlive the scope itself (such as services registered as singleton), since a service cannot be used once it has been disposed.
 
-.. __PerRequest:
-.. __PerGraph:
-.. __Request:
-.. __Graph:
+.. _LifeStyle-PerRequest:
+.. _LifeStyle-PerGraph:
+.. _LifeStyle-Request:
+.. _LifeStyle-Graph:
 
 Per Graph
 =========
@@ -482,8 +485,8 @@ Per Graph
 
 Compared to *Transient*, there will be just a single instance per explicit call to the container, while *Transient* services can have multiple new instances per explicit call to the container. This lifestyle can be simulated by using one of the `Scoped <Scoped>` lifestyles.
 
-.. __PerThread:
-.. __Thread:
+.. _LifeStyle-PerThread:
+.. _LifeStyle-Thread:
 
 Per Thread
 ==========
@@ -494,7 +497,7 @@ Per Thread
 
 This lifestyle is deliberately left out of *Simple Injector* because `it is considered to be harmful <https://stackoverflow.com/a/14592419/264697>`_. Instead of using Per Thread lifestyle, you will usually be better of using one of the `Scoped lifestyles <Scoped>`.
 
-.. __PerHttpSession:
+.. _LifeStyle-PerHttpSession:
 
 Per HTTP Session
 ================
@@ -505,7 +508,7 @@ Per HTTP Session
 
 This lifestyle is deliberately left out of *Simple Injector* because `it is be used with care <https://stackoverflow.com/questions/17702546>`_. Instead of using Per HTTP Session lifestyle, you will usually be better of by writing a stateless service that can be registered as singleton and let it communicate with the ASP.NET Session cache to handle cached user-specific data.
 
-.. __Hybrid:
+.. _LifeStyle-Hybrid:
 
 Hybrid
 ======
@@ -527,7 +530,7 @@ Hybrid
 	container.Register<IUserRepository, SqlUserRepository>(hybridLifestyle);
 	container.Register<ICustomerRepository, SqlCustomerRepository>(hybridLifestyle);
 
-In the example a hybrid lifestyle is defined wrapping the :ref:`Web Request <WebRequest>` lifestyle and the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle. The supplied **lifestyleSelector** predicate returns **true** when the container should use the **Web Request** lifestyle and **false** when the **Per Lifetime Scope** lifestyle should be selected.
+In the example a hybrid lifestyle is defined wrapping the :ref:`Web Request <LifeStyle-WebRequest>` lifestyle and the :ref:`Per Lifetime Scope <LifeStyle-PerLifetimeScope>` lifestyle. The supplied **lifestyleSelector** predicate returns **true** when the container should use the **Web Request** lifestyle and **false** when the **Per Lifetime Scope** lifestyle should be selected.
 
 A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations run outside the context of an **HttpContext** (in a background thread for instance). Please note though that when the lifestyle doesn't have to change throughout the lifetime of the application, a hybrid lifestyle is not needed. A normal lifestyle can be registered instead:
 
@@ -538,9 +541,9 @@ A hybrid lifestyle is useful for registrations that need to be able to dynamical
 	container.Register<IUserRepository, SqlUserRepository>(lifestyle);
 	container.Register<ICustomerRepository, SqlCustomerRepository>(lifestyle);
 
-.. __CustomLifestyles:
+.. _LifeStyle-CustomLifestyles:
 
 Developing a Custom Lifestyle
 =============================
 
-The lifestyles supplied by the framework should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from `Lifestyle <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm>`_ and let it return `Custom Lifestyle <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm>`_ instances. This however is a lot of work, and a shortcut is available in the form of the `Lifestyle.CreateCustom <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Lifestyle_CreateCustom.htm>`_. Please take a look at the example given on the *CreateCustom* documentation for more information.
+The lifestyles supplied by the framework should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from `Lifestyle <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm>`_ and let it return `Custom Lifestyle <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm>`_ instances. This however is a lot of work, and a shortcut is available in the form of the `Lifestyle.CreateCustom <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_LifeStyle-CreateCustom.htm>`_. Please take a look at the example given on the *CreateCustom* documentation for more information.
