@@ -26,6 +26,7 @@ Contents:
    decisions
    legal
    contribute
+   appendix
 
 Indices and tables
 ==================

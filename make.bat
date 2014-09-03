@@ -1,5 +1,9 @@
 @ECHO OFF
 
+if "%2" == "all" (
+	del build\html\.buildinfo
+)
+
 REM Command file for Sphinx documentation
 
 if "%SPHINXBUILD%" == "" (

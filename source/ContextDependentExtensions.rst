@@ -1,6 +1,8 @@
-================================
-Adding context dependent injection to Simple Injector
-================================
+============================
+Context Dependent Extensions
+============================
+
+**Adding context dependent injection to Simple Injector.**
 
 The following code snippet adds the ability to add context dependent injection.
 
