@@ -19,7 +19,7 @@ The following platforms are supported:
 
 .. container:: Note
 
-    *Simple Injector* is carefully designed to run in **partial / medium trust**, and it is fast; `blazingly fast <https://simpleinjector.codeplex.com/discussions/326621>`_.
+*Simple Injector* is carefully designed to run in **partial / medium trust**, and it is fast; `blazingly fast <https://simpleinjector.codeplex.com/discussions/326621>`_.
 
 New Diagnostic Services in Simple Injector 2
 ============================================
@@ -42,7 +42,7 @@ The easiest way to get started is by installing  `the available NuGet packages <
 #. Unpack the downloaded `.zip` file;
 #. Add the **SimpleInjector.dll** to your start-up project by right-clicking on a project in the Visual Studio solution explorer and selecting 'Add Reference...'.
 #. Add the **using SimpleInjector;** directive on the top of the code file where you wish to configure the application.
-#. Look at the :doc:`Using <using>` section in the documentation for how to configure and use the *Simple Injector*.
+#. Look at the :doc:`Using <using>` section in the documentation for how to configure and use *Simple Injector*.
 #. Look at the :ref:`QuickStart-More-Information` section to learn more or if you have any questions.
 
 A Quick Example

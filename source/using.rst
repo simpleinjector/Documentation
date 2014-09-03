@@ -4,10 +4,6 @@ Using Simple Injector
 
 This section will walk you through the basics of *Simple Injector*. After reading this section, you will have a good idea how to use *Simple Injector*.
 
-.. container:: Note
-
-    **Note**: this documentation is specific for *Simple Injector version 2.0* and up. Look `here <https://simpleinjector.codeplex.com/wikipage?title=Using the Simple Injector&version=19>`_ for 1.x specific documentation.
-
 .. _Using_Simple_Injector:
 .. _Using-Simple-Injector:
 
