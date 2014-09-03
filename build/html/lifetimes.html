@@ -72,7 +72,8 @@
 </ul>
 <div class="section" id="transient">
 <span id="id1"></span><h2>Transient<a class="headerlink" href="#transient" title="Permalink to this headline">¶</a></h2>
-<p><strong>A new instance of the service type will be created for each request (both for calls to *GetInstance&lt;T&gt;* and instances as part of an object graph).</strong></p>
+<div class="note container">
+A new instance of the service type will be created for each request (both for calls to <em>GetInstance&lt;T&gt;</em> and instances as part of an object graph).</div>
 <p>This example instantiates a new <strong>IService</strong> implementation for each call, while leveraging the power of <a class="reference internal" href="using.html#automatic-constructor-injection"><em>automatic constructor injection</em></a>.</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">RealService</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
 
@@ -102,7 +103,8 @@
 </div>
 <div class="section" id="singleton">
 <span id="id2"></span><h2>Singleton<a class="headerlink" href="#singleton" title="Permalink to this headline">¶</a></h2>
-<p><strong>There will be only one instance of the registered service type during the lifetime of that container instance. Clients will always receive that same instance.</strong></p>
+<div class="note container">
+There will be only one instance of the registered service type during the lifetime of that container instance. Clients will always receive that same instance.</div>
 <p>There are multiple ways to register singletons. The most simple and common way to do this is by specifying both the service type and the implementation as generic type arguments. This allows the implementation type to be constructed using automatic constructor injection:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">RealService</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
 
@@ -134,7 +136,8 @@
 </div>
 <div class="section" id="scoped">
 <span id="id3"></span><h2>Scoped<a class="headerlink" href="#scoped" title="Permalink to this headline">¶</a></h2>
-<p><strong>For every request within an implicitly or explicitly defined scope, a single instance of the service will be returned and that instance will (optionally) be disposed when the scope ends.</strong></p>
+<div class="note container">
+For every request within an implicitly or explicitly defined scope, a single instance of the service will be returned and that instance will (optionally) be disposed when the scope ends.</div>
 <p><em>Simple Injector</em> contains five scoped lifestyles:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#perwebrequest"><em>Per Web Request</em></a></li>
@@ -148,7 +151,8 @@
 </div>
 <div class="section" id="per-web-request">
 <span id="webrequest"></span><span id="perwebrequest"></span><h2>Per Web Request<a class="headerlink" href="#per-web-request" title="Permalink to this headline">¶</a></h2>
-<p><strong>Only one instance will be created by the container per web request and the instance will be disposed when the web request ends (unless specified otherwise).</strong></p>
+<div class="note container">
+Only one instance will be created by the container per web request and the instance will be disposed when the web request ends (unless specified otherwise).</div>
 <p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Web">ASP.NET Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Web.dll</strong> in the default download here on CodePlex) contains <em>RegisterPerWebRequest</em> extension methods and a <em>WebRequestLifestyle</em> class that enable easy <em>Per Web Request</em> registrations:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWebRequest</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWebRequest</span><span class="p">&lt;</span><span class="n">IOrderRepository</span><span class="p">,</span> <span class="n">SqlOrderRepository</span><span class="p">&gt;();</span>
@@ -182,7 +186,8 @@
 </div>
 <div class="section" id="per-web-api-request">
 <span id="webapirequest"></span><span id="perwebapirequest"></span><h2>Per Web API Request<a class="headerlink" href="#per-web-api-request" title="Permalink to this headline">¶</a></h2>
-<p><strong>Only one instance will be created by the container per request in a ASP.NET Web API application and the instance will be disposed when that request ends (unless specified otherwise).</strong></p>
+<div class="note container">
+Only one instance will be created by the container per request in a ASP.NET Web API application and the instance will be disposed when that request ends (unless specified otherwise).</div>
 <p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.WebApi">ASP.NET Web API Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.WebApi.dll</strong> in the default download here on CodePlex) contains <em>RegisterWebApiRequest</em> extension methods and a <em>WebApiRequestLifestyle</em> class that enable easy <em>Per Web API Request</em> registrations:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiRequest</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiRequest</span><span class="p">&lt;</span><span class="n">IOrderRepository</span><span class="p">,</span> <span class="n">SqlOrderRepository</span><span class="p">&gt;();</span>
@@ -217,7 +222,8 @@ SynchronizationContext</a>.</p>
 </div>
 <div class="section" id="per-wcf-operation">
 <span id="wcfoperation"></span><span id="perwcfoperation"></span><h2>Per WCF Operation<a class="headerlink" href="#per-wcf-operation" title="Permalink to this headline">¶</a></h2>
-<p><strong>Only one instance will be created by the container per call to a WCF operation and the instance will be disposed when the operation ends (unless specified otherwise).</strong></p>
+<div class="note container">
+Only one instance will be created by the container per call to a WCF operation and the instance will be disposed when the operation ends (unless specified otherwise).</div>
 <p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">WCF Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Wcf.dll</strong> in the default download here on CodePlex) contains <em>RegisterPerWcfOperation</em> extension methods and a <em>WcfOperationLifestyle</em> class that enable easy <em>Per WCF Operation</em> registrations:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IOrderRepository</span><span class="p">,</span> <span class="n">SqlOrderRepository</span><span class="p">&gt;();</span>
@@ -256,7 +262,8 @@ SynchronizationContext</a>.</p>
 </div>
 <div class="section" id="per-lifetime-scope">
 <span id="lifetimescope"></span><span id="perlifetimescope"></span><h2>Per Lifetime Scope<a class="headerlink" href="#per-lifetime-scope" title="Permalink to this headline">¶</a></h2>
-<p><strong>Within a certain (explicitly defined) scope, there will be only one instance of a given service type and the instance will be disposed when the scope ends (unless specified otherwise).</strong></p>
+<div class="note container">
+Within a certain (explicitly defined) scope, there will be only one instance of a given service type and the instance will be disposed when the scope ends (unless specified otherwise).</div>
 <p>Lifetime Scoping is supported as an extension package for <em>Simple Injector</em>. It is available as <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Extensions.LifetimeScoping">Lifetime Scoping Extensions NuGet package</a> and is part of the default download on CodePlex as <em>SimpleInjector.Extensions.LifetimeScoping.dll</em>. The extension package adds multiple <em>RegisterLifetimeScope</em> extension method overloads and a <em>LifetimeScopeLifestyle</em> class, which allow to register services with the <strong>Lifetime Scope</strong> lifestyle:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterLifetimeScope</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;();</span>
 
@@ -313,7 +320,8 @@ SynchronizationContext</a>.</p>
 </div>
 <div class="section" id="per-execution-context-scope">
 <span id="executioncontextscope"></span><span id="perexecutioncontextscope"></span><h2>Per Execution Context Scope<a class="headerlink" href="#per-execution-context-scope" title="Permalink to this headline">¶</a></h2>
-<p><strong>There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends (unless specified otherwise).</strong></p>
+<div class="note container">
+There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends (unless specified otherwise).</div>
 <p>This scope will automatically flow with the logical flow of control of asynchronous methods. This lifestyle is especially suited for client applications that work with the new asynchronous programming model. For Web API there&#8217;s a <cite>separate lifestyle &lt;PerWebAPIRequest&gt;</cite> (which actually uses this Execution Context Scope lifestyle under the covers).</p>
 <p>Execution Context Scoping is an extension package for <em>Simple Injector</em>. It is available as <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Extensions.ExecutionContextScoping">Execution Context Extensions NuGet package</a> and is part of the default download on CodePlex as <em>SimpleInjector.Extensions.ExecutionContextScoping.dll</em>. The extension package adds multiple <em>RegisterExecutionContextScope</em> extension method overloads and a <em>ExecutionContextScopeLifestyle</em> class, which allow to register services with the <strong>Execution Context Scope</strong> lifestyle:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterExecutionContextScope</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;();</span>
@@ -379,22 +387,26 @@ SynchronizationContext</a>.</p>
 </div>
 <div class="section" id="per-graph">
 <span id="graph"></span><span id="request"></span><span id="pergraph"></span><span id="perrequest"></span><h2>Per Graph<a class="headerlink" href="#per-graph" title="Permalink to this headline">¶</a></h2>
-<p><strong>For each explicit call to *Container.GetInstance&lt;T&gt;* a new instance of the service type will be created, but the instance will be reused within the object graph that gets constructed.</strong></p>
+<div class="note container">
+For each explicit call to <em>Container.GetInstance&lt;T&gt;</em> a new instance of the service type will be created, but the instance will be reused within the object graph that gets constructed.</div>
 <p>Compared to <em>Transient</em>, there will be just a single instance per explicit call to the container, while <em>Transient</em> services can have multiple new instances per explicit call to the container. This lifestyle can be simulated by using one of the <cite>Scoped &lt;Scoped&gt;</cite> lifestyles.</p>
 </div>
 <div class="section" id="per-thread">
 <span id="thread"></span><span id="perthread"></span><h2>Per Thread<a class="headerlink" href="#per-thread" title="Permalink to this headline">¶</a></h2>
-<p><strong>There will be one instance of the registered service type per thread.</strong></p>
+<div class="note container">
+There will be one instance of the registered service type per thread.</div>
 <p>This lifestyle is deliberately left out of <em>Simple Injector</em> because <a class="reference external" href="https://stackoverflow.com/a/14592419/264697">it is considered to be harmful</a>. Instead of using Per Thread lifestyle, you will usually be better of using one of the <cite>Scoped lifestyles &lt;Scoped&gt;</cite>.</p>
 </div>
 <div class="section" id="per-http-session">
 <span id="perhttpsession"></span><h2>Per HTTP Session<a class="headerlink" href="#per-http-session" title="Permalink to this headline">¶</a></h2>
-<p><strong>There will be one instance of the registered session per (user) session in a ASP.NET web application.</strong></p>
+<div class="note container">
+There will be one instance of the registered session per (user) session in a ASP.NET web application.</div>
 <p>This lifestyle is deliberately left out of <em>Simple Injector</em> because <a class="reference external" href="https://stackoverflow.com/questions/17702546">it is be used with care</a>. Instead of using Per HTTP Session lifestyle, you will usually be better of by writing a stateless service that can be registered as singleton and let it communicate with the ASP.NET Session cache to handle cached user-specific data.</p>
 </div>
 <div class="section" id="hybrid">
 <span id="id4"></span><h2>Hybrid<a class="headerlink" href="#hybrid" title="Permalink to this headline">¶</a></h2>
-<p><strong>A hybrid lifestyle is a mix between two or more lifestyles where the the developer defines the context for which the wrapped lifestyles hold.</strong></p>
+<div class="note container">
+A hybrid lifestyle is a mix between two or more lifestyles where the the developer defines the context for which the wrapped lifestyles hold.</div>
 <p><em>Simple Injector</em> has no built-in hybrid lifestyles, but has a simple mechanism for defining them:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">hybridLifestyle</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateHybrid</span><span class="p">(</span>
     <span class="n">lifestyleSelector</span><span class="p">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span> <span class="p">!=</span> <span class="k">null</span><span class="p">,</span>
@@ -493,7 +505,7 @@ SynchronizationContext</a>.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2014, Simple Injector Contributors.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
