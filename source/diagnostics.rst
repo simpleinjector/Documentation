@@ -105,14 +105,9 @@ Supported Warnings
 ==================
 
 .. toctree::
-   :hidden:
+    :titlesonly:
 
-   PotentialLifestyleMismatches
-   ShortCircuitedDependencies
-   PotentialSingleResponsibilityViolations
-   UnregisteredTypes
-
-* :doc:`Potential Lifestyle Mismatches <PotentialLifestyleMismatches>`
-* :doc:`Short Circuited Dependencies <ShortCircuitedDependencies>`
-* :doc:`Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>`
-* :doc:`Unregistered Types <UnregisteredTypes>`
+    Potential Lifestyle Mismatches <PotentialLifestyleMismatches>
+    Short Circuited Dependencies <ShortCircuitedDependencies>
+    Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
+    Unregistered Types <UnregisteredTypes>
