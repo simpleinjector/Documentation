@@ -2,15 +2,7 @@
 Diagnostic Services
 ===================
 
-The *Diagnostic Services* allow you to analyze the container's configuration to search for common configuration mistakes and supports the following types of warnings:
-
-.. toctree::
-    :maxdepth: 1
-
-    Potential Lifestyle Mismatches <PotentialLifestyleMismatches>
-    Short Circuited Dependencies <ShortCircuitedDependencies>
-    Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
-    Unregistered Types <UnregisteredTypes>
+The *Diagnostic Services* allow you to analyze the container's configuration to search for common configuration mistakes.
 
 How to view diagnostic results
 ==============================
@@ -108,3 +100,16 @@ The *Diagnostic Services* cannot analyze the following:
 .. container:: Note
 
     **Tip**: Try to prevent depending on any framework features listed above because they all prevent you from having a :ref:`verifiable configuration <Verify-Configuration>` and trustworthy diagnostic results.
+
+Supported Warnings
+==================
+
+The *Diagnostic Services* currently supports the following types of warnings:
+
+.. toctree::
+    :maxdepth: 1
+
+    Potential Lifestyle Mismatches <PotentialLifestyleMismatches>
+    Short Circuited Dependencies <ShortCircuitedDependencies>
+    Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
+    Unregistered Types <UnregisteredTypes>    
