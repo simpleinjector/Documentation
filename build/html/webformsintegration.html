@@ -1,222 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>ASP.NET Web Forms Integration Guide &mdash; Simple Injector 2 documentation</title>
-  
-
-  
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  
-  
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
-        <link rel="up" title="Integration Guide" href="integration.html"/>
-        <link rel="next" title="Windows Forms Integration Guide" href="windowsformsintegration.html"/>
-        <link rel="prev" title="ASP.NET Web API Integration Guide" href="webapiintegration.html"/> 
-
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
-
-</head>
-
-<body class="wy-body-for-nav" role="document">
-
-  <div class="wy-grid-for-nav">
-
+    <title>ASP.NET Web Forms Integration Guide &mdash; Simple Injector 2 documentation</title>
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        <a href="index.html" class="fa fa-home"> Simple Injector</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-      </div>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html" />
+    <link rel="up" title="Integration Guide" href="integration.html" />
+    <link rel="next" title="Windows Forms Integration Guide" href="windowsformsintegration.html" />
+    <link rel="prev" title="ASP.NET Web API Integration Guide" href="webapiintegration.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="windowsformsintegration.html" title="Windows Forms Integration Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="webapiintegration.html" title="ASP.NET Web API Integration Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" accesskey="U">Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
-        
-            <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#new-diagnostic-services-in-simple-injector-2">New Diagnostic Services in Simple Injector 2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-started">Getting started</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#a-quick-example">A Quick Example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#more-information">More information</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="using.html">Using Simple Injector</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="using.html#resolving-instances">Resolving instances</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using.html#configuring-simple-injector">Configuring Simple Injector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using.html#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using.html#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using.html#more-information">More information</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="lifetimes.html">Object Lifetime Management</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#transient">Transient</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#singleton">Singleton</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#scoped">Scoped</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-web-request">Per Web Request</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-web-api-request">Per Web API Request</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope">Per Execution Context Scope</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-thread">Per Thread</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-http-session">Per HTTP Session</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#hybrid">Hybrid</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#developing-a-custom-lifestyle">Developing a Custom Lifestyle</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#register-factory-delegates">Register factory delegates</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-instances-by-key">Resolve instances by key</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-containers-configuration">Verify the container’s configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Scenarios</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#generics">Generics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#batch-automatic-registration">Batch / Automatic registration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#registration-of-open-generic-types">Registration of open generic types</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#unregistered-type-resolution">Unregistered type resolution</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#context-based-injection">Context based injection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#decorators">Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#interception">Interception</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#property-injection">Property injection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#covariance-and-contravariance">Covariance and Contravariance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#registering-plugins-dynamically">Registering plugins dynamically</a></li>
-</ul>
-</li>
-<li class="toctree-l1 current"><a class="reference internal" href="integration.html">Integration Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">    ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#property-injection">Property Injection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#resolving-unregistered-types">Resolving Unregistered Types</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline.html#registration-pipeline">Registration Pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline.html#resolve-pipeline">Resolve Pipeline</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="principles.html">Design Principles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="principles.html#make-simple-use-cases-easy-make-complex-use-cases-possible">Make simple use cases easy, make complex use cases possible</a></li>
-<li class="toctree-l2"><a class="reference internal" href="principles.html#push-developers-into-best-practices">Push developers into best practices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="principles.html#fast-by-default">Fast by default</a></li>
-<li class="toctree-l2"><a class="reference internal" href="principles.html#don-t-force-vendor-lock-in">Don&#8217;t force vendor lock-in</a></li>
-<li class="toctree-l2"><a class="reference internal" href="principles.html#never-fail-silently">Never fail silently</a></li>
-<li class="toctree-l2"><a class="reference internal" href="principles.html#features-should-be-intuitive">Features should be intuitive</a></li>
-<li class="toctree-l2"><a class="reference internal" href="principles.html#communicate-errors-clearly-and-describe-how-to-solve-them">Communicate errors clearly and describe how to solve them</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="decisions.html">Design Decisions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#the-container-is-locked-after-the-first-call-to-resolve">The container is locked after the first call to resolve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#dont-allow-resolving-scoped-instances-outside-an-active-scope">Don’t allow resolving scoped instances outside an active scope</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="legal.html#simple-injector-license">Simple Injector License</a></li>
-<li class="toctree-l2"><a class="reference internal" href="legal.html#contributions">Contributions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="legal.html#simple-injector-trademark-policy">Simple Injector Trademark Policy</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
-<li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-</ul>
-</li>
-</ul>
-
-        
-      </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Simple Injector</a>
-      </nav>
-
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-          <li><a href="integration.html">Integration Guide</a> &raquo;</li>
-      
-    <li>ASP.NET Web Forms Integration Guide</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          <a href="_sources/webformsintegration.txt" rel="nofollow"> View page source</a>
-        
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
             
   <div class="section" id="asp-net-web-forms-integration-guide">
 <h1>ASP.NET Web Forms Integration Guide<a class="headerlink" href="#asp-net-web-forms-integration-guide" title="Permalink to this headline">¶</a></h1>
@@ -335,67 +168,57 @@
 
 
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="windowsformsintegration.html" class="btn btn-neutral float-right" title="Windows Forms Integration Guide"/>Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="webapiintegration.html" class="btn btn-neutral" title="ASP.NET Web API Integration Guide"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2014, Simple Injector Contributors.
-    </p>
-  </div>
-
-  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
-</footer>
         </div>
       </div>
-
-    </section>
-
-  </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'2',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
-      });
-  </script>
-   
-
-</body>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="webapiintegration.html"
+                        title="previous chapter">ASP.NET Web API Integration Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="windowsformsintegration.html"
+                        title="next chapter">Windows Forms Integration Guide</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/webformsintegration.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="windowsformsintegration.html" title="Windows Forms Integration Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="webapiintegration.html" title="ASP.NET Web API Integration Guide"
+             >previous</a> |</li>
+        <li><a href="index.html">Simple Injector 2 documentation</a> &raquo;</li>
+          <li><a href="integration.html" >Integration Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Simple Injector Contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
 </html>
