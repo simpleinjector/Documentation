@@ -51,15 +51,7 @@
             
   <div class="section" id="diagnostic-services">
 <h1>Diagnostic Services<a class="headerlink" href="#diagnostic-services" title="Permalink to this headline">¶</a></h1>
-<p>The <em>Diagnostic Services</em> allow you to analyze the container&#8217;s configuration to search for common configuration mistakes and supports the following types of warnings:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="PotentialLifestyleMismatches.html">Potential Lifestyle Mismatches</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ShortCircuitedDependencies.html">Short Circuited Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="PotentialSingleResponsibilityViolations.html">Potential Single Responsibility Violations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="UnregisteredTypes.html">Unregistered Types</a></li>
-</ul>
-</div>
+<p>The <em>Diagnostic Services</em> allow you to analyze the container&#8217;s configuration to search for common configuration mistakes.</p>
 <div class="section" id="how-to-view-diagnostic-results">
 <h2>How to view diagnostic results<a class="headerlink" href="#how-to-view-diagnostic-results" title="Permalink to this headline">¶</a></h2>
 <p>There are two ways to view the diagnostic results - results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.</p>
@@ -141,6 +133,17 @@
 <div class="note container">
 <strong>Tip</strong>: Try to prevent depending on any framework features listed above because they all prevent you from having a <a class="reference internal" href="howto.html#verify-configuration"><em>verifiable configuration</em></a> and trustworthy diagnostic results.</div>
 </div>
+<div class="section" id="supported-warnings">
+<h2>Supported Warnings<a class="headerlink" href="#supported-warnings" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+<ul class="simple">
+<li><a class="reference internal" href="PotentialLifestyleMismatches.html"><em>Potential Lifestyle Mismatches</em></a></li>
+<li><a class="reference internal" href="ShortCircuitedDependencies.html"><em>Short Circuited Dependencies</em></a></li>
+<li><a class="reference internal" href="PotentialSingleResponsibilityViolations.html"><em>Potential Single Responsibility Violations</em></a></li>
+<li><a class="reference internal" href="UnregisteredTypes.html"><em>Unregistered Types</em></a></li>
+</ul>
+</div>
 </div>
 
 
@@ -154,6 +157,7 @@
 <li><a class="reference internal" href="#">Diagnostic Services</a><ul>
 <li><a class="reference internal" href="#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
 <li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#supported-warnings">Supported Warnings</a></li>
 </ul>
 </li>
 </ul>
@@ -203,7 +207,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, Simple Injector Contributors.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

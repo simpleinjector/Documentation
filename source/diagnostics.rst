@@ -104,12 +104,15 @@ The *Diagnostic Services* cannot analyze the following:
 Supported Warnings
 ==================
 
-The *Diagnostic Services* currently supports the following types of warnings:
-
 .. toctree::
-    :maxdepth: 1
+   :hidden:
 
-    Potential Lifestyle Mismatches <PotentialLifestyleMismatches>
-    Short Circuited Dependencies <ShortCircuitedDependencies>
-    Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
-    Unregistered Types <UnregisteredTypes>    
+   PotentialLifestyleMismatches
+   ShortCircuitedDependencies
+   PotentialSingleResponsibilityViolations
+   UnregisteredTypes
+
+* :doc:`Potential Lifestyle Mismatches <PotentialLifestyleMismatches>`
+* :doc:`Short Circuited Dependencies <ShortCircuitedDependencies>`
+* :doc:`Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>`
+* :doc:`Unregistered Types <UnregisteredTypes>`
