@@ -4,16 +4,16 @@ Collection Registration Extension
 
 **Allowing the Simple Injector to resolve arrays and other list types.**
 
-The default behavior of *Simple Injector* is to resolve collections of types through the *IEnumerable<T>* interface. Resolving a set of elements using other collection types is possible by registrering a mapping on a per type basis, such as can be seen the following example:
+The default behavior of Simple Injector is to resolve collections of types through the *IEnumerable<T>* interface. Resolving a set of elements using other collection types is possible by registrering a mapping on a per type basis, such as can be seen the following example:
 
 .. code-block:: c#
 
     container.RegisterAll<IFilter>(
-        typeof(SqlFilter), typeof(XssFilter), typeof(SmartFilter));
+        typeof(SqlFilter), 
+        typeof(XssFilter), 
+        typeof(SmartFilter));
 
-    container.Register<IFilter[]>(
-    
-        () => container.GetAllInstances<IFilter>().ToArray());
+    container.Register<IFilter[]>(() => container.GetAllInstances<IFilter>().ToArray());
 
 When having many collections of types that need to be resolved in this way, the registration can be come cumbersome. Alternatively you can revert to unregistered type resolution, as can be seen in the following example:
 

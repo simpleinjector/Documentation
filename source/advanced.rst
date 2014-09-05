@@ -6,7 +6,7 @@ Although its name may not imply it, Simple Injector is capable of handling many 
 
 .. container:: Note
 
-    **Note**: After including the *SimpleInjector.dll* in your project, you will have to add the *SimpleInjector.Extensions* namespace to your code to be able to use the majority of features that are presented in this wiki page.
+    **Note**: After including the *SimpleInjector.dll* in your project, you will have to add the **SimpleInjector.Extensions** namespace to your code to be able to use the majority of features that are presented in this wiki page.
 
 This page discusses the following subjects:
 
@@ -28,7 +28,7 @@ Generics
 
 .NET has superior support for generic programming and Simple Injector has been designed to make full use of it. Simple Injector arguably has the most advanced support for generics of all DI libraries. Simple Injector can handle any generic type and implementing patterns such as decorator, mediator, strategy and chain of responsibility is simple.
 
-Aspect Oriented Programming is easy with Simple Injector's advanced support for generics. Generic decorators with generic type constraints can be registered with a single line of code and can be applied conditionally using predicates. Simple Injector can handle open generic types, closed generic types and partially-closed generic types. The sections below provides more detail on Simple Injector's support for generic typing:
+`Aspect Oriented Programming <https://en.wikipedia.org/wiki/Aspect-oriented_programming>`_ is easy with Simple Injector's advanced support for generics. Generic decorators with generic type constraints can be registered with a single line of code and can be applied conditionally using predicates. Simple Injector can handle open generic types, closed generic types and partially-closed generic types. The sections below provides more detail on Simple Injector's support for generic typing:
 
 * :ref:`Batch registration of non-generic types based on an open-generic interface<Batch-Registration>`
 * :ref:`Registering open generic types and working with partially-closed types <Registration-Of-Open-Generic-Types>`
@@ -230,9 +230,11 @@ There are some instance where want to have a fallback implementation in the case
 .. code-block:: c#
 
     container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadOnlyRepository<>),
-        c => typeof(IReadOnlyEntity).IsAssignableFrom(c.ServiceType.GetGenericArguments().Single()));
+        c => typeof(IReadOnlyEntity).IsAssignableFrom(
+            c.ServiceType.GetGenericArguments().Single()));
 
-    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>), c => !c.Handled);
+    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>),
+        c => !c.Handled);
 
 In the case where the open generic implementation contains generic type constraints Simple Injector will automatically apply the type conditionally based on its generic type constraints:
 
@@ -241,7 +243,8 @@ In the case where the open generic implementation contains generic type constrai
     class ReadOnlyRepository<T> : IRepository<T> where T : IReadOnlyEntity { }
 
     container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadOnlyRepository<>));
-    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>), c => !c.Handled);
+    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>),
+        c => !c.Handled);
 
 The final option in Simple Injector is to supply the **RegisterOpenGeneric** method with a partially-closed generic type:
 
@@ -352,7 +355,7 @@ Take the plausible scenario where we want to validate all commands that get exec
         }
     }
 
-The *ValidationCommandHandlerDecorator<TCommand>* class is an implementation of the **ICommandHandler<TCommand>** interface, but it also wraps / decorates an *ICommandHandler<TCommand>* instance. Instead of injecting the real implementation directly into a consumer, we can (let Simple Injector) inject a validator decorator that wraps the real implementation.
+The *ValidationCommandHandlerDecorator<TCommand>* class is an implementation of the *ICommandHandler<TCommand>* interface, but it also wraps / decorates an *ICommandHandler<TCommand>* instance. Instead of injecting the real implementation directly into a consumer, we can (let Simple Injector) inject a validator decorator that wraps the real implementation.
 
 The *ValidationCommandHandlerDecorator<TCommand>* depends on an *IValidator* interface. An implementation that used Microsoft Data Annotations might look like this:
 
@@ -427,7 +430,7 @@ The given context contains several properties that allows you to analyze whether
 
 .. _Decorators-with-Func-factories:
 
-Decorators with Func<T> factories
+Decorators with Func<T> decoratee factories
 ---------------------------------
 
 In certain scenarios, it is needed to postpone building part of the object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be :ref:`executed on a different thread <Multi-Threaded-Applications>`, or when instances need to be created in a certain :ref:`scope <Scoped>` or (security) context.
@@ -669,7 +672,7 @@ The current example doesn't add much compared to simply using a decorator. When 
 
 .. container:: Note
 
-    **Note**: the interfaces in the given :doc:`Interception extensions <InterceptionExtensions>` code snippets are a simplified version of the Castle Project interception facility. If you need to create lots different interceptors, you might benefit from using the interception abilities of the Castle Project. Also please note that the given snippets use dynamic proxies to do the interception, while Castle uses lightweight code generation (LCG). LCG allows much better performance than the use of dynamic proxies. Please see `this stackoverflow q/a <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_ for an Castle implementation.
+    **Note**: the interfaces in the given :doc:`Interception extensions <InterceptionExtensions>` code snippets are a simplified version of the Castle Project interception facility. If you need to create lots different interceptors, you might benefit from using the interception abilities of the Castle Project. Also please note that the given snippets use dynamic proxies to do the interception, while Castle uses lightweight code generation (LCG). LCG allows much better performance than the use of dynamic proxies. Please see `this stackoverflow q/a <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_ for an implementation for Castle Windsor.
 
 .. container:: Note
 
@@ -735,8 +738,7 @@ The previous class can be registered as follows:
 .. code-block:: c#
 
     var container = new Container();
-    container.Options.PropertySelectionBehavior = 
-        new ImportPropertySelectionBehavior();
+    container.Options.PropertySelectionBehavior = new ImportPropertySelectionBehavior();
 
 This enables explicit property injection on all properties that are marked with the [Import] attribute and an exception will be thrown when the property cannot be injected for whatever reason.
 

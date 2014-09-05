@@ -37,7 +37,7 @@ Imagine the scenario where you want to replace some *FileLogger* component for a
 
 The description above is a simple to grasp example of dealing with the runtime replacement of services. But adding new registrations can also cause things to go wrong in unexpected ways. A simple example would be where the container has previously supplied the object graph with a default implementation resolved through unregistered type resolution.
 
-Problems with thread-safety can easily emerge when the user changes a registration during a web request. If the container allowed such registration changes during a request, other requests could directly be impacted by those changes (since in general there should only be one Container instance per AppDomain). Depending on things such as the lifestyle of the registration; the use of factories and how the object graph is structured, it could be a real possibility that another request gets both the old and the new registration. Take for instance a transient registration that is replaced with a different one. If this is done while an object graph for a different thread is being resolved while the service is injected into multiple points within the graph - the graph would contain different instance of that abstraction with different lifetimes at the same time in the same request – and this is bad.
+Problems with thread-safety can easily emerge when the user changes a registration during a web request. If the container allowed such registration changes during a request, other requests could directly be impacted by those changes (since in general there should only be one *Container* instance per AppDomain). Depending on things such as the lifestyle of the registration; the use of factories and how the object graph is structured, it could be a real possibility that another request gets both the old and the new registration. Take for instance a transient registration that is replaced with a different one. If this is done while an object graph for a different thread is being resolved while the service is injected into multiple points within the graph - the graph would contain different instance of that abstraction with different lifetimes at the same time in the same request – and this is bad.
 
 Since we consider it good practice to lock the container, we were able to greatly optimize performance of the container and adhere to the :ref:`Fast by default <Fast-by-default>` principle.
 
@@ -69,7 +69,11 @@ Instead of injecting an *IEnumerable* a consumer should instead depend on a sing
 
 .. code-block:: c#
 
-	container.RegisterAll<ILogger>(typeof(FileLogger), typeof(SqlLogger), typeof(EventLogLogger));
+    container.RegisterAll<ILogger>(
+        typeof(FileLogger), 
+        typeof(SqlLogger),
+        typeof(EventLogLogger));
+    
 	container.Register<ILogger, CompositeLogger>();
 
 .. _No-support-for-XML:
@@ -106,7 +110,7 @@ When you register a component in Simple Injector with a :ref:`scoped lifestyle <
 
 * :ref:`Never fail silently <Never-fail-silently>`
 
-The reason is simple - resolving an instance outside of the context of a scope is a bug. The container could decide to return a singleton or transient for you (as other DI libraries do), but neither of these cases is usually what you would expect. Take a look at the DbContext example for instance, the class is normally registered as Per Web Request lifestyle for a reason, probably because you want to reuse one instance for the whole request. Not reusing an instance, but instead injecting a new instance (transient) would most likely not give the expected results. Returning a single instance (singleton) when outside of a scope, i.e. reusing a single DbContext over multiple requests/threads will sooner or later lead you down the path of failure.
+The reason is simple - resolving an instance outside of the context of a scope is a bug. The container could decide to return a singleton or transient for you (as other DI libraries do), but neither of these cases is usually what you would expect. Take a look at the *DbContext* example for instance, the class is normally registered as Per Web Request lifestyle for a reason, probably because you want to reuse one instance for the whole request. Not reusing an instance, but instead injecting a new instance (transient) would most likely not give the expected results. Returning a single instance (singleton) when outside of a scope, i.e. reusing a single *DbContext* over multiple requests/threads will sooner or later lead you down the path of failure.
 
 Because there is not a standard logical default for Simple Injector to return when you request an instance outside of the context of an active scope, the right thing to do is throwing an exception. Returning a transient or singleton is a form of failing silently.
 
