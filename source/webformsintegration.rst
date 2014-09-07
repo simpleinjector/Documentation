@@ -6,7 +6,7 @@ ASP.NET Web Forms was never designed with dependency injection in mind. Although
 
 .. container:: Note
 
-    **Note**: `This blog post <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=81>`_ shows how to do constructor injection in pages and user controls, but please keep in mind that this will fail when trying to run the application in partial trust. Besides, it still doesn't work for **IHttpHandlers**.
+    **Note**: `This blog post <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=81>`_ shows how to do constructor injection in pages and user controls, but please keep in mind that this will fail when trying to run the application in partial trust. Besides, it still doesn't work for *IHttpHandlers*.
 
 Instead of doing constructor injection, there are alternatives. The simplest thing to do is to fall back to property injection and initialize the page in the constructor.
 
@@ -22,31 +22,25 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
     using SimpleInjector;
     using SimpleInjector.Advanced;
 
-    public abstract class BasePage : Page
-    {
-        public BasePage()
-        {
+    public abstract class BasePage : Page {
+        public BasePage() {
             Global.Initialize(this);
         }
     }
 
-    public class Global : HttpApplication
-    {
+    public class Global : HttpApplication {
         private static Container container;
 
-        public static void Initialize(Page page)
-        {
+        public static void Initialize(Page page) {
             container.GetRegistration(page.GetType().BaseType, true).Registration
                 .InitializeInstance(page);
         }
 
-        protected void Application_Start(object sender, EventArgs e)
-        {
+        protected void Application_Start(object sender, EventArgs e) {
             Bootstrap();
         }
 
-        private static void Bootstrap()
-        {
+        private static void Bootstrap() {
             // 1. Create a new Simple Injector container.
             var container = new Container();
 
@@ -72,8 +66,7 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
         // manually call Global.Initialize in their ctor, we want to test on application 
         // startup if all pages can be initialized, to prevent having to go through 
         // each page in the application during testing.
-        private static void VerifyPages(Container container)
-        {
+        private static void VerifyPages(Container container) {
             var assemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>();
 
             var pageTypes =
@@ -82,16 +75,13 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                 where typeof(Page).IsAssignableFrom(type) && !type.IsAbstract
                 select type;
 
-            foreach (Type pageType in pageTypes)
-            {
+            foreach (Type pageType in pageTypes) {
                 container.GetInstance(pageType);
             }
         }
 
-        private class ImportAttributePropertySelectionBehavior : IPropertySelectionBehavior
-        {
-            public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo)
-            {
+        private class ImportAttributePropertySelectionBehavior : IPropertySelectionBehavior {
+            public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo) {
                 // Makes use of the System.ComponentModel.Composition assembly
                 return typeof(Page).IsAssignableFrom(serviceType) &&
                     propertyInfo.GetCustomAttributes<ImportAttribute>().Any();
@@ -103,18 +93,12 @@ With this code in place, we can now write our page classes as follows:
 
 .. code-block:: c#
 
-    public partial class Default : BasePage
-    {
-        [Import]
-        public IUserRepository UserRepository { get; set; }
+    public partial class Default : BasePage {
+        [Import] public IUserRepository UserRepository { get; set; }
+        [Import] public IUserContext UserContext { get; set; }
 
-        [Import]
-        public IUserContext UserContext { get; set; }
-
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            if (this.UserContext.IsAdministrator)
-            {
+        protected void Page_Load(object sender, EventArgs e) {
+            if (this.UserContext.IsAdministrator) {
                 this.UserRepository.DoSomeStuff();
             }
         }

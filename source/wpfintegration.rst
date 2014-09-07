@@ -2,9 +2,9 @@
 Windows Presentation Foundation Integration Guide
 =================================================
 
-WPF was not designed with dependency injection in mind. Instead of doing constructor injection, there are alternatives. The simplest thing to register the container in the **App** class, store the container in a static field and let **Window** instances request their dependencies from within their default constructor.
+WPF was not designed with dependency injection in mind. Instead of doing constructor injection, there are alternatives. The simplest thing to register the container in the *App* class, store the container in a static field and let *Window* instances request their dependencies from within their default constructor.
 
-Here is an example of how your **App** code behind could look like:
+Here is an example of how your *App* code behind could look like:
 
 .. code-block:: c#
 
@@ -16,19 +16,16 @@ Here is an example of how your **App** code behind could look like:
         private static Container container;
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static TService GetInstance<TService>() where TService : class
-        {
+        public static TService GetInstance<TService>() where TService : class {
             return container.GetInstance<TService>();
         }
 
-        protected override void OnStartup(StartupEventArgs e)
-        {
+        protected override void OnStartup(StartupEventArgs e) {
             base.OnStartup(e);
             Bootstrap();
         }
 
-        private static void Bootstrap()
-        {
+        private static void Bootstrap()  {
             // Create the container as usual.
             var container = new Container();
 
@@ -44,19 +41,17 @@ Here is an example of how your **App** code behind could look like:
         }
     }
 
-With the static **App.GetInstance<T>** method, we can request instances from our **Window** constructors:
+With the static *App.GetInstance<T>* method, we can request instances from our *Window* constructors:
 
 .. code-block:: c#
 
     using System.Windows;
 
-    public partial class MainWindow : Window
-    {
+    public partial class MainWindow : Window {
         private readonly IUserRepository userRepository;
         private readonly IUserContext userContext;
 
-        public MainWindow()
-        {
+        public MainWindow() {
             this.userRepository = App.GetInstance<IUserRepository>();
             this.userContext = App.GetInstance<IUserContext>();
 

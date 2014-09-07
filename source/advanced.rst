@@ -6,7 +6,7 @@ Although its name may not imply it, Simple Injector is capable of handling many 
 
 .. container:: Note
 
-    **Note**: After including the *SimpleInjector.dll* in your project, you will have to add the **SimpleInjector.Extensions** namespace to your code to be able to use the majority of features that are presented in this wiki page.
+    **Note**: After including the **SimpleInjector.dll** in your project, you will have to add the **SimpleInjector.Extensions** namespace to your code to be able to use the majority of features that are presented in this wiki page.
 
 This page discusses the following subjects:
 
@@ -60,11 +60,7 @@ To prevent having to change the container for each new repository we can use the
         from type in repositoryAssembly.GetExportedTypes()
         where type.Namespace == "MyComp.MyProd.BL.SqlRepositories"
         where type.GetInterfaces().Any()
-        select new
-        {
-            Service = type.GetInterfaces().Single(),
-            Implementation = type
-        };
+        select new { Service = type.GetInterfaces().Single(), Implementation = type };
 
     foreach (var reg in registrations)
     {
@@ -145,8 +141,7 @@ This *CompositeValidator<T>* can be registered as follows:
 
 .. code-block:: c#
 
-    container.RegisterSingleOpenGeneric(typeof(IValidate<>), 
-        typeof(CompositeValidator<>));
+    container.RegisterSingleOpenGeneric(typeof(IValidate<>), typeof(CompositeValidator<>));
 
 This registration maps the open generic *IValidator<T>* interface to the open generic *CompositeValidator<T>* implementation. Because the *CompositeValidator<T>* contains an *IEnumerable<IValidator<T>>* dependency, the registered types will be injected into its constructor. This allows you to let the rest of the application simply depend on the *IValidator<T>*, while registering a collection of *IValidator<T>* implementations under the covers.
 
@@ -154,7 +149,7 @@ This registration maps the open generic *IValidator<T>* interface to the open ge
 
     **Note**: Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>* instance. In reality you should not see the the injected *IEnumerable<IValidator<T>>* as a collection of implementations, you should consider it a *stream* of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the *CompositeValidator<T>* is registered as singleton the validators it wraps will each have their own specific lifestyle.
 
-The next section will explain mapping of open generic types (just like *CompositeValidator<>* seen above).
+The next section will explain mapping of open generic types (just like the *CompositeValidator<T>* as seen above).
 
 .. _Registration-Of-Open-Generic-Types:
 
@@ -175,8 +170,7 @@ As the previous section explained, this can be rewritten to the following one-li
 
 .. code-block:: c#
 
-    container.RegisterManyForOpenGeneric(typeof(IValidate<>), 
-        typeof(IValidate<>).Assembly);
+    container.RegisterManyForOpenGeneric(typeof(IValidate<>), typeof(IValidate<>).Assembly);
 
 Sometimes you'll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The *IValidate<T>* is a good example, it is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this we would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:
  
@@ -455,8 +449,7 @@ Since this is a scenario that is really hard to solve without library support, S
                     // Create new handler in this thread.
                     ICommandHandler<T> handler = this.factory.Invoke();
                     handler.Handle(command);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     // log the exception
                 }			
             });
@@ -535,8 +528,7 @@ When a collection is uncontrolled, it means that the lifetime of its elements ar
 .. code-block:: c#
 
     IEnumerable<IEventHandler<CustomerMovedEvent>> handlers =
-        new IEventHandler<CustomerMovedEvent>[]
-        {
+        new IEventHandler<CustomerMovedEvent>[] {
             new CustomerMovedEventHandler(),
             new NotifyStaffWhenCustomerMovedEventHandler(),
         };
@@ -642,13 +634,10 @@ Using the :doc:`Interception extensions <InterceptionExtensions>` code snippets,
             // Calls the decorated instance.
             invocation.Proceed();
 
-            var decoratedType =
-                invocation.InvocationTarget.GetType();
+            var decoratedType = invocation.InvocationTarget.GetType();
             
-            this.logger.Log(string.Format(
-                "{0} executed in {1} ms.",
-                decoratedType.Name,
-                watch.ElapsedMiliseconds));
+            this.logger.Log(string.Format("{0} executed in {1} ms.",
+                decoratedType.Name, watch.ElapsedMiliseconds));
         }
     }
 

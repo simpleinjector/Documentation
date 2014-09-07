@@ -19,37 +19,32 @@ The following example shows an extension method that allows registering a decora
     using System.Threading;
     using SimpleInjector.Extensions;
 
-    public static class RuntimeDecoratorExtensions
-    {
-        public static void RegisterRuntimeDecorator(this Container container, Type serviceType, 
-            Type decoratorType, Predicate<DecoratorPredicateContext> runtimePredicate)
-        {
-            container.RegisterRuntimeDecorator(serviceType, decoratorType, Lifestyle.Transient,
-                runtimePredicate);
+    public static class RuntimeDecoratorExtensions {
+        public static void RegisterRuntimeDecorator(this Container container,
+            Type serviceType, Type decoratorType, 
+            Predicate<DecoratorPredicateContext> runtimePredicate) {
+            container.RegisterRuntimeDecorator(serviceType, decoratorType, 
+                Lifestyle.Transient, runtimePredicate);
         }
 
-        public static void RegisterRuntimeDecorator(this Container container, Type serviceType, 
-            Type decoratorType, Lifestyle lifestyle,
+        public static void RegisterRuntimeDecorator(this Container container, 
+            Type serviceType, Type decoratorType, Lifestyle lifestyle,
             Predicate<DecoratorPredicateContext> runtimePredicate,
-            Predicate<DecoratorPredicateContext> compileTimePredicate = null)
-        {
+            Predicate<DecoratorPredicateContext> compileTimePredicate = null) {
             var localContext = new ThreadLocal<DecoratorPredicateContext>();
 
             compileTimePredicate = compileTimePredicate ?? (context => true);
 
-            container.RegisterDecorator(serviceType, decoratorType, lifestyle, c =>
-            {
+            container.RegisterDecorator(serviceType, decoratorType, lifestyle, c => {
                 bool mustDecorate = compileTimePredicate(c);
                 localContext.Value = mustDecorate ? c : null;
                 return mustDecorate;
             });
 
-            container.ExpressionBuilt += (s, e) =>
-            {
+            container.ExpressionBuilt += (s, e) => {
                 bool isDecorated = localContext.Value != null;
 
-                if (isDecorated)
-                {
+                if (isDecorated) {
                     Expression decorator = e.Expression;
                     Expression original = localContext.Value.Expression;
 
@@ -73,9 +68,7 @@ The following line shows an example of how to use this extension method:
 
     container.RegisterRuntimeDecorator(
         typeof(ICommandHandler<>),
-        typeof(AuthorizationHandlerDecorator<>), context =>
-        {
-            var userContext =
-                container.GetInstance<IUserContext>();
+        typeof(AuthorizationHandlerDecorator<>), context => {
+            var userContext = container.GetInstance<IUserContext>();
             return !userContext.UserInRole("Admin");
         });

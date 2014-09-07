@@ -15,12 +15,10 @@ The following code snippet adds the ability to add context dependent injection.
 
     [DebuggerDisplay("DependencyContext (ServiceType: {ServiceType}, " + 
         "ImplementationType: {ImplementationType})")]
-    public class DependencyContext
-    {
+    public class DependencyContext {
         internal static readonly DependencyContext Root = new DependencyContext();
 
-        internal DependencyContext(Type serviceType, Type implementationType)
-        {
+        internal DependencyContext(Type serviceType, Type implementationType) {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
         }
@@ -31,14 +29,11 @@ The following code snippet adds the ability to add context dependent injection.
         public Type ImplementationType { get; private set; }
     }
 
-    public static class ContextDependentExtensions
-    {
+    public static class ContextDependentExtensions {
         public static void RegisterWithContext<TService>(this Container container,
             Func<DependencyContext, TService> contextBasedFactory)
-            where TService : class
-        {
-            if (contextBasedFactory == null)
-            {
+            where TService : class {
+            if (contextBasedFactory == null) {
                 throw new ArgumentNullException("contextBasedFactory");
             }
 
@@ -47,12 +42,9 @@ The following code snippet adds the ability to add context dependent injection.
             container.Register<TService>(rootFactory, Lifestyle.Transient);
 
             // Allow the Func<DependencyContext, TService> to be injected into parent types.
-            container.ExpressionBuilding += (sender, e) =>
-            {
-                if (e.RegisteredServiceType != typeof(TService))
-                {
-                    var rewriter = new DependencyContextRewriter
-                    {
+            container.ExpressionBuilding += (sender, e) => {
+                if (e.RegisteredServiceType != typeof(TService)) {
+                    var rewriter = new DependencyContextRewriter {
                         ServiceType = e.RegisteredServiceType,
                         ContextBasedFactory = contextBasedFactory,
                         RootFactory = rootFactory,
@@ -64,21 +56,17 @@ The following code snippet adds the ability to add context dependent injection.
             };
         }
 
-        private sealed class DependencyContextRewriter : ExpressionVisitor
-        {
+        private sealed class DependencyContextRewriter : ExpressionVisitor {
             internal Type ServiceType { get; set; }
             internal object ContextBasedFactory { get; set; }
             internal object RootFactory { get; set; }
             internal Expression Expression { get; set; }
 
-            internal Type ImplementationType
-            {
-                get 
-                {
+            internal Type ImplementationType {
+                get  {
                     var expression = this.Expression as NewExpression;
 
-                    if (expression != null)
-                    {
+                    if (expression != null) {
                         return expression.Constructor.DeclaringType;
                     }
 
@@ -86,10 +74,8 @@ The following code snippet adds the ability to add context dependent injection.
                 }
             }
 
-            protected override Expression VisitInvocation(InvocationExpression node)
-            {
-                if (!this.IsRootedContextBasedFactory(node))
-                {
+            protected override Expression VisitInvocation(InvocationExpression node) {
+                if (!this.IsRootedContextBasedFactory(node)) {
                     return base.VisitInvocation(node);
                 }
 
@@ -99,12 +85,10 @@ The following code snippet adds the ability to add context dependent injection.
                         new DependencyContext(this.ServiceType, this.ImplementationType)));
             }
 
-            private bool IsRootedContextBasedFactory(InvocationExpression node)
-            {
+            private bool IsRootedContextBasedFactory(InvocationExpression node) {
                 var expression = node.Expression as ConstantExpression;
 
-                if (expression == null)
-                {
+                if (expression == null) {
                     return false;
                 }
 
@@ -117,10 +101,8 @@ After copying the previous code snippet to your project, you can use the extensi
 
 .. code-block:: c#
 
-    container.RegisterWithContext<IAccessValidator>(context =>
-    {
-        if (context.ImplementationType.Namespace.EndsWith("Management"))
-        {
+    container.RegisterWithContext<IAccessValidator>(context => {
+        if (context.ImplementationType.Namespace.EndsWith("Management")) {
             return container.GetInstance<ManagementAccesValidator>();
         }
 

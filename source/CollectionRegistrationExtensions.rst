@@ -26,23 +26,16 @@ When having many collections of types that need to be resolved in this way, the 
 
     using SimpleInjector;
 
-    public static class CollectionRegistrationExtensions
-    {
-        public static void AllowToResolveArraysAndLists(
-            this Container container)
-        {
-            container.ResolveUnregisteredType += (sender, e) =>
-            {
+    public static class CollectionRegistrationExtensions {
+        public static void AllowToResolveArraysAndLists(this Container container) {
+            container.ResolveUnregisteredType += (sender, e) => {
                 var serviceType = e.UnregisteredServiceType;
 
-                if (serviceType.IsArray)
-                {
+                if (serviceType.IsArray) {
                     RegisterArrayResolver(e, container, 
                         serviceType.GetElementType());
-                }
-                else if (serviceType.IsGenericType &&
-                    serviceType.GetGenericTypeDefinition() == typeof(IList<>))
-                {
+                } else if (serviceType.IsGenericType &&
+                    serviceType.GetGenericTypeDefinition() == typeof(IList<>)) {
                     RegisterArrayResolver(e, container, 
                         serviceType.GetGenericArguments()[0]);
                 }
@@ -50,8 +43,7 @@ When having many collections of types that need to be resolved in this way, the 
         }
 
         private static void RegisterArrayResolver(UnregisteredTypeEventArgs e, 
-            Container container, Type elementType)
-        {
+            Container container, Type elementType) {
             var producer = container.GetRegistration(typeof(IEnumerable<>)
                 .MakeGenericType(elementType));
             var enumerableExpression = producer.BuildExpression();
