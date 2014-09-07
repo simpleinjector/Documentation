@@ -529,4 +529,70 @@ A hybrid lifestyle is useful for registrations that need to be able to dynamical
 Developing a Custom Lifestyle
 =============================
 
-The lifestyles supplied by the framework should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from `Lifestyle <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm>`_ and let it return `Custom Lifestyle <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm>`_ instances. This however is a lot of work, and a shortcut is available in the form of the `Lifestyle.CreateCustom <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_CreateCustom.htm>`_. Please take a look at the example given on the *CreateCustom* documentation for more information.
+The lifestyles supplied by the framework should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from `Lifestyle <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm>`_ and let it return `Custom Registration <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm>`_ instances. This however is a lot of work, and a shortcut is available in the form of the `Lifestyle.CreateCustom <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Lifestyle_CreateCustom.htm>`_.
+
+A custom lifestyle can be created by calling the **Lifestyle.CreateCustom** factory method. This method takes two arguments: the name of the lifestyle to create (used mainly for display in the :ref:`Diagnostic Services <diagnostics>`) and a `CreateLifestyleApplier <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_CreateLifestyleApplier.htm>`_ delegate:
+
+.. code-block:: c#
+
+    public delegate Func<object> CreateLifestyleApplier(
+        Func<object> transientInstanceCreator)    
+
+The **CreateLifestyleApplier** delegate accepts a *Func<object>* that allows the creation of a transient instance of the registered type. This *Func<object>* is created by Simple Injector supplied to the registered  **CreateLifestyleApplier** delegate for the registered type. When this *Func<object>* delegate is called, the creation of the type goes through the :doc:`Simple Injector pipeline <pipeline>`. This keeps the experience consistent with the rest of the library.
+
+When Simple Injector calls the **CreateLifestyleApplier**, it is your job to return another *Func<object>* delegate that applies the caching based on the supplied *instanceCreator*. A simple example would be the following:
+
+.. code-block:: c#
+
+    var sillyTransientLifestyle = Lifestyle.CreateCustom(
+        name: "Silly Transient",
+        // instanceCreator is of type Func<object>
+        lifestyleApplierFactory: instanceCreator => {
+            // A Func<object> is returned that applies caching.
+            return () => {
+                return instanceCreator.Invoke();
+            };
+        });
+
+    var container = new Container();
+
+    container.Register<IService, MyService>(sillyTransientLifestyle);
+
+Here we create a custom lifestyle that applies no caching and simply returns a delegate that will on invocation always call the wrapped *instanceCreator*. Of course this would be rather useless and using the built-in **Lifestyle.Transient** would be much better in this case. It does however demonstrate its use.
+
+The *Func<object>* delegate that you return from your **CreateLifestyleApplier** delegate will get cached by Simple Injector per registration. Simple Injector will call the delegate once per registration and stores the returned *Func<object>* for reuse. This means that each registration will get its own *Func<object>*.
+
+Here's an example of the creation of a more useful custom lifestyle that caches an instance for 10 minutes:
+
+.. code-block:: c#
+
+    var tenMinuteLifestyle = Lifestyle.CreateCustom(
+        name: "Absolute 10 Minute Expiration", 
+        lifestyleApplierFactory: instanceCreator => {
+            TimeSpan timeout = TimeSpan.FromMinutes(10);
+            var syncRoot = new object();
+            var expirationTime = DateTime.MinValue;
+            object instance = null;
+
+            return () => {
+                lock (syncRoot) {
+                    if (expirationTime < DateTime.UtcNow) {
+                        instance = instanceCreator.Invoke();
+                        expirationTime = DateTime.UtcNow.Add(timeout);
+                    }
+                    return instance;
+                }
+            };
+        });
+
+    var container = new Container();
+
+    // We can reuse the created lifestyle for multiple registrations.
+    container.Register<IService, MyService>(tenMinuteLifestyle);
+    container.Register<AnotherService, MeTwoService>(tenMinuteLifestyle);
+
+In this example the **Lifestyle.CreateCustom** method is called and supplied with a delegate that returns a delegate that applies the 10 minute cache. This example makes use of the fact that each registration gets its own delegate by using four closures (timeout, syncRoot, expirationTime and instance). Since each registration (in the example *IService* and *AnotherService*) will get its own *Func<object>* delegate, each registration gets its own set of closures. The closures are static per registration.
+
+One of the closure variables is the *instance* and this will contain the cached instance that will change after 10 minutes has passed. As long as the time hasn't passed, the same instance will be returned.
+
+Since the constructed *Func<object>* delegate can be called from multiple threads, the code needs to do its own synchronization. Both the DateTime comparison and the DateTime assignment are not thread-safe and this code needs to handle this itself.
