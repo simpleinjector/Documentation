@@ -238,7 +238,7 @@
 </div>
 <div class="section" id="fast-by-default">
 <span id="id2"></span><h2>Fast by default<a class="headerlink" href="#fast-by-default" title="Permalink to this headline">¶</a></h2>
-<p>For most applications the performance of the IoC container is not an issue, I/O is usually the bottleneck. You will find, however, that certain DI libraries are very sensitive to different configurations and you will need to monitor the container for potential performance problems. Most performance problems can be fixed by changing the configuration (changing registrations to singleton, adding caching, etc), no matter which library you use. At that point however it can get really complicated to configure certain libraries.</p>
+<p>For most applications the performance of the DI library is not an issue; I/O is usually the bottleneck. You will find, however, that certain DI libraries are very sensitive to different configurations and you will need to monitor the container for potential performance problems. Most performance problems can be fixed by changing the configuration (changing registrations to singleton, adding caching, etc), no matter which library you use. At that point however it can get really complicated to configure certain libraries.</p>
 <p>Making Simple Injector fast by default removes any concerns regarding the performance of the construction of object graphs. Instead of having to monitor Simple Injector’s performance and make ugly tweaks to the configuration when object construction is too slow, the developer is free to worry about more important things.</p>
 <p>_Fast by default** means that the performance of object instantiation from any of the registration features that the library supplies out-of-the-box will be comparable to the performance of hard-wired object instantiation.</p>
 </div>
@@ -258,7 +258,7 @@
 </div>
 <div class="section" id="communicate-errors-clearly-and-describe-how-to-solve-them">
 <span id="communicate-errors-clearly"></span><h2>Communicate errors clearly and describe how to solve them<a class="headerlink" href="#communicate-errors-clearly-and-describe-how-to-solve-them" title="Permalink to this headline">¶</a></h2>
-<p>In our day jobs we regularly encounter exception messages that aren&#8217;t helpful or, even worse, are misleading (we have all seen the <strong>NullReferenceException</strong>). It frustrates us, takes time to track down and therefore costs money. We don&#8217;t want to put any developer in that position and therefore defined an explicit design rule stating that Simple Injector should always communicate errors as clearly as possible. And, not only should it describe the problem, it should offer details on the options for solving the problem.</p>
+<p>In our day jobs we regularly encounter exception messages that aren&#8217;t helpful or, even worse, are misleading (we have all seen the <em>NullReferenceException</em>). It frustrates us, takes time to track down and therefore costs money. We don&#8217;t want to put any developer in that position and therefore defined an explicit design rule stating that Simple Injector should always communicate errors as clearly as possible. And, not only should it describe the problem, it should offer details on the options for solving the problem.</p>
 <p>If you encounter a scenario where we fail to do this, please let us know. We are serious about this and we will fix it!</p>
 </div>
 </div>

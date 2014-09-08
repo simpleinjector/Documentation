@@ -2,7 +2,7 @@
 Integration Guide
 =================
 
-The *Simple Injector* library can be used in a wide range of .NET technologies, both server side as client side. Jump directly to to the integration page for the application framework of your choice. When the framework of your choice is not listed, doesn't mean it isn't supported, but just that we didn't have the time write it :-)
+Simple Injector can be used in a wide range of .NET technologies, both server side as client side. Jump directly to to the integration page for the application framework of your choice. When the framework of your choice is not listed, doesn't mean it isn't supported, but just that we didn't have the time write it :-)
 
 .. toctree::
     :maxdepth: 1
@@ -29,6 +29,8 @@ See Also
 * `Web Forms MVP <https://stackoverflow.com/questions/15123515/pass-runtime-value-to-constructor-using-simpleinjector>`_
 * `Nancy <https://simpleinjector.codeplex.com/discussions/541398>`_
 * `Castle DynamicProxy Interception <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_
+* `OWIN <https://simpleinjector.codeplex.com/discussions/564822>`_
+
 
 Patterns
 ========

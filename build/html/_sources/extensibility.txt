@@ -18,7 +18,7 @@ Out of the box, Simple Injector only allows the creation of classes that contain
 
 There are some exceptional circumstances though, where we don't control the amount of public constructors a type has. Code generators for instance, can have this annoying side effect. Earlier versions of the `T4MVC <https://t4mvc.codeplex.com>`_ template for instance did this.
 
-In these rare cases we need to override the way Simple Injector does its constructor overload resolution. This can be done by creating custom implementation of *IConstructorResolutionBehavior*. The default behavior can be replaced by setting the *Container.Options.ConstructorResolutionBehavior* property.
+In these rare cases we need to override the way Simple Injector does its constructor overload resolution. This can be done by creating custom implementation of **IConstructorResolutionBehavior**. The default behavior can be replaced by setting the *Container.Options.ConstructorResolutionBehavior* property.
 
 .. code-block:: c#
 
@@ -26,7 +26,7 @@ In these rare cases we need to override the way Simple Injector does its constru
         ConstructorInfo GetConstructor(Type serviceType, Type implementationType);
     }
 
-Simple Injector will call into the registered *IConstructorResolutionBehavior* when the type is registered to allow the *IConstructorResolutionBehavior* implementation to verify the type. The implementation is called again when the registered type is resolved for the first time.
+Simple Injector will call into the registered **IConstructorResolutionBehavior** when the type is registered to allow the **IConstructorResolutionBehavior** implementation to verify the type. The implementation is called again when the registered type is resolved for the first time.
 
 The following example changes the constructor resolution behavior to always select the constructor with the most parameters (the greediest constructor):
 
@@ -102,15 +102,13 @@ The previous examples changed the constructor overload resolution for all regist
         }
 
         public ConstructorInfo GetConstructor(Type serviceType, Type impType) {
-            if (typeof(IController).IsAssignableFrom(impType))
-            {
+            if (typeof(IController).IsAssignableFrom(impType)) {
                 var nonDefaultConstructors =
                     from constructor in impType.GetConstructors()
                     where constructor.GetParameters().Length > 0
                     select constructor;
 
-                if (nonDefaultConstructors.Count() == 1)
-                {
+                if (nonDefaultConstructors.Count() == 1) {
                     return nonDefaultConstructors.Single();
                 }
             }
@@ -125,7 +123,7 @@ The previous examples changed the constructor overload resolution for all regist
     container.Options.ConstructorResolutionBehavior = 
         new T4MvcConstructorBehavior(container.Options.ConstructorResolutionBehavior);
 
-The old T4MVC template generated an extra public constructor on MVC Controller types and overload resolution only had to be changed for types implementing **System.Web.Mvc.IController**, which is what the previous code snippet does. For all other types of registration in the container, the container's default behavior is used.
+The old T4MVC template generated an extra public constructor on MVC Controller types and overload resolution only had to be changed for types implementing *System.Web.Mvc.IController*, which is what the previous code snippet does. For all other types of registration in the container, the container's default behavior is used.
 
 .. _Property-Injection:
 
@@ -134,19 +132,18 @@ Property Injection
 
 Attribute based property injection and implicit property injection are not supported by Simple Injector out of the box. With attribute based property injection the container injects properties that are decorated with an attribute. With implicit property injection the container automatically injects all properties that can be mapped to a registration, but silently skips other properties. An extension point is provided to change the library's default behavior, which is to **not** inject any property at all.
 
-Out of the box, Simple Injector does allow explicit property injection based on registration of delegates using the *RegisterInitializer* method:
+Out of the box, Simple Injector does allow explicit property injection based on registration of delegates using the **RegisterInitializer** method:
 
 .. code-block:: c#
 
     container.Register<ILogger, FileLogger>();
-    container.RegisterInitializer<FileLogger>(instance =>
-    {
+    container.RegisterInitializer<FileLogger>(instance => {
         instance.Path = "c:\logs\log.txt";
     });
 
-This enables property injection on a per-type basis and it allows configuration errors to be spot by the C# compiler and is especially suited for injection of configuration values. Downside of this approach is that the :doc:`Diagnostic Services <diagnostics>` will not be able to analyze properties injected this way and although the *RegisterInitializer* can be called on base types and interfaces, it is cumbersome when applying property injection on a larger scale.
+This enables property injection on a per-type basis and it allows configuration errors to be spot by the C# compiler and is especially suited for injection of configuration values. Downside of this approach is that the :doc:`Diagnostic Services <diagnostics>` will not be able to analyze properties injected this way and although the **RegisterInitializer** can be called on base types and interfaces, it is cumbersome when applying property injection on a larger scale.
 
-The Simple Injector API exposes the *IPropertySelectionBehavior* interface to change the way the library does property injection. The example below shows a custom *IPropertySelectionBehavior* implementation that enables attribute based property injection using any custom attribute:
+The Simple Injector API exposes the **IPropertySelectionBehavior** interface to change the way the library does property injection. The example below shows a custom **IPropertySelectionBehavior** implementation that enables attribute based property injection using any custom attribute:
 
 .. code-block:: c#
 
@@ -156,8 +153,7 @@ The Simple Injector API exposes the *IPropertySelectionBehavior* interface to ch
     using SimpleInjector.Advanced;
 
     class PropertySelectionBehavior<TAttribute> : IPropertySelectionBehavior
-        where TAttribute : Attribute
-    {
+        where TAttribute : Attribute {
         public bool SelectProperty(Type type, PropertyInfo prop) {
             return prop.GetCustomAttributes(typeof(TAttribute)).Any();
         }
@@ -172,14 +168,13 @@ This enables explicit property injection on all properties that are marked with 
 
 .. container:: Note
 
-    **Tip**: Dependencies injected by the container through the *IPropertySelectionBehavior* will be analyzed by the :doc:`Diagnostic <diagnostics>`.
+    **Tip**: Dependencies injected by the container through the **IPropertySelectionBehavior** will be analyzed by the :doc:`Diagnostic <diagnostics>`.
 
-Implicit property injection can be enabled by creating an *IPropertySelectionBehavior* implementation that queries the container to check whether the property's type to be registered in the container:
+Implicit property injection can be enabled by creating an **IPropertySelectionBehavior** implementation that queries the container to check whether the property's type to be registered in the container:
 
 .. code-block:: c#
 
-    public class ImplicitPropertyInjectionBehavior : IPropertySelectionBehavior
-    {
+    public class ImplicitPropertyInjectionBehavior : IPropertySelectionBehavior {
         private readonly Container container;
         internal ImplicitPropertyInjectionBehavior(Container container) {
             this.container = container;
@@ -190,8 +185,7 @@ Implicit property injection can be enabled by creating an *IPropertySelectionBeh
         }
 
         private bool IsImplicitInjectable(PropertyInfo property) {
-            return IsInjectableProperty(property) &&
-                this.IsAvailable(property.PropertyType);
+            return IsInjectableProperty(property) && this.IsAvailable(property.PropertyType);
         }
 
         private static bool IsInjectableProperty(PropertyInfo prop) {
@@ -218,7 +212,7 @@ Implicit property injection can be enabled by creating an *IPropertySelectionBeh
 Overriding Parameter Injection Behavior
 =======================================
 
-Simple Injector does not allow injecting primitive types (such as integers and string) into constructors. The *IConstructorInjectionBehavior* interface is defined by the library to change this default behavior.
+Simple Injector does not allow injecting primitive types (such as integers and string) into constructors. The **IConstructorInjectionBehavior** interface is defined by the library to change this default behavior.
 
 The following article contains more information about changing the library's default behavior: `Primitive Dependencies with the Simple Injector <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=94>`_.
 
@@ -236,7 +230,7 @@ For more information about how to use this event, please look at the `ResolveUnr
 Overriding Lifestyle Selection Behavior
 =======================================
 
-By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the *Transient* lifestyle. Since *Simple Injector 2.6*, this behavior can be overridden and this is especially useful in batch-registration scenarios.
+By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the **Transient** lifestyle. Since Simple Injector 2.6 this behavior can be overridden and this is especially useful in batch-registration scenarios.
 
 Here are some examples of registration calls that all register types as *transient*:
 
@@ -254,9 +248,9 @@ Here are some examples of registration calls that all register types as *transie
     container.RegisterWcfServices();
     container.RegisterWebApiControllers(GlobalConfiguration.Configuration);
 
-Most of these methods have overloads that allow supplying a different lifestyle. This works great in situations where you register a single type (using one of the *Register* method overloads for instance), and when all registrations need the same lifestyle. This is less suitable for cases where you batch-register a set of types where each type needs a different lifestyle.
+Most of these methods have overloads that allow supplying a different lifestyle. This works great in situations where you register a single type (using one of the **Register** method overloads for instance), and when all registrations need the same lifestyle. This is less suitable for cases where you batch-register a set of types where each type needs a different lifestyle.
 
-In this case we need to override the way Simple Injector does lifestyle selection. This can be done by creating custom implementation of *ILifestyleSelectionBehavior*.
+In this case we need to override the way Simple Injector does lifestyle selection. This can be done by creating custom implementation of **ILifestyleSelectionBehavior**.
 
 .. code-block:: c#
 
@@ -264,7 +258,7 @@ In this case we need to override the way Simple Injector does lifestyle selectio
         Lifestyle SelectLifestyle(Type serviceType, Type implementationType);
     }
 
-When no lifestyle is explicitly supplied by the user, Simple Injector will call into the registered ILifestyleSelectionBehavior when the type is registered to allow the ILifestyleSelectionBehavior implementation to select the proper lifestyle. The default behavior can be replaced by setting the *Container.Options.LifestyleSelectionBehavior* property.
+When no lifestyle is explicitly supplied by the user, Simple Injector will call into the registered **ILifestyleSelectionBehavior** when the type is registered to allow the **ILifestyleSelectionBehavior** implementation to select the proper lifestyle. The default behavior can be replaced by setting the *Container.Options.LifestyleSelectionBehavior* property.
 
 The following (not very useful) example changes the lifestyle selection behavior to always register those instances as singleton:
 
@@ -354,6 +348,6 @@ Intercepting the Creation of Types
 
 Interception the creation of types allows registrations to be modified. This enables all sorts of advanced scenarios where the creation of a single type or whole object graphs gets altered. Simple Injector contains two events that allow altering the type's creation: `ExpressionBuilding <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm>`_ and `ExpressionBuilt <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm>`_. Both events are quite similar but are called in different stages of the :ref:`building process <Resolve-Pipeline>`. 
 
-The *ExpressionBuilding* event gets called just after the registrations expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for :ref:`Context based injection <Context-Based-Injection>`.
+The **ExpressionBuilding** event gets called just after the registrations expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for :ref:`Context based injection <Context-Based-Injection>`.
 
-The *ExpressionBuilt* event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time *ExpressionBuilding* was called, is gone. While *ExpressionBuilding* is especially suited for changing the relationship between the resolved type and its dependencies, *ExpressionBuilt* is especially useful for applying decorators or :ref:`applying interceptors <Interception>`. Note that Simple Injector has built-in support for :ref:`applying decorators <Decorators>` using the `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ extension methods. These methods internally use the *ExpressionBuilt* event.
+The **ExpressionBuilt** event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time **ExpressionBuilding** was called, is gone. While **ExpressionBuilding** is especially suited for changing the relationship between the resolved type and its dependencies, **ExpressionBuilt** is especially useful for applying decorators or :ref:`applying interceptors <Interception>`. Note that Simple Injector has built-in support for :ref:`applying decorators <Decorators>` using the `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ extension methods. These methods internally use the **ExpressionBuilt** event.

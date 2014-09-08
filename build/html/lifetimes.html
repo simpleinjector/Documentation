@@ -217,10 +217,8 @@
             
   <div class="section" id="object-lifetime-management">
 <h1>Object Lifetime Management<a class="headerlink" href="#object-lifetime-management" title="Permalink to this headline">¶</a></h1>
-<p>Object Lifetime Management is the concept of controlling the number of instances a configured service will have and the duration of the lifetime of those instances. In other words, it allows you to determine how returned instances are cached. Most IoC frameworks have sophisticated mechanisms for lifestyle management, and <em>Simple Injector</em> is no exception with built-in support for the most common lifestyles. The two default lifestyles (transient and singleton) are part of the core library, while other lifestyles can be found within some of the extension and integration packages. The built-in lifestyles will suit about 99% of cases. For anything else custom lifestyles can be used.</p>
-<div class="note container">
-<strong>Note</strong>: this documentation is specific for <em>Simple Injector version 2.5</em> and up. Look <a class="reference external" href="https://simpleinjector.codeplex.com/wikipage?title=ObjectLifestyleManagement&amp;version=59">here</a> for documentation specific to lower versions.</div>
-<p>Below is a list of the most common lifestyles with code examples of how to configure them using <em>Simple Injector</em>:</p>
+<p>Object Lifetime Management is the concept of controlling the number of instances a configured service will have and the duration of the lifetime of those instances. In other words, it allows you to determine how returned instances are cached. Most DI libraries have sophisticated mechanisms for lifestyle management, and Simple Injector is no exception with built-in support for the most common lifestyles. The two default lifestyles (transient and singleton) are part of the core library, while other lifestyles can be found within some of the extension and integration packages. The built-in lifestyles will suit about 99% of cases. For anything else custom lifestyles can be used.</p>
+<p>Below is a list of the most common lifestyles with code examples of how to configure them using Simple Injector:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#transient"><em>Transient</em></a></li>
 <li><a class="reference internal" href="#singleton"><em>Singleton</em></a></li>
@@ -239,33 +237,32 @@
 <div class="section" id="transient">
 <span id="id1"></span><h2>Transient<a class="headerlink" href="#transient" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
-A new instance of the service type will be created for each request (both for calls to <em>GetInstance&lt;T&gt;</em> and instances as part of an object graph).</div>
-<p>This example instantiates a new <strong>IService</strong> implementation for each call, while leveraging the power of <a class="reference internal" href="using.html#automatic-constructor-injection"><em>automatic constructor injection</em></a>.</p>
+A new instance of the service type will be created for each request (both for calls to <strong>GetInstance&lt;T&gt;</strong> and instances as part of an object graph).</div>
+<p>This example instantiates a new <em>IService</em> implementation for each call, while leveraging the power of <a class="reference internal" href="using.html#automatic-constructor-injection"><em>automatic constructor injection</em></a>.</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">RealService</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
 
 <span class="c1">// Alternatively, you can use the following short cut</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">RealService</span><span class="p">&gt;();</span>
 </pre></div>
 </div>
-<p>The next example instantiates a new <strong>RealService</strong> instance on each call by using a delegate.</p>
+<p>The next example instantiates a new <em>RealService</em> instance on each call by using a delegate.</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">RealService</span><span class="p">(</span><span class="k">new</span> <span class="n">SqlRepository</span><span class="p">()),</span>
     <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: It is normally recommended that registrations are made using <em>Register&lt;TService, TImplementation&gt;()</em>. It is easier, leads to less fragile configuration, and results in faster retrieval than registrations using a <strong>Func&lt;T&gt;</strong> delegate. Always try the former approach before resorting to using delegates.</div>
+<strong>Note</strong>: It is normally recommended that registrations are made using <strong>Register&lt;TService, TImplementation&gt;()</strong>. It is easier, leads to less fragile configuration, and results in faster retrieval than registrations using a <em>Func&lt;T&gt;</em> delegate. Always try the former approach before resorting to using delegates.</div>
 <p>This construct is only required for registering types by a base type or an interface. For concrete transient types, no formal registration is required as concrete types will be automatically registered on request:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">RealService</span><span class="p">&gt;();</span>
 </pre></div>
 </div>
-<p>When you have a type that you want to be created using automatic constructor injection, but need some configuration that can&#8217;t be done using constructor injection, you can use the <em>RegisterInitializer</em> method. It takes an <strong>Action&lt;T&gt;</strong> delegate:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ICommand</span><span class="p">&gt;(</span><span class="n">commandToInitialize</span> <span class="p">=&gt;</span>
-<span class="p">{</span>
+<p>When you have a type that you want to be created using automatic constructor injection, but need some configuration that can&#8217;t be done using constructor injection, you can use the <strong>RegisterInitializer</strong> method. It takes an <em>Action&lt;T&gt;</em> delegate:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ICommand</span><span class="p">&gt;(</span><span class="n">commandToInitialize</span> <span class="p">=&gt;</span> <span class="p">{</span>
     <span class="n">commandToInitialize</span><span class="p">.</span><span class="n">ExecuteAsynchronously</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
 <span class="p">});</span>
 </pre></div>
 </div>
-<p>The given configuration calls the delegate after the creation of each type that implements <strong>ICommand</strong> and will set the <strong>ExecuteAsynchroniously</strong> property to <strong>true</strong>. This is a powerful mechanism that enables attribute-free property injection.</p>
+<p>The given configuration calls the delegate after the creation of each type that implements <em>ICommand</em> and will set the <em>ExecuteAsynchroniously</em> property to <em>true</em>. This is a powerful mechanism that enables attribute-free property injection.</p>
 </div>
 <div class="section" id="singleton">
 <span id="id2"></span><h2>Singleton<a class="headerlink" href="#singleton" title="Permalink to this headline">¶</a></h2>
@@ -283,7 +280,7 @@ There will be only one instance of the registered service type during the lifeti
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(</span><span class="n">service</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>There is also an overload that takes an <strong>Func&lt;T&gt;</strong> delegate. The container guarantees that this delegate is called only once:</p>
+<p>There is also an overload that takes an <em>Func&lt;T&gt;</em> delegate. The container guarantees that this delegate is called only once:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">RealService</span><span class="p">(</span><span class="k">new</span> <span class="n">SqlRepository</span><span class="p">()),</span>
     <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
 
@@ -291,7 +288,7 @@ There will be only one instance of the registered service type during the lifeti
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">RealService</span><span class="p">(</span><span class="k">new</span> <span class="n">SqlRepository</span><span class="p">()));</span>
 </pre></div>
 </div>
-<p>Alternatively, when needing to register a concrete type as singleton, you can use the parameterless <em>RegisterSingle&lt;T&gt;()</em> overload. This will inform the container to automatically construct that concrete type (at most) once, and return that instance on each request:</p>
+<p>Alternatively, when needing to register a concrete type as singleton, you can use the parameterless <strong>RegisterSingle&lt;T&gt;()</strong> overload. This will inform the container to automatically construct that concrete type (at most) once, and return that instance on each request:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">RealService</span><span class="p">&gt;();</span>
 
 <span class="c1">// Which is a more convenient short cut for:</span>
@@ -304,7 +301,7 @@ There will be only one instance of the registered service type during the lifeti
 <span id="id3"></span><h2>Scoped<a class="headerlink" href="#scoped" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 For every request within an implicitly or explicitly defined scope, a single instance of the service will be returned and that instance will (optionally) be disposed when the scope ends.</div>
-<p><em>Simple Injector</em> contains five scoped lifestyles:</p>
+<p>Simple Injector contains five scoped lifestyles:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#perwebrequest"><em>Per Web Request</em></a></li>
 <li><a class="reference internal" href="#perwebapirequest"><em>Per Web API Request</em></a></li>
@@ -313,13 +310,13 @@ For every request within an implicitly or explicitly defined scope, a single ins
 <li><a class="reference internal" href="#perexecutioncontextscope"><em>Per Execution Context Scope</em></a></li>
 </ul>
 <p>Both <em>Per Web Request</em> and <em>Per WCF Operation</em> implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The <em>Container</em> does this for you. With the <em>Per Lifetime Scope</em> lifestyle on the other hand, you explicitly define a scope (just like you would do with .NET&#8217;s TransactionScope class).</p>
-<p>The default behavior of <em>Simple Injector</em> is to <strong>not</strong> keep track of instances and to <strong>not</strong> dispose them. The scoped lifestyles on the other hand are the exceptions to this rule. Although most of your services should be registered either as <a class="reference internal" href="#transient"><em>Transient</em></a> or <a class="reference internal" href="#singleton"><em>Singleton</em></a>, scoped lifestyles are especially useful for implementing patterns such as the <a class="reference external" href="http://martinfowler.com/eaaCatalog/unitOfWork.html">Unit of Work</a>.</p>
+<p>The default behavior of Simple Injector is to <strong>not</strong> keep track of instances and to <strong>not</strong> dispose them. The scoped lifestyles on the other hand are the exceptions to this rule. Although most of your services should be registered either as <a class="reference internal" href="#transient"><em>Transient</em></a> or <a class="reference internal" href="#singleton"><em>Singleton</em></a>, scoped lifestyles are especially useful for implementing patterns such as the <a class="reference external" href="http://martinfowler.com/eaaCatalog/unitOfWork.html">Unit of Work</a>.</p>
 </div>
 <div class="section" id="per-web-request">
 <span id="perwebrequest"></span><h2>Per Web Request<a class="headerlink" href="#per-web-request" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 Only one instance will be created by the container per web request and the instance will be disposed when the web request ends (unless specified otherwise).</div>
-<p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Web">ASP.NET Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Web.dll</strong> in the default download here on CodePlex) contains <em>RegisterPerWebRequest</em> extension methods and a <em>WebRequestLifestyle</em> class that enable easy <em>Per Web Request</em> registrations:</p>
+<p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Web">ASP.NET Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Web.dll</strong> in the default download here on CodePlex) contains <em>RegisterPerWebRequest</em> extension methods and a <strong>WebRequestLifestyle</strong> class that enable easy <em>Per Web Request</em> registrations:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWebRequest</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWebRequest</span><span class="p">&lt;</span><span class="n">IOrderRepository</span><span class="p">,</span> <span class="n">SqlOrderRepository</span><span class="p">&gt;();</span>
 
@@ -334,19 +331,19 @@ Only one instance will be created by the container per web request and the insta
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;(</span><span class="n">withoutDispose</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In contrast to the default behavior of <em>Simple Injector</em>, these extension methods ensure the created service is disposed (when such an instance implements <strong>IDisposable</strong>). This disposal is done at the end of the web request. During startup an <strong>HttpModule</strong> is automatically registered for you that ensures all created instances are disposed when the web request ends.</p>
+<p>In contrast to the default behavior of Simple Injector, these extension methods ensure the created service is disposed (when such an instance implements <em>IDisposable</em>). This disposal is done at the end of the web request. During startup an <em>HttpModule</em> is automatically registered for you that ensures all created instances are disposed when the web request ends.</p>
 <div class="note container">
 <strong>Tip</strong>: For ASP.NET MVC, there&#8217;s a <a class="reference external" href="https://nuget.org/packages/SimpleInjector.MVC3">Simple Injector MVC Integration Quick Start</a> NuGet Package available that helps you get started with Simple Injector in MVC applications quickly.</div>
 <p>Optionally you can register other services for disposal at the end of the web request:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">scoped</span> <span class="p">=</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">ServiceImpl</span><span class="p">&gt;();</span>
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ServiceImp</span><span class="p">&gt;(</span><span class="n">s</span> <span class="p">=&gt;</span>
-    <span class="n">scoped</span><span class="p">.</span><span class="n">RegisterForDisposal</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">s</span><span class="p">));</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ServiceImpl</span><span class="p">&gt;(</span><span class="n">instance</span>  <span class="p">=&gt;</span>
+    <span class="n">scoped</span><span class="p">.</span><span class="n">RegisterForDisposal</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">instance</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>This ensures that each time a <strong>ServiceImp</strong> is created by the container, it is registered for disposal when the web request ends.</p>
+<p>This ensures that each time a <em>ServiceImpl</em> is created by the container, it is registered for disposal when the web request ends.</p>
 <div class="note container">
-<strong>Note</strong>: To be able to dispose an instance, the <em>RegisterForDisposal</em> will store the reference to that instance in the <strong>HttpContext</strong> Items cache. This means that the instance will be kept alive for the duration of that request.</div>
+<strong>Note</strong>: To be able to dispose an instance, the <strong>RegisterForDisposal</strong> will store the reference to that instance in the <em>HttpContext</em> Items cache. This means that the instance will be kept alive for the duration of that request.</div>
 <div class="note container">
 <strong>Note</strong>: Be careful to not register any services for disposal that will outlive the web request (such as services registered as singleton), since a service cannot be used once it has been disposed.</div>
 </div>
@@ -354,7 +351,7 @@ Only one instance will be created by the container per web request and the insta
 <span id="perwebapirequest"></span><h2>Per Web API Request<a class="headerlink" href="#per-web-api-request" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 Only one instance will be created by the container per request in a ASP.NET Web API application and the instance will be disposed when that request ends (unless specified otherwise).</div>
-<p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.WebApi">ASP.NET Web API Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.WebApi.dll</strong> in the default download here on CodePlex) contains <em>RegisterWebApiRequest</em> extension methods and a <em>WebApiRequestLifestyle</em> class that enable easy <em>Per Web API Request</em> registrations:</p>
+<p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.WebApi">ASP.NET Web API Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.WebApi.dll</strong> in the default download here on CodePlex) contains <em>RegisterWebApiRequest</em> extension methods and a <strong>WebApiRequestLifestyle</strong> class that enable easy <em>Per Web API Request</em> registrations:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiRequest</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiRequest</span><span class="p">&lt;</span><span class="n">IOrderRepository</span><span class="p">,</span> <span class="n">SqlOrderRepository</span><span class="p">&gt;();</span>
 
@@ -369,19 +366,19 @@ Only one instance will be created by the container per request in a ASP.NET Web 
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;(</span><span class="n">withoutDispose</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In contrast to the default behavior of Simple Injector, these extension methods ensure the created service is disposed (when such an instance implements <strong>IDisposable</strong>). This is done at the end of the Web API request. For this lifestyle to work,</p>
+<p>In contrast to the default behavior of Simple Injector, these extension methods ensure the created service is disposed (when such an instance implements <em>IDisposable</em>). This is done at the end of the Web API request. For this lifestyle to work,</p>
 <div class="note container">
 <strong>Tip</strong>: There&#8217;s a <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart">Simple Injector Web API Integration Quick Start</a> NuGet Package available that helps you get started with Simple Injector in Web API applications quickly.</div>
 </div>
 <div class="section" id="web-api-request-lifestyle-vs-web-request-lifestyle">
 <span id="webapirequest-vs-webrequest"></span><h2>Web API Request lifestyle vs. Web Request lifestyle<a class="headerlink" href="#web-api-request-lifestyle-vs-web-request-lifestyle" title="Permalink to this headline">¶</a></h2>
-<p>The lifestyles and scope implementations <strong>Web Request</strong> and <strong>Web API Request</strong> in SimpleInjector are based on different technologies.</p>
-<p><em>WebApiRequestLifestyle</em> is derived from <em>ExecutionContextScopeLifestyle</em> which works well both inside and outside of IIS. i.e. It can function in a self-hosted Web API project where there is no <strong>HttpContext.Current</strong>. The scope used by <em>WebApiRequestLifestyle</em> is the <em>ExecutionContextScope</em>. As the name implies, an execution context scope registers itself in the logical call context and flows with <em>async</em> operations across threads (e.g. a continuation after <em>await</em> on a different thread still has access to the scope regardless of whether <strong>ConfigureAwait()</strong> was used with <strong>true</strong> or <strong>false</strong>).</p>
-<p>In contrast, the <em>Scope</em> of the <em>WebRequestLifestyle</em> is stored within the <strong>HttpContext.Items</strong> dictionary. The <strong>HttpContext</strong> can be used with Web API when it is hosted in IIS but care must be taken because it will not always flow with the execution context, because the current <strong>HttpContext</strong> is stored in the <strong>IllogicalCallContext</strong> (see <a class="reference external" href="https://blogs.msdn.com/b/pfxteam/archive/2012/06/15/executioncontext-vs-synchronizationcontext.aspx">Understanding SynchronizationContext in ASP.NET</a>). If you use <em>await</em> with <strong>ConfigureAwait(false)</strong> the continuation may lose track of the original <strong>HttpContext</strong> whenever the async operation does not execute synchronously. A direct effect of this is that it would no longer be possible to resolve the instance of a previously created service with <em>WebRequestLifestyle</em> from the container (e.g. in a factory that has access to the container) - and an exception would be thrown because <strong>HttpContext.Current</strong> would be null.</p>
-<p>The recommendation is therefore to use <em>WebApiRequestLifestyle</em> for services that should be &#8216;per Web API request&#8217;, the most obvious example being services that are injected into Web API controllers. <em>WebApiRequestLifestyle</em> offers the following benefits:</p>
+<p>The lifestyles and scope implementations <em>Web Request</em> and <em>Web API Request</em> in SimpleInjector are based on different technologies.</p>
+<p><strong>WebApiRequestLifestyle</strong> is derived from <strong>ExecutionContextScopeLifestyle</strong> which works well both inside and outside of IIS. i.e. It can function in a self-hosted Web API project where there is no <em>HttpContext.Current</em>. The scope used by <strong>WebApiRequestLifestyle</strong> is the <strong>ExecutionContextScope</strong>. As the name implies, an execution context scope registers itself in the logical call context and flows with <em>async</em> operations across threads (e.g. a continuation after <em>await</em> on a different thread still has access to the scope regardless of whether <em>ConfigureAwait()</em> was used with <em>true</em> or <em>false</em>).</p>
+<p>In contrast, the <strong>Scope</strong> of the <strong>WebRequestLifestyle</strong> is stored within the <em>HttpContext.Items</em> dictionary. The <em>HttpContext</em> can be used with Web API when it is hosted in IIS but care must be taken because it will not always flow with the execution context, because the current <em>HttpContext</em> is stored in the <em>IllogicalCallContext</em> (see <a class="reference external" href="https://blogs.msdn.com/b/pfxteam/archive/2012/06/15/executioncontext-vs-synchronizationcontext.aspx">Understanding SynchronizationContext in ASP.NET</a>). If you use <em>await</em> with <em>ConfigureAwait(false)</em> the continuation may lose track of the original <em>HttpContext</em> whenever the async operation does not execute synchronously. A direct effect of this is that it would no longer be possible to resolve the instance of a previously created service with <strong>WebRequestLifestyle</strong> from the container (e.g. in a factory that has access to the container) - and an exception would be thrown because <em>HttpContext.Current</em> would be null.</p>
+<p>The recommendation is therefore to use <strong>WebApiRequestLifestyle</strong> for services that should be &#8216;per Web API request&#8217;, the most obvious example being services that are injected into Web API controllers. <strong>WebApiRequestLifestyle</strong> offers the following benefits:</p>
 <ul class="simple">
 <li>The Web API controller can be used outside of IIS (e.g. in a self-hosted project)</li>
-<li>The Web API controller can execute <strong>free-threaded</strong> (or <strong>multi-threaded</strong>) <em>async</em> methods because it is not limited to the ASP.NET <strong>SynchronizationContext</strong>.</li>
+<li>The Web API controller can execute <em>free-threaded</em> (or <em>multi-threaded</em>) <em>async</em> methods because it is not limited to the ASP.NET <em>SynchronizationContext</em>.</li>
 </ul>
 <p>For more information, check out the blog entry of Stephen Toub regarding the <a class="reference external" href="https://vegetarianprogrammer.blogspot.de/2012/12/understanding-synchronizationcontext-in.html">difference between ExecutionContext and
 SynchronizationContext</a>.</p>
@@ -390,7 +387,7 @@ SynchronizationContext</a>.</p>
 <span id="perwcfoperation"></span><h2>Per WCF Operation<a class="headerlink" href="#per-wcf-operation" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 Only one instance will be created by the container per call to a WCF operation and the instance will be disposed when the operation ends (unless specified otherwise).</div>
-<p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">WCF Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Wcf.dll</strong> in the default download here on CodePlex) contains <em>RegisterPerWcfOperation</em> extension methods and a <em>WcfOperationLifestyle</em> class that enable easy <em>Per WCF Operation</em> registrations:</p>
+<p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">WCF Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Wcf.dll</strong> in the default download here on CodePlex) contains <strong>RegisterPerWcfOperation</strong> extension methods and a <strong>WcfOperationLifestyle</strong> class that enable easy <em>Per WCF Operation</em> registrations:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IOrderRepository</span><span class="p">,</span> <span class="n">SqlOrderRepository</span><span class="p">&gt;();</span>
 
@@ -405,9 +402,10 @@ Only one instance will be created by the container per call to a WCF operation a
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;(</span><span class="n">withoutDispose</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In contrast to the default behavior of <em>Simple Injector</em>, these extension methods ensure the created service is disposed (when such an instance implements <strong>IDisposable</strong>). This is done after the call to the WCF operation has finished.</p>
-<p>Besides registering services using the <em>RegisterPerWcfOperation</em> extension methods, each WCF service markup (the .svc file) should include the following attribute:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">Factory</span><span class="p">=</span><span class="s">&quot;SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory, SimpleInjector.Integration.Wcf&quot;</span>
+<p>In contrast to the default behavior of Simple Injector, these extension methods ensure the created service is disposed (when such an instance implements <em>IDisposable</em>). This is done after the call to the WCF operation has finished.</p>
+<p>Besides registering services using the <strong>RegisterPerWcfOperation</strong> extension methods, each WCF service markup (the .svc file) should include the following attribute:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">Factory</span><span class="p">=</span><span class="s">&quot;SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory,</span>
+    <span class="n">SimpleInjector</span><span class="p">.</span><span class="n">Integration</span><span class="p">.</span><span class="n">Wcf</span><span class="s">&quot;</span>
 </pre></div>
 </div>
 <p>An exception will be thrown by the framework if this attribute is missing.</p>
@@ -416,13 +414,13 @@ Only one instance will be created by the container per call to a WCF operation a
 <p>You can optionally register other services for disposal at the end of the web request:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">scoped</span> <span class="p">=</span> <span class="k">new</span> <span class="n">WcfOperationLifestyle</span><span class="p">();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">ServiceImpl</span><span class="p">&gt;();</span>
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ServiceImp</span><span class="p">&gt;(</span><span class="n">instance</span> <span class="p">=&gt;</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ServiceImpl</span><span class="p">&gt;(</span><span class="n">instance</span> <span class="p">=&gt;</span>
     <span class="n">scoped</span><span class="p">.</span><span class="n">RegisterForDisposal</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">instance</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>This ensures that each time a <strong>ServiceImp</strong> is created by the container, it is registered for disposal when the WCF operation ends.</p>
+<p>This ensures that each time a <em>ServiceImpl</em> is created by the container, it is registered for disposal when the WCF operation ends.</p>
 <div class="note container">
-<strong>Note</strong>: To be able to dispose an instance, the <em>RegisterForDisposal</em> will store a reference to that instance during the lifetime of the WCF operation. This means that the instance will be kept alive for the duration of that operation.</div>
+<strong>Note</strong>: To be able to dispose an instance, the <strong>RegisterForDisposal</strong> will store a reference to that instance during the lifetime of the WCF operation. This means that the instance will be kept alive for the duration of that operation.</div>
 <div class="note container">
 <strong>Note</strong>: Be careful to not register any services for disposal that will outlive the WCF operation (such as services registered as singleton), since a service cannot be used once it has been disposed.</div>
 </div>
@@ -430,57 +428,54 @@ Only one instance will be created by the container per call to a WCF operation a
 <span id="perlifetimescope"></span><h2>Per Lifetime Scope<a class="headerlink" href="#per-lifetime-scope" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 Within a certain (explicitly defined) scope, there will be only one instance of a given service type and the instance will be disposed when the scope ends (unless specified otherwise).</div>
-<p>Lifetime Scoping is supported as an extension package for <em>Simple Injector</em>. It is available as <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Extensions.LifetimeScoping">Lifetime Scoping Extensions NuGet package</a> and is part of the default download on CodePlex as <em>SimpleInjector.Extensions.LifetimeScoping.dll</em>. The extension package adds multiple <em>RegisterLifetimeScope</em> extension method overloads and a <em>LifetimeScopeLifestyle</em> class, which allow to register services with the <strong>Lifetime Scope</strong> lifestyle:</p>
+<p>Lifetime Scoping is supported as an extension package for Simple Injector. It is available as <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Extensions.LifetimeScoping">Lifetime Scoping Extensions NuGet package</a> and is part of the default download on CodePlex as <strong>SimpleInjector.Extensions.LifetimeScoping.dll</strong>. The extension package adds multiple <strong>RegisterLifetimeScope</strong> extension method overloads and a <strong>LifetimeScopeLifestyle</strong> class, which allow to register services with the <em>Lifetime Scope</em> lifestyle:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterLifetimeScope</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;();</span>
 
 <span class="c1">// Or alternatively</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;(</span><span class="k">new</span> <span class="n">LifetimeScopeLifestyle</span><span class="p">());</span>
 </pre></div>
 </div>
-<p>Within an explicitly defined scope, there will be only one instance of a service that is defined with the <strong>Lifetime Scope</strong> lifestyle:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span>
-<span class="p">{</span>
+<p>Within an explicitly defined scope, there will be only one instance of a service that is defined with the <em>Lifetime Scope</em> lifestyle:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span> <span class="p">{</span>
     <span class="kt">var</span> <span class="n">uow1</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
     <span class="kt">var</span> <span class="n">uow2</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
 
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">uow1</span><span class="p">,</span> <span class="n">uow2</span><span class="p">);</span>
+    <span class="n">Assert</span><span class="p">.</span><span class="n">AreSame</span><span class="p">(</span><span class="n">uow1</span><span class="p">,</span> <span class="n">uow2</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: A scope is <em>thread-specific</em>. A single scope should not be used on multiple threads. Do not pass a scope between threads and do not wrap an ASP.NET HTTP request with a Lifetime Scope, since ASP.NET can finish a web request on different thread to the thread the request is started on. Use <cite>Per Web Request &lt;PerWebRequest&gt;</cite> scoping for ASP.NET web applications while running inside a web request. Lifetime scoping however, can still be used in web applications on background threads that are created by web requests or when processing commands in a Windows Service (where each commands gets its own scope). For developing multi-threaded applications, take <a class="reference internal" href="howto.html#multi-threaded-applications"><em>these guidelines</em></a> into consideration.</div>
+<strong>Note</strong>: A scope is <em>thread-specific</em>. A single scope should <strong>not</strong> be used over multiple threads. Do not pass a scope between threads and do not wrap an ASP.NET HTTP request with a Lifetime Scope, since ASP.NET can finish a web request on different thread to the thread the request is started on. Use <a class="reference internal" href="#perwebrequest"><em>Per Web Request</em></a> scoping for ASP.NET web applications while running inside a web request. Lifetime scoping however, can still be used in web applications on background threads that are created by web requests or when processing commands in a Windows Service (where each commands gets its own scope). For developing multi-threaded applications, take <a class="reference internal" href="howto.html#multi-threaded-applications"><em>these guidelines</em></a> into consideration.</div>
 <p>Outside the context of a lifetime scope, i.e. <cite>using (container.BeginLifetimeScope())</cite> no instances can be created. An exception is thrown when a lifetime soped registration is requested outside of a scope instance.</p>
 <p>Scopes can be nested and each scope will get its own set of instances:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span>
-<span class="p">{</span>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span> <span class="p">{</span>
     <span class="kt">var</span> <span class="n">outer1</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
     <span class="kt">var</span> <span class="n">outer2</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
 
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">outer1</span><span class="p">,</span> <span class="n">outer2</span><span class="p">);</span>
+    <span class="n">Assert</span><span class="p">.</span><span class="n">AreSame</span><span class="p">(</span><span class="n">outer1</span><span class="p">,</span> <span class="n">outer2</span><span class="p">);</span>
 
-    <span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span>
-    <span class="p">{</span>
+    <span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span> <span class="p">{</span>
         <span class="kt">var</span> <span class="n">inner1</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
         <span class="kt">var</span> <span class="n">inner2</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
 
-        <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">inner1</span><span class="p">,</span> <span class="n">inner2</span><span class="p">);</span>
+        <span class="n">Assert</span><span class="p">.</span><span class="n">AreSame</span><span class="p">(</span><span class="n">inner1</span><span class="p">,</span> <span class="n">inner2</span><span class="p">);</span>
 
-        <span class="n">Assert</span><span class="p">.</span><span class="n">AreNotEqual</span><span class="p">(</span><span class="n">outer1</span><span class="p">,</span> <span class="n">inner1</span><span class="p">);</span>
+        <span class="n">Assert</span><span class="p">.</span><span class="n">AreNotSame</span><span class="p">(</span><span class="n">outer1</span><span class="p">,</span> <span class="n">inner1</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In contrast to the default behavior of <em>Simple Injector</em>, a lifetime scope ensures the created service is disposed (when such an instance implements <strong>IDisposable</strong>), unless explicitly disabled. This is happens at the end of the scope.</p>
+<p>In contrast to the default behavior of Simple Injector, a lifetime scope ensures the created service is disposed (when such an instance implements <em>IDisposable</em>), unless explicitly disabled. This is happens at the end of the scope.</p>
 <p>You can explicitly register services for disposal at the end of the scope:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">LifetimeScopeLifestyle</span><span class="p">();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">ServiceImpl</span><span class="p">&gt;();</span>
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ServiceImp</span><span class="p">&gt;(</span><span class="n">instance</span> <span class="p">=&gt;</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ServiceImpl</span><span class="p">&gt;(</span><span class="n">instance</span> <span class="p">=&gt;</span>
     <span class="n">scopedLifestyle</span><span class="p">.</span><span class="n">RegisterForDisposal</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">instance</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>This ensures that each time a <strong>ServiceImp</strong> is created by the container, it is disposed when the associated scope (in which it was created) ends.</p>
+<p>This ensures that each time a <em>ServiceImpl</em> is created by the container, it is disposed when the associated scope (in which it was created) ends.</p>
 <div class="note container">
-<strong>Note</strong>: To be able to dispose an instance, the <em>RegisterForDisposal</em> method will store a reference to that instance within the <strong>LifetimeScope</strong> instance. This means that the instance will be kept alive for the duration of that scope.</div>
+<strong>Note</strong>: To be able to dispose an instance, the <strong>RegisterForDisposal</strong> method will store a reference to that instance within the <strong>LifetimeScope</strong> instance. This means that the instance will be kept alive for the duration of that scope.</div>
 <div class="note container">
 <strong>Note</strong>: Be careful to not register any services for disposal that will outlive the scope itself (such as services registered as singleton), since a service cannot be used once it has been disposed.</div>
 </div>
@@ -488,25 +483,25 @@ Within a certain (explicitly defined) scope, there will be only one instance of 
 <span id="perexecutioncontextscope"></span><h2>Per Execution Context Scope<a class="headerlink" href="#per-execution-context-scope" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends (unless specified otherwise).</div>
-<p>This scope will automatically flow with the logical flow of control of asynchronous methods. This lifestyle is especially suited for client applications that work with the new asynchronous programming model. For Web API there&#8217;s a <cite>separate lifestyle &lt;PerWebAPIRequest&gt;</cite> (which actually uses this Execution Context Scope lifestyle under the covers).</p>
-<p>Execution Context Scoping is an extension package for <em>Simple Injector</em>. It is available as <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Extensions.ExecutionContextScoping">Execution Context Extensions NuGet package</a> and is part of the default download on CodePlex as <em>SimpleInjector.Extensions.ExecutionContextScoping.dll</em>. The extension package adds multiple <em>RegisterExecutionContextScope</em> extension method overloads and a <em>ExecutionContextScopeLifestyle</em> class, which allow to register services with the <strong>Execution Context Scope</strong> lifestyle:</p>
+<p>This scope will automatically flow with the logical flow of control of asynchronous methods. This lifestyle is especially suited for client applications that work with the new asynchronous programming model. For Web API there&#8217;s a <a class="reference internal" href="#perwebapirequest"><em>Per Web API Request lifestyle</em></a> (which actually uses this Execution Context Scope lifestyle under the covers).</p>
+<p>Execution Context Scoping is an extension package for Simple Injector. It is available as <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Extensions.ExecutionContextScoping">Execution Context Extensions NuGet package</a> and is part of the default download on CodePlex as <strong>SimpleInjector.Extensions.ExecutionContextScoping.dll</strong>. The extension package adds multiple <strong>RegisterExecutionContextScope</strong> extension method overloads and a <strong>ExecutionContextScopeLifestyle</strong> class, which allow to register services with the <em>Execution Context Scope</em> lifestyle:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterExecutionContextScope</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;();</span>
 
 <span class="c1">// Or alternatively</span>
-<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;(</span><span class="k">new</span> <span class="n">ExecutionContextScopeLifestyle</span><span class="p">());</span>
+    <span class="n">ver</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ExecutionContextScopeLifestyle</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;(</span><span class="n">scopedLifestyle</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Within an explicitly defined scope, there will be only one instance of a service that is defined with the <strong>Execution Context Scope</strong> lifestyle:</p>
+<p>Within an explicitly defined scope, there will be only one instance of a service that is defined with the <em>Execution Context Scope</em> lifestyle:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Extensions.ExecutionContextScoping;</span>
 
-<span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginExecutionContextScope</span><span class="p">())</span>
-<span class="p">{</span>
+<span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginExecutionContextScope</span><span class="p">())</span> <span class="p">{</span>
     <span class="kt">var</span> <span class="n">uow1</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
     <span class="k">await</span> <span class="nf">SomeAsyncOperation</span><span class="p">();</span>
     <span class="kt">var</span> <span class="n">uow2</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
     <span class="k">await</span> <span class="nf">SomeOtherAsyncOperation</span><span class="p">();</span>
 
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">uow1</span><span class="p">,</span> <span class="n">uow2</span><span class="p">);</span>
+    <span class="n">Assert</span><span class="p">.</span><span class="n">AreSame</span><span class="p">(</span><span class="n">uow1</span><span class="p">,</span> <span class="n">uow2</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -514,66 +509,64 @@ There will be only one instance of a given service type within a certain (explic
 <strong>Note</strong>: A scope is specific to the asynchronous flow. A method call on a different (unrelated) thread, will get its own scope.</div>
 <p>Outside the context of a lifetime scope no instances can be created. An exception is thrown when this happens.</p>
 <p>Scopes can be nested and each scope will get its own set of instances:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span>
-<span class="p">{</span>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span> <span class="p">{</span>
     <span class="kt">var</span> <span class="n">outer1</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
     <span class="k">await</span> <span class="nf">SomeAsyncOperation</span><span class="p">();</span>
     <span class="kt">var</span> <span class="n">outer2</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
 
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">outer1</span><span class="p">,</span> <span class="n">outer2</span><span class="p">);</span>
+    <span class="n">Assert</span><span class="p">.</span><span class="n">AreSame</span><span class="p">(</span><span class="n">outer1</span><span class="p">,</span> <span class="n">outer2</span><span class="p">);</span>
 
-    <span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span>
-    <span class="p">{</span>
+    <span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span> <span class="p">{</span>
         <span class="kt">var</span> <span class="n">inner1</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
 
         <span class="k">await</span> <span class="nf">SomeOtherAsyncOperation</span><span class="p">();</span>
 
         <span class="kt">var</span> <span class="n">inner2</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
 
-        <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">inner1</span><span class="p">,</span> <span class="n">inner2</span><span class="p">);</span>
+        <span class="n">Assert</span><span class="p">.</span><span class="n">AreSame</span><span class="p">(</span><span class="n">inner1</span><span class="p">,</span> <span class="n">inner2</span><span class="p">);</span>
 
-        <span class="n">Assert</span><span class="p">.</span><span class="n">AreNotEqual</span><span class="p">(</span><span class="n">outer1</span><span class="p">,</span> <span class="n">inner1</span><span class="p">);</span>
+        <span class="n">Assert</span><span class="p">.</span><span class="n">AreNotSame</span><span class="p">(</span><span class="n">outer1</span><span class="p">,</span> <span class="n">inner1</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In contrast to the default behavior of <em>Simple Injector</em>, a scoped lifestyle ensures the created service is disposed (when such an instance implements <strong>IDisposable</strong>), unless explicitly disabled. This is done at the end of the scope.</p>
+<p>In contrast to the default behavior of Simple Injector, a scoped lifestyle ensures the created service is disposed (when such an instance implements <em>IDisposable</em>), unless explicitly disabled. This is done at the end of the scope.</p>
 <p>Optionally you can register other services for disposal at the end of the scope:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ExecutionContextScopeLifestyle</span><span class="p">();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">ServiceImpl</span><span class="p">&gt;();</span>
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ServiceImp</span><span class="p">&gt;(</span><span class="n">instance</span> <span class="p">=&gt;</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">ServiceImpl</span><span class="p">&gt;(</span><span class="n">instance</span> <span class="p">=&gt;</span>
     <span class="n">scopedLifestyle</span><span class="p">.</span><span class="n">RegisterForDisposal</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">instance</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>This ensures that each time a <strong>ServiceImp</strong> is created by the container, it is registered for disposal when the scope (in which it is created) ends.</p>
+<p>This ensures that each time a <em>ServiceImpl</em> is created by the container, it is registered for disposal when the scope (in which it is created) ends.</p>
 <div class="note container">
-<strong>Note</strong>: To be able to dispose an instance, the <em>RegisterForDisposal</em> will store the reference to that instance within that scope. This means that the instance will be kept alive for the duration of that scope.</div>
+<strong>Note</strong>: To be able to dispose an instance, the <strong>RegisterForDisposal</strong> will store the reference to that instance within that scope. This means that the instance will be kept alive for the duration of that scope.</div>
 <div class="note container">
 <strong>Note</strong>: Be careful to not register any services for disposal that will outlive the scope itself (such as services registered as singleton), since a service cannot be used once it has been disposed.</div>
 </div>
 <div class="section" id="per-graph">
 <span id="pergraph"></span><h2>Per Graph<a class="headerlink" href="#per-graph" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
-For each explicit call to <em>Container.GetInstance&lt;T&gt;</em> a new instance of the service type will be created, but the instance will be reused within the object graph that gets constructed.</div>
-<p>Compared to <em>Transient</em>, there will be just a single instance per explicit call to the container, while <em>Transient</em> services can have multiple new instances per explicit call to the container. This lifestyle can be simulated by using one of the <cite>Scoped &lt;Scoped&gt;</cite> lifestyles.</p>
+For each explicit call to <strong>Container.GetInstance&lt;T&gt;</strong> a new instance of the service type will be created, but the instance will be reused within the object graph that gets constructed.</div>
+<p>Compared to <strong>Transient</strong>, there will be just a single instance per explicit call to the container, while <strong>Transient</strong> services can have multiple new instances per explicit call to the container. This lifestyle can be simulated by using one of the <a class="reference internal" href="#scoped"><em>Scoped</em></a> lifestyles.</p>
 </div>
 <div class="section" id="per-thread">
 <span id="perthread"></span><h2>Per Thread<a class="headerlink" href="#per-thread" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 There will be one instance of the registered service type per thread.</div>
-<p>This lifestyle is deliberately left out of <em>Simple Injector</em> because <a class="reference external" href="https://stackoverflow.com/a/14592419/264697">it is considered to be harmful</a>. Instead of using Per Thread lifestyle, you will usually be better of using one of the <cite>Scoped lifestyles &lt;Scoped&gt;</cite>.</p>
+<p>This lifestyle is deliberately left out of Simple Injector because <a class="reference external" href="https://stackoverflow.com/a/14592419/264697">it is considered to be harmful</a>. Instead of using Per Thread lifestyle, you will usually be better of using one of the <a class="reference internal" href="#scoped"><em>Scoped lifestyles</em></a>.</p>
 </div>
 <div class="section" id="per-http-session">
 <span id="perhttpsession"></span><h2>Per HTTP Session<a class="headerlink" href="#per-http-session" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 There will be one instance of the registered session per (user) session in a ASP.NET web application.</div>
-<p>This lifestyle is deliberately left out of <em>Simple Injector</em> because <a class="reference external" href="https://stackoverflow.com/questions/17702546">it is be used with care</a>. Instead of using Per HTTP Session lifestyle, you will usually be better of by writing a stateless service that can be registered as singleton and let it communicate with the ASP.NET Session cache to handle cached user-specific data.</p>
+<p>This lifestyle is deliberately left out of Simple Injector because <a class="reference external" href="https://stackoverflow.com/questions/17702546">it is be used with care</a>. Instead of using Per HTTP Session lifestyle, you will usually be better of by writing a stateless service that can be registered as singleton and let it communicate with the ASP.NET Session cache to handle cached user-specific data.</p>
 </div>
 <div class="section" id="hybrid">
 <span id="id4"></span><h2>Hybrid<a class="headerlink" href="#hybrid" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 A hybrid lifestyle is a mix between two or more lifestyles where the the developer defines the context for which the wrapped lifestyles hold.</div>
-<p><em>Simple Injector</em> has no built-in hybrid lifestyles, but has a simple mechanism for defining them:</p>
+<p>Simple Injector has no built-in hybrid lifestyles, but has a simple mechanism for defining them:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">hybridLifestyle</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateHybrid</span><span class="p">(</span>
     <span class="n">lifestyleSelector</span><span class="p">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span> <span class="p">!=</span> <span class="k">null</span><span class="p">,</span>
     <span class="n">trueLifestyle</span><span class="p">:</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">(),</span>
@@ -584,9 +577,10 @@ A hybrid lifestyle is a mix between two or more lifestyles where the the develop
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ICustomerRepository</span><span class="p">,</span> <span class="n">SqlCustomerRepository</span><span class="p">&gt;(</span><span class="n">hybridLifestyle</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In the example a hybrid lifestyle is defined wrapping the <a class="reference internal" href="#perwebrequest"><em>Web Request</em></a> lifestyle and the <a class="reference internal" href="#perlifetimescope"><em>Per Lifetime Scope</em></a> lifestyle. The supplied <strong>lifestyleSelector</strong> predicate returns <strong>true</strong> when the container should use the <strong>Web Request</strong> lifestyle and <strong>false</strong> when the <strong>Per Lifetime Scope</strong> lifestyle should be selected.</p>
-<p>A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations run outside the context of an <strong>HttpContext</strong> (in a background thread for instance). Please note though that when the lifestyle doesn&#8217;t have to change throughout the lifetime of the application, a hybrid lifestyle is not needed. A normal lifestyle can be registered instead:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">lifestyle</span> <span class="p">=</span> <span class="n">RunsOnWebServer</span> <span class="p">?</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">()</span> <span class="p">:</span> <span class="k">new</span> <span class="n">LifetimeScopeLifestyle</span><span class="p">();</span>
+<p>In the example a hybrid lifestyle is defined wrapping the <a class="reference internal" href="#perwebrequest"><em>Web Request</em></a> lifestyle and the <a class="reference internal" href="#perlifetimescope"><em>Per Lifetime Scope</em></a> lifestyle. The supplied <em>lifestyleSelector</em> predicate returns <em>true</em> when the container should use the <em>Web Request</em> lifestyle and <em>false</em> when the <em>Per Lifetime Scope</em> lifestyle should be selected.</p>
+<p>A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations run outside the context of an <em>HttpContext</em> (in a background thread for instance). Please note though that when the lifestyle doesn&#8217;t have to change throughout the lifetime of the application, a hybrid lifestyle is not needed. A normal lifestyle can be registered instead:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">lifestyle</span> <span class="p">=</span>
+    <span class="n">RunsOnWebServer</span> <span class="p">?</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">()</span> <span class="p">:</span> <span class="k">new</span> <span class="n">LifetimeScopeLifestyle</span><span class="p">();</span>
 
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;(</span><span class="n">lifestyle</span><span class="p">);</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ICustomerRepository</span><span class="p">,</span> <span class="n">SqlCustomerRepository</span><span class="p">&gt;(</span><span class="n">lifestyle</span><span class="p">);</span>
@@ -595,7 +589,61 @@ A hybrid lifestyle is a mix between two or more lifestyles where the the develop
 </div>
 <div class="section" id="developing-a-custom-lifestyle">
 <span id="customlifestyles"></span><h2>Developing a Custom Lifestyle<a class="headerlink" href="#developing-a-custom-lifestyle" title="Permalink to this headline">¶</a></h2>
-<p>The lifestyles supplied by the framework should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm">Lifestyle</a> and let it return <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm">Custom Lifestyle</a> instances. This however is a lot of work, and a shortcut is available in the form of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_CreateCustom.htm">Lifestyle.CreateCustom</a>. Please take a look at the example given on the <em>CreateCustom</em> documentation for more information.</p>
+<p>The lifestyles supplied by the framework should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm">Lifestyle</a> and let it return <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm">Custom Registration</a> instances. This however is a lot of work, and a shortcut is available in the form of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Lifestyle_CreateCustom.htm">Lifestyle.CreateCustom</a>.</p>
+<p>A custom lifestyle can be created by calling the <strong>Lifestyle.CreateCustom</strong> factory method. This method takes two arguments: the name of the lifestyle to create (used mainly for display in the <em class="xref std std-ref">Diagnostic Services</em>) and a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_CreateLifestyleApplier.htm">CreateLifestyleApplier</a> delegate:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">delegate</span> <span class="n">Func</span><span class="p">&lt;</span><span class="kt">object</span><span class="p">&gt;</span> <span class="n">CreateLifestyleApplier</span><span class="p">(</span>
+    <span class="n">Func</span><span class="p">&lt;</span><span class="kt">object</span><span class="p">&gt;</span> <span class="n">transientInstanceCreator</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <strong>CreateLifestyleApplier</strong> delegate accepts a <em>Func&lt;object&gt;</em> that allows the creation of a transient instance of the registered type. This <em>Func&lt;object&gt;</em> is created by Simple Injector supplied to the registered  <strong>CreateLifestyleApplier</strong> delegate for the registered type. When this <em>Func&lt;object&gt;</em> delegate is called, the creation of the type goes through the <a class="reference internal" href="pipeline.html"><em>Simple Injector pipeline</em></a>. This keeps the experience consistent with the rest of the library.</p>
+<p>When Simple Injector calls the <strong>CreateLifestyleApplier</strong>, it is your job to return another <em>Func&lt;object&gt;</em> delegate that applies the caching based on the supplied <em>instanceCreator</em>. A simple example would be the following:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">sillyTransientLifestyle</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateCustom</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="s">&quot;Silly Transient&quot;</span><span class="p">,</span>
+    <span class="c1">// instanceCreator is of type Func&lt;object&gt;</span>
+    <span class="n">lifestyleApplierFactory</span><span class="p">:</span> <span class="n">instanceCreator</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// A Func&lt;object&gt; is returned that applies caching.</span>
+        <span class="k">return</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">instanceCreator</span><span class="p">.</span><span class="n">Invoke</span><span class="p">();</span>
+        <span class="p">};</span>
+    <span class="p">});</span>
+
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">MyService</span><span class="p">&gt;(</span><span class="n">sillyTransientLifestyle</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here we create a custom lifestyle that applies no caching and simply returns a delegate that will on invocation always call the wrapped <em>instanceCreator</em>. Of course this would be rather useless and using the built-in <strong>Lifestyle.Transient</strong> would be much better in this case. It does however demonstrate its use.</p>
+<p>The <em>Func&lt;object&gt;</em> delegate that you return from your <strong>CreateLifestyleApplier</strong> delegate will get cached by Simple Injector per registration. Simple Injector will call the delegate once per registration and stores the returned <em>Func&lt;object&gt;</em> for reuse. This means that each registration will get its own <em>Func&lt;object&gt;</em>.</p>
+<p>Here&#8217;s an example of the creation of a more useful custom lifestyle that caches an instance for 10 minutes:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">tenMinuteLifestyle</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateCustom</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="s">&quot;Absolute 10 Minute Expiration&quot;</span><span class="p">,</span>
+    <span class="n">lifestyleApplierFactory</span><span class="p">:</span> <span class="n">instanceCreator</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="n">TimeSpan</span> <span class="n">timeout</span> <span class="p">=</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromMinutes</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+        <span class="kt">var</span> <span class="n">syncRoot</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">object</span><span class="p">();</span>
+        <span class="kt">var</span> <span class="n">expirationTime</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">MinValue</span><span class="p">;</span>
+        <span class="kt">object</span> <span class="n">instance</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+            <span class="k">lock</span> <span class="p">(</span><span class="n">syncRoot</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">expirationTime</span> <span class="p">&lt;</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">UtcNow</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">instance</span> <span class="p">=</span> <span class="n">instanceCreator</span><span class="p">.</span><span class="n">Invoke</span><span class="p">();</span>
+                    <span class="n">expirationTime</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">UtcNow</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">timeout</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="k">return</span> <span class="n">instance</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">});</span>
+
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="c1">// We can reuse the created lifestyle for multiple registrations.</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">MyService</span><span class="p">&gt;(</span><span class="n">tenMinuteLifestyle</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">AnotherService</span><span class="p">,</span> <span class="n">MeTwoService</span><span class="p">&gt;(</span><span class="n">tenMinuteLifestyle</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In this example the <strong>Lifestyle.CreateCustom</strong> method is called and supplied with a delegate that returns a delegate that applies the 10 minute cache. This example makes use of the fact that each registration gets its own delegate by using four closures (timeout, syncRoot, expirationTime and instance). Since each registration (in the example <em>IService</em> and <em>AnotherService</em>) will get its own <em>Func&lt;object&gt;</em> delegate, each registration gets its own set of closures. The closures are static per registration.</p>
+<p>One of the closure variables is the <em>instance</em> and this will contain the cached instance that will change after 10 minutes has passed. As long as the time hasn&#8217;t passed, the same instance will be returned.</p>
+<p>Since the constructed <em>Func&lt;object&gt;</em> delegate can be called from multiple threads, the code needs to do its own synchronization. Both the DateTime comparison and the DateTime assignment are not thread-safe and this code needs to handle this itself.</p>
 </div>
 </div>
 

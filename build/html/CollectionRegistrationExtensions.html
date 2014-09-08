@@ -221,13 +221,13 @@
   <div class="section" id="collection-registration-extension">
 <h1>Collection Registration Extension<a class="headerlink" href="#collection-registration-extension" title="Permalink to this headline">¶</a></h1>
 <p><strong>Allowing the Simple Injector to resolve arrays and other list types.</strong></p>
-<p>The default behavior of <em>Simple Injector</em> is to resolve collections of types through the <em>IEnumerable&lt;T&gt;</em> interface. Resolving a set of elements using other collection types is possible by registrering a mapping on a per type basis, such as can be seen the following example:</p>
+<p>The default behavior of Simple Injector is to resolve collections of types through the <em>IEnumerable&lt;T&gt;</em> interface. Resolving a set of elements using other collection types is possible by registrering a mapping on a per type basis, such as can be seen the following example:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">IFilter</span><span class="p">&gt;(</span>
-    <span class="k">typeof</span><span class="p">(</span><span class="n">SqlFilter</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">XssFilter</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">SmartFilter</span><span class="p">));</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">SqlFilter</span><span class="p">),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">XssFilter</span><span class="p">),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">SmartFilter</span><span class="p">));</span>
 
-<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IFilter</span><span class="p">[]&gt;(</span>
-
-    <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">&lt;</span><span class="n">IFilter</span><span class="p">&gt;().</span><span class="n">ToArray</span><span class="p">());</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IFilter</span><span class="p">[]&gt;(()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">&lt;</span><span class="n">IFilter</span><span class="p">&gt;().</span><span class="n">ToArray</span><span class="p">());</span>
 </pre></div>
 </div>
 <p>When having many collections of types that need to be resolved in this way, the registration can be come cumbersome. Alternatively you can revert to unregistered type resolution, as can be seen in the following example:</p>
@@ -238,23 +238,16 @@
 
 <span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
 
-<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">CollectionRegistrationExtensions</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">AllowToResolveArraysAndLists</span><span class="p">(</span>
-        <span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">ResolveUnregisteredType</span> <span class="p">+=</span> <span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span>
-        <span class="p">{</span>
+<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">CollectionRegistrationExtensions</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">AllowToResolveArraysAndLists</span><span class="p">(</span><span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">ResolveUnregisteredType</span> <span class="p">+=</span> <span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
             <span class="kt">var</span> <span class="n">serviceType</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">UnregisteredServiceType</span><span class="p">;</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="n">serviceType</span><span class="p">.</span><span class="n">IsArray</span><span class="p">)</span>
-            <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">serviceType</span><span class="p">.</span><span class="n">IsArray</span><span class="p">)</span> <span class="p">{</span>
                 <span class="n">RegisterArrayResolver</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span>
                     <span class="n">serviceType</span><span class="p">.</span><span class="n">GetElementType</span><span class="p">());</span>
-            <span class="p">}</span>
-            <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">serviceType</span><span class="p">.</span><span class="n">IsGenericType</span> <span class="p">&amp;&amp;</span>
-                <span class="n">serviceType</span><span class="p">.</span><span class="n">GetGenericTypeDefinition</span><span class="p">()</span> <span class="p">==</span> <span class="k">typeof</span><span class="p">(</span><span class="n">IList</span><span class="p">&lt;&gt;))</span>
-            <span class="p">{</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">serviceType</span><span class="p">.</span><span class="n">IsGenericType</span> <span class="p">&amp;&amp;</span>
+                <span class="n">serviceType</span><span class="p">.</span><span class="n">GetGenericTypeDefinition</span><span class="p">()</span> <span class="p">==</span> <span class="k">typeof</span><span class="p">(</span><span class="n">IList</span><span class="p">&lt;&gt;))</span> <span class="p">{</span>
                 <span class="n">RegisterArrayResolver</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span>
                     <span class="n">serviceType</span><span class="p">.</span><span class="n">GetGenericArguments</span><span class="p">()[</span><span class="m">0</span><span class="p">]);</span>
             <span class="p">}</span>
@@ -262,8 +255,7 @@
     <span class="p">}</span>
 
     <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterArrayResolver</span><span class="p">(</span><span class="n">UnregisteredTypeEventArgs</span> <span class="n">e</span><span class="p">,</span>
-        <span class="n">Container</span> <span class="n">container</span><span class="p">,</span> <span class="n">Type</span> <span class="n">elementType</span><span class="p">)</span>
-    <span class="p">{</span>
+        <span class="n">Container</span> <span class="n">container</span><span class="p">,</span> <span class="n">Type</span> <span class="n">elementType</span><span class="p">)</span> <span class="p">{</span>
         <span class="kt">var</span> <span class="n">producer</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IEnumerable</span><span class="p">&lt;&gt;)</span>
             <span class="p">.</span><span class="n">MakeGenericType</span><span class="p">(</span><span class="n">elementType</span><span class="p">));</span>
         <span class="kt">var</span> <span class="n">enumerableExpression</span> <span class="p">=</span> <span class="n">producer</span><span class="p">.</span><span class="n">BuildExpression</span><span class="p">();</span>

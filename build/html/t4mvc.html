@@ -220,9 +220,9 @@
   <div class="section" id="t4mvc-integration-guide">
 <h1>T4MVC Integration Guide<a class="headerlink" href="#t4mvc-integration-guide" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference external" href="http://t4mvc.codeplex.com/">T4MVC</a> is a T4 template for ASP.NET MVC apps that creates strongly typed helpers that eliminate the use of literal strings when referring the controllers, actions and views.</p>
-<p>Besides generating strongly typed helpers, T4MVC also generates partial classes for all controllers in your project. This partial class sometimes adds a public constructor to the controller. Since <em>Simple Injector</em> by default only allows auto-wiring on types that contain just a single public constructor, the application will fail to start up.</p>
+<p>Besides generating strongly typed helpers, T4MVC also generates partial classes for all controllers in your project. This partial class sometimes adds a public constructor to the controller. Since Simple Injector by default only allows auto-wiring on types that contain just a single public constructor, the application will fail to start up.</p>
 <p>To fix this you will either have to change the T4 template and remove the generation of the default constructor, or change the constructor resolution behavior of the container.</p>
-<p>Change the constructor resolution behavior of the container can be done by implementing a custom <em>IConstructorResolutionBehavior</em> as follows:</p>
+<p>Change the constructor resolution behavior of the container can be done by implementing a custom <strong>IConstructorResolutionBehavior</strong> as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.Diagnostics</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
@@ -232,36 +232,29 @@
 <span class="k">using</span> <span class="nn">SimpleInjector.Advanced</span><span class="p">;</span>
 
 <span class="k">public</span> <span class="k">class</span> <span class="nc">T4MvcControllerConstructorResolutionBehavior</span>
-    <span class="p">:</span> <span class="n">IConstructorResolutionBehavior</span>
-<span class="p">{</span>
+    <span class="p">:</span> <span class="n">IConstructorResolutionBehavior</span> <span class="p">{</span>
     <span class="k">private</span> <span class="n">IConstructorResolutionBehavior</span> <span class="n">defaultBehavior</span><span class="p">;</span>
 
     <span class="k">public</span> <span class="nf">T4MvcControllerConstructorResolutionBehavior</span><span class="p">(</span>
-        <span class="n">IConstructorResolutionBehavior</span> <span class="n">defaultBehavior</span><span class="p">)</span>
-    <span class="p">{</span>
+        <span class="n">IConstructorResolutionBehavior</span> <span class="n">defaultBehavior</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">this</span><span class="p">.</span><span class="n">defaultBehavior</span> <span class="p">=</span> <span class="n">defaultBehavior</span><span class="p">;</span>
     <span class="p">}</span>
 
 <span class="na">    [DebuggerStepThrough]</span>
-    <span class="k">public</span> <span class="n">ConstructorInfo</span> <span class="nf">GetConstructor</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span>
-        <span class="n">Type</span> <span class="n">impType</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IController</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">impType</span><span class="p">))</span>
-        <span class="p">{</span>
+    <span class="k">public</span> <span class="n">ConstructorInfo</span> <span class="nf">GetConstructor</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">impType</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IController</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">impType</span><span class="p">))</span> <span class="p">{</span>
             <span class="kt">var</span> <span class="n">nonDefaultConstructors</span> <span class="p">=</span>
                 <span class="k">from</span> <span class="n">constructor</span> <span class="k">in</span> <span class="n">impType</span><span class="p">.</span><span class="n">GetConstructors</span><span class="p">()</span>
                 <span class="k">where</span> <span class="n">constructor</span><span class="p">.</span><span class="n">GetParameters</span><span class="p">().</span><span class="n">Length</span> <span class="p">&gt;</span> <span class="m">0</span>
                 <span class="k">select</span> <span class="n">constructor</span><span class="p">;</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="n">nonDefaultConstructors</span><span class="p">.</span><span class="n">Count</span><span class="p">()</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span>
-            <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">nonDefaultConstructors</span><span class="p">.</span><span class="n">Count</span><span class="p">()</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span>
                 <span class="k">return</span> <span class="n">nonDefaultConstructors</span><span class="p">.</span><span class="n">Single</span><span class="p">();</span>
             <span class="p">}</span>
         <span class="p">}</span>
 
         <span class="c1">// fall back to the container&#39;s default behavior.</span>
-        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">defaultBehavior</span><span class="p">.</span><span class="n">GetConstructor</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span>
-            <span class="n">impType</span><span class="p">);</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">defaultBehavior</span><span class="p">.</span><span class="n">GetConstructor</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">impType</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>

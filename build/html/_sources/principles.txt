@@ -35,7 +35,7 @@ We believe in good design and best practices. When it comes to Dependency Inject
 Fast by default
 ===============
 
-For most applications the performance of the IoC container is not an issue, I/O is usually the bottleneck. You will find, however, that certain DI libraries are very sensitive to different configurations and you will need to monitor the container for potential performance problems. Most performance problems can be fixed by changing the configuration (changing registrations to singleton, adding caching, etc), no matter which library you use. At that point however it can get really complicated to configure certain libraries.
+For most applications the performance of the DI library is not an issue; I/O is usually the bottleneck. You will find, however, that certain DI libraries are very sensitive to different configurations and you will need to monitor the container for potential performance problems. Most performance problems can be fixed by changing the configuration (changing registrations to singleton, adding caching, etc), no matter which library you use. At that point however it can get really complicated to configure certain libraries.
 
 Making Simple Injector fast by default removes any concerns regarding the performance of the construction of object graphs. Instead of having to monitor Simple Injector’s performance and make ugly tweaks to the configuration when object construction is too slow, the developer is free to worry about more important things.
 
@@ -71,6 +71,6 @@ This means that features should be easy to use and do the right thing by default
 Communicate errors clearly and describe how to solve them
 =========================================================
 
-In our day jobs we regularly encounter exception messages that aren't helpful or, even worse, are misleading (we have all seen the **NullReferenceException**). It frustrates us, takes time to track down and therefore costs money. We don't want to put any developer in that position and therefore defined an explicit design rule stating that Simple Injector should always communicate errors as clearly as possible. And, not only should it describe the problem, it should offer details on the options for solving the problem.
+In our day jobs we regularly encounter exception messages that aren't helpful or, even worse, are misleading (we have all seen the *NullReferenceException*). It frustrates us, takes time to track down and therefore costs money. We don't want to put any developer in that position and therefore defined an explicit design rule stating that Simple Injector should always communicate errors as clearly as possible. And, not only should it describe the problem, it should offer details on the options for solving the problem.
 
 If you encounter a scenario where we fail to do this, please let us know. We are serious about this and we will fix it!

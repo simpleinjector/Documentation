@@ -221,9 +221,8 @@
   <div class="section" id="wcf-integration-guide">
 <h1>WCF Integration Guide<a class="headerlink" href="#wcf-integration-guide" title="Permalink to this headline">¶</a></h1>
 <p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">Simple Injector WCF Integration NuGet Package</a> allows WCF services to be resolved by the container, which enables constructor injection.</p>
-<p>After installing this NuGet package, it must be initialized in the start-up path of the application by calling the <em>SimpleInjectorServiceHostFactory.SetContainer</em> method:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span>
-<span class="p">{</span>
+<p>After installing this NuGet package, it must be initialized in the start-up path of the application by calling the <strong>SimpleInjectorServiceHostFactory.SetContainer</strong> method:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Create the container as usual.</span>
     <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
 
@@ -237,7 +236,7 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Warning</strong>: Instead of what the name of the names of the <em>WcfOperationLifestyle</em> class and the <em>RegisterPerWcfOperation</em> methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how  the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx">InstanceContextMode enumeration</a>. Components that are registers <em>PerWcfOperation</em> live as long as the WCF service class they are injected into.</div>
+<strong>Warning</strong>: Instead of what the name of the names of the <strong>WcfOperationLifestyle</strong> class and the <strong>RegisterPerWcfOperation</strong> methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx">InstanceContextMode enumeration</a>. Components that are registered <em>PerWcfOperation</em> live as long as the WCF service class they are injected into.</div>
 <p>For each service class, you should supply a factory attribute in the .SVC file of each service class. For instance:</p>
 <div class="highlight-xml"><div class="highlight"><pre>&lt;%@ ServiceHost
     Service=&quot;UserService&quot;

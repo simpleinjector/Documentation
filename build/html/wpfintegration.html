@@ -220,8 +220,8 @@
             
   <div class="section" id="windows-presentation-foundation-integration-guide">
 <h1>Windows Presentation Foundation Integration Guide<a class="headerlink" href="#windows-presentation-foundation-integration-guide" title="Permalink to this headline">¶</a></h1>
-<p>WPF was not designed with dependency injection in mind. Instead of doing constructor injection, there are alternatives. The simplest thing to register the container in the <strong>App</strong> class, store the container in a static field and let <strong>Window</strong> instances request their dependencies from within their default constructor.</p>
-<p>Here is an example of how your <strong>App</strong> code behind could look like:</p>
+<p>WPF was not designed with dependency injection in mind. Instead of doing constructor injection, there are alternatives. The simplest thing to register the container in the <em>App</em> class, store the container in a static field and let <em>Window</em> instances request their dependencies from within their default constructor.</p>
+<p>Here is an example of how your <em>App</em> code behind could look like:</p>
 <div class="highlight-c#"><div class="highlight"><pre>using System.Windows;
 using SimpleInjector;
 
@@ -230,19 +230,16 @@ public partial class App : Application
     private static Container container;
 
     [System.Diagnostics.DebuggerStepThrough]
-    public static TService GetInstance&lt;TService&gt;() where TService : class
-    {
+    public static TService GetInstance&lt;TService&gt;() where TService : class {
         return container.GetInstance&lt;TService&gt;();
     }
 
-    protected override void OnStartup(StartupEventArgs e)
-    {
+    protected override void OnStartup(StartupEventArgs e) {
         base.OnStartup(e);
         Bootstrap();
     }
 
-    private static void Bootstrap()
-    {
+    private static void Bootstrap()  {
         // Create the container as usual.
         var container = new Container();
 
@@ -259,16 +256,14 @@ public partial class App : Application
 }
 </pre></div>
 </div>
-<p>With the static <strong>App.GetInstance&lt;T&gt;</strong> method, we can request instances from our <strong>Window</strong> constructors:</p>
+<p>With the static <em>App.GetInstance&lt;T&gt;</em> method, we can request instances from our <em>Window</em> constructors:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System.Windows</span><span class="p">;</span>
 
-<span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">MainWindow</span> <span class="p">:</span> <span class="n">Window</span>
-<span class="p">{</span>
+<span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">MainWindow</span> <span class="p">:</span> <span class="n">Window</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserRepository</span> <span class="n">userRepository</span><span class="p">;</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserContext</span> <span class="n">userContext</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="nf">MainWindow</span><span class="p">()</span>
-    <span class="p">{</span>
+    <span class="k">public</span> <span class="nf">MainWindow</span><span class="p">()</span> <span class="p">{</span>
         <span class="k">this</span><span class="p">.</span><span class="n">userRepository</span> <span class="p">=</span> <span class="n">App</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">&gt;();</span>
         <span class="k">this</span><span class="p">.</span><span class="n">userContext</span> <span class="p">=</span> <span class="n">App</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">&gt;();</span>
 

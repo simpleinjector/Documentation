@@ -229,13 +229,13 @@
 <span id="id1"></span><h2>Overriding Constructor Resolution Behavior<a class="headerlink" href="#overriding-constructor-resolution-behavior" title="Permalink to this headline">¶</a></h2>
 <p>Out of the box, Simple Injector only allows the creation of classes that contain a single public constructor. This behavior is chosen deliberately because <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=97">having multiple constructors is an anti-pattern</a>.</p>
 <p>There are some exceptional circumstances though, where we don&#8217;t control the amount of public constructors a type has. Code generators for instance, can have this annoying side effect. Earlier versions of the <a class="reference external" href="https://t4mvc.codeplex.com">T4MVC</a> template for instance did this.</p>
-<p>In these rare cases we need to override the way Simple Injector does its constructor overload resolution. This can be done by creating custom implementation of <em>IConstructorResolutionBehavior</em>. The default behavior can be replaced by setting the <em>Container.Options.ConstructorResolutionBehavior</em> property.</p>
+<p>In these rare cases we need to override the way Simple Injector does its constructor overload resolution. This can be done by creating custom implementation of <strong>IConstructorResolutionBehavior</strong>. The default behavior can be replaced by setting the <em>Container.Options.ConstructorResolutionBehavior</em> property.</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">IConstructorResolutionBehavior</span> <span class="p">{</span>
     <span class="n">ConstructorInfo</span> <span class="nf">GetConstructor</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">implementationType</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Simple Injector will call into the registered <em>IConstructorResolutionBehavior</em> when the type is registered to allow the <em>IConstructorResolutionBehavior</em> implementation to verify the type. The implementation is called again when the registered type is resolved for the first time.</p>
+<p>Simple Injector will call into the registered <strong>IConstructorResolutionBehavior</strong> when the type is registered to allow the <strong>IConstructorResolutionBehavior</strong> implementation to verify the type. The implementation is called again when the registered type is resolved for the first time.</p>
 <p>The following example changes the constructor resolution behavior to always select the constructor with the most parameters (the greediest constructor):</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Custom constructor resolution behavior</span>
 <span class="k">public</span> <span class="k">class</span> <span class="nc">GreediestConstructorBehavior</span> <span class="p">:</span> <span class="n">IConstructorResolutionBehavior</span> <span class="p">{</span>
@@ -303,15 +303,13 @@
     <span class="p">}</span>
 
     <span class="k">public</span> <span class="n">ConstructorInfo</span> <span class="nf">GetConstructor</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">impType</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IController</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">impType</span><span class="p">))</span>
-        <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IController</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">impType</span><span class="p">))</span> <span class="p">{</span>
             <span class="kt">var</span> <span class="n">nonDefaultConstructors</span> <span class="p">=</span>
                 <span class="k">from</span> <span class="n">constructor</span> <span class="k">in</span> <span class="n">impType</span><span class="p">.</span><span class="n">GetConstructors</span><span class="p">()</span>
                 <span class="k">where</span> <span class="n">constructor</span><span class="p">.</span><span class="n">GetParameters</span><span class="p">().</span><span class="n">Length</span> <span class="p">&gt;</span> <span class="m">0</span>
                 <span class="k">select</span> <span class="n">constructor</span><span class="p">;</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="n">nonDefaultConstructors</span><span class="p">.</span><span class="n">Count</span><span class="p">()</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span>
-            <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">nonDefaultConstructors</span><span class="p">.</span><span class="n">Count</span><span class="p">()</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span>
                 <span class="k">return</span> <span class="n">nonDefaultConstructors</span><span class="p">.</span><span class="n">Single</span><span class="p">();</span>
             <span class="p">}</span>
         <span class="p">}</span>
@@ -327,29 +325,27 @@
     <span class="k">new</span> <span class="nf">T4MvcConstructorBehavior</span><span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">ConstructorResolutionBehavior</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The old T4MVC template generated an extra public constructor on MVC Controller types and overload resolution only had to be changed for types implementing <strong>System.Web.Mvc.IController</strong>, which is what the previous code snippet does. For all other types of registration in the container, the container&#8217;s default behavior is used.</p>
+<p>The old T4MVC template generated an extra public constructor on MVC Controller types and overload resolution only had to be changed for types implementing <em>System.Web.Mvc.IController</em>, which is what the previous code snippet does. For all other types of registration in the container, the container&#8217;s default behavior is used.</p>
 </div>
 <div class="section" id="property-injection">
 <span id="id2"></span><h2>Property Injection<a class="headerlink" href="#property-injection" title="Permalink to this headline">¶</a></h2>
 <p>Attribute based property injection and implicit property injection are not supported by Simple Injector out of the box. With attribute based property injection the container injects properties that are decorated with an attribute. With implicit property injection the container automatically injects all properties that can be mapped to a registration, but silently skips other properties. An extension point is provided to change the library&#8217;s default behavior, which is to <strong>not</strong> inject any property at all.</p>
-<p>Out of the box, Simple Injector does allow explicit property injection based on registration of delegates using the <em>RegisterInitializer</em> method:</p>
+<p>Out of the box, Simple Injector does allow explicit property injection based on registration of delegates using the <strong>RegisterInitializer</strong> method:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">FileLogger</span><span class="p">&gt;();</span>
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">FileLogger</span><span class="p">&gt;(</span><span class="n">instance</span> <span class="p">=&gt;</span>
-<span class="p">{</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">FileLogger</span><span class="p">&gt;(</span><span class="n">instance</span> <span class="p">=&gt;</span> <span class="p">{</span>
     <span class="n">instance</span><span class="p">.</span><span class="n">Path</span> <span class="p">=</span> <span class="s">&quot;c:\logs\log.txt&quot;</span><span class="p">;</span>
 <span class="p">});</span>
 </pre></div>
 </div>
-<p>This enables property injection on a per-type basis and it allows configuration errors to be spot by the C# compiler and is especially suited for injection of configuration values. Downside of this approach is that the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a> will not be able to analyze properties injected this way and although the <em>RegisterInitializer</em> can be called on base types and interfaces, it is cumbersome when applying property injection on a larger scale.</p>
-<p>The Simple Injector API exposes the <em>IPropertySelectionBehavior</em> interface to change the way the library does property injection. The example below shows a custom <em>IPropertySelectionBehavior</em> implementation that enables attribute based property injection using any custom attribute:</p>
+<p>This enables property injection on a per-type basis and it allows configuration errors to be spot by the C# compiler and is especially suited for injection of configuration values. Downside of this approach is that the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a> will not be able to analyze properties injected this way and although the <strong>RegisterInitializer</strong> can be called on base types and interfaces, it is cumbersome when applying property injection on a larger scale.</p>
+<p>The Simple Injector API exposes the <strong>IPropertySelectionBehavior</strong> interface to change the way the library does property injection. The example below shows a custom <strong>IPropertySelectionBehavior</strong> implementation that enables attribute based property injection using any custom attribute:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.Reflection</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">SimpleInjector.Advanced</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">PropertySelectionBehavior</span><span class="p">&lt;</span><span class="n">TAttribute</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IPropertySelectionBehavior</span>
-    <span class="k">where</span> <span class="n">TAttribute</span> <span class="p">:</span> <span class="n">Attribute</span>
-<span class="p">{</span>
+    <span class="k">where</span> <span class="n">TAttribute</span> <span class="p">:</span> <span class="n">Attribute</span> <span class="p">{</span>
     <span class="k">public</span> <span class="kt">bool</span> <span class="nf">SelectProperty</span><span class="p">(</span><span class="n">Type</span> <span class="n">type</span><span class="p">,</span> <span class="n">PropertyInfo</span> <span class="n">prop</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">prop</span><span class="p">.</span><span class="n">GetCustomAttributes</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">TAttribute</span><span class="p">)).</span><span class="n">Any</span><span class="p">();</span>
     <span class="p">}</span>
@@ -363,10 +359,9 @@
 </div>
 <p>This enables explicit property injection on all properties that are marked with the supplied attribute (in this case <strong>MyInjectAttribute</strong>). In case a property is decorated that can&#8217;t be injected, the container will throw an exception.</p>
 <div class="note container">
-<strong>Tip</strong>: Dependencies injected by the container through the <em>IPropertySelectionBehavior</em> will be analyzed by the <a class="reference internal" href="diagnostics.html"><em>Diagnostic</em></a>.</div>
-<p>Implicit property injection can be enabled by creating an <em>IPropertySelectionBehavior</em> implementation that queries the container to check whether the property&#8217;s type to be registered in the container:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">ImplicitPropertyInjectionBehavior</span> <span class="p">:</span> <span class="n">IPropertySelectionBehavior</span>
-<span class="p">{</span>
+<strong>Tip</strong>: Dependencies injected by the container through the <strong>IPropertySelectionBehavior</strong> will be analyzed by the <a class="reference internal" href="diagnostics.html"><em>Diagnostic</em></a>.</div>
+<p>Implicit property injection can be enabled by creating an <strong>IPropertySelectionBehavior</strong> implementation that queries the container to check whether the property&#8217;s type to be registered in the container:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">ImplicitPropertyInjectionBehavior</span> <span class="p">:</span> <span class="n">IPropertySelectionBehavior</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
     <span class="k">internal</span> <span class="nf">ImplicitPropertyInjectionBehavior</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">this</span><span class="p">.</span><span class="n">container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
@@ -377,8 +372,7 @@
     <span class="p">}</span>
 
     <span class="k">private</span> <span class="kt">bool</span> <span class="nf">IsImplicitInjectable</span><span class="p">(</span><span class="n">PropertyInfo</span> <span class="n">property</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nf">IsInjectableProperty</span><span class="p">(</span><span class="n">property</span><span class="p">)</span> <span class="p">&amp;&amp;</span>
-            <span class="k">this</span><span class="p">.</span><span class="n">IsAvailable</span><span class="p">(</span><span class="n">property</span><span class="p">.</span><span class="n">PropertyType</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nf">IsInjectableProperty</span><span class="p">(</span><span class="n">property</span><span class="p">)</span> <span class="p">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="n">IsAvailable</span><span class="p">(</span><span class="n">property</span><span class="p">.</span><span class="n">PropertyType</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="k">private</span> <span class="k">static</span> <span class="kt">bool</span> <span class="nf">IsInjectableProperty</span><span class="p">(</span><span class="n">PropertyInfo</span> <span class="n">prop</span><span class="p">)</span> <span class="p">{</span>
@@ -402,7 +396,7 @@
 </div>
 <div class="section" id="overriding-parameter-injection-behavior">
 <span id="id3"></span><h2>Overriding Parameter Injection Behavior<a class="headerlink" href="#overriding-parameter-injection-behavior" title="Permalink to this headline">¶</a></h2>
-<p>Simple Injector does not allow injecting primitive types (such as integers and string) into constructors. The <em>IConstructorInjectionBehavior</em> interface is defined by the library to change this default behavior.</p>
+<p>Simple Injector does not allow injecting primitive types (such as integers and string) into constructors. The <strong>IConstructorInjectionBehavior</strong> interface is defined by the library to change this default behavior.</p>
 <p>The following article contains more information about changing the library&#8217;s default behavior: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=94">Primitive Dependencies with the Simple Injector</a>.</p>
 </div>
 <div class="section" id="resolving-unregistered-types">
@@ -412,7 +406,7 @@
 </div>
 <div class="section" id="overriding-lifestyle-selection-behavior">
 <span id="overriding-selection-behavior"></span><h2>Overriding Lifestyle Selection Behavior<a class="headerlink" href="#overriding-lifestyle-selection-behavior" title="Permalink to this headline">¶</a></h2>
-<p>By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the <em>Transient</em> lifestyle. Since <em>Simple Injector 2.6</em>, this behavior can be overridden and this is especially useful in batch-registration scenarios.</p>
+<p>By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the <strong>Transient</strong> lifestyle. Since Simple Injector 2.6 this behavior can be overridden and this is especially useful in batch-registration scenarios.</p>
 <p>Here are some examples of registration calls that all register types as <em>transient</em>:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">,</span> <span class="n">AspNetUserContext</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ITimeProvider</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">RealTimeProvider</span><span class="p">());</span>
@@ -427,14 +421,14 @@
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiControllers</span><span class="p">(</span><span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Most of these methods have overloads that allow supplying a different lifestyle. This works great in situations where you register a single type (using one of the <em>Register</em> method overloads for instance), and when all registrations need the same lifestyle. This is less suitable for cases where you batch-register a set of types where each type needs a different lifestyle.</p>
-<p>In this case we need to override the way Simple Injector does lifestyle selection. This can be done by creating custom implementation of <em>ILifestyleSelectionBehavior</em>.</p>
+<p>Most of these methods have overloads that allow supplying a different lifestyle. This works great in situations where you register a single type (using one of the <strong>Register</strong> method overloads for instance), and when all registrations need the same lifestyle. This is less suitable for cases where you batch-register a set of types where each type needs a different lifestyle.</p>
+<p>In this case we need to override the way Simple Injector does lifestyle selection. This can be done by creating custom implementation of <strong>ILifestyleSelectionBehavior</strong>.</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">ILifestyleSelectionBehavior</span> <span class="p">{</span>
     <span class="n">Lifestyle</span> <span class="nf">SelectLifestyle</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">implementationType</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>When no lifestyle is explicitly supplied by the user, Simple Injector will call into the registered ILifestyleSelectionBehavior when the type is registered to allow the ILifestyleSelectionBehavior implementation to select the proper lifestyle. The default behavior can be replaced by setting the <em>Container.Options.LifestyleSelectionBehavior</em> property.</p>
+<p>When no lifestyle is explicitly supplied by the user, Simple Injector will call into the registered <strong>ILifestyleSelectionBehavior</strong> when the type is registered to allow the <strong>ILifestyleSelectionBehavior</strong> implementation to select the proper lifestyle. The default behavior can be replaced by setting the <em>Container.Options.LifestyleSelectionBehavior</em> property.</p>
 <p>The following (not very useful) example changes the lifestyle selection behavior to always register those instances as singleton:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
@@ -516,8 +510,8 @@
 <div class="section" id="intercepting-the-creation-of-types">
 <span id="id5"></span><h2>Intercepting the Creation of Types<a class="headerlink" href="#intercepting-the-creation-of-types" title="Permalink to this headline">¶</a></h2>
 <p>Interception the creation of types allows registrations to be modified. This enables all sorts of advanced scenarios where the creation of a single type or whole object graphs gets altered. Simple Injector contains two events that allow altering the type&#8217;s creation: <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm">ExpressionBuilding</a> and <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm">ExpressionBuilt</a>. Both events are quite similar but are called in different stages of the <a class="reference internal" href="pipeline.html#resolve-pipeline"><em>building process</em></a>.</p>
-<p>The <em>ExpressionBuilding</em> event gets called just after the registrations expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for <a class="reference internal" href="advanced.html#context-based-injection"><em>Context based injection</em></a>.</p>
-<p>The <em>ExpressionBuilt</em> event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time <em>ExpressionBuilding</em> was called, is gone. While <em>ExpressionBuilding</em> is especially suited for changing the relationship between the resolved type and its dependencies, <em>ExpressionBuilt</em> is especially useful for applying decorators or <a class="reference internal" href="advanced.html#interception"><em>applying interceptors</em></a>. Note that Simple Injector has built-in support for <a class="reference internal" href="advanced.html#decorators"><em>applying decorators</em></a> using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm">RegisterDecorator</a> extension methods. These methods internally use the <em>ExpressionBuilt</em> event.</p>
+<p>The <strong>ExpressionBuilding</strong> event gets called just after the registrations expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for <a class="reference internal" href="advanced.html#context-based-injection"><em>Context based injection</em></a>.</p>
+<p>The <strong>ExpressionBuilt</strong> event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time <strong>ExpressionBuilding</strong> was called, is gone. While <strong>ExpressionBuilding</strong> is especially suited for changing the relationship between the resolved type and its dependencies, <strong>ExpressionBuilt</strong> is especially useful for applying decorators or <a class="reference internal" href="advanced.html#interception"><em>applying interceptors</em></a>. Note that Simple Injector has built-in support for <a class="reference internal" href="advanced.html#decorators"><em>applying decorators</em></a> using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm">RegisterDecorator</a> extension methods. These methods internally use the <strong>ExpressionBuilt</strong> event.</p>
 </div>
 </div>
 

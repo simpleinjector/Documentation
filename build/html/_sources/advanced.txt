@@ -6,7 +6,7 @@ Although its name may not imply it, Simple Injector is capable of handling many 
 
 .. container:: Note
 
-    **Note**: After including the *SimpleInjector.dll* in your project, you will have to add the *SimpleInjector.Extensions* namespace to your code to be able to use the majority of features that are presented in this wiki page.
+    **Note**: After including the **SimpleInjector.dll** in your project, you will have to add the **SimpleInjector.Extensions** namespace to your code to be able to use the majority of features that are presented in this wiki page.
 
 This page discusses the following subjects:
 
@@ -28,7 +28,7 @@ Generics
 
 .NET has superior support for generic programming and Simple Injector has been designed to make full use of it. Simple Injector arguably has the most advanced support for generics of all DI libraries. Simple Injector can handle any generic type and implementing patterns such as decorator, mediator, strategy and chain of responsibility is simple.
 
-Aspect Oriented Programming is easy with Simple Injector's advanced support for generics. Generic decorators with generic type constraints can be registered with a single line of code and can be applied conditionally using predicates. Simple Injector can handle open generic types, closed generic types and partially-closed generic types. The sections below provides more detail on Simple Injector's support for generic typing:
+`Aspect Oriented Programming <https://en.wikipedia.org/wiki/Aspect-oriented_programming>`_ is easy with Simple Injector's advanced support for generics. Generic decorators with generic type constraints can be registered with a single line of code and can be applied conditionally using predicates. Simple Injector can handle open generic types, closed generic types and partially-closed generic types. The sections below provides more detail on Simple Injector's support for generic typing:
 
 * :ref:`Batch registration of non-generic types based on an open-generic interface<Batch-Registration>`
 * :ref:`Registering open generic types and working with partially-closed types <Registration-Of-Open-Generic-Types>`
@@ -60,11 +60,7 @@ To prevent having to change the container for each new repository we can use the
         from type in repositoryAssembly.GetExportedTypes()
         where type.Namespace == "MyComp.MyProd.BL.SqlRepositories"
         where type.GetInterfaces().Any()
-        select new
-        {
-            Service = type.GetInterfaces().Single(),
-            Implementation = type
-        };
+        select new { Service = type.GetInterfaces().Single(), Implementation = type };
 
     foreach (var reg in registrations)
     {
@@ -145,8 +141,7 @@ This *CompositeValidator<T>* can be registered as follows:
 
 .. code-block:: c#
 
-    container.RegisterSingleOpenGeneric(typeof(IValidate<>), 
-        typeof(CompositeValidator<>));
+    container.RegisterSingleOpenGeneric(typeof(IValidate<>), typeof(CompositeValidator<>));
 
 This registration maps the open generic *IValidator<T>* interface to the open generic *CompositeValidator<T>* implementation. Because the *CompositeValidator<T>* contains an *IEnumerable<IValidator<T>>* dependency, the registered types will be injected into its constructor. This allows you to let the rest of the application simply depend on the *IValidator<T>*, while registering a collection of *IValidator<T>* implementations under the covers.
 
@@ -154,7 +149,7 @@ This registration maps the open generic *IValidator<T>* interface to the open ge
 
     **Note**: Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>* instance. In reality you should not see the the injected *IEnumerable<IValidator<T>>* as a collection of implementations, you should consider it a *stream* of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the *CompositeValidator<T>* is registered as singleton the validators it wraps will each have their own specific lifestyle.
 
-The next section will explain mapping of open generic types (just like *CompositeValidator<>* seen above).
+The next section will explain mapping of open generic types (just like the *CompositeValidator<T>* as seen above).
 
 .. _Registration-Of-Open-Generic-Types:
 
@@ -175,8 +170,7 @@ As the previous section explained, this can be rewritten to the following one-li
 
 .. code-block:: c#
 
-    container.RegisterManyForOpenGeneric(typeof(IValidate<>), 
-        typeof(IValidate<>).Assembly);
+    container.RegisterManyForOpenGeneric(typeof(IValidate<>), typeof(IValidate<>).Assembly);
 
 Sometimes you'll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The *IValidate<T>* is a good example, it is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this we would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:
  
@@ -230,9 +224,11 @@ There are some instance where want to have a fallback implementation in the case
 .. code-block:: c#
 
     container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadOnlyRepository<>),
-        c => typeof(IReadOnlyEntity).IsAssignableFrom(c.ServiceType.GetGenericArguments().Single()));
+        c => typeof(IReadOnlyEntity).IsAssignableFrom(
+            c.ServiceType.GetGenericArguments().Single()));
 
-    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>), c => !c.Handled);
+    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>),
+        c => !c.Handled);
 
 In the case where the open generic implementation contains generic type constraints Simple Injector will automatically apply the type conditionally based on its generic type constraints:
 
@@ -241,7 +237,8 @@ In the case where the open generic implementation contains generic type constrai
     class ReadOnlyRepository<T> : IRepository<T> where T : IReadOnlyEntity { }
 
     container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadOnlyRepository<>));
-    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>), c => !c.Handled);
+    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>),
+        c => !c.Handled);
 
 The final option in Simple Injector is to supply the **RegisterOpenGeneric** method with a partially-closed generic type:
 
@@ -352,7 +349,7 @@ Take the plausible scenario where we want to validate all commands that get exec
         }
     }
 
-The *ValidationCommandHandlerDecorator<TCommand>* class is an implementation of the **ICommandHandler<TCommand>** interface, but it also wraps / decorates an *ICommandHandler<TCommand>* instance. Instead of injecting the real implementation directly into a consumer, we can (let Simple Injector) inject a validator decorator that wraps the real implementation.
+The *ValidationCommandHandlerDecorator<TCommand>* class is an implementation of the *ICommandHandler<TCommand>* interface, but it also wraps / decorates an *ICommandHandler<TCommand>* instance. Instead of injecting the real implementation directly into a consumer, we can (let Simple Injector) inject a validator decorator that wraps the real implementation.
 
 The *ValidationCommandHandlerDecorator<TCommand>* depends on an *IValidator* interface. An implementation that used Microsoft Data Annotations might look like this:
 
@@ -427,7 +424,7 @@ The given context contains several properties that allows you to analyze whether
 
 .. _Decorators-with-Func-factories:
 
-Decorators with Func<T> factories
+Decorators with Func<T> decoratee factories
 ---------------------------------
 
 In certain scenarios, it is needed to postpone building part of the object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be :ref:`executed on a different thread <Multi-Threaded-Applications>`, or when instances need to be created in a certain :ref:`scope <Scoped>` or (security) context.
@@ -452,8 +449,7 @@ Since this is a scenario that is really hard to solve without library support, S
                     // Create new handler in this thread.
                     ICommandHandler<T> handler = this.factory.Invoke();
                     handler.Handle(command);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     // log the exception
                 }			
             });
@@ -532,8 +528,7 @@ When a collection is uncontrolled, it means that the lifetime of its elements ar
 .. code-block:: c#
 
     IEnumerable<IEventHandler<CustomerMovedEvent>> handlers =
-        new IEventHandler<CustomerMovedEvent>[]
-        {
+        new IEventHandler<CustomerMovedEvent>[] {
             new CustomerMovedEventHandler(),
             new NotifyStaffWhenCustomerMovedEventHandler(),
         };
@@ -639,13 +634,10 @@ Using the :doc:`Interception extensions <InterceptionExtensions>` code snippets,
             // Calls the decorated instance.
             invocation.Proceed();
 
-            var decoratedType =
-                invocation.InvocationTarget.GetType();
+            var decoratedType = invocation.InvocationTarget.GetType();
             
-            this.logger.Log(string.Format(
-                "{0} executed in {1} ms.",
-                decoratedType.Name,
-                watch.ElapsedMiliseconds));
+            this.logger.Log(string.Format("{0} executed in {1} ms.",
+                decoratedType.Name, watch.ElapsedMiliseconds));
         }
     }
 
@@ -669,7 +661,7 @@ The current example doesn't add much compared to simply using a decorator. When 
 
 .. container:: Note
 
-    **Note**: the interfaces in the given :doc:`Interception extensions <InterceptionExtensions>` code snippets are a simplified version of the Castle Project interception facility. If you need to create lots different interceptors, you might benefit from using the interception abilities of the Castle Project. Also please note that the given snippets use dynamic proxies to do the interception, while Castle uses lightweight code generation (LCG). LCG allows much better performance than the use of dynamic proxies. Please see `this stackoverflow q/a <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_ for an Castle implementation.
+    **Note**: the interfaces in the given :doc:`Interception extensions <InterceptionExtensions>` code snippets are a simplified version of the Castle Project interception facility. If you need to create lots different interceptors, you might benefit from using the interception abilities of the Castle Project. Also please note that the given snippets use dynamic proxies to do the interception, while Castle uses lightweight code generation (LCG). LCG allows much better performance than the use of dynamic proxies. Please see `this stackoverflow q/a <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_ for an implementation for Castle Windsor.
 
 .. container:: Note
 
@@ -735,8 +727,7 @@ The previous class can be registered as follows:
 .. code-block:: c#
 
     var container = new Container();
-    container.Options.PropertySelectionBehavior = 
-        new ImportPropertySelectionBehavior();
+    container.Options.PropertySelectionBehavior = new ImportPropertySelectionBehavior();
 
 This enables explicit property injection on all properties that are marked with the [Import] attribute and an exception will be thrown when the property cannot be injected for whatever reason.
 

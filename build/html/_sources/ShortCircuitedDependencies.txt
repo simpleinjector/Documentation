@@ -15,8 +15,8 @@ This warning signals the possible use of a short circuited dependency in a compo
 * a concrete type
 * that is not registered by itself
 * that is referenced by another component (most likely using a constructor argument)
-* and exists as **TImplementation** in an explicitly made *Register<TService, TImplementation>()* registration (or its non-generic equivalent)
-* and where the lifestyle of this explicit registration differs from the unregistered type (in normal cases this means that the explicit registration is not *Transient*)
+* and exists as *TImplementation* in an explicitly made **Register<TService, TImplementation>()** registration (or its non-generic equivalent)
+* and where the lifestyle of this explicit registration differs from the unregistered type (in normal cases this means that the explicit registration is not **Transient**)
 
 When a component depends on a short circuited dependency, the application might be wired incorrectly because the flagged component gets a different instance of that concrete type than other components in the application will get. This can result in incorrect behavior.
 
@@ -49,11 +49,11 @@ Example
         }
     }
 
-In this example **HomeController** depends on **MyUnitOfWork**. **MyUnitOfWork** however is not registered explicitly, but **IUnitOfWork** is. Furthermore **IUnitOfWork** is registered with the **WebRequestLifestyle**. However, since **MyUnitOfWork** is a concrete unregistered type, the container will create it on your behalf with the *Transient* lifestyle. This will typically be a problem, since during a request, the **HomeController** will get a different instance than other types that depend on **IUnitOfWork** while the intended use of **IUnitOfWork** is to have a single instance per web request.
+In this example *HomeController* depends on *MyUnitOfWork*. *MyUnitOfWork* however is not registered explicitly, but *IUnitOfWork* is. Furthermore *IUnitOfWork* is registered with the *WebRequestLifestyle*. However, since *MyUnitOfWork* is a concrete unregistered type, the container will create it on your behalf with the **Transient** lifestyle. This will typically be a problem, since during a request, the *HomeController* will get a different instance than other types that depend on *IUnitOfWork* while the intended use of *IUnitOfWork* is to have a single instance per web request.
 
 For Unit of Work implementations this is typically a problem, since the unit of work defines an atomic operation and creating multiple instances of such a unit of work in a single web request means that the work is split up in multiple (database) transactions (breaking consistency) or could result in part of the work not being committed at all.
 
-The **MyUnitOfWork** type is called 'short circuited' because **HomeController** skips the **IUnitOfWork** dependency and directly depends on **MyUnitOfWork**. In other words, **HomeController** short circuits to **MyUnitOfWork**.
+The *MyUnitOfWork* type is called 'short circuited' because *HomeController* skips the *IUnitOfWork* dependency and directly depends on *MyUnitOfWork*. In other words, *HomeController* short circuits to *MyUnitOfWork*.
 
 Here is an example of a short circuited dependency in the watch window:
 
@@ -85,4 +85,4 @@ The following example shows how to query the Diagnostic API for Short Circuited 
 
 .. container:: Note
 
-    **Note**: The Diagnostic API is new in *Simple Injector v2.4*.
+    **Note**: The Diagnostic API is new in Simple Injector v2.4.

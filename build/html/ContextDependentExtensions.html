@@ -229,12 +229,10 @@ using SimpleInjector;
 
 [DebuggerDisplay(&quot;DependencyContext (ServiceType: {ServiceType}, &quot; +
     &quot;ImplementationType: {ImplementationType})&quot;)]
-public class DependencyContext
-{
+public class DependencyContext {
     internal static readonly DependencyContext Root = new DependencyContext();
 
-    internal DependencyContext(Type serviceType, Type implementationType)
-    {
+    internal DependencyContext(Type serviceType, Type implementationType) {
         this.ServiceType = serviceType;
         this.ImplementationType = implementationType;
     }
@@ -245,14 +243,11 @@ public class DependencyContext
     public Type ImplementationType { get; private set; }
 }
 
-public static class ContextDependentExtensions
-{
+public static class ContextDependentExtensions {
     public static void RegisterWithContext&lt;TService&gt;(this Container container,
         Func&lt;DependencyContext, TService&gt; contextBasedFactory)
-        where TService : class
-    {
-        if (contextBasedFactory == null)
-        {
+        where TService : class {
+        if (contextBasedFactory == null) {
             throw new ArgumentNullException(&quot;contextBasedFactory&quot;);
         }
 
@@ -261,12 +256,9 @@ public static class ContextDependentExtensions
         container.Register&lt;TService&gt;(rootFactory, Lifestyle.Transient);
 
         // Allow the Func&lt;DependencyContext, TService&gt; to be injected into parent types.
-        container.ExpressionBuilding += (sender, e) =&gt;
-        {
-            if (e.RegisteredServiceType != typeof(TService))
-            {
-                var rewriter = new DependencyContextRewriter
-                {
+        container.ExpressionBuilding += (sender, e) =&gt; {
+            if (e.RegisteredServiceType != typeof(TService)) {
+                var rewriter = new DependencyContextRewriter {
                     ServiceType = e.RegisteredServiceType,
                     ContextBasedFactory = contextBasedFactory,
                     RootFactory = rootFactory,
@@ -278,21 +270,17 @@ public static class ContextDependentExtensions
         };
     }
 
-    private sealed class DependencyContextRewriter : ExpressionVisitor
-    {
+    private sealed class DependencyContextRewriter : ExpressionVisitor {
         internal Type ServiceType { get; set; }
         internal object ContextBasedFactory { get; set; }
         internal object RootFactory { get; set; }
         internal Expression Expression { get; set; }
 
-        internal Type ImplementationType
-        {
-            get
-            {
+        internal Type ImplementationType {
+            get  {
                 var expression = this.Expression as NewExpression;
 
-                if (expression != null)
-                {
+                if (expression != null) {
                     return expression.Constructor.DeclaringType;
                 }
 
@@ -300,10 +288,8 @@ public static class ContextDependentExtensions
             }
         }
 
-        protected override Expression VisitInvocation(InvocationExpression node)
-        {
-            if (!this.IsRootedContextBasedFactory(node))
-            {
+        protected override Expression VisitInvocation(InvocationExpression node) {
+            if (!this.IsRootedContextBasedFactory(node)) {
                 return base.VisitInvocation(node);
             }
 
@@ -313,12 +299,10 @@ public static class ContextDependentExtensions
                     new DependencyContext(this.ServiceType, this.ImplementationType)));
         }
 
-        private bool IsRootedContextBasedFactory(InvocationExpression node)
-        {
+        private bool IsRootedContextBasedFactory(InvocationExpression node) {
             var expression = node.Expression as ConstantExpression;
 
-            if (expression == null)
-            {
+            if (expression == null) {
                 return false;
             }
 
@@ -329,10 +313,8 @@ public static class ContextDependentExtensions
 </pre></div>
 </div>
 <p>After copying the previous code snippet to your project, you can use the extension method as follows:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterWithContext</span><span class="p">&lt;</span><span class="n">IAccessValidator</span><span class="p">&gt;(</span><span class="n">context</span> <span class="p">=&gt;</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Namespace</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s">&quot;Management&quot;</span><span class="p">))</span>
-    <span class="p">{</span>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterWithContext</span><span class="p">&lt;</span><span class="n">IAccessValidator</span><span class="p">&gt;(</span><span class="n">context</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Namespace</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s">&quot;Management&quot;</span><span class="p">))</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">ManagementAccesValidator</span><span class="p">&gt;();</span>
     <span class="p">}</span>
 

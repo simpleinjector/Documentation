@@ -4,12 +4,11 @@ WCF Integration Guide
 
 The `Simple Injector WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ allows WCF services to be resolved by the container, which enables constructor injection.
 
-After installing this NuGet package, it must be initialized in the start-up path of the application by calling the *SimpleInjectorServiceHostFactory.SetContainer* method:
+After installing this NuGet package, it must be initialized in the start-up path of the application by calling the **SimpleInjectorServiceHostFactory.SetContainer** method:
 
 .. code-block:: c#
 
-    protected void Application_Start(object sender, EventArgs e)
-    {
+    protected void Application_Start(object sender, EventArgs e) {
         // Create the container as usual.
         var container = new Container();
         
@@ -23,7 +22,7 @@ After installing this NuGet package, it must be initialized in the start-up path
 
 .. container:: Note
 
-    **Warning**: Instead of what the name of the names of the *WcfOperationLifestyle* class and the *RegisterPerWcfOperation* methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how  the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registers *PerWcfOperation* live as long as the WCF service class they are injected into.
+    **Warning**: Instead of what the name of the names of the **WcfOperationLifestyle** class and the **RegisterPerWcfOperation** methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registered *PerWcfOperation* live as long as the WCF service class they are injected into.
 
 For each service class, you should supply a factory attribute in the .SVC file of each service class. For instance:
 

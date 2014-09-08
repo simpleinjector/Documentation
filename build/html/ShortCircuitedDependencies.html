@@ -231,8 +231,8 @@
 <li>a concrete type</li>
 <li>that is not registered by itself</li>
 <li>that is referenced by another component (most likely using a constructor argument)</li>
-<li>and exists as <strong>TImplementation</strong> in an explicitly made <em>Register&lt;TService, TImplementation&gt;()</em> registration (or its non-generic equivalent)</li>
-<li>and where the lifestyle of this explicit registration differs from the unregistered type (in normal cases this means that the explicit registration is not <em>Transient</em>)</li>
+<li>and exists as <em>TImplementation</em> in an explicitly made <strong>Register&lt;TService, TImplementation&gt;()</strong> registration (or its non-generic equivalent)</li>
+<li>and where the lifestyle of this explicit registration differs from the unregistered type (in normal cases this means that the explicit registration is not <strong>Transient</strong>)</li>
 </ul>
 <p>When a component depends on a short circuited dependency, the application might be wired incorrectly because the flagged component gets a different instance of that concrete type than other components in the application will get. This can result in incorrect behavior.</p>
 </div>
@@ -261,9 +261,9 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In this example <strong>HomeController</strong> depends on <strong>MyUnitOfWork</strong>. <strong>MyUnitOfWork</strong> however is not registered explicitly, but <strong>IUnitOfWork</strong> is. Furthermore <strong>IUnitOfWork</strong> is registered with the <strong>WebRequestLifestyle</strong>. However, since <strong>MyUnitOfWork</strong> is a concrete unregistered type, the container will create it on your behalf with the <em>Transient</em> lifestyle. This will typically be a problem, since during a request, the <strong>HomeController</strong> will get a different instance than other types that depend on <strong>IUnitOfWork</strong> while the intended use of <strong>IUnitOfWork</strong> is to have a single instance per web request.</p>
+<p>In this example <em>HomeController</em> depends on <em>MyUnitOfWork</em>. <em>MyUnitOfWork</em> however is not registered explicitly, but <em>IUnitOfWork</em> is. Furthermore <em>IUnitOfWork</em> is registered with the <em>WebRequestLifestyle</em>. However, since <em>MyUnitOfWork</em> is a concrete unregistered type, the container will create it on your behalf with the <strong>Transient</strong> lifestyle. This will typically be a problem, since during a request, the <em>HomeController</em> will get a different instance than other types that depend on <em>IUnitOfWork</em> while the intended use of <em>IUnitOfWork</em> is to have a single instance per web request.</p>
 <p>For Unit of Work implementations this is typically a problem, since the unit of work defines an atomic operation and creating multiple instances of such a unit of work in a single web request means that the work is split up in multiple (database) transactions (breaking consistency) or could result in part of the work not being committed at all.</p>
-<p>The <strong>MyUnitOfWork</strong> type is called &#8216;short circuited&#8217; because <strong>HomeController</strong> skips the <strong>IUnitOfWork</strong> dependency and directly depends on <strong>MyUnitOfWork</strong>. In other words, <strong>HomeController</strong> short circuits to <strong>MyUnitOfWork</strong>.</p>
+<p>The <em>MyUnitOfWork</em> type is called &#8216;short circuited&#8217; because <em>HomeController</em> skips the <em>IUnitOfWork</em> dependency and directly depends on <em>MyUnitOfWork</em>. In other words, <em>HomeController</em> short circuits to <em>MyUnitOfWork</em>.</p>
 <p>Here is an example of a short circuited dependency in the watch window:</p>
 <img alt="Debugger watch window showing short circuited dependency" src="_images/shortcircuited.png" />
 <p>The following example shows how to query the Diagnostic API for Short Circuited Dependencies:</p>
@@ -288,7 +288,7 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: The Diagnostic API is new in <em>Simple Injector v2.4</em>.</div>
+<strong>Note</strong>: The Diagnostic API is new in Simple Injector v2.4.</div>
 </div>
 </div>
 

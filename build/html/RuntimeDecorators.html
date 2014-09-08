@@ -230,37 +230,32 @@
 <span class="k">using</span> <span class="nn">System.Threading</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">SimpleInjector.Extensions</span><span class="p">;</span>
 
-<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">RuntimeDecoratorExtensions</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterRuntimeDecorator</span><span class="p">(</span><span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">,</span> <span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span>
-        <span class="n">Type</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">Predicate</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;</span> <span class="n">runtimePredicate</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">RegisterRuntimeDecorator</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">,</span>
-            <span class="n">runtimePredicate</span><span class="p">);</span>
+<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">RuntimeDecoratorExtensions</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterRuntimeDecorator</span><span class="p">(</span><span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">,</span>
+        <span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">decoratorType</span><span class="p">,</span>
+        <span class="n">Predicate</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;</span> <span class="n">runtimePredicate</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">RegisterRuntimeDecorator</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">decoratorType</span><span class="p">,</span>
+            <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">,</span> <span class="n">runtimePredicate</span><span class="p">);</span>
     <span class="p">}</span>
 
-    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterRuntimeDecorator</span><span class="p">(</span><span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">,</span> <span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span>
-        <span class="n">Type</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">Lifestyle</span> <span class="n">lifestyle</span><span class="p">,</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterRuntimeDecorator</span><span class="p">(</span><span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">,</span>
+        <span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">Type</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">Lifestyle</span> <span class="n">lifestyle</span><span class="p">,</span>
         <span class="n">Predicate</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;</span> <span class="n">runtimePredicate</span><span class="p">,</span>
-        <span class="n">Predicate</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;</span> <span class="n">compileTimePredicate</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span>
-    <span class="p">{</span>
+        <span class="n">Predicate</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;</span> <span class="n">compileTimePredicate</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
         <span class="kt">var</span> <span class="n">localContext</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="p">&lt;</span><span class="n">DecoratorPredicateContext</span><span class="p">&gt;();</span>
 
         <span class="n">compileTimePredicate</span> <span class="p">=</span> <span class="n">compileTimePredicate</span> <span class="p">??</span> <span class="p">(</span><span class="n">context</span> <span class="p">=&gt;</span> <span class="k">true</span><span class="p">);</span>
 
-        <span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">lifestyle</span><span class="p">,</span> <span class="n">c</span> <span class="p">=&gt;</span>
-        <span class="p">{</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">decoratorType</span><span class="p">,</span> <span class="n">lifestyle</span><span class="p">,</span> <span class="n">c</span> <span class="p">=&gt;</span> <span class="p">{</span>
             <span class="kt">bool</span> <span class="n">mustDecorate</span> <span class="p">=</span> <span class="n">compileTimePredicate</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
             <span class="n">localContext</span><span class="p">.</span><span class="n">Value</span> <span class="p">=</span> <span class="n">mustDecorate</span> <span class="p">?</span> <span class="n">c</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
             <span class="k">return</span> <span class="n">mustDecorate</span><span class="p">;</span>
         <span class="p">});</span>
 
-        <span class="n">container</span><span class="p">.</span><span class="n">ExpressionBuilt</span> <span class="p">+=</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span>
-        <span class="p">{</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">ExpressionBuilt</span> <span class="p">+=</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
             <span class="kt">bool</span> <span class="n">isDecorated</span> <span class="p">=</span> <span class="n">localContext</span><span class="p">.</span><span class="n">Value</span> <span class="p">!=</span> <span class="k">null</span><span class="p">;</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="n">isDecorated</span><span class="p">)</span>
-            <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">isDecorated</span><span class="p">)</span> <span class="p">{</span>
                 <span class="n">Expression</span> <span class="n">decorator</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">Expression</span><span class="p">;</span>
                 <span class="n">Expression</span> <span class="n">original</span> <span class="p">=</span> <span class="n">localContext</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">Expression</span><span class="p">;</span>
 
@@ -282,10 +277,8 @@
 <p>The following line shows an example of how to use this extension method:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterRuntimeDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
-    <span class="k">typeof</span><span class="p">(</span><span class="n">AuthorizationHandlerDecorator</span><span class="p">&lt;&gt;),</span> <span class="n">context</span> <span class="p">=&gt;</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">userContext</span> <span class="p">=</span>
-            <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">&gt;();</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">AuthorizationHandlerDecorator</span><span class="p">&lt;&gt;),</span> <span class="n">context</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">userContext</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">&gt;();</span>
         <span class="k">return</span> <span class="p">!</span><span class="n">userContext</span><span class="p">.</span><span class="n">UserInRole</span><span class="p">(</span><span class="s">&quot;Admin&quot;</span><span class="p">);</span>
     <span class="p">});</span>
 </pre></div>

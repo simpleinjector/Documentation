@@ -2,10 +2,6 @@
 Diagnostic Warning - Potential Single Responsibility Violations
 ===============================================================
 
-.. container:: Note
-
-    **Note**: This warning type is new in *Simple Injector version 2.1*.
-
 Cause
 =====
 
@@ -74,4 +70,4 @@ The following example shows how to query the Diagnostic API for possible Single 
 
 .. container:: Note
 
-    **Note**: The Diagnostic API is new in *Simple Injector v2.4*.
+    **Note**: The Diagnostic API is new in Simple Injector v2.4.
