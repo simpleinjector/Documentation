@@ -241,7 +241,7 @@ Per WCF Operation
 
 .. container:: Note
     
-    Only one instance will be created by the container per call to a WCF operation and the instance will be disposed when the operation ends (unless specified otherwise).
+    Only one instance will be created by the container during the lifetime of the WCF service class and the instance will be disposed when the WCF service class is released (unless specified otherwise).
 
 The `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ is available (and available as **SimpleInjector.Integration.Wcf.dll** in the default download here on CodePlex) contains **RegisterPerWcfOperation** extension methods and a **WcfOperationLifestyle** class that enable easy *Per WCF Operation* registrations:
 
@@ -260,20 +260,13 @@ The `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.In
     var withoutDispose = new WcfOperationLifestyle(false);
     container.Register<IUserRepository, SqlUserRepository>(withoutDispose);
 
-In contrast to the default behavior of Simple Injector, these extension methods ensure the created service is disposed (when such an instance implements *IDisposable*). This is done after the call to the WCF operation has finished.
-
-Besides registering services using the **RegisterPerWcfOperation** extension methods, each WCF service markup (the .svc file) should include the following attribute:
-
-.. code-block:: c#
-    
-    Factory="SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory, 
-        SimpleInjector.Integration.Wcf"
-
-An exception will be thrown by the framework if this attribute is missing.
+In contrast to the default behavior of Simple Injector, these extension methods ensure the created service is disposed (when such an instance implements *IDisposable*). This is done after the WCF service instance is released by WCF.
 
 .. container:: Note
 
-    **Tip**: There is a `Simple Injector WCF Integration Quick Start <https://nuget.org/packages/SimpleInjector.Integration.Wcf.QuickStart>`_ NuGet Package available that helps you get started with Simple Injector in WCF.
+    **Warning**: Instead of what the name of the **WcfOperationLifestyle** class and the **RegisterPerWcfOperation** methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registered *PerWcfOperation* live as long as the WCF service class they are injected into.
+
+For more information about integrating Simple Injector with WCF, please see the :doc:`WCF integration guide <wcfintegration>`.
 
 You can optionally register other services for disposal at the end of the web request:
 
