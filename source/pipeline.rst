@@ -11,7 +11,7 @@ Registration Pipeline
 
 The registration pipeline is the set of steps Simple Injector takes when making a registration in the container. This pipeline mainly consists of a set of validations that is performed. The process is rather straightforward and looks like this:
 
-.. image:: images/pipeline1.png 
+.. image:: images/pipeline1_v2.png 
    :alt: Register Type Pipeline Diagram
 
 .. container:: Note
@@ -29,6 +29,8 @@ Steps:
 * **Is constructable type?**: When the registration is supplied with an implementation type that the container must create and auto-wire (using **Register<TService, TImplementation>()** for instance), the container checks if the implementation type is constructable. A type is considered to be constructable when it is a concrete type and has a single public constructor. An exception is thrown when these conditions are not met. This behavior can be overridden by implementing a custom  **IConstructorResolutionBehavior**. Take for instance :doc:`this example about T4MVC <t4mvc>`.
 
 * **All ctor params valid?**: The constructor that has been selected in the previous step will be analyzed for invalid constructor parameters. Ambiguous types such as *System.String* and value types such as *Int32* and *Guid* are not allowed. This behavior can be overridden by implementing a custom **IConstructorVerificationBehavior**. The **IConstructorVerificationBehavior** will typically have to be overridden in combination with the **IConstructorInjectionBehavior**, which is used during the :ref:`Resolve Pipeline <Resolve-Pipeline>`. Take a look at `this blog post <http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=94>`_ for an elaborate example.
+
+* **Lifestyle supplied?**: If the user explicitly supplied a **Lifestyle** to its registration, the registration is done using that lifestyle, i.e. the registration is made using one of the **RegisterXXX** method overload that accepts a **Lifestyle** instance. Otherwise, the configured **ILifestyleSelectionBehavior** is queried to get the proper lifestyle for the given service type and implementation. By default this means that the registration is made using the **Transient** lifestyle, but this behavior can be overridden by replacing the default **ILifestyleSelectionBehavior**.
 
 * **Add registration**: When all previous validations succeeded, the registration is added to the container. Although the type may be registered successfully, this still doesn't mean it can always be resolved. This depends on several other factors such as whether all dependencies can be resolved correctly. These checks cannot be performed during registration, and they are performed during the :ref:`Resolve Pipeline <Resolve-Pipeline>`.
 
