@@ -141,13 +141,14 @@ This *CompositeValidator<T>* can be registered as follows:
 
 .. code-block:: c#
 
-    container.RegisterSingleOpenGeneric(typeof(IValidate<>), typeof(CompositeValidator<>));
+    container.RegisterOpenGeneric(typeof(IValidate<>), typeof(CompositeValidator<>),
+        Lifestyle.Singleton);
 
 This registration maps the open generic *IValidator<T>* interface to the open generic *CompositeValidator<T>* implementation. Because the *CompositeValidator<T>* contains an *IEnumerable<IValidator<T>>* dependency, the registered types will be injected into its constructor. This allows you to let the rest of the application simply depend on the *IValidator<T>*, while registering a collection of *IValidator<T>* implementations under the covers.
 
 .. container:: Note
 
-    **Note**: Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>* instance. In reality you should not see the the injected *IEnumerable<IValidator<T>>* as a collection of implementations, you should consider it a *stream* of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the *CompositeValidator<T>* is registered as singleton the validators it wraps will each have their own specific lifestyle.
+    **Note**: Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>* instance. In reality you should not see the the injected *IEnumerable<IValidator<T>>* as a collection of implementations, you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the *CompositeValidator<T>* is registered as singleton the validators it wraps will each have their own specific lifestyle.
 
 The next section will explain mapping of open generic types (just like the *CompositeValidator<T>* as seen above).
 
@@ -172,7 +173,7 @@ As the previous section explained, this can be rewritten to the following one-li
 
     container.RegisterManyForOpenGeneric(typeof(IValidate<>), typeof(IValidate<>).Assembly);
 
-Sometimes you'll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The *IValidate<T>* is a good example, it is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this we would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:
+Sometimes you'll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The *IValidate<T>* is a good example. It is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this we would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:
  
 .. code-block:: c#
 
@@ -205,7 +206,7 @@ The result of this registration is exactly as you would have expected to see fro
 
 .. container:: Note
 
-    **Note**: Because the use of unregistered type resolution will only get called for types that are not explicitly registered this allows for the default implementation to be overridden with specific implementations. The **RegisterManyForOpenGeneric** method covered above does not use unregistered type resolution, it registers all the concrete types it finds in the given assemblies. Those types will therefore always be returned, giving a very convenient and easy to grasp mix.
+    **Note**: Because the use of unregistered type resolution will only get called for types that are not explicitly registered this allows for the default implementation to be overridden with specific implementations. The **RegisterManyForOpenGeneric** method does not use unregistered type resolution, it explicitly registers all the concrete types it finds in the given assemblies. Those types will therefore always be returned, giving a very convenient and easy to grasp mix.
 
 There's an advanced version of **RegisterOpenGeneric** overload that allows applying the open generic type conditionally, based on a supplied predicate. Example:
 
@@ -219,7 +220,7 @@ There's an advanced version of **RegisterOpenGeneric** overload that allows appl
 
 Simple Injector protects you from defining invalid registrations by ensuring that given the registrations do not overlap. Building on the last code snippet, imagine accidentally defining a type in the namespace "MyCompany.LeftRight". In this case both open-generic implementations would apply, but Simple Injector will never silently pick one. It will throw an exception instead.
 
-There are some instance where want to have a fallback implementation in the case that no other implementation was applied and this can be achieved by checking the **Handled** property of the predicate's **OpenGenericPredicateContext** object:
+There are some cases where want to have a fallback implementation in the case that no other implementation was applied and this can be achieved by checking the **Handled** property of the predicate's **OpenGenericPredicateContext** object:
 
 .. code-block:: c#
 
@@ -230,7 +231,7 @@ There are some instance where want to have a fallback implementation in the case
     container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>),
         c => !c.Handled);
 
-In the case where the open generic implementation contains generic type constraints Simple Injector will automatically apply the type conditionally based on its generic type constraints:
+In the case above we tell Simple Injector to only apply the *ReadOnlyRepository<T>* registration in case the given *T* implements *IReadOnlyEntity*. Although applying the predicate can be useful, in this particular case it's better to apply a generic type constraint to *ReadOnlyRepository<T>*. Simple Injector will automatically apply the registered type conditionally based on it generic type constraints. So if we apply the generic type constraint to the *ReadOnlyRepository<T>* we can remove the predicate:
 
 .. code-block:: c#
 
