@@ -39,7 +39,7 @@ For most applications the performance of the DI library is not an issue; I/O is 
 
 Making Simple Injector fast by default removes any concerns regarding the performance of the construction of object graphs. Instead of having to monitor Simple Injector’s performance and make ugly tweaks to the configuration when object construction is too slow, the developer is free to worry about more important things.
 
-_Fast by default** means that the performance of object instantiation from any of the registration features that the library supplies out-of-the-box will be comparable to the performance of hard-wired object instantiation.
+**Fast by default** means that the performance of object instantiation from any of the registration features that the library supplies out-of-the-box will be comparable to the performance of hard-wired object instantiation.
 
 .. _Vendor-lock-in:
 
