@@ -13,6 +13,7 @@ This page discusses the following subjects:
 * :ref:`Generics <Generics>`
 * :ref:`Batch registration / Automatic registration <Batch-Registration>`
 * :ref:`Registration of open generic types <Registration-Of-Open-Generic-Types>`
+* :ref:`Mixing collections of open-generic and non-generic components <Mixing-collections-of-open-generic-and-non-generic-components>`
 * :ref:`Unregistered type resolution <Unregistered-Type-Resolution>`
 * :ref:`Context based injection / Contextual binding <Context-Based-Injection>`
 * :ref:`Decorators <Decorators>`
@@ -32,6 +33,7 @@ Generics
 
 * :ref:`Batch registration of non-generic types based on an open-generic interface<Batch-Registration>`
 * :ref:`Registering open generic types and working with partially-closed types <Registration-Of-Open-Generic-Types>`
+* :ref:`Mixing collections of open-generic and non-generic components <Mixing-collections-of-open-generic-and-non-generic-components>`
 * :ref:`Registration of generic decorators <Decorators>`
 * :ref:`Resolving Covariant/Contravariant types <Covariance-Contravariance>`
 
@@ -40,7 +42,7 @@ Generics
 Batch / Automatic registration
 ==============================
 
-Batch or automatic registration is a way of registering a set of related types in one go based on some convention. This features removes the need to constantly update the containers configuration each and every time a new type is added. The following example show a series of manually registered repositories: 
+Batch or automatic registration is a way of registering a set of related types in one go based on some convention. This features removes the need to constantly update the container's configuration each and every time a new type is added. The following example show a series of manually registered repositories: 
 
 .. code-block:: c#
 
@@ -62,8 +64,7 @@ To prevent having to change the container for each new repository we can use the
         where type.GetInterfaces().Any()
         select new { Service = type.GetInterfaces().Single(), Implementation = type };
 
-    foreach (var reg in registrations)
-    {
+    foreach (var reg in registrations) {
         container.Register(reg.Service, reg.Implementation, Lifestyle.Transient);
     }
 
@@ -73,8 +74,7 @@ Another interesting scenario is registering multiple implementations of a generi
 
 .. code-block:: c#
 
-    public interface IValidator<T>
-    {
+    public interface IValidator<T> {
         ValidationResults Validate(T instance);
     }
 
@@ -95,7 +95,7 @@ By using the extension methods for batch registration of open generic types from
     container.RegisterManyForOpenGeneric(typeof(IValidator<>),
         typeof(IValidator<>).Assembly);
 
-By default **RegisterManyForOpenGeneric** searches the supplied assembly for all public types that implement the *IValidator<T>* interface and registers each type by their specific (closed generic) interface. It even works for types that implement multiple closed versions of the given interface.
+By default **RegisterManyForOpenGeneric** searches the supplied assembly for all types that implement the *IValidator<T>* interface and registers each type by their specific (closed generic) interface. It even works for types that implement multiple closed versions of the given interface.
 
 .. container:: Note
 
@@ -108,13 +108,12 @@ As an example, imagine the scenario where you have a *CustomerValidator* type an
 .. code-block:: c#
 
     container.RegisterManyForOpenGeneric(typeof(IValidator<>),
-        AccessibilityOption.PublicTypesOnly,
         (serviceType, implTypes) => container.RegisterAll(serviceType, implTypes),
         typeof(IValidator<>).Assembly);
 
-The code snippet registers all types from the given assembly that implement *IValidator<T>*. As we now have multiple implementations the container cannot inject a single instance of *IValidator<T>* and we can no longer call *container.GetInstance<IValidator<T>>()*. Instead instances can be retrieved by having an *IEnumerable<IValidator<T>>* constructor argument or by calling *container.GetAllInstances<IValidator<T>>()*.
+The code snippet registers all types from the given assembly that implement *IValidator<T>*. As we now have multiple implementations the container cannot inject a single instance of *IValidator<T>* and because of this, we need to supply a callback delegate. This allows us to override the way the registration is made, and allows us to make a registration for a collection. Because we register a collection, we can no longer call *container.GetInstance<IValidator<T>>()*. Instead instances can be retrieved by having an *IEnumerable<IValidator<T>>* constructor argument or by calling *container.GetAllInstances<IValidator<T>>()*.
 
-It is not generally regarded as best practice to have an *IEnumerable<IValidator<T>>* dependency in multiple class constructors (or accessed from the  container directly). Depending on a set of types complicates your application design and can often be simplified with an alternate configuration. A better way is to have a single composite type that wraps *IEnumerable<IValidator<T>>* and presents it to the consumer as a single instance, in this case a *CompositeValidator<T>*:
+It is not generally regarded as best practice to have an *IEnumerable<IValidator<T>>* dependency in multiple class constructors (or accessed from the  container directly). Depending on a set of types complicates your application design, can lead to code duplication. This can often be simplified with an alternate configuration. A better way is to have a single composite type that wraps *IEnumerable<IValidator<T>>* and presents it to the consumer as a single instance, in this case a *CompositeValidator<T>*:
 
 .. code-block:: c#
 
@@ -171,7 +170,8 @@ As the previous section explained, this can be rewritten to the following one-li
 
 .. code-block:: c#
 
-    container.RegisterManyForOpenGeneric(typeof(IValidate<>), typeof(IValidate<>).Assembly);
+    container.RegisterManyForOpenGeneric(typeof(IValidate<>),
+        typeof(IValidate<>).Assembly);
 
 Sometimes you'll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The *IValidate<T>* is a good example. It is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this we would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:
  
@@ -184,7 +184,6 @@ Sometimes you'll find that many implementations of the given generic interface a
         }
     }
 
-
 We could configure the container to use this *NullValidator<T>* for any entity that does not need validation:
 
 .. code-block:: c#
@@ -195,18 +194,18 @@ We could configure the container to use this *NullValidator<T>* for any entity t
     container.Register<IValidate<Mothership>, NullValidator<Mothership>>();
     // and the list goes on...
 
-This repeated registration is, of course, not very practical. Falling back to such a default implementation is a good example for *unregistered type resolution*. Simple Injector contains an event that you can hook into that allows you to fallback to a default implementation. The `RegisterOpenGeneric <https://simpleinjector.org/ReferenceLibrary/?topic=html/Methods_T_SimpleInjector_Extensions_OpenGenericRegistrationExtensions.htm>`_ extension method is defined to handle this registration. The *NullValidator<T>* would be registered as follows:
+This repeated registration is, of course, not very practical. Falling back to such a default implementation is a good example for *unregistered type resolution*. Simple Injector contains an event that you can hook into that allows you to fallback to a default implementation. The `RegisterOpenGeneric <https://simpleinjector.org/ReferenceLibrary/?topic=html/Methods_T_SimpleInjector_Extensions_OpenGenericRegistrationExtensions.htm>`_ extension method is built on top of this event to handle this specific scenario. The *NullValidator<T>* would be registered as follows:
 
 .. code-block:: c#
 
     // using SimpleInjector.Extensions;
     container.RegisterOpenGeneric(typeof(IValidate<>), typeof(NullValidator<>));
 
-The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for *IValidate<Department>*, for example, will return a single *NullValidator<Department>* instance each time.
+The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for *IValidate<Department>*, for example, will return a *NullValidator<Department>* instance each time.
 
 .. container:: Note
 
-    **Note**: Because the use of unregistered type resolution will only get called for types that are not explicitly registered this allows for the default implementation to be overridden with specific implementations. The **RegisterManyForOpenGeneric** method does not use unregistered type resolution, it explicitly registers all the concrete types it finds in the given assemblies. Those types will therefore always be returned, giving a very convenient and easy to grasp mix.
+    **Note**: Because the use of unregistered type resolution will only get called for types that are not explicitly registered this allows for the default implementation to be overridden with specific implementations. The **RegisterManyForOpenGeneric** method does not use unregistered type resolution; it explicitly registers all the concrete types it finds in the given assemblies. Those types will therefore always be returned, giving a very convenient and easy to grasp mix.
 
 There's an advanced version of **RegisterOpenGeneric** overload that allows applying the open generic type conditionally, based on a supplied predicate. Example:
 
@@ -250,6 +249,73 @@ The final option in Simple Injector is to supply the **RegisterOpenGeneric** met
     container.RegisterOpenGeneric(typeof(IValidator<>), partiallyClosedType);
 
 The type *SomeValidator<List<T>>* is called *partially-closed*, since although its generic type argument has been filled in with a type, it still contains a generic type argument. Simple Injector will be able to apply these constraints, just as it handles any other generic type constraints.
+
+.. _Mixing-collections-of-open-generic-and-non-generic-components:
+
+Mixing collections of open-generic and non-generic components
+============================
+
+The **RegisterManyForOpenGeneric** overloads that take in a list of assemblies only select non-generic implementations of the given open-generic type. Open-generic implementations are skipped, because they often need special attention.
+
+To register collections that contain both non-generic and open-generic components a **RegisterAll** overload is available that accept a list of Type instances. For instance:
+
+.. code-block:: c#
+
+    container.RegisterAll(typeof(IValidator<>), new[] {
+        typeof(DataAnnotationsValidator<>), // open generic
+        typeof(CustomerValidator), // implements IValidator<Customer>
+        typeof(GoldCustomerValidator), // implements IValidator<Customer>
+        typeof(EmployeeValidator), // implements IValidator<Employee>
+        typeof(OrderValidator) // implements IValidator<Order>
+    });
+
+In the previous example a set of *IValidator<T>* implementations are supplied to the **RegisterAll** overload. This list contains one generic implementation, namely *DataAnnotationsValidator<T>*. This leads to a registration that is equivalent to the following manual registration:
+
+.. code-block:: c#
+
+    container.RegisterAll<IValidator<Customer>>(
+        typeof(DataAnnotationsValidator<Customer>),
+        typeof(CustomerValidator),
+        typeof(GoldCustomerValidator));
+        
+    container.RegisterAll<IValidator<Employee>>(
+        typeof(DataAnnotationsValidator<Employee>),
+        typeof(EmployeeValidator));
+        
+    container.RegisterAll<IValidator<Order>>(
+        typeof(DataAnnotationsValidator<Order>),
+        typeof(OrderValidator));
+
+In other words, the supplied non-generic types are grouped by their closed *IValidator<T>* interface and the *DataAnnotationsValidator<T>* is applied to every group. This leads to three seperate *IEnumerable<IValidator<T>>* registrations. One for each closed-generic *IValidator<T>* type.
+
+.. container:: Note
+
+    **Note**: **RegisterAll** is guaranteed to preserve the order of the types that you supply.	
+		
+But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible fourth registration is made. This is a registration that hooks onto the **unregistered type resolution** and this will ensure that any time an *IEnumerable<IValidator<T>>* for a *T* that is anything other than *Customer*, *Employee* and *Order*, an *IEnumerable<IValidator<T>>* is returned that contains the closed-generic versions of the supplied open-generic types; *DataAnnotationsValidator<T>* in the given example.
+
+.. container:: Note
+
+    **Note**: This will work equally well when the open generic types contain type constraints. In that case those types will be applied conditionally to the collections based on their generic type constraints.
+
+In most cases however, manually supplying the **RegisterAll** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of the **GetTypesToRegister** of the *OpenGenericBatchRegistrationExtensions* class to find the types for us:
+
+.. code-block:: c#
+
+    List<Type> typesToRegister = new List<Type> {
+        typeof(DataAnnotationsValidator<>)
+    };
+    
+    typesToRegister.AddRange(
+        OpenGenericBatchRegistrationExtensions.GetTypesToRegister(container,
+            typeof(IValidator<>), AppDomain.CurrentDomain.GetAssemblies()));
+
+    container.RegisterAll(typeof(IValidator<>), typesToRegister);
+        
+.. container:: Note
+
+The **RegisterManyForOpenGeneric** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well.
+
 
 .. _Unregistered-Type-Resolution:
 
