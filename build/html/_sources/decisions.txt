@@ -4,7 +4,7 @@
 Design Decisions
 ================
 
-Our design principles have influenced the direction of the development of features in Simple Injector. In this section we would like to explain some of the design decisions.
+Our :doc:`design principles <principles>` have influenced the direction of the development of features in Simple Injector. In this section we would like to explain some of the design decisions.
 
 * :ref:`The container is locked after the first call to resolve <Container-is-locked>`
 * :ref:`The API clearly separates registration of collections from other registrations <Separate-collections>`

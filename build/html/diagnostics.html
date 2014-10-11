@@ -30,7 +30,7 @@
   
     <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
         <link rel="next" title="Diagnostic Warning - Potential Lifestyle Mismatches" href="PotentialLifestyleMismatches.html"/>
-        <link rel="prev" title="Object Lifetime Management" href="lifetimes.html"/> 
+        <link rel="prev" title="Windows Presentation Foundation Integration Guide" href="wpfintegration.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -60,7 +60,6 @@
             <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#new-diagnostic-services-in-simple-injector-2">New Diagnostic Services in Simple Injector 2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-started">Getting started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#a-quick-example">A Quick Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#more-information">More information</a></li>
@@ -91,6 +90,16 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#developing-a-custom-lifestyle">Developing a Custom Lifestyle</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#limitations">Limitations</a></li>
@@ -111,6 +120,7 @@
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#generics">Generics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#batch-automatic-registration">Batch / Automatic registration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#registration-of-open-generic-types">Registration of open generic types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#mixing-collections-of-open-generic-and-non-generic-components">Mixing collections of open-generic and non-generic components</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#unregistered-type-resolution">Unregistered type resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#context-based-injection">Context based injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#decorators">Decorators</a></li>
@@ -118,16 +128,6 @@
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#property-injection">Property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#covariance-and-contravariance">Covariance and Contravariance</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#registering-plugins-dynamically">Registering plugins dynamically</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
@@ -225,7 +225,9 @@
 <img alt="Diagnostics debugger view context menu" src="_images/diagnosticsdebuggerview.png" />
 <p>Another option is to add the <strong>container</strong> variable to the Visual Studio watch window by right clicking on the variable and selecting &#8216;Add Watch&#8217; in the context menu:</p>
 <img alt="Diagnostics debugger view watch window" src="_images/diagnostics2.png" />
-<p>These same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the <strong>SimpleInjector.Diagnostics.dll</strong>. This dll is part of the core NuGet package. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:</p>
+<p>The debugger views also allow visualizing your application&#8217;s dependency graphs. This can give you a good view of what the end result of your DI configuration is. By drilling into the list of <strong>Registrations</strong> or <strong>Root Registrations</strong>, you can select the text visualizer (the magnifying glass icon) on the <strong>DependencyGraph</strong> property on any of the lister registrations:</p>
+<img alt="Viewing dependency graphs" src="_images/dependencygraph.png" />
+<p>This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the <strong>SimpleInjector.Diagnostics.dll</strong>. This dll is part of the core NuGet package. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="na">[TestMethod]</span>
 <span class="k">public</span> <span class="k">void</span> <span class="nf">Container_Always_ContainsNoDiagnosticWarnings</span><span class="p">()</span> <span class="p">{</span>
     <span class="c1">// Arrange</span>
@@ -243,8 +245,6 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="note container">
-<strong>Note</strong>: The Diagnostic API is new in Simple Injector v2.4.</div>
 </div>
 <div class="section" id="limitations">
 <h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
@@ -256,9 +256,10 @@
 <li>Dependencies added by <a class="reference internal" href="advanced.html#decorators"><em>Decorators</em></a>.</li>
 <li>Dependencies that are not registered explicitly but are referenced as constructor argument (this included types that got created through unregistered type resolution).</li>
 </ul>
-<p>The Diagnostic Services cannot analyze the following:</p>
+<p>The Diagnostic Services <strong>cannot</strong> analyze the following:</p>
 <ul class="simple">
 <li>Types that are completely unknown, because these types are not registered explicitly and no registered type depends on them. In general you should register all root types (types that are requested directly by calling <strong>GetInstance&lt;T&gt;()</strong>, such as MVC Controllers) explicitly.</li>
+<li>Open-generic registrations that are resolved as root type (no registered type depends on them). Since the container uses unregistered type resolution, those registrations will be unknown untill they are resolved. Prefer registering each closed-generic version explicitly, or add unit tests to verify that these root types can be resolved.</li>
 <li>Dependencies added using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> method:</li>
 </ul>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(</span><span class="n">service</span> <span class="p">=&gt;</span> <span class="p">{</span>
@@ -325,7 +326,7 @@
         <a href="PotentialLifestyleMismatches.html" class="btn btn-neutral float-right" title="Diagnostic Warning - Potential Lifestyle Mismatches"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="lifetimes.html" class="btn btn-neutral" title="Object Lifetime Management"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="wpfintegration.html" class="btn btn-neutral" title="Windows Presentation Foundation Integration Guide"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

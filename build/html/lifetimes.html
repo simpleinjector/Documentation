@@ -29,7 +29,7 @@
 
   
     <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
-        <link rel="next" title="Diagnostic Services" href="diagnostics.html"/>
+        <link rel="next" title="Integration Guide" href="integration.html"/>
         <link rel="prev" title="Using Simple Injector" href="using.html"/> 
 
   
@@ -60,7 +60,6 @@
             <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#new-diagnostic-services-in-simple-injector-2">New Diagnostic Services in Simple Injector 2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-started">Getting started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#a-quick-example">A Quick Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#more-information">More information</a></li>
@@ -91,6 +90,16 @@
 <li class="toctree-l2"><a class="reference internal" href="#developing-a-custom-lifestyle">Developing a Custom Lifestyle</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
@@ -111,6 +120,7 @@
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#generics">Generics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#batch-automatic-registration">Batch / Automatic registration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#registration-of-open-generic-types">Registration of open generic types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#mixing-collections-of-open-generic-and-non-generic-components">Mixing collections of open-generic and non-generic components</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#unregistered-type-resolution">Unregistered type resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#context-based-injection">Context based injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#decorators">Decorators</a></li>
@@ -118,16 +128,6 @@
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#property-injection">Property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#covariance-and-contravariance">Covariance and Contravariance</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#registering-plugins-dynamically">Registering plugins dynamically</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
@@ -386,7 +386,7 @@ SynchronizationContext</a>.</p>
 <div class="section" id="per-wcf-operation">
 <span id="perwcfoperation"></span><h2>Per WCF Operation<a class="headerlink" href="#per-wcf-operation" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
-Only one instance will be created by the container per call to a WCF operation and the instance will be disposed when the operation ends (unless specified otherwise).</div>
+Only one instance will be created by the container during the lifetime of the WCF service class and the instance will be disposed when the WCF service class is released (unless specified otherwise).</div>
 <p>The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">WCF Integration NuGet Package</a> is available (and available as <strong>SimpleInjector.Integration.Wcf.dll</strong> in the default download here on CodePlex) contains <strong>RegisterPerWcfOperation</strong> extension methods and a <strong>WcfOperationLifestyle</strong> class that enable easy <em>Per WCF Operation</em> registrations:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IOrderRepository</span><span class="p">,</span> <span class="n">SqlOrderRepository</span><span class="p">&gt;();</span>
@@ -402,15 +402,10 @@ Only one instance will be created by the container per call to a WCF operation a
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;(</span><span class="n">withoutDispose</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In contrast to the default behavior of Simple Injector, these extension methods ensure the created service is disposed (when such an instance implements <em>IDisposable</em>). This is done after the call to the WCF operation has finished.</p>
-<p>Besides registering services using the <strong>RegisterPerWcfOperation</strong> extension methods, each WCF service markup (the .svc file) should include the following attribute:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">Factory</span><span class="p">=</span><span class="s">&quot;SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory,</span>
-    <span class="n">SimpleInjector</span><span class="p">.</span><span class="n">Integration</span><span class="p">.</span><span class="n">Wcf</span><span class="s">&quot;</span>
-</pre></div>
-</div>
-<p>An exception will be thrown by the framework if this attribute is missing.</p>
+<p>In contrast to the default behavior of Simple Injector, these extension methods ensure the created service is disposed (when such an instance implements <em>IDisposable</em>). This is done after the WCF service instance is released by WCF.</p>
 <div class="note container">
-<strong>Tip</strong>: There is a <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf.QuickStart">Simple Injector WCF Integration Quick Start</a> NuGet Package available that helps you get started with Simple Injector in WCF.</div>
+<strong>Warning</strong>: Instead of what the name of the <strong>WcfOperationLifestyle</strong> class and the <strong>RegisterPerWcfOperation</strong> methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx">InstanceContextMode enumeration</a>. Components that are registered <em>PerWcfOperation</em> live as long as the WCF service class they are injected into.</div>
+<p>For more information about integrating Simple Injector with WCF, please see the <a class="reference internal" href="wcfintegration.html"><em>WCF integration guide</em></a>.</p>
 <p>You can optionally register other services for disposal at the end of the web request:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">scoped</span> <span class="p">=</span> <span class="k">new</span> <span class="n">WcfOperationLifestyle</span><span class="p">();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">,</span> <span class="n">ServiceImpl</span><span class="p">&gt;();</span>
@@ -590,7 +585,7 @@ A hybrid lifestyle is a mix between two or more lifestyles where the the develop
 <div class="section" id="developing-a-custom-lifestyle">
 <span id="customlifestyles"></span><h2>Developing a Custom Lifestyle<a class="headerlink" href="#developing-a-custom-lifestyle" title="Permalink to this headline">¶</a></h2>
 <p>The lifestyles supplied by the framework should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm">Lifestyle</a> and let it return <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm">Custom Registration</a> instances. This however is a lot of work, and a shortcut is available in the form of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Lifestyle_CreateCustom.htm">Lifestyle.CreateCustom</a>.</p>
-<p>A custom lifestyle can be created by calling the <strong>Lifestyle.CreateCustom</strong> factory method. This method takes two arguments: the name of the lifestyle to create (used mainly for display in the <em class="xref std std-ref">Diagnostic Services</em>) and a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_CreateLifestyleApplier.htm">CreateLifestyleApplier</a> delegate:</p>
+<p>A custom lifestyle can be created by calling the <strong>Lifestyle.CreateCustom</strong> factory method. This method takes two arguments: the name of the lifestyle to create (used mainly for display in the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a>) and a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_CreateLifestyleApplier.htm">CreateLifestyleApplier</a> delegate:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">delegate</span> <span class="n">Func</span><span class="p">&lt;</span><span class="kt">object</span><span class="p">&gt;</span> <span class="n">CreateLifestyleApplier</span><span class="p">(</span>
     <span class="n">Func</span><span class="p">&lt;</span><span class="kt">object</span><span class="p">&gt;</span> <span class="n">transientInstanceCreator</span><span class="p">)</span>
 </pre></div>
@@ -653,7 +648,7 @@ A hybrid lifestyle is a mix between two or more lifestyles where the the develop
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="diagnostics.html" class="btn btn-neutral float-right" title="Diagnostic Services"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="integration.html" class="btn btn-neutral float-right" title="Integration Guide"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="using.html" class="btn btn-neutral" title="Using Simple Injector"><span class="fa fa-arrow-circle-left"></span> Previous</a>

@@ -60,7 +60,6 @@
             <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#new-diagnostic-services-in-simple-injector-2">New Diagnostic Services in Simple Injector 2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-started">Getting started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#a-quick-example">A Quick Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#more-information">More information</a></li>
@@ -91,6 +90,16 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#developing-a-custom-lifestyle">Developing a Custom Lifestyle</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
@@ -111,6 +120,7 @@
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#generics">Generics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#batch-automatic-registration">Batch / Automatic registration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#registration-of-open-generic-types">Registration of open generic types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#mixing-collections-of-open-generic-and-non-generic-components">Mixing collections of open-generic and non-generic components</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#unregistered-type-resolution">Unregistered type resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#context-based-injection">Context based injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#decorators">Decorators</a></li>
@@ -118,16 +128,6 @@
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#property-injection">Property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#covariance-and-contravariance">Covariance and Contravariance</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#registering-plugins-dynamically">Registering plugins dynamically</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
@@ -221,7 +221,7 @@
 <div class="section" id="registration-pipeline">
 <span id="id1"></span><h2>Registration Pipeline<a class="headerlink" href="#registration-pipeline" title="Permalink to this headline">¶</a></h2>
 <p>The registration pipeline is the set of steps Simple Injector takes when making a registration in the container. This pipeline mainly consists of a set of validations that is performed. The process is rather straightforward and looks like this:</p>
-<img alt="Register Type Pipeline Diagram" src="_images/pipeline1.png" />
+<img alt="Register Type Pipeline Diagram" src="_images/pipeline1_v2.png" />
 <div class="note container">
 <strong>Note</strong>: The order in which those validations are performed is undocumented and might change from version to version.</div>
 <p>Steps:</p>
@@ -231,6 +231,7 @@
 <li><strong>Service type registered?</strong>: When a service type has already been registered, the container throws an exception. This prevents any accidental misconfigurations. This behavior can be overridden. See the <a class="reference internal" href="howto.html#override-existing-registrations"><em>How to override existing registrations</em></a> for more information.</li>
 <li><strong>Is constructable type?</strong>: When the registration is supplied with an implementation type that the container must create and auto-wire (using <strong>Register&lt;TService, TImplementation&gt;()</strong> for instance), the container checks if the implementation type is constructable. A type is considered to be constructable when it is a concrete type and has a single public constructor. An exception is thrown when these conditions are not met. This behavior can be overridden by implementing a custom  <strong>IConstructorResolutionBehavior</strong>. Take for instance <a class="reference internal" href="t4mvc.html"><em>this example about T4MVC</em></a>.</li>
 <li><strong>All ctor params valid?</strong>: The constructor that has been selected in the previous step will be analyzed for invalid constructor parameters. Ambiguous types such as <em>System.String</em> and value types such as <em>Int32</em> and <em>Guid</em> are not allowed. This behavior can be overridden by implementing a custom <strong>IConstructorVerificationBehavior</strong>. The <strong>IConstructorVerificationBehavior</strong> will typically have to be overridden in combination with the <strong>IConstructorInjectionBehavior</strong>, which is used during the <a class="reference internal" href="#resolve-pipeline"><em>Resolve Pipeline</em></a>. Take a look at <a class="reference external" href="http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=94">this blog post</a> for an elaborate example.</li>
+<li><strong>Lifestyle supplied?</strong>: If the user explicitly supplied a <strong>Lifestyle</strong> to its registration, the registration is done using that lifestyle, i.e. the registration is made using one of the <strong>RegisterXXX</strong> method overload that accepts a <strong>Lifestyle</strong> instance. Otherwise, the configured <strong>ILifestyleSelectionBehavior</strong> is queried to get the proper lifestyle for the given service type and implementation. By default this means that the registration is made using the <strong>Transient</strong> lifestyle, but this behavior can be overridden by replacing the default <strong>ILifestyleSelectionBehavior</strong>.</li>
 <li><strong>Add registration</strong>: When all previous validations succeeded, the registration is added to the container. Although the type may be registered successfully, this still doesn&#8217;t mean it can always be resolved. This depends on several other factors such as whether all dependencies can be resolved correctly. These checks cannot be performed during registration, and they are performed during the <a class="reference internal" href="#resolve-pipeline"><em>Resolve Pipeline</em></a>.</li>
 </ul>
 </div>

@@ -32,7 +32,7 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
         private static Container container;
 
         public static void Initialize(Page page) {
-            container.GetRegistration(page.GetType().BaseType, true).Registration
+            container.GetRegistration(page.GetType(), true).Registration
                 .InitializeInstance(page);
         }
 
@@ -73,6 +73,7 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                 from assembly in assemblies
                 from type in assembly.GetExportedTypes()
                 where typeof(Page).IsAssignableFrom(type) && !type.IsAbstract
+                where !type.IsGenericType
                 select type;
 
             foreach (Type pageType in pageTypes) {
