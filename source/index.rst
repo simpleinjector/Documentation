@@ -16,10 +16,10 @@ Contents:
    quickstart
    using
    lifetimes
+   integration
    diagnostics
    howto
    advanced
-   integration
    extensibility
    pipeline
    principles

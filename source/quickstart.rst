@@ -21,18 +21,6 @@ The following platforms are supported:
 
     Simple Injector is carefully designed to run in **partial / medium trust**, and it is fast; `blazingly fast <https://simpleinjector.codeplex.com/discussions/326621>`_.
 
-New Diagnostic Services in Simple Injector 2
-============================================
-
-Simple Injector 2.0 adds the ability to warn about common misconfigurations while unit testing and/or debugging your application. Many Simple Injector users have already used this feature to diagnose their configuration and have successfully fixed problems that would have otherwise been difficult or even impossible to find. 
-
-Here's a quick visual example of this feature:
-
-.. image:: images/diagnosticsdebuggerview.png 
-   :alt: Diagnostics debugger view context menu
-
-See the :doc:`diagnostics` page for more information.
-
 Getting started
 ===============
 
