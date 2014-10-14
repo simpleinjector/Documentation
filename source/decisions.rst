@@ -133,7 +133,7 @@ With explicit property injection, the container is forced to inject a property a
 
 The use of property injection should be non-standard; constructor injection should be used in the majority of cases. If a constructor gets too many parameters (the constructor over-injection anti-pattern), it is an indication of a violation of the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). SRP violations often lead to maintainability issues. Instead of fixing constructor over-injection with property injection the root cause should be analyzed and the type should be refactored, probably with `Facade Services <http://blog.ploeh.dk/2010/02/02/RefactoringtoAggregateServices/>`_. Another common reason to use properties is because the dependencies are optional. But instead of using optional property dependencies, the best practice is to inject empty implementations (a.k.a. `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) into the constructor; Dependencies should rarely be optional.
 
-This doesn’t mean that you can’t do property injection with Simple Injector, but with Simple Injector this will have to be :ref:`explicitly configured <Property-Injection>`.
+This doesn’t mean that you can’t do property injection with Simple Injector, but with Simple Injector this will have to be :ref:`explicitly configured <Overriding-Property-Injection-Behavior>`.
 
 .. _No-interception:
 

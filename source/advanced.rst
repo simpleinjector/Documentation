@@ -734,7 +734,7 @@ The current example doesn't add much compared to simply using a decorator. When 
 
     **Note**: Don't use interception for intercepting types that all implement the same generic interface, such as *ICommandHandler<T>* or *IValidator<T>*. Try using decorator classes instead, as shown in the :ref:`Decorators <Decorators>` section on this page.
 
-.. _Implicit-Property-Injection:
+.. _Property-Injection:
 
 Property injection
 ==================
