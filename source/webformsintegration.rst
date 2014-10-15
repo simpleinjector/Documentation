@@ -2,11 +2,7 @@
 ASP.NET Web Forms Integration Guide
 ===================================
 
-ASP.NET Web Forms was never designed with dependency injection in mind. Although using constructor injection in our **Page** classes, user controls and http handlers would be preferable, it is unfortunately not possible, because ASP.NET expects those types to have a default constructor.
-
-.. container:: Note
-
-    **Note**: `This blog post <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=81>`_ shows how to do constructor injection in pages and user controls, but please keep in mind that this will fail when trying to run the application in partial trust. Besides, it still doesn't work for *IHttpHandlers*.
+ASP.NET Web Forms was never designed with dependency injection in mind. Although using constructor injection in our **Page** classes, user controls and HTTP handlers would be preferable, it is unfortunately not possible, because ASP.NET expects those types to have a default constructor.
 
 Instead of doing constructor injection, there are alternatives. The simplest thing to do is to fall back to property injection and initialize the page in the constructor.
 
@@ -19,73 +15,87 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
     using System.Web;
     using System.Web.Compilation;
     using System.Web.UI;
+    using Microsoft.Web.Infrastructure.DynamicModuleHelper;
     using SimpleInjector;
     using SimpleInjector.Advanced;
 
-    public abstract class BasePage : Page {
-        public BasePage() {
-            Global.Initialize(this);
-        }
-    }
+    [assembly: PreApplicationStartMethod(
+        typeof(MyWebApplication.PageInitializerModule),
+        "Initialize")]
 
-    public class Global : HttpApplication {
-        private static Container container;
-
-        public static void Initialize(Page page) {
-            container.GetRegistration(page.GetType(), true).Registration
-                .InitializeInstance(page);
-        }
-
-        protected void Application_Start(object sender, EventArgs e) {
-            Bootstrap();
-        }
-
-        private static void Bootstrap() {
-            // 1. Create a new Simple Injector container.
-            var container = new Container();
-
-            // Registere a custom PropertySelectionBehavior to enable property injection.
-            container.Options.PropertySelectionBehavior = 
-                new ImportAttributePropertySelectionBehavior();
-
-            // 2. Configure the container (register)
-            container.Register<IUserRepository, SqlUserRepository>();
-            container.RegisterPerWebRequest<IUserContext, AspNetUserContext>();
-
-            // 3. Store the container for use by Page classes.
-            Global.container = container;
-
-            // 4. Optionally verify the container's configuration.
-            //    Did you know the container can diagnose your configuration? 
-            //    For more information, go to: https://bit.ly/YE8OJj.
-            container.Verify();
-            VerifyPages(container);
-        }
-
-        // This method tests if each Page class can be created. Because Page classes 
-        // manually call Global.Initialize in their ctor, we want to test on application 
-        // startup if all pages can be initialized, to prevent having to go through 
-        // each page in the application during testing.
-        private static void VerifyPages(Container container) {
-            var assemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>();
-
-            var pageTypes =
-                from assembly in assemblies
-                from type in assembly.GetExportedTypes()
-                where typeof(Page).IsAssignableFrom(type) && !type.IsAbstract
-                where !type.IsGenericType
-                select type;
-
-            foreach (Type pageType in pageTypes) {
-                container.GetInstance(pageType);
+    namespace MyWebApplication
+    {
+        public sealed class PageInitializerModule : IHttpModule {
+            public static void Initialize() {
+                DynamicModuleUtility.RegisterModule(typeof(PageInitializerModule));
             }
+
+            void IHttpModule.Init(HttpApplication context) {
+                context.PreRequestHandlerExecute += (sender, e) => {
+                    if (context.Context.CurrentHandler != null) {
+                        Global.InitializeHandler(context.Context.CurrentHandler);
+                    }
+                };
+            }
+
+            void IHttpModule.Dispose() { }
         }
 
-        private class ImportAttributePropertySelectionBehavior : IPropertySelectionBehavior {
-            public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo) {
-                // Makes use of the System.ComponentModel.Composition assembly
-                return typeof(Page).IsAssignableFrom(serviceType) &&
-                    propertyInfo.GetCustomAttributes<ImportAttribute>().Any();
+        public class Global : HttpApplication {
+            private static Container container;
+
+            public static void InitializeHandler(IHttpHandler handler) {
+                container.GetRegistration(handler.GetType(), true).Registration
+                    .InitializeInstance(handler);
+            }
+
+            protected void Application_Start(object sender, EventArgs e) {
+                Bootstrap();
+            }
+
+            private static void Bootstrap() {
+                // 1. Create a new Simple Injector container.
+                var container = new Container();
+
+                // Register a custom PropertySelectionBehavior to enable property injection.
+                container.Options.PropertySelectionBehavior =
+                    new ImportAttributePropertySelectionBehavior();
+
+                // 2. Configure the container (register)
+                container.Register<IUserRepository, SqlUserRepository>();
+                container.RegisterPerWebRequest<IUserContext, AspNetUserContext>();
+
+                // Register your Page classes.
+                RegisterWebPages(container);
+
+                // 3. Store the container for use by Page classes.
+                Global.container = container;
+
+                // 4. Optionally verify the container's configuration.
+                //    Did you know the container can diagnose your configuration? 
+                //    For more information, go to: https://simpleinjector.org/diagnostics.
+                container.Verify();
+            }
+
+            private static void RegisterWebPages(Container container) {
+                var pageTypes =
+                    from assembly in BuildManager.GetReferencedAssemblies().Cast<Assembly>()
+                    where !assembly.IsDynamic
+                    where !assembly.GlobalAssemblyCache
+                    from type in assembly.GetExportedTypes()
+                    where type.IsSubclassOf(typeof(Page))
+                    where !type.IsAbstract && !type.IsGenericType
+                    select type;
+
+                pageTypes.ToList().ForEach(container.Register);
+            }
+
+            class ImportAttributePropertySelectionBehavior : IPropertySelectionBehavior {
+                public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo) {
+                    // Makes use of the System.ComponentModel.Composition assembly
+                    return typeof(Page).IsAssignableFrom(serviceType) &&
+                        propertyInfo.GetCustomAttributes<ImportAttribute>().Any();
+                }
             }
         }
     }
