@@ -104,7 +104,7 @@ With this code in place, we can now write our page classes as follows:
 
 .. code-block:: c#
 
-    public partial class Default : BasePage {
+    public partial class Default : Page {
         [Import] public IUserRepository UserRepository { get; set; }
         [Import] public IUserContext UserContext { get; set; }
 
