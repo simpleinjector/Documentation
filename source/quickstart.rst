@@ -87,7 +87,7 @@ Using Simple Injector, the configuration of the application using the *UserContr
             container.GetInstance<MailLogger>()
         ));
 
-        ; // 3. Optionally verify the container's configuration.
+        // 3. Optionally verify the container's configuration.
         container.Verify();
 
         // 4. Register the container as MVC3 IDependencyResolver.
