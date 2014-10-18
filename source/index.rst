@@ -27,6 +27,7 @@ Contents:
    legal
    contribute
    appendix
+   API Documentation <https://simpleinjector.org/ReferenceLibrary/>
 
 Indices and tables
 ==================
