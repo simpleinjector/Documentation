@@ -3,9 +3,9 @@ Extensibility Points
 ====================
 
 * :ref:`Overriding Constructor Resolution Behavior <Overriding-Constructor-Resolution-Behavior>`
-* :ref:`Overriding Parameter Injection Behavior <Overriding-Parameter-Injection-Behavior>`
 * :ref:`Property Injection <Overriding-Property-Injection-Behavior>`
 * :ref:`Overriding Parameter Injection Behavior <Overriding-Parameter-Injection-Behavior>`
+* :ref:`Resolving Unregistered Types <Resolving-Unregistered-Types>`
 * :ref:`Overriding Lifestyle Selection Behavior <Overriding-Selection-Behavior>`
 * :ref:`Intercepting the Creation of Types <Intercepting-the-Creation-of-Types>`
 * :ref:`Building up external instances <Building-Up-External-Instances>`
