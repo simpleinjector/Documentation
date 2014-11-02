@@ -8,6 +8,8 @@ Simple Injector contains `Simple Injector ASP.NET Web API Integration Quick Star
 
     **Note**: To be able to run the Web API integration packages, `you need <https://stackoverflow.com/questions/22392032/are-there-any-technical-reasons-simpleinjector-cannot-support-webapi-on-net-4-0>`_ *.NET 4.5* or above.
 
+.. _Web-API-basic-setup:
+	
 Basic setup
 ===========
 
@@ -71,10 +73,14 @@ Given the configuration above, an actual controller could look like this:
         }
     }
 
+.. _Web-API-extra-features:	
+	
 Extra features
 ==============
 
 The basic features of the Web API integration package are the **SimpleInjectorWebApiDependencyResolver** class and the **WebApiRequestLifestyle** with its **RegisterWebApiRequest** extension methods. Besides these basic features, the integration package contains extra features that can make your life easier.
+
+.. _Getting-the-current-requests-HttpRequestMessage:
 
 Getting the current request's HttpRequestMessage
 ------------------------------------------------
@@ -117,6 +123,8 @@ This implementation can be implemented as follows:
 
     container.RegisterWebApiRequest<IRequestMessageProvider, RequestMessageProvider>();
 
+.. _Injecting-dependencies-into-Web-API-filter-attributes:
+	
 Injecting dependencies into Web API filter attributes
 -----------------------------------------------------
 
@@ -129,3 +137,61 @@ To allow attributes to be integrated into the Simple Injector pipeline, you have
     container.RegisterWebApiFilterProvider(GlobalConfiguration.Configuration);
 
 This ensures that attributes are initialized by Simple Injector according to the container's configuration. This by itself however, doesn't do much, since Simple Injector will not inject any properties by default. By registering a custom **IPropertySelectionBehavior** however, you can property injection to take place on attributes. An example of such custom behavior is given :ref:`here <ImportPropertySelectionBehavior>` in the advanced sections of the wiki.
+
+.. _Injecting-dependencies-into-Web-API-message-handlers:
+
+Injecting dependencies into Web API message handlers
+----------------------------------------------------
+
+The default mechanism in Web API to use HTTP Message Handlers to 'decorate' requests is by adding them to the global *MessageHandlers* collection as shown here:
+
+.. code-block:: c#
+
+    GlobalConfiguration.Configuration.MessageHandlers.Add(new MessageHandler1());
+
+The problem with this approach is that this effectively hooks in the *MessageHandler1* into the Web API pipeline as a singleton. This is fine when the handler itself has no state and no dependencies, but in a system that is based on the SOLID design principles, it's very likely that those handlers will have dependencies of their own and its very likely that some of those dependencies need a lifetime that is shorter than singleton.
+
+If that's the case, such message handler should not be created as singleton, since in general, a component should never have a lifetime that is longer than the lifetime of its dependencies.
+
+The solution is to define a proxy class that sits in between. Since Web API lacks that functionality, we need to build this ourselves as follows:
+
+.. code-block:: c#
+
+    public sealed class DelegatingHandlerProxy<THandler> : DelegatingHandler
+        where THandler : DelegatingHandler {
+        private readonly Container container;
+
+        public DelegatingHandlerProxy(Container container) {
+            this.container = container;
+        }
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken) {
+
+            // Important: Trigger the creation of the scope.
+            request.GetDependencyScope();
+
+            var handler = this.container.GetInstance<THandler>();
+
+            handler.InnerHandler = this.InnerHandler;
+
+            var invoker = new HttpMessageInvoker(handler);
+        
+            return invoker.SendAsync(request, cancellationToken);
+        }
+    }
+	
+This *DelegatingHandlerProxy<THandler>* can be added as singleton to the global *MessageHandlers* collection, and it will resolve the given *THandler* on each request, allowing it to be resolved according to its lifestyle. 
+
+.. container:: Note
+
+	**Warning**: Prevent registering any *THandler* with a lifestyle longer than the request, since message handlers are **not** thread-safe (just look at the assignment of *InnerHandler* in the *SendAsync* method and you'll understand why).
+
+The *DelegatingHandlerProxy<THandler>* can be used as follows:
+
+.. code-block:: c#
+
+    container.Register<MessageHandler1>();
+
+    GlobalConfiguration.Configuration.MessageHandlers.Add(
+        new DelegatingHandlerProxy<MessageHandler1>(container));

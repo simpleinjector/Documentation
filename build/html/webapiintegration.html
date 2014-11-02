@@ -98,7 +98,7 @@
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
@@ -113,7 +113,7 @@
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-containers-configuration">Verify the container’s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
 </ul>
 </li>
@@ -133,11 +133,12 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#property-injection">Property Injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-property-injection-behavior">Overriding Property Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#resolving-unregistered-types">Resolving Unregistered Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -160,7 +161,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#dont-allow-resolving-scoped-instances-outside-an-active-scope">Don’t allow resolving scoped instances outside an active scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#don-t-allow-resolving-scoped-instances-outside-an-active-scope">Don&#8217;t allow resolving scoped instances outside an active scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
@@ -180,8 +181,11 @@
 <li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
 </ul>
 
         
@@ -224,7 +228,7 @@
 <div class="note container">
 <strong>Note</strong>: To be able to run the Web API integration packages, <a class="reference external" href="https://stackoverflow.com/questions/22392032/are-there-any-technical-reasons-simpleinjector-cannot-support-webapi-on-net-4-0">you need</a> <em>.NET 4.5</em> or above.</div>
 <div class="section" id="basic-setup">
-<h2>Basic setup<a class="headerlink" href="#basic-setup" title="Permalink to this headline">¶</a></h2>
+<span id="web-api-basic-setup"></span><h2>Basic setup<a class="headerlink" href="#basic-setup" title="Permalink to this headline">¶</a></h2>
 <p>The following code snippet shows how to use the use the integration package (note that the quick start package injects this code for you).</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// You&#39;ll need to include the following namespaces</span>
 <span class="k">using</span> <span class="nn">System.Web.Http</span><span class="p">;</span>
@@ -280,10 +284,10 @@
 </div>
 </div>
 <div class="section" id="extra-features">
-<h2>Extra features<a class="headerlink" href="#extra-features" title="Permalink to this headline">¶</a></h2>
+<span id="web-api-extra-features"></span><h2>Extra features<a class="headerlink" href="#extra-features" title="Permalink to this headline">¶</a></h2>
 <p>The basic features of the Web API integration package are the <strong>SimpleInjectorWebApiDependencyResolver</strong> class and the <strong>WebApiRequestLifestyle</strong> with its <strong>RegisterWebApiRequest</strong> extension methods. Besides these basic features, the integration package contains extra features that can make your life easier.</p>
 <div class="section" id="getting-the-current-request-s-httprequestmessage">
-<h3>Getting the current request&#8217;s HttpRequestMessage<a class="headerlink" href="#getting-the-current-request-s-httprequestmessage" title="Permalink to this headline">¶</a></h3>
+<span id="getting-the-current-requests-httprequestmessage"></span><h3>Getting the current request&#8217;s HttpRequestMessage<a class="headerlink" href="#getting-the-current-request-s-httprequestmessage" title="Permalink to this headline">¶</a></h3>
 <p>When working with Web API you will often find yourself wanting access to the current <em>HttpRequestMessage</em>. Simple Injector allows fetching the current <em>HttpRequestMessage</em> by calling the <em>container.GetCurrentHttpRequestMessage()</em> extension method. To be able to request the current <em>HttpRequestMessage</em> you need to explicitly enable this as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">EnableHttpRequestMessageTracking</span><span class="p">(</span><span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">);</span>
 </pre></div>
@@ -316,13 +320,58 @@
 </div>
 </div>
 <div class="section" id="injecting-dependencies-into-web-api-filter-attributes">
-<h3>Injecting dependencies into Web API filter attributes<a class="headerlink" href="#injecting-dependencies-into-web-api-filter-attributes" title="Permalink to this headline">¶</a></h3>
+<span id="id1"></span><h3>Injecting dependencies into Web API filter attributes<a class="headerlink" href="#injecting-dependencies-into-web-api-filter-attributes" title="Permalink to this headline">¶</a></h3>
 <p>Simple Injector allows integrating Web API filter attributes with the Simple Injector pipeline. This means that Simple Injector can inject properties into those attributes and allow any registered initializer delegates to be applied to those attributes. Constructor injection however is out of the picture. Since it is the reflection API of the CLR that is responsible for creating attributes, it&#8217;s impossible to inject dependencies into the attribute&#8217;s constructor.</p>
 <p>To allow attributes to be integrated into the Simple Injector pipeline, you have to register a custom filter provider as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiFilterProvider</span><span class="p">(</span><span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>This ensures that attributes are initialized by Simple Injector according to the container&#8217;s configuration. This by itself however, doesn&#8217;t do much, since Simple Injector will not inject any properties by default. By registering a custom <strong>IPropertySelectionBehavior</strong> however, you can property injection to take place on attributes. An example of such custom behavior is given <a class="reference internal" href="advanced.html#importpropertyselectionbehavior"><em>here</em></a> in the advanced sections of the wiki.</p>
+</div>
+<div class="section" id="injecting-dependencies-into-web-api-message-handlers">
+<span id="id2"></span><h3>Injecting dependencies into Web API message handlers<a class="headerlink" href="#injecting-dependencies-into-web-api-message-handlers" title="Permalink to this headline">¶</a></h3>
+<p>The default mechanism in Web API to use HTTP Message Handlers to &#8216;decorate&#8217; requests is by adding them to the global <em>MessageHandlers</em> collection as shown here:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">.</span><span class="n">MessageHandlers</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">MessageHandler1</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>The problem with this approach is that this effectively hooks in the <em>MessageHandler1</em> into the Web API pipeline as a singleton. This is fine when the handler itself has no state and no dependencies, but in a system that is based on the SOLID design principles, it&#8217;s very likely that those handlers will have dependencies of their own and its very likely that some of those dependencies need a lifetime that is shorter than singleton.</p>
+<p>If that&#8217;s the case, such message handler should not be created as singleton, since in general, a component should never have a lifetime that is longer than the lifetime of its dependencies.</p>
+<p>The solution is to define a proxy class that sits in between. Since Web API lacks that functionality, we need to build this ourselves as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">DelegatingHandlerProxy</span><span class="p">&lt;</span><span class="n">THandler</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">DelegatingHandler</span>
+    <span class="k">where</span> <span class="n">THandler</span> <span class="p">:</span> <span class="n">DelegatingHandler</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">DelegatingHandlerProxy</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">override</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">HttpResponseMessage</span><span class="p">&gt;</span> <span class="n">SendAsync</span><span class="p">(</span>
+        <span class="n">HttpRequestMessage</span> <span class="n">request</span><span class="p">,</span> <span class="n">CancellationToken</span> <span class="n">cancellationToken</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="c1">// Important: Trigger the creation of the scope.</span>
+        <span class="n">request</span><span class="p">.</span><span class="n">GetDependencyScope</span><span class="p">();</span>
+
+        <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">THandler</span><span class="p">&gt;();</span>
+
+        <span class="n">handler</span><span class="p">.</span><span class="n">InnerHandler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">InnerHandler</span><span class="p">;</span>
+
+        <span class="kt">var</span> <span class="n">invoker</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HttpMessageInvoker</span><span class="p">(</span><span class="n">handler</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="n">invoker</span><span class="p">.</span><span class="n">SendAsync</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">cancellationToken</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This <em>DelegatingHandlerProxy&lt;THandler&gt;</em> can be added as singleton to the global <em>MessageHandlers</em> collection, and it will resolve the given <em>THandler</em> on each request, allowing it to be resolved according to its lifestyle.</p>
+<div class="note container">
+<strong>Warning</strong>: Prevent registering any <em>THandler</em> with a lifestyle longer than the request, since message handlers are <strong>not</strong> thread-safe (just look at the assignment of <em>InnerHandler</em> in the <em>SendAsync</em> method and you&#8217;ll understand why).</div>
+<p>The <em>DelegatingHandlerProxy&lt;THandler&gt;</em> can be used as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">MessageHandler1</span><span class="p">&gt;();</span>
+
+<span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">.</span><span class="n">MessageHandlers</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span>
+    <span class="k">new</span> <span class="n">DelegatingHandlerProxy</span><span class="p">&lt;</span><span class="n">MessageHandler1</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">));</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>

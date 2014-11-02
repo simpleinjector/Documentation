@@ -87,7 +87,7 @@ Using Simple Injector, the configuration of the application using the *UserContr
             container.GetInstance<MailLogger>()
         ));
 
-        ; // 3. Optionally verify the container's configuration.
+        // 3. Optionally verify the container's configuration.
         container.Verify();
 
         // 4. Register the container as MVC3 IDependencyResolver.
@@ -100,7 +100,7 @@ Using Simple Injector, the configuration of the application using the *UserContr
 
 The given configuration registers implementations for the *IUserRepository* and *ILogger* interfaces. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as *SqlUserRepository*) to an interface or base type. In the given example, every time you ask the container for an *IUserRepository*, it will create a new *SqlUserRepository* on your behalf (in DI terminology: an object with a **Transient** lifestyle).
 
-The registration of the *ILogger* is a bit more complex though. It registers a delegate that knows how to create a new *ILogger* implementation, in this case *CompositeLogger* (which is an implementation of *ILogger*). The delegate itself calls back into the container and this allows the container to create the concrete *DatabaseLogger* and *MailLogger* and inject them into the *CompositeLogger*. While the type of registration that we’ve seen with the *IUserRepository* is much more common, the use of delegates allows many interesting scenarios.
+The registration of the *ILogger* is a bit more complex though. It registers a delegate that knows how to create a new *ILogger* implementation, in this case *CompositeLogger* (which is an implementation of *ILogger*). The delegate itself calls back into the container and this allows the container to create the concrete *DatabaseLogger* and *MailLogger* and inject them into the *CompositeLogger*. While the type of registration that we've seen with the *IUserRepository* is much more common, the use of delegates allows many interesting scenarios.
 
 .. container:: Note
 

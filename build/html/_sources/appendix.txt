@@ -10,3 +10,5 @@ Appendix
 	Collection Registration Extensions <CollectionRegistrationExtensions>
 	Context Dependent Extensions <ContextDependentExtensions>
 	T4MVC <t4mvc>
+	InjectProperties is Deprecated <injectproperties-is-deprecated>
+	RegisterMvcAttributeFilterProvider is Deprecated <registermvcattributefilterprovider-is-deprecated>

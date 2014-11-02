@@ -220,7 +220,7 @@ This way the application can simply depend on *IMyService* instead of *Lazy<IMyS
 
 .. container:: Note
 
-    **Warning**: The same warning applies to the use of *Lazy<T>* as it does for the use of *Func<T>* delegates. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container’s configuration <Verify-Configuration>`.
+    **Warning**: The same warning applies to the use of *Lazy<T>* as it does for the use of *Func<T>* delegates. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container's configuration <Verify-Configuration>`.
 
 .. _Resolve-Instances-By-Key:
 
@@ -229,7 +229,7 @@ Resolve instances by key
 
 Resolving instances by a key is a feature that is deliberately left out of Simple Injector, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the *Container* instance and this leads to the `Service Locator anti-pattern <http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx>`_.
 
-This doesn’t mean that resolving instances by a key is never useful. Resolving instances by a key is normally a job for a specific factory rather than the *Container*. This approach makes the design much cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn’t consider.
+This doesn't mean that resolving instances by a key is never useful. Resolving instances by a key is normally a job for a specific factory rather than the *Container*. This approach makes the design much cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn't consider.
 
 .. container:: Note
 
@@ -250,7 +250,7 @@ Take a look at the following scenario, where we want to retrieve instances of ty
     var handler = factory.CreateNew("customers");
     handler.Handle(requestContext);
 
-By inheriting from the BCL’s *Dictionary<TKey, TValue>*, creating an *IRequestHandlerFactory* implementation is almost a one-liner:
+By inheriting from the BCL's *Dictionary<TKey, TValue>*, creating an *IRequestHandlerFactory* implementation is almost a one-liner:
 
 .. code-block:: c#
 
@@ -279,7 +279,7 @@ With this class, we can register *Func<IRequestHandler>* factory methods by a ke
 
     **Note**: this design will work with almost all DI containers making the design easy to follow and also making it portable between DI libraries.
 
-If you don’t like a design that uses *Func<T>* delegates this way, it can easily be changed to be a *Dictionary<string, Type>* instead. The *RequestHandlerFactory* can be implemented as follows:
+If you don't like a design that uses *Func<T>* delegates this way, it can easily be changed to be a *Dictionary<string, Type>* instead. The *RequestHandlerFactory* can be implemented as follows:
 
 .. code-block:: c#
 
@@ -479,7 +479,7 @@ The previous example created a *Container* instance that allows overriding. It i
 
 .. _Verify-Configuration:
 
-Verify the container’s configuration
+Verify the container's configuration
 ====================================
 
 Dependency Injection promotes the concept of programming against abstractions. This makes your code much easier to test, easier to change and more maintainable. However, since the code itself isn't responsible for maintaining the dependencies between implementations, the compiler will not be able to verify whether the dependency graph is correct.
@@ -490,7 +490,7 @@ Simple Injector contains a **Verify()** method, that will simply iterate over al
 
 Calling the **Verify()** method however, is just part of the story. It is very easy to create a configuration that passes any verification, but still fails at runtime. Here are some tips to help building a verifiable configuration:
 
-#. Stay away from :ref:`implicit property injection <Implicit-Property-Injection>`, where the container is allowed to skip injecting the property if a corresponding or correctly registered dependency can't be found. This will disallow your application to fail fast and will result in *NullReferenceException*'s later on. Only use implicit property injection when the property is truly optional, omitting the dependency still keeps the configuration valid, and the application still runs correctly without that dependency. Truly optional dependencies should be very rare though, since most of the time you should prefer injecting empty implementations (a.k.a. the `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) instead of allowing dependencies to be a null reference. :ref:`Explicit property injection <Configuring-Property-Injection>` on the other hand is fine. With explicit property injection you force the container to inject a property and it will fail when it can't succeed. However, you should prefer constructor injection whenever possible. Note that the need for property injection is often an indication of problems in the design. If you revert to property injection because you otherwise have too many constructor arguments, you're probably violating the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_.
+#. Stay away from :ref:`implicit property injection <Property-Injection>`, where the container is allowed to skip injecting the property if a corresponding or correctly registered dependency can't be found. This will disallow your application to fail fast and will result in *NullReferenceException*'s later on. Only use implicit property injection when the property is truly optional, omitting the dependency still keeps the configuration valid, and the application still runs correctly without that dependency. Truly optional dependencies should be very rare though, since most of the time you should prefer injecting empty implementations (a.k.a. the `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) instead of allowing dependencies to be a null reference. :ref:`Explicit property injection <Configuring-Property-Injection>` on the other hand is fine. With explicit property injection you force the container to inject a property and it will fail when it can't succeed. However, you should prefer constructor injection whenever possible. Note that the need for property injection is often an indication of problems in the design. If you revert to property injection because you otherwise have too many constructor arguments, you're probably violating the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_.
 
 #. Register all root objects explicitly if possible. For instance, register all ASP.NET MVC Controller instances explicitly in the container (Controller instances are requested directly and are therefore called 'root objects'). This way the container can check the complete dependency graph starting from the root object when you call **Verify()**. Prefer registering all root objects in an automated fashion, for instance by using reflection to find all root types. The `Simple Injector ASP.NET MVC Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Web.Mvc>`_ for instance, contains a `RegisterMvcControllers <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_SimpleInjectorMvcExtensions_RegisterMvcControllers.htm>`_ extension method that will do this for you and the `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ contains a `RegisterWcfServices <https://simpleinjector.org/ReferenceLibrary.v2/?topic=html/M_SimpleInjector_SimpleInjectorWcfExtensions_RegisterWcfServices.htm>`_ extension method for this purpose.
 #. If registering root objects is not possible or feasible, test the creation of each root object manually during start-up. With ASP.NET Web Form Page classes for instance, you will probably call the container (directly or indirectly) from within their constructor (since Page classes must unfortunately have a default constructor). The key here again is finding them all in once using reflection. By finding all Page classes using reflection and instantiating them, you'll find out (during app start-up or through automated testing) whether there is a problem with your DI configuration or not. The :doc:`Web Forms Integration <webformsintegration>` guide contains an example of how to verify page classes.

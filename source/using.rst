@@ -372,7 +372,7 @@ Verifying the container's configuration
 
 You can optionally call the *Verify* method of the *Container*. The *Verify* method provides a fail-fast mechanism to prevent your application from starting when the *Container* has been accidentaly misconfigured. The *Verify* method checks the entire configuration by creating an instance of each registered type.
 
-For more information about creating an application and container configuration that can be succesfully verified, please read the :ref:`How To Verify the container’s configuration <Verify-Configuration>`.
+For more information about creating an application and container configuration that can be succesfully verified, please read the :ref:`How To Verify the container's configuration <Verify-Configuration>`.
 
 .. _Automatic-Constructor-Injection:
 
@@ -387,7 +387,7 @@ Simple Injector has the following prerequisites to be able to provide auto-wirin
 #. The type *should* have one public constructor (this may be a default constructor and this requirement can be overridden).
 #. All the types of the arguments in that constructor must be resolvable by the *Container*.
 
-Simple Injector can create a type even if it hasn’t registered in the container by using constructor injection.
+Simple Injector can create a type even if it hasn't registered in the container by using constructor injection.
 
 The following code shows an example of the use of automatic constructor injection. The example shows an *IUserRepository* interface with a concrete *SqlUserRepository* implementation and a concrete *UserService* class. The *UserService* class has one public constructor with an *IUserRepository* argument. Because the dependencies of the *UserService* are registered, Simple Injector is able to create a new *UserService* instance.
 
@@ -411,7 +411,7 @@ The following code shows an example of the use of automatic constructor injectio
 
 .. container:: Note
 
-    **Note**: Because *UserService* is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can significantly simplify the *Container*’s configuration for more complex scenarios. Alwasy keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
+    **Note**: Because *UserService* is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can significantly simplify the *Container*'s configuration for more complex scenarios. Alwasy keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
 
 .. _More-Information:
 

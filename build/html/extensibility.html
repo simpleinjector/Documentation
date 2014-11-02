@@ -97,7 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
@@ -112,7 +112,7 @@
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-containers-configuration">Verify the container’s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
 </ul>
 </li>
@@ -132,11 +132,12 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Extensibility Points</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#property-injection">Property Injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#overriding-property-injection-behavior">Overriding Property Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#resolving-unregistered-types">Resolving Unregistered Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-up-external-instances">Building up External Instances</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -159,7 +160,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#dont-allow-resolving-scoped-instances-outside-an-active-scope">Don’t allow resolving scoped instances outside an active scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#don-t-allow-resolving-scoped-instances-outside-an-active-scope">Don&#8217;t allow resolving scoped instances outside an active scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
@@ -179,8 +180,11 @@
 <li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
 </ul>
 
         
@@ -219,11 +223,12 @@
 <h1>Extensibility Points<a class="headerlink" href="#extensibility-points" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><a class="reference internal" href="#overriding-constructor-resolution-behavior"><em>Overriding Constructor Resolution Behavior</em></a></li>
+<li><a class="reference internal" href="#overriding-property-injection-behavior"><em>Property Injection</em></a></li>
 <li><a class="reference internal" href="#overriding-parameter-injection-behavior"><em>Overriding Parameter Injection Behavior</em></a></li>
-<li><a class="reference internal" href="#property-injection"><em>Property Injection</em></a></li>
-<li><a class="reference internal" href="#overriding-parameter-injection-behavior"><em>Overriding Parameter Injection Behavior</em></a></li>
+<li><a class="reference internal" href="#resolving-unregistered-types"><em>Resolving Unregistered Types</em></a></li>
 <li><a class="reference internal" href="#overriding-selection-behavior"><em>Overriding Lifestyle Selection Behavior</em></a></li>
 <li><a class="reference internal" href="#intercepting-the-creation-of-types"><em>Intercepting the Creation of Types</em></a></li>
+<li><a class="reference internal" href="#building-up-external-instances"><em>Building up external instances</em></a></li>
 </ul>
 <div class="section" id="overriding-constructor-resolution-behavior">
 <span id="id1"></span><h2>Overriding Constructor Resolution Behavior<a class="headerlink" href="#overriding-constructor-resolution-behavior" title="Permalink to this headline">¶</a></h2>
@@ -327,8 +332,8 @@
 </div>
 <p>The old T4MVC template generated an extra public constructor on MVC Controller types and overload resolution only had to be changed for types implementing <em>System.Web.Mvc.IController</em>, which is what the previous code snippet does. For all other types of registration in the container, the container&#8217;s default behavior is used.</p>
 </div>
-<div class="section" id="property-injection">
-<span id="id2"></span><h2>Property Injection<a class="headerlink" href="#property-injection" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="overriding-property-injection-behavior">
+<span id="id2"></span><h2>Overriding Property Injection Behavior<a class="headerlink" href="#overriding-property-injection-behavior" title="Permalink to this headline">¶</a></h2>
 <p>Attribute based property injection and implicit property injection are not supported by Simple Injector out of the box. With attribute based property injection the container injects properties that are decorated with an attribute. With implicit property injection the container automatically injects all properties that can be mapped to a registration, but silently skips other properties. An extension point is provided to change the library&#8217;s default behavior, which is to <strong>not</strong> inject any property at all.</p>
 <p>Out of the box, Simple Injector does allow explicit property injection based on registration of delegates using the <strong>RegisterInitializer</strong> method:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">FileLogger</span><span class="p">&gt;();</span>
@@ -512,6 +517,29 @@
 <p>Interception the creation of types allows registrations to be modified. This enables all sorts of advanced scenarios where the creation of a single type or whole object graphs gets altered. Simple Injector contains two events that allow altering the type&#8217;s creation: <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm">ExpressionBuilding</a> and <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm">ExpressionBuilt</a>. Both events are quite similar but are called in different stages of the <a class="reference internal" href="pipeline.html#resolve-pipeline"><em>building process</em></a>.</p>
 <p>The <strong>ExpressionBuilding</strong> event gets called just after the registrations expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for <a class="reference internal" href="advanced.html#context-based-injection"><em>Context based injection</em></a>.</p>
 <p>The <strong>ExpressionBuilt</strong> event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time <strong>ExpressionBuilding</strong> was called, is gone. While <strong>ExpressionBuilding</strong> is especially suited for changing the relationship between the resolved type and its dependencies, <strong>ExpressionBuilt</strong> is especially useful for applying decorators or <a class="reference internal" href="advanced.html#interception"><em>applying interceptors</em></a>. Note that Simple Injector has built-in support for <a class="reference internal" href="advanced.html#decorators"><em>applying decorators</em></a> using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm">RegisterDecorator</a> extension methods. These methods internally use the <strong>ExpressionBuilt</strong> event.</p>
+</div>
+<div class="section" id="building-up-external-instances">
+<span id="id6"></span><h2>Building up External Instances<a class="headerlink" href="#building-up-external-instances" title="Permalink to this headline">¶</a></h2>
+<p>Some frameworks insist in creating some of the classes we write and want to manage their lifetime. A notorious example of this is ASP.NET Web Forms. One of symptoms the we often see with those frameworks is that the classes that the framework creates need to have a default constructor.</p>
+<p>This disallows Simple Injector to create those instances and inject dependencies into their constructor. But Simple Injector can still be asked to initialize such instance according the container&#8217;s configuration. This is especially useful when overriding the default <a class="reference internal" href="#overriding-property-injection-behavior"><em>property injection behavior</em></a>.</p>
+<p>The following code snippet shows how an external instance can be initialized:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">static</span> <span class="nf">BuildUp</span><span class="p">(</span><span class="n">Page</span> <span class="n">page</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">InstanceProducer</span> <span class="n">producer</span> <span class="p">=</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="n">page</span><span class="p">.</span><span class="n">GetType</span><span class="p">(),</span> <span class="n">throwOnFailure</span><span class="p">:</span> <span class="k">true</span><span class="p">);</span>
+    <span class="n">Registration</span> <span class="n">registration</span> <span class="p">=</span> <span class="n">producer</span><span class="p">.</span><span class="n">Registration</span><span class="p">;</span>
+    <span class="n">registration</span><span class="p">.</span><span class="n">InitializeInstance</span><span class="p">(</span><span class="n">page</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This allows any properties and initializers to be applied, but obviously doesn&#8217;t allow the lifestyle to be changed, or any decorators to be applied.</p>
+<p>By calling the <strong>GetRegistration</strong> method, the container will create and cache an <em>InstanceProducer</em> instance that is normally used to create the instance. Note however, that the <strong>GetRegistration</strong> method restricts the shape of the type to initialize. Since <strong>GetRegistration</strong> is used in cases where Simple Injector creates types for you, Simple Injector will therefore check whether it can create that type. This means that if this type has a constructor with arguments that Simple Injector can&#8217;t inject (for instance because there are primitive type arguments in there), an exception will be thrown.</p>
+<p>In that particular case, instead of requesting an <em>InstanceProducer</em> from the container, you need to create a <em>Registration</em> class using the <em>Lifestyle</em> class:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">Registration</span> <span class="n">registration</span> <span class="p">=</span>
+    <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">.</span><span class="n">CreateRegistration</span><span class="p">(</span><span class="n">page</span><span class="p">.</span><span class="n">GetType</span><span class="p">(),</span> <span class="n">container</span><span class="p">);</span>
+<span class="n">registration</span><span class="p">.</span><span class="n">InitializeInstance</span><span class="p">(</span><span class="n">page</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Do note however that if you create <em>Registration</em> instances manually, make sure you cache them. <em>Registration</em> instances generate expression trees and compile them down to a delegate. This is a time -and memory- consuming operation. But every second time you call <strong>InitializeInstance</strong> on the same <em>Registration</em> instance, it will be fast as hell.</p>
 </div>
 </div>
 

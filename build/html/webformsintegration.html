@@ -98,7 +98,7 @@
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
@@ -113,7 +113,7 @@
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-containers-configuration">Verify the container’s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
 </ul>
 </li>
@@ -133,11 +133,12 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#property-injection">Property Injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-property-injection-behavior">Overriding Property Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#resolving-unregistered-types">Resolving Unregistered Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -160,7 +161,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#dont-allow-resolving-scoped-instances-outside-an-active-scope">Don’t allow resolving scoped instances outside an active scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#don-t-allow-resolving-scoped-instances-outside-an-active-scope">Don&#8217;t allow resolving scoped instances outside an active scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
@@ -180,8 +181,11 @@
 <li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
 </ul>
 
         
@@ -220,9 +224,7 @@
             
   <div class="section" id="asp-net-web-forms-integration-guide">
 <h1>ASP.NET Web Forms Integration Guide<a class="headerlink" href="#asp-net-web-forms-integration-guide" title="Permalink to this headline">¶</a></h1>
-<p>ASP.NET Web Forms was never designed with dependency injection in mind. Although using constructor injection in our <strong>Page</strong> classes, user controls and http handlers would be preferable, it is unfortunately not possible, because ASP.NET expects those types to have a default constructor.</p>
-<div class="note container">
-<strong>Note</strong>: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=81">This blog post</a> shows how to do constructor injection in pages and user controls, but please keep in mind that this will fail when trying to run the application in partial trust. Besides, it still doesn&#8217;t work for <em>IHttpHandlers</em>.</div>
+<p>ASP.NET Web Forms was never designed with dependency injection in mind. Although using constructor injection in our <strong>Page</strong> classes, user controls and HTTP handlers would be preferable, it is unfortunately not possible, because ASP.NET expects those types to have a default constructor.</p>
 <p>Instead of doing constructor injection, there are alternatives. The simplest thing to do is to fall back to property injection and initialize the page in the constructor.</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.ComponentModel.Composition</span><span class="p">;</span>
@@ -231,80 +233,94 @@
 <span class="k">using</span> <span class="nn">System.Web</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.Web.Compilation</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">System.Web.UI</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Microsoft.Web.Infrastructure.DynamicModuleHelper</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">SimpleInjector.Advanced</span><span class="p">;</span>
 
-<span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="nc">BasePage</span> <span class="p">:</span> <span class="n">Page</span> <span class="p">{</span>
-    <span class="k">public</span> <span class="nf">BasePage</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">Global</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<span class="na">[assembly: PreApplicationStartMethod(</span>
+<span class="na">    typeof(MyWebApplication.PageInitializerModule),</span>
+<span class="na">    &quot;Initialize&quot;)]</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">Global</span> <span class="p">:</span> <span class="n">HttpApplication</span> <span class="p">{</span>
-    <span class="k">private</span> <span class="k">static</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Initialize</span><span class="p">(</span><span class="n">Page</span> <span class="n">page</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="n">page</span><span class="p">.</span><span class="n">GetType</span><span class="p">(),</span> <span class="k">true</span><span class="p">).</span><span class="n">Registration</span>
-            <span class="p">.</span><span class="n">InitializeInstance</span><span class="p">(</span><span class="n">page</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">Bootstrap</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Bootstrap</span><span class="p">()</span> <span class="p">{</span>
-        <span class="c1">// 1. Create a new Simple Injector container.</span>
-        <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
-
-        <span class="c1">// Registere a custom PropertySelectionBehavior to enable property injection.</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">PropertySelectionBehavior</span> <span class="p">=</span>
-            <span class="k">new</span> <span class="nf">ImportAttributePropertySelectionBehavior</span><span class="p">();</span>
-
-        <span class="c1">// 2. Configure the container (register)</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWebRequest</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">,</span> <span class="n">AspNetUserContext</span><span class="p">&gt;();</span>
-
-        <span class="c1">// 3. Store the container for use by Page classes.</span>
-        <span class="n">Global</span><span class="p">.</span><span class="n">container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
-
-        <span class="c1">// 4. Optionally verify the container&#39;s configuration.</span>
-        <span class="c1">//    Did you know the container can diagnose your configuration?</span>
-        <span class="c1">//    For more information, go to: https://bit.ly/YE8OJj.</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
-        <span class="n">VerifyPages</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="c1">// This method tests if each Page class can be created. Because Page classes</span>
-    <span class="c1">// manually call Global.Initialize in their ctor, we want to test on application</span>
-    <span class="c1">// startup if all pages can be initialized, to prevent having to go through</span>
-    <span class="c1">// each page in the application during testing.</span>
-    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">VerifyPages</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">assemblies</span> <span class="p">=</span> <span class="n">BuildManager</span><span class="p">.</span><span class="n">GetReferencedAssemblies</span><span class="p">().</span><span class="n">Cast</span><span class="p">&lt;</span><span class="n">Assembly</span><span class="p">&gt;();</span>
-
-        <span class="kt">var</span> <span class="n">pageTypes</span> <span class="p">=</span>
-            <span class="k">from</span> <span class="n">assembly</span> <span class="k">in</span> <span class="n">assemblies</span>
-            <span class="k">from</span> <span class="n">type</span> <span class="k">in</span> <span class="n">assembly</span><span class="p">.</span><span class="n">GetExportedTypes</span><span class="p">()</span>
-            <span class="k">where</span> <span class="nf">typeof</span><span class="p">(</span><span class="n">Page</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">type</span><span class="p">)</span> <span class="p">&amp;&amp;</span> <span class="p">!</span><span class="n">type</span><span class="p">.</span><span class="n">IsAbstract</span>
-            <span class="k">where</span> <span class="p">!</span><span class="n">type</span><span class="p">.</span><span class="n">IsGenericType</span>
-            <span class="k">select</span> <span class="n">type</span><span class="p">;</span>
-
-        <span class="k">foreach</span> <span class="p">(</span><span class="n">Type</span> <span class="n">pageType</span> <span class="k">in</span> <span class="n">pageTypes</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">(</span><span class="n">pageType</span><span class="p">);</span>
+<span class="k">namespace</span> <span class="nn">MyWebApplication</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">PageInitializerModule</span> <span class="p">:</span> <span class="n">IHttpModule</span> <span class="p">{</span>
+        <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Initialize</span><span class="p">()</span> <span class="p">{</span>
+            <span class="n">DynamicModuleUtility</span><span class="p">.</span><span class="n">RegisterModule</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">PageInitializerModule</span><span class="p">));</span>
         <span class="p">}</span>
+
+        <span class="k">void</span> <span class="n">IHttpModule</span><span class="p">.</span><span class="n">Init</span><span class="p">(</span><span class="n">HttpApplication</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">context</span><span class="p">.</span><span class="n">PreRequestHandlerExecute</span> <span class="p">+=</span> <span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">Context</span><span class="p">.</span><span class="n">CurrentHandler</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">Global</span><span class="p">.</span><span class="n">InitializeHandler</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">Context</span><span class="p">.</span><span class="n">CurrentHandler</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">};</span>
+        <span class="p">}</span>
+
+        <span class="k">void</span> <span class="n">IHttpModule</span><span class="p">.</span><span class="n">Dispose</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span>
     <span class="p">}</span>
 
-    <span class="k">private</span> <span class="k">class</span> <span class="nc">ImportAttributePropertySelectionBehavior</span> <span class="p">:</span> <span class="n">IPropertySelectionBehavior</span> <span class="p">{</span>
-        <span class="k">public</span> <span class="kt">bool</span> <span class="nf">SelectProperty</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">PropertyInfo</span> <span class="n">propertyInfo</span><span class="p">)</span> <span class="p">{</span>
-            <span class="c1">// Makes use of the System.ComponentModel.Composition assembly</span>
-            <span class="k">return</span> <span class="nf">typeof</span><span class="p">(</span><span class="n">Page</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">serviceType</span><span class="p">)</span> <span class="p">&amp;&amp;</span>
-                <span class="n">propertyInfo</span><span class="p">.</span><span class="n">GetCustomAttributes</span><span class="p">&lt;</span><span class="n">ImportAttribute</span><span class="p">&gt;().</span><span class="n">Any</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">Global</span> <span class="p">:</span> <span class="n">HttpApplication</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="k">static</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
+
+        <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">InitializeHandler</span><span class="p">(</span><span class="n">IHttpHandler</span> <span class="n">handler</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="n">handler</span><span class="p">.</span><span class="n">GetType</span><span class="p">(),</span> <span class="k">true</span><span class="p">).</span><span class="n">Registration</span>
+                <span class="p">.</span><span class="n">InitializeInstance</span><span class="p">(</span><span class="n">handler</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Bootstrap</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Bootstrap</span><span class="p">()</span> <span class="p">{</span>
+            <span class="c1">// 1. Create a new Simple Injector container.</span>
+            <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+            <span class="c1">// Register a custom PropertySelectionBehavior to enable property injection.</span>
+            <span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">PropertySelectionBehavior</span> <span class="p">=</span>
+                <span class="k">new</span> <span class="nf">ImportAttributePropertySelectionBehavior</span><span class="p">();</span>
+
+            <span class="c1">// 2. Configure the container (register)</span>
+            <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
+            <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWebRequest</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">,</span> <span class="n">AspNetUserContext</span><span class="p">&gt;();</span>
+
+            <span class="c1">// Register your Page classes.</span>
+            <span class="n">RegisterWebPages</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+
+            <span class="c1">// 3. Store the container for use by Page classes.</span>
+            <span class="n">Global</span><span class="p">.</span><span class="n">container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
+
+            <span class="c1">// 4. Optionally verify the container&#39;s configuration.</span>
+            <span class="c1">//    Did you know the container can diagnose your configuration?</span>
+            <span class="c1">//    For more information, go to: https://simpleinjector.org/diagnostics.</span>
+            <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RegisterWebPages</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">pageTypes</span> <span class="p">=</span>
+                <span class="k">from</span> <span class="n">assembly</span> <span class="k">in</span> <span class="n">BuildManager</span><span class="p">.</span><span class="n">GetReferencedAssemblies</span><span class="p">().</span><span class="n">Cast</span><span class="p">&lt;</span><span class="n">Assembly</span><span class="p">&gt;()</span>
+                <span class="k">where</span> <span class="p">!</span><span class="n">assembly</span><span class="p">.</span><span class="n">IsDynamic</span>
+                <span class="k">where</span> <span class="p">!</span><span class="n">assembly</span><span class="p">.</span><span class="n">GlobalAssemblyCache</span>
+                <span class="k">from</span> <span class="n">type</span> <span class="k">in</span> <span class="n">assembly</span><span class="p">.</span><span class="n">GetExportedTypes</span><span class="p">()</span>
+                <span class="k">where</span> <span class="n">type</span><span class="p">.</span><span class="n">IsSubclassOf</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">Page</span><span class="p">))</span>
+                <span class="k">where</span> <span class="p">!</span><span class="n">type</span><span class="p">.</span><span class="n">IsAbstract</span> <span class="p">&amp;&amp;</span> <span class="p">!</span><span class="n">type</span><span class="p">.</span><span class="n">IsGenericType</span>
+                <span class="k">select</span> <span class="n">type</span><span class="p">;</span>
+
+            <span class="n">pageTypes</span><span class="p">.</span><span class="n">ToList</span><span class="p">().</span><span class="n">ForEach</span><span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">class</span> <span class="nc">ImportAttributePropertySelectionBehavior</span> <span class="p">:</span> <span class="n">IPropertySelectionBehavior</span> <span class="p">{</span>
+            <span class="k">public</span> <span class="kt">bool</span> <span class="nf">SelectProperty</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span> <span class="n">PropertyInfo</span> <span class="n">propertyInfo</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// Makes use of the System.ComponentModel.Composition assembly</span>
+                <span class="k">return</span> <span class="nf">typeof</span><span class="p">(</span><span class="n">Page</span><span class="p">).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">serviceType</span><span class="p">)</span> <span class="p">&amp;&amp;</span>
+                    <span class="n">propertyInfo</span><span class="p">.</span><span class="n">GetCustomAttributes</span><span class="p">&lt;</span><span class="n">ImportAttribute</span><span class="p">&gt;().</span><span class="n">Any</span><span class="p">();</span>
+            <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>With this code in place, we can now write our page classes as follows:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">Default</span> <span class="p">:</span> <span class="n">BasePage</span> <span class="p">{</span>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">Default</span> <span class="p">:</span> <span class="n">Page</span> <span class="p">{</span>
 <span class="na">    [Import]</span> <span class="k">public</span> <span class="n">IUserRepository</span> <span class="n">UserRepository</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
 <span class="na">    [Import]</span> <span class="k">public</span> <span class="n">IUserContext</span> <span class="n">UserContext</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
 

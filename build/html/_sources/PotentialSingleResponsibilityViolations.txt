@@ -10,7 +10,9 @@ The component depends on too many services.
 Warning Description
 ===================
 
-In general, components should only depend on a few other components. When a component depends on many other components (usually caused by constructor over-injection), it might indicate that the component has too many responsibilities. In other words it might be a sign that the component violates the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). Violations of the SRP will often lead to maintainability issues later on in the application lifecycle.
+Psychological studies show that the human mind has difficulty dealing with more than seven things at once. This is related to the concept of `High Fan In - Low Fan Out <http://it.toolbox.com/blogs/enterprise-solutions/design-principles-fanin-vs-fanout-16088>`_. Lowering the number of dependencies (fan out) that a class has can therefore reduce complexity and increase maintainability of such class.
+
+So in general, components should only depend on a few other components. When a component depends on many other components (usually caused by constructor over-injection), it might indicate that the component has too many responsibilities. In other words it might be a sign that the component violates the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). Violations of the SRP will often lead to maintainability issues later on in the application lifecycle.
 
 The general consensus is that a constructor with more than 4 or 5 dependencies is a code smell. To prevent too many false positives, the threshold for the Diagnostic Services is 6 dependencies, so you'll start to see warnings on types with 7 or more dependencies.
 
@@ -19,9 +21,9 @@ How to Fix Violations
 
 The article `Dealing with constructor over-injection by Mark Seemann <https://deals.manningpublications.com/DependencyInjectioninNET.pdf>`_ goes into detail how to about fixing the root cause of constructor over-injection.
 
-Note that moving dependencies out of the constructor and into properties might solve the constructor over-injection code smell, but does not solve a violation of the SRP, since the class itself is not refactored.
+Note that moving dependencies out of the constructor and into properties might solve the constructor over-injection code smell, but does not solve a violation of the SRP, since the number of dependencies doesn't decrease.
 
-Moving those properties to a base class also doesn't solve the SRP violation. Often derived types will still use the dependencies of the base class making them still violating the SRP and even if they don't, the base class itself will probably violate the SRP.
+Moving those properties to a base class also doesn't solve the SRP violation. Often derived types will still use the dependencies of the base class making them still violating the SRP and even if they don't, the base class itself will probably violate the SRP or have a high fan out.
 
 Those base classes will often just be helpers to implement all kinds of cross-cutting concerns. Instead of using base classes, a better way to implementing cross-cutting concerns is through :ref:`decorators <Decorators>`.
 
@@ -37,7 +39,8 @@ Example
 
     public class Foo : IFoo
     {
-        public Foo(IUnitOfWorkFactory uowFactory,
+        public Foo(
+            IUnitOfWorkFactory uowFactory,
             CurrencyProvider currencyProvider,
             IFooPolicy fooPolicy,
             IBarService barService,
@@ -67,7 +70,3 @@ The following example shows how to query the Diagnostic API for possible Single 
         Console.WriteLine(result.ImplementationType.Name + 
     		" has " + result.Dependencies.Count + " dependencies.");
     }
-
-.. container:: Note
-
-    **Note**: The Diagnostic API is new in Simple Injector v2.4.

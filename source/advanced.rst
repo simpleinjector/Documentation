@@ -332,7 +332,7 @@ For more information about how to use this event, please take a look at the `Res
 Context based injection
 =======================
 
-Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don’t. Simple Injector does *not* contain such a feature out of the box, but this ability can easily be added by using the :doc:`context based injection extension method <ContextDependentExtensions>` code snippet.
+Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don't. Simple Injector does *not* contain such a feature out of the box, but this ability can easily be added by using the :doc:`context based injection extension method <ContextDependentExtensions>` code snippet.
 
 .. container:: Note
 
@@ -532,7 +532,7 @@ This special decorator can be registered just as any other decorator:
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-However, since the *AsyncCommandHandlerDecorator<T>* solely has singleton dependencies (the *Func<T>* is a singleton), and creates a new decorated instance each time it’s called, we can even register it as a singleton itself:
+However, since the *AsyncCommandHandlerDecorator<T>* solely has singleton dependencies (the *Func<T>* is a singleton), and creates a new decorated instance each time it's called, we can even register it as a singleton itself:
 
 .. code-block:: c#
 
@@ -743,7 +743,7 @@ Simple Injector does not inject any properties into types that get resolved by t
 
 **Implicit property injection**
 
-Some containers (such as Castle Windsor) implicitly inject public writable properties by default for any instance you resolve. They do this by mapping those properties to configured types. When no such registration exists, or when the property doesn’t have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that **implicit property injection** is simply too uuhh...  implicit :-). Silently skipping properties that can't be mapped can lead to a DI configuration that can't be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified.
+Some containers (such as Castle Windsor) implicitly inject public writable properties by default for any instance you resolve. They do this by mapping those properties to configured types. When no such registration exists, or when the property doesn't have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that **implicit property injection** is simply too uuhh...  implicit :-). Silently skipping properties that can't be mapped can lead to a DI configuration that can't be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified.
 
 .. _Explicit-Property-Injection:
 

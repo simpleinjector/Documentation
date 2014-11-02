@@ -97,7 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
@@ -112,7 +112,7 @@
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-containers-configuration">Verify the container’s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
 </ul>
 </li>
@@ -132,11 +132,12 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#property-injection">Property Injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-property-injection-behavior">Overriding Property Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#resolving-unregistered-types">Resolving Unregistered Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -159,7 +160,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#dont-allow-resolving-scoped-instances-outside-an-active-scope">Don’t allow resolving scoped instances outside an active scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#don-t-allow-resolving-scoped-instances-outside-an-active-scope">Don&#8217;t allow resolving scoped instances outside an active scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
@@ -179,8 +180,11 @@
 <li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
 </ul>
 
         
@@ -230,7 +234,7 @@
 <li><a class="reference internal" href="#context-based-injection"><em>Context based injection / Contextual binding</em></a></li>
 <li><a class="reference internal" href="#decorators"><em>Decorators</em></a></li>
 <li><a class="reference internal" href="#interception"><em>Interception</em></a></li>
-<li><a class="reference internal" href="extensibility.html#property-injection"><em>Property injection</em></a></li>
+<li><a class="reference internal" href="#property-injection"><em>Property injection</em></a></li>
 <li><a class="reference internal" href="#covariance-contravariance"><em>Covariance and Contravariance</em></a></li>
 <li><a class="reference internal" href="#plugins"><em>Registering plugins dynamically</em></a></li>
 </ul>
@@ -452,7 +456,8 @@
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span> <span class="n">typesToRegister</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of assemblies use this <strong>GetTypesToRegister</strong> method internally as well.</p>
+<div class="note container">
+The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of assemblies use this <strong>GetTypesToRegister</strong> method internally as well.</div>
 </div>
 <div class="section" id="unregistered-type-resolution">
 <span id="id4"></span><h2>Unregistered type resolution<a class="headerlink" href="#unregistered-type-resolution" title="Permalink to this headline">¶</a></h2>
@@ -461,7 +466,7 @@
 </div>
 <div class="section" id="context-based-injection">
 <span id="id5"></span><h2>Context based injection<a class="headerlink" href="#context-based-injection" title="Permalink to this headline">¶</a></h2>
-<p>Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don’t. Simple Injector does <em>not</em> contain such a feature out of the box, but this ability can easily be added by using the <a class="reference internal" href="ContextDependentExtensions.html"><em>context based injection extension method</em></a> code snippet.</p>
+<p>Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don&#8217;t. Simple Injector does <em>not</em> contain such a feature out of the box, but this ability can easily be added by using the <a class="reference internal" href="ContextDependentExtensions.html"><em>context based injection extension method</em></a> code snippet.</p>
 <div class="note container">
 <strong>Note</strong>: In many cases context based injection is not the best solution, and the design should be reevaluated. In some narrow cases however it can make sense.</div>
 <p>The most common scenario is to base the type of the injected dependency on the type of the consumer. Take for instance the following <em>ILogger</em> interface with a generic <em>Logger&lt;T&gt;</em> class that needs to be injected into several consumers.</p>
@@ -616,7 +621,7 @@
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">StartsWith</span><span class="p">(</span><span class="s">&quot;Async&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>However, since the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> solely has singleton dependencies (the <em>Func&lt;T&gt;</em> is a singleton), and creates a new decorated instance each time it’s called, we can even register it as a singleton itself:</p>
+<p>However, since the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> solely has singleton dependencies (the <em>Func&lt;T&gt;</em> is a singleton), and creates a new decorated instance each time it&#8217;s called, we can even register it as a singleton itself:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">AsyncCommandHandlerDecorator</span><span class="p">&lt;&gt;),</span>
@@ -774,10 +779,10 @@
 <strong>Note</strong>: Don&#8217;t use interception for intercepting types that all implement the same generic interface, such as <em>ICommandHandler&lt;T&gt;</em> or <em>IValidator&lt;T&gt;</em>. Try using decorator classes instead, as shown in the <a class="reference internal" href="#decorators"><em>Decorators</em></a> section on this page.</div>
 </div>
 <div class="section" id="property-injection">
-<span id="implicit-property-injection"></span><h2>Property injection<a class="headerlink" href="#property-injection" title="Permalink to this headline">¶</a></h2>
+<span id="id12"></span><h2>Property injection<a class="headerlink" href="#property-injection" title="Permalink to this headline">¶</a></h2>
 <p>Simple Injector does not inject any properties into types that get resolved by the container. In general there are two ways of doing property injection, and both are not enabled by default for reasons explained below.</p>
 <p><strong>Implicit property injection</strong></p>
-<p>Some containers (such as Castle Windsor) implicitly inject public writable properties by default for any instance you resolve. They do this by mapping those properties to configured types. When no such registration exists, or when the property doesn’t have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that <strong>implicit property injection</strong> is simply too uuhh...  implicit :-). Silently skipping properties that can&#8217;t be mapped can lead to a DI configuration that can&#8217;t be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified.</p>
+<p>Some containers (such as Castle Windsor) implicitly inject public writable properties by default for any instance you resolve. They do this by mapping those properties to configured types. When no such registration exists, or when the property doesn&#8217;t have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that <strong>implicit property injection</strong> is simply too uuhh...  implicit :-). Silently skipping properties that can&#8217;t be mapped can lead to a DI configuration that can&#8217;t be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified.</p>
 <p id="explicit-property-injection"><strong>Explicit property injection</strong></p>
 <p>We strongly feel that explicit property injection is a much better way to go. With explicit property injection the container is forced to inject a property and the process will fail immediately when a property can&#8217;t be mapped or injected. Some containers (such as Unity and Ninject) allow explicit property injection by allowing properties to be decorated with attributes that are defined by the DI library. Problem with this is that this forces the application to take a dependency on the library, which is something that should be prevented.</p>
 <p>Because Simple Injector does not encourage its users to take a dependency on the container (except for the startup path of course), Simple Injector does not contain any attributes that allow explicit property injection and it can therefore not explicitly inject properties out-of-the-box.</p>

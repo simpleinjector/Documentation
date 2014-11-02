@@ -98,7 +98,7 @@
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">    WCF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
@@ -113,7 +113,7 @@
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-containers-configuration">Verify the container’s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
 </ul>
 </li>
@@ -133,11 +133,12 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#property-injection">Property Injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-property-injection-behavior">Overriding Property Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#resolving-unregistered-types">Resolving Unregistered Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -160,7 +161,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#dont-allow-resolving-scoped-instances-outside-an-active-scope">Don’t allow resolving scoped instances outside an active scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#don-t-allow-resolving-scoped-instances-outside-an-active-scope">Don&#8217;t allow resolving scoped instances outside an active scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
@@ -180,8 +181,11 @@
 <li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
 </ul>
 
         
@@ -241,12 +245,90 @@
 <div class="highlight-xml"><div class="highlight"><pre>&lt;%@ ServiceHost
     Service=&quot;UserService&quot;
     CodeBehind=&quot;UserService.svc.cs&quot;
-    Factory=&quot;SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory, SimpleInjector.Integration.Wcf&quot;
+    Factory=&quot;SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory,
+        SimpleInjector.Integration.Wcf&quot;
 %&gt;
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: Instead of having a WCF service layer consisting of many service classes and methods, consider a design that consists of just a single service class with a single method as explained in <a class="reference external" href="http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=95">this article</a>. A design where operations are communicated through messages allows the creation of highly maintainable WCF services. With such a design, this integration package will be ​​redundant.</div>
+<strong>Note</strong>: Instead of having a WCF service layer consisting of many service classes and methods, consider a design that consists of just a single service class with a single method as explained in <a class="reference external" href="http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=95">this article</a>. A design where operations are communicated through messages allows the creation of highly maintainable WCF services. With such a design, this integration package will be ??redundant.</div>
+<div class="section" id="was-hosting-and-non-http-activation">
+<h2>WAS Hosting and Non-HTTP Activation<a class="headerlink" href="#was-hosting-and-non-http-activation" title="Permalink to this headline">¶</a></h2>
+<p>When hosting WCF Services in WAS (Windows Activation Service), you are not given an opportunity to build your container in the Application_Start event defined in your Global.asax because WAS doesn&#8217;t use the standard ASP.NET pipeline. A workaround for this is to move the container initialization to a static constructor</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Bootstrapper</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">readonly</span> <span class="n">Container</span> <span class="n">Container</span><span class="p">;</span>
+
+    <span class="k">static</span> <span class="nf">Bootstrapper</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+        <span class="c1">// register all your components with the container here:</span>
+        <span class="c1">// container.Register&lt;IService1, Service1&gt;()</span>
+        <span class="c1">// container.RegisterLifetimeScope&lt;IDataContext,DataContext&gt;();</span>
+
+        <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+        <span class="n">Container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Your custom <em>ServiceHostFactory</em> can no use the static <strong>Bootstrapper.Container</strong> field:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">WcfServiceFactory</span> <span class="p">:</span> <span class="n">SimpleInjectorServiceHostFactory</span> <span class="p">{</span>
+    <span class="k">protected</span> <span class="k">override</span> <span class="n">ServiceHost</span> <span class="nf">CreateServiceHost</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span>
+        <span class="n">Uri</span><span class="p">[]</span> <span class="n">baseAddresses</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">SimpleInjectorServiceHost</span><span class="p">(</span>
+            <span class="n">Bootstrapper</span><span class="p">.</span><span class="n">Container</span><span class="p">,</span>
+            <span class="n">serviceType</span><span class="p">,</span>
+            <span class="n">baseAddresses</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Optionally, you can apply your custom service behaviors and contract behaviors to the service host:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">WcfServiceFactory</span> <span class="p">:</span> <span class="n">SimpleInjectorServiceHostFactory</span> <span class="p">{</span>
+    <span class="k">protected</span> <span class="k">override</span> <span class="n">ServiceHost</span> <span class="nf">CreateServiceHost</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span>
+        <span class="n">Uri</span><span class="p">[]</span> <span class="n">baseAddresses</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">host</span> <span class="p">=</span> <span class="k">new</span> <span class="n">SimpleInjectorServiceHost</span><span class="p">(</span>
+            <span class="n">Bootstrapper</span><span class="p">.</span><span class="n">Container</span><span class="p">,</span>
+            <span class="n">serviceType</span><span class="p">,</span>
+            <span class="n">baseAddresses</span><span class="p">);</span>
+
+        <span class="c1">// This is all optional</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">ApplyServiceBehaviors</span><span class="p">(</span><span class="n">host</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">ApplyContractBehaviors</span><span class="p">(</span><span class="n">host</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="n">host</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">ApplyServiceBehaviors</span><span class="p">(</span><span class="n">ServiceHost</span> <span class="n">host</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">behavior</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">&lt;</span><span class="n">IServiceBehavior</span><span class="p">&gt;())</span> <span class="p">{</span>
+            <span class="n">host</span><span class="p">.</span><span class="n">Description</span><span class="p">.</span><span class="n">Behaviors</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">behavior</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">ApplyContractBehaviors</span><span class="p">(</span><span class="n">SimpleInjectorServiceHost</span> <span class="n">host</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">behavior</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">&lt;</span><span class="n">IContractBehavior</span><span class="p">&gt;())</span> <span class="p">{</span>
+            <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">contract</span> <span class="k">in</span> <span class="n">host</span><span class="p">.</span><span class="n">GetImplementedContracts</span><span class="p">())</span> <span class="p">{</span>
+                <span class="n">contract</span><span class="p">.</span><span class="n">Behaviors</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">behavior</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx">InstanceContextMode enumeration</a>. Components that are registered <em>PerWcfOperation</em> live as long as the WCF service class they are injected into.</p>
+<p>For each service class, you should supply a factory attribute in the .SVC file of each service class. For instance:</p>
+<div class="highlight-xml"><div class="highlight"><pre>&lt;%@ ServiceHost
+    Service=&quot;UserService&quot;
+    CodeBehind=&quot;UserService.svc.cs&quot;
+    Factory=&quot;SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory,
+        SimpleInjector.Integration.Wcf&quot;
+%&gt;
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: Instead of having a WCF service layer consisting of many service classes and methods, consider a design that consists of just a single service class with a single method as explained in <a class="reference external" href="http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=95">this article</a>. A design where operations are communicated through messages allows the creation of highly maintainable WCF services. With such a design, this integration package will be ??redundant.</div>
+</div>
 </div>
 
 

@@ -97,7 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#see-also">See Also</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
@@ -112,7 +112,7 @@
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-containers-configuration">Verify the container’s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
 </ul>
 </li>
@@ -132,11 +132,12 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#property-injection">Property Injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-property-injection-behavior">Overriding Property Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#resolving-unregistered-types">Resolving Unregistered Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -159,7 +160,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="decisions.html#dont-allow-resolving-scoped-instances-outside-an-active-scope">Don’t allow resolving scoped instances outside an active scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#don-t-allow-resolving-scoped-instances-outside-an-active-scope">Don&#8217;t allow resolving scoped instances outside an active scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
@@ -179,8 +180,11 @@
 <li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
 </ul>
 
         
@@ -239,7 +243,7 @@
 <div class="section" id="fast-by-default">
 <span id="id2"></span><h2>Fast by default<a class="headerlink" href="#fast-by-default" title="Permalink to this headline">¶</a></h2>
 <p>For most applications the performance of the DI library is not an issue; I/O is usually the bottleneck. You will find, however, that certain DI libraries are very sensitive to different configurations and you will need to monitor the container for potential performance problems. Most performance problems can be fixed by changing the configuration (changing registrations to singleton, adding caching, etc), no matter which library you use. At that point however it can get really complicated to configure certain libraries.</p>
-<p>Making Simple Injector fast by default removes any concerns regarding the performance of the construction of object graphs. Instead of having to monitor Simple Injector’s performance and make ugly tweaks to the configuration when object construction is too slow, the developer is free to worry about more important things.</p>
+<p>Making Simple Injector fast by default removes any concerns regarding the performance of the construction of object graphs. Instead of having to monitor Simple Injector&#8217;s performance and make ugly tweaks to the configuration when object construction is too slow, the developer is free to worry about more important things.</p>
 <p><strong>Fast by default</strong> means that the performance of object instantiation from any of the registration features that the library supplies out-of-the-box will be comparable to the performance of hard-wired object instantiation.</p>
 </div>
 <div class="section" id="don-t-force-vendor-lock-in">
@@ -249,7 +253,7 @@
 </div>
 <div class="section" id="never-fail-silently">
 <span id="id3"></span><h2>Never fail silently<a class="headerlink" href="#never-fail-silently" title="Permalink to this headline">¶</a></h2>
-<p>We all hate the hunt for bugs in our code. It can be made even worse when we discover a library or framework we have chosen to use is hiding these bugs by ignoring them and failing to report them to us. A good example is logging libraries - many of us have been frustrated when we discover our logging libraries continue to run without logging, because we misconfigured it, but didn’t bother to inform us. This frustration can lead to real world costs and a lack of trust in the tools we use.</p>
+<p>We all hate the hunt for bugs in our code. It can be made even worse when we discover a library or framework we have chosen to use is hiding these bugs by ignoring them and failing to report them to us. A good example is logging libraries - many of us have been frustrated when we discover our logging libraries continue to run without logging, because we misconfigured it, but didn&#8217;t bother to inform us. This frustration can lead to real world costs and a lack of trust in the tools we use.</p>
 <p>We decided that Simple Injector should by default never fail silently. If you make a configuration error then Simple Injector should tell you as soon as reasonably possible. We want Simple Injector to fail fast!</p>
 </div>
 <div class="section" id="features-should-be-intuitive">

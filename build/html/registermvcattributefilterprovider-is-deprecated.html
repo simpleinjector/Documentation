@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; Simple Injector 2 documentation</title>
+  <title>Compiler Warning: ‘SimpleInjector.SimpleInjectorMvcExtensions. RegisterMvcAttributeFilterProvider(Container)’ is obsolete &mdash; Simple Injector 2 documentation</title>
   
 
   
@@ -28,7 +28,9 @@
   
 
   
-    <link rel="top" title="Simple Injector 2 documentation" href="index.html"/> 
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
+        <link rel="up" title="Appendix" href="appendix.html"/>
+        <link rel="prev" title="Compiler Warning: ‘SimpleInjector.Container.InjectProperties(object)’ is obsolete" href="injectproperties-is-deprecated.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -44,7 +46,7 @@
       <div class="wy-side-nav-search">
         <a href="index.html" class="fa fa-home"> Simple Injector</a>
         <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -55,7 +57,7 @@
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
         
         
-            <ul>
+            <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-started">Getting started</a></li>
@@ -172,14 +174,14 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
-<li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="appendix.html">Appendix</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -206,8 +208,12 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li></li>
+          <li><a href="appendix.html">Appendix</a> &raquo;</li>
+      
+    <li>Compiler Warning: &#8216;SimpleInjector.SimpleInjectorMvcExtensions. RegisterMvcAttributeFilterProvider(Container)&#8217; is obsolete</li>
       <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/registermvcattributefilterprovider-is-deprecated.txt" rel="nofollow"> View page source</a>
         
       </li>
   </ul>
@@ -215,22 +221,56 @@
 </div>
           <div role="main">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="compiler-warning-simpleinjector-simpleinjectormvcextensions-registermvcattributefilterprovider-container-is-obsolete">
+<h1>Compiler Warning: &#8216;SimpleInjector.SimpleInjectorMvcExtensions. RegisterMvcAttributeFilterProvider(Container)&#8217; is obsolete<a class="headerlink" href="#compiler-warning-simpleinjector-simpleinjectormvcextensions-registermvcattributefilterprovider-container-is-obsolete" title="Permalink to this headline">¶</a></h1>
+<p>Starting with Simple Injector 2.6 the <strong>RegisterMvcAttributeFilterProvider</strong> extension method will be marked as <em>obsolete</em> with the <strong>System.ObsoleteAttribute</strong>. This page describes why we made this decision and identifies things you should consider to mitigate the impact of it&#8217;s eventual removal from the API.</p>
+<div class="section" id="what-s-the-problem">
+<h2>What&#8217;s the problem?<a class="headerlink" href="#what-s-the-problem" title="Permalink to this headline">¶</a></h2>
+<p>As of release Simple Injector 2.6 the <strong>Container.InjectProperties</strong> method is deprecated and the <strong>RegisterMvcAttributeFilterProvider</strong> extension method initializes attributes by passing instances to the <strong>InjectProperties</strong> method. The <strong>InjectProperties</strong> method is an unfortunate legacy method that performs <em>implicit property injection</em> and doesn&#8217;t integrate nicely with both the <a class="reference internal" href="pipeline.html"><em>Simple Injector Pipeline</em></a> and the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a>.</p>
+<div class="note container">
+<strong>RegisterMvcAttributeFilterProvider</strong> is deprecated because <strong>InjectProperties</strong> is deprecated. Please read <a class="reference internal" href="injectproperties-is-deprecated.html"><em>this wiki page</em></a> for further information.</div>
+</div>
+<div class="section" id="so-what-do-you-need-to-do">
+<h2>So what do you need to do?<a class="headerlink" href="#so-what-do-you-need-to-do" title="Permalink to this headline">¶</a></h2>
+<p>The new <strong>RegisterMvcIntegratedFilterProvider</strong> extension method is provided as the preferred mechanism for property injection into MVC filter attributes. The <strong>RegisterMvcIntegratedFilterProvider</strong> method integrates with both the <a class="reference internal" href="pipeline.html"><em>Simple Injector Pipeline</em></a> and the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a> and is therefore considered safe to use. Any attributes that are handled by this mechanism will pass through the <em>Pipeline</em> and will be correctly initialized according to the container&#8217;s configuration.</p>
+<p>Please note that by default Simple Injector is configured to <strong>not</strong> do property injection as we advise developers to always prefer constructor injection. Switching to <strong>RegisterMvcIntegratedFilterProvider</strong> will therefore <strong>not</strong> automatically prompt the container to inject properties. The container needs to be explicitly configured to do property injection.</p>
+<p>The <a class="reference internal" href="extensibility.html#overriding-property-injection-behavior"><em>IPropertySelectionBehavior extension point</em></a> can be used to enable property injection in a way that fully integrates with both the <em>Pipeline</em> and <em>Diagnostic Services</em>. A common solution is to apply the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/vstudio/system.componentmodel.composition.importattribute">ImportAttribute</a> to the properties of attributes that need injection and register an instance of the following class with Simple Injector:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.ComponentModel.Composition</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Reflection</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Advanced</span><span class="p">;</span>
 
-  
-  <div id="search-results">
-  
-  </div>
+<span class="k">class</span> <span class="nc">ImportPropertySelectionBehavior</span> <span class="p">:</span> <span class="n">IPropertySelectionBehavior</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="kt">bool</span> <span class="nf">SelectProperty</span><span class="p">(</span><span class="n">Type</span> <span class="n">type</span><span class="p">,</span> <span class="n">PropertyInfo</span> <span class="n">prop</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">prop</span><span class="p">.</span><span class="n">GetCustomAttributes</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">ImportAttribute</span><span class="p">)).</span><span class="n">Any</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The previous class can be registered as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">PropertySelectionBehavior</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ImportPropertySelectionBehavior</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterMvcIntegratedFilterProvider</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Please read the <a class="reference internal" href="advanced.html#property-injection"><em>Advanced Scenarios - Propery Injection</em></a> documentation page for more information.</p>
+<div class="note container">
+<strong>Note</strong>: Instead of injecting dependencies into attributes (i.e. injecting behaviour into metadata), please consider adopting a different design, one where the attribute data and the behaviours are kept separate, as outlined in <a class="reference external" href="https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=98">this article</a>.</div>
+</div>
+</div>
+
 
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="injectproperties-is-deprecated.html" class="btn btn-neutral" title="Compiler Warning: ‘SimpleInjector.Container.InjectProperties(object)’ is obsolete"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -266,7 +306,6 @@
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/searchtools.js"></script>
 
   
 
@@ -282,14 +321,7 @@
           SphinxRtdTheme.StickyNav.enable();
       });
   </script>
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
    
-
 
 </body>
 </html>

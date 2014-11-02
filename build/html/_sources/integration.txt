@@ -16,9 +16,6 @@ Simple Injector can be used in a wide range of .NET technologies, both server si
 
 Besides integration with standard .NET technologies, Simple Injector can be integrated with a wide range of other technologies. Here are a few links to help you get started quickly:
 
-See Also
---------
-
 * `RavenDB <https://stackoverflow.com/questions/10940988/how-to-configure-simple-injector-ioc-to-use-ravendb>`_
 * `SignalR <https://stackoverflow.com/questions/10555791/using-simpleinjector-with-signalr>`_
 * `Fluent Validations <https://stackoverflow.com/questions/9984144/what-is-the-correct-way-to-register-fluentvalidation-with-simpleinjector>`_
@@ -30,7 +27,7 @@ See Also
 * `Nancy <https://simpleinjector.codeplex.com/discussions/541398>`_
 * `Castle DynamicProxy Interception <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_
 * `OWIN <https://simpleinjector.codeplex.com/discussions/564822>`_
-
+* `Drum <https://stackoverflow.com/questions/26661621/how-to-register-drum-urimaker-using-simple-injector>`_
 
 Patterns
 ========

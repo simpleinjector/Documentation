@@ -220,7 +220,7 @@ This way the application can simply depend on *IMyService* instead of *Lazy<IMyS
 
 .. container:: Note
 
-    **Warning**: The same warning applies to the use of *Lazy<T>* as it does for the use of *Func<T>* delegates. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container’s configuration <Verify-Configuration>`.
+    **Warning**: The same warning applies to the use of *Lazy<T>* as it does for the use of *Func<T>* delegates. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container's configuration <Verify-Configuration>`.
 
 .. _Resolve-Instances-By-Key:
 
@@ -229,7 +229,7 @@ Resolve instances by key
 
 Resolving instances by a key is a feature that is deliberately left out of Simple Injector, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the *Container* instance and this leads to the `Service Locator anti-pattern <http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx>`_.
 
-This doesn’t mean that resolving instances by a key is never useful. Resolving instances by a key is normally a job for a specific factory rather than the *Container*. This approach makes the design much cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn’t consider.
+This doesn't mean that resolving instances by a key is never useful. Resolving instances by a key is normally a job for a specific factory rather than the *Container*. This approach makes the design much cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn't consider.
 
 .. container:: Note
 
@@ -250,7 +250,7 @@ Take a look at the following scenario, where we want to retrieve instances of ty
     var handler = factory.CreateNew("customers");
     handler.Handle(requestContext);
 
-By inheriting from the BCL’s *Dictionary<TKey, TValue>*, creating an *IRequestHandlerFactory* implementation is almost a one-liner:
+By inheriting from the BCL's *Dictionary<TKey, TValue>*, creating an *IRequestHandlerFactory* implementation is almost a one-liner:
 
 .. code-block:: c#
 
@@ -279,7 +279,7 @@ With this class, we can register *Func<IRequestHandler>* factory methods by a ke
 
     **Note**: this design will work with almost all DI containers making the design easy to follow and also making it portable between DI libraries.
 
-If you don’t like a design that uses *Func<T>* delegates this way, it can easily be changed to be a *Dictionary<string, Type>* instead. The *RequestHandlerFactory* can be implemented as follows:
+If you don't like a design that uses *Func<T>* delegates this way, it can easily be changed to be a *Dictionary<string, Type>* instead. The *RequestHandlerFactory* can be implemented as follows:
 
 .. code-block:: c#
 
@@ -479,7 +479,7 @@ The previous example created a *Container* instance that allows overriding. It i
 
 .. _Verify-Configuration:
 
-Verify the container’s configuration
+Verify the container's configuration
 ====================================
 
 Dependency Injection promotes the concept of programming against abstractions. This makes your code much easier to test, easier to change and more maintainable. However, since the code itself isn't responsible for maintaining the dependencies between implementations, the compiler will not be able to verify whether the dependency graph is correct.

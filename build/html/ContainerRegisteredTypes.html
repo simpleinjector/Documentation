@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; Simple Injector 2 documentation</title>
+  <title>Diagnostic Warning - Container-registered Types &mdash; Simple Injector 2 documentation</title>
   
 
   
@@ -28,7 +28,10 @@
   
 
   
-    <link rel="top" title="Simple Injector 2 documentation" href="index.html"/> 
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
+        <link rel="up" title="Diagnostic Services" href="diagnostics.html"/>
+        <link rel="next" title="How To" href="howto.html"/>
+        <link rel="prev" title="Diagnostic Warning - Potential Single Responsibility Violations" href="PotentialSingleResponsibilityViolations.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -44,7 +47,7 @@
       <div class="wy-side-nav-search">
         <a href="index.html" class="fa fa-home"> Simple Injector</a>
         <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -55,7 +58,7 @@
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
         
         
-            <ul>
+            <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-started">Getting started</a></li>
@@ -98,10 +101,10 @@
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
@@ -206,8 +209,12 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li></li>
+          <li><a href="diagnostics.html">Diagnostic Services</a> &raquo;</li>
+      
+    <li>Diagnostic Warning - Container-registered Types</li>
       <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/ContainerRegisteredTypes.txt" rel="nofollow"> View page source</a>
         
       </li>
   </ul>
@@ -215,22 +222,84 @@
 </div>
           <div role="main">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="diagnostic-warning-container-registered-types">
+<h1>Diagnostic Warning - Container-registered Types<a class="headerlink" href="#diagnostic-warning-container-registered-types" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="cause">
+<h2>Cause<a class="headerlink" href="#cause" title="Permalink to this headline">¶</a></h2>
+<p>A concrete type that was not registered explicitly and was not resolved using unregistered type resolution, but was created by the container using the default lifestyle.</p>
+</div>
+<div class="section" id="warning-description">
+<h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
+<p>The <em>Container-Tegistered Types</em> warning shows all concrete types that weren&#8217;t registered explicitly, but registered by the container as transient for you, because they were referenced by another component&#8217;s constructor or were resolved through a direct call to <em>container.GetIntance&lt;T&gt;()</em> (inside a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> registered delegate for instance).</p>
+<p>This warning deserves your attention, since it might indicate that you program to implementations, instead of abstractions. Although the <a class="reference internal" href="PotentialLifestyleMismatches.html"><em>Potential Lifestyle Mismatches</em></a> and <a class="reference internal" href="ShortCircuitedDependencies.html"><em>Short Circuited Dependencies</em></a> warnings are a very strong signal of a configuration problem, this <em>Container-Tegistered Types</em> warnings is just a point of attention.</p>
+</div>
+<div class="section" id="how-to-fix-violations">
+<h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
+<p>Let components depend on an interface that described the contract that this concrete type implements and register that concrete type in the container by that interface.</p>
+</div>
+<div class="section" id="when-to-ignore-warnings">
+<h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
+<p>If your intention is to resolve those types as transient and don&#8217;t depend directly on their concrete types, this warning can in general be ignored safely.</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
 
-  
-  <div id="search-results">
-  
-  </div>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">HomeController</span><span class="p">&gt;();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+<span class="c1">// Definition of HomeController</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">SqlUserRepository</span> <span class="n">repository</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">HomeController</span><span class="p">(</span><span class="n">SqlUserRepository</span> <span class="n">repository</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">repository</span> <span class="p">=</span> <span class="n">repository</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The given example registers a <em>HomeController</em> class that depends on an unregistered <em>SqlUserRepository</em> class. Injecting a concrete type can lead to a lot of problems, such as:</p>
+<ul class="simple">
+<li>It makes the <em>HomeController</em> hard to test, since concrete types are often hard to fake (or when using a mocking framework that fixes this, would still result in unit tests that contain a lot of configuration for the mocking framework, instead of pure test logic) making the unit tests hard to read and hard to maintain.</li>
+<li>It makes it harder to reuse the class, since it expects a certain implementation of its dependency.</li>
+<li>It makes it harder to add cross-cutting concerns (such as logging, audit trailing and authorization) to the system, because this must now either be added directly in the <em>SqlUserRepository</em> class (which will make this class hard to test and hard to maintain) or all constructors of classes that depend on <em>SqlUserRepository</em> must be changed to allow injecting a type that adds these cross-cutting concerns.</li>
+</ul>
+<p>Instead of depending directly on <em>SqlUserRepository</em>, <em>HomeController</em> can better depend on an <em>IUserRepository</em> abstraction:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">HomeController</span><span class="p">&gt;();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+<span class="c1">// Definition of HomeController</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">HomeController</span><span class="p">(</span><span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">repository</span> <span class="p">=</span> <span class="n">repository</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Tip</strong>: It would probably be better to define a generic <em>IRepository&lt;T&gt;</em> abstraction. This makes easy to <a class="reference internal" href="advanced.html#batch-registration"><em>batch registration</em></a> implementations and allows cross-cutting concerns to be added using <a class="reference internal" href="advanced.html#decorators"><em>decorators</em></a>.</div>
+</div>
+</div>
+
 
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="howto.html" class="btn btn-neutral float-right" title="How To"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="PotentialSingleResponsibilityViolations.html" class="btn btn-neutral" title="Diagnostic Warning - Potential Single Responsibility Violations"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -266,7 +335,6 @@
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/searchtools.js"></script>
 
   
 
@@ -282,14 +350,7 @@
           SphinxRtdTheme.StickyNav.enable();
       });
   </script>
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
    
-
 
 </body>
 </html>
