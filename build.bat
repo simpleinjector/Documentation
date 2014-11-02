@@ -1,6 +1,7 @@
 @ECHO OFF
 
 del build\html\.buildinfo /f
+del build\doctrees\*.doctree /f
 
 del source\conf.py
 copy source\conf.py.local source\conf.py
