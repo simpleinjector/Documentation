@@ -128,8 +128,8 @@ The old T4MVC template generated an extra public constructor on MVC Controller t
 
 .. _Overriding-Property-Injection-Behavior:
 
-Property Injection
-==================
+Overriding Property Injection Behavior
+======================================
 
 Attribute based property injection and implicit property injection are not supported by Simple Injector out of the box. With attribute based property injection the container injects properties that are decorated with an attribute. With implicit property injection the container automatically injects all properties that can be mapped to a registration, but silently skips other properties. An extension point is provided to change the library's default behavior, which is to **not** inject any property at all.
 

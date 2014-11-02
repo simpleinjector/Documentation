@@ -234,7 +234,7 @@ By supplying a delegate, types can be registered that cannot be created by using
 
 **Configuring property injection on an instance:**
 
-For types that need to be injected we recommend that you define a single public constructor that contains all dependencies. In scenarios where constructor injection is not possible, property injection is your fallback option. The previous example showed an example of property injection but our preferred approach is to use the **RegisterInitializer* method:
+For types that need to be injected we recommend that you define a single public constructor that contains all dependencies. In scenarios where constructor injection is not possible, property injection is your fallback option. The previous example showed an example of property injection but our preferred approach is to use the **RegisterInitializer** method:
 
 .. code-block:: c#
 

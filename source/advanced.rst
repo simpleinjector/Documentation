@@ -253,7 +253,7 @@ The type *SomeValidator<List<T>>* is called *partially-closed*, since although i
 .. _Mixing-collections-of-open-generic-and-non-generic-components:
 
 Mixing collections of open-generic and non-generic components
-============================
+=============================================================
 
 The **RegisterManyForOpenGeneric** overloads that take in a list of assemblies only select non-generic implementations of the given open-generic type. Open-generic implementations are skipped, because they often need special attention.
 
@@ -314,7 +314,7 @@ In most cases however, manually supplying the **RegisterAll** with a list of typ
         
 .. container:: Note
 
-The **RegisterManyForOpenGeneric** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well.
+    The **RegisterManyForOpenGeneric** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well.
 
 
 .. _Unregistered-Type-Resolution:
@@ -492,7 +492,7 @@ The given context contains several properties that allows you to analyze whether
 .. _Decorators-with-Func-factories:
 
 Decorators with Func<T> decoratee factories
----------------------------------
+-------------------------------------------
 
 In certain scenarios, it is needed to postpone building part of the object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be :ref:`executed on a different thread <Multi-Threaded-Applications>`, or when instances need to be created in a certain :ref:`scope <Scoped>` or (security) context.
 
