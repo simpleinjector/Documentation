@@ -494,19 +494,23 @@ The given context contains several properties that allows you to analyze whether
 Decorators with Func<T> decoratee factories
 -------------------------------------------
 
-In certain scenarios, it is needed to postpone building part of the object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be :ref:`executed on a different thread <Multi-Threaded-Applications>`, or when instances need to be created in a certain :ref:`scope <Scoped>` or (security) context.
+There are certain scenarios where it is necessary to postpone the building of part of an object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be :ref:`executed on a different thread <Multi-Threaded-Applications>`, or when instances need to be created within a certain :ref:`scope <Scoped>` or context (e.g. security).
 
-When building a 'normal' object graph with dependencies, you can easily delay building a part of the graph by letting a service depend on a factory. This allows building that part of the object graph to be postponed until the time the type starts using the factory. When working with decorators however, injecting a factory to postpone the creation of the decorated instance will not work. Take for instance a *AsyncCommandHandlerDecorator<T>* that allows executing a command handler on a different thread. We could let the *AsyncCommandHandlerDecorator<T>* depend on a *CommandHandlerFactory<T>*, and let this factory call back into the container to retrieve a new *ICommandHandler<T>*. Unfortunately this would fail, since requesting an *ICommandHandler<T>* would again wrap this instance with a new *AsyncCommandHandlerDecorator<T>*, and we'd end up recursively creating the same instance and causing a stack overflow.
+You can easily delay the building of part of the graph by depending on a factory; the factory allows building that part of the object graph to be postponed until the moment the type is actually required. However, when working with decorators, injecting a factory to postpone the creation of the decorated instance will not work. This is best demonstrated with an example.
 
-Since this is a scenario that is really hard to solve without library support, Simple Injector allows injecting a *Func<T>* delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance. Taking the *AsyncCommandHandlerDecorator<T>* as example, it could be implemented as follows:
+Take for instance a *AsyncCommandHandlerDecorator<T>* that executes a command handler on a different thread. We could let the *AsyncCommandHandlerDecorator<T>* depend on a *CommandHandlerFactory<T>*, and let this factory call back into the container to retrieve a new *ICommandHandler<T>* but this would fail, since requesting an *ICommandHandler<T>* would again wrap the new instance with a *AsyncCommandHandlerDecorator<T>* and we'd end up recursively creating the same instance type again and again resulting in a stack overflow.
+
+This particular scenario is really hard to solve without library support and as such Simple Injector allows injecting a *Func<T>* delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance and avoids the recursive decoration explained above.
+
+Taking the same *AsyncCommandHandlerDecorator<T>* as an example, it could be implemented as follows:
 
 .. code-block:: c#
 
     public class AsyncCommandHandlerDecorator<T> : ICommandHandler<T> {
-        private readonly Func<ICommandHandler<T>> factory;
+        private readonly Func<ICommandHandler<T>> decorateeFactory;
 
-        public AsyncCommandHandlerDecorator(Func<ICommandHandler<T>> factory) {
-            this.factory = factory;
+        public AsyncCommandHandlerDecorator(Func<ICommandHandler<T>> decorateeFactory) {
+            this.decorateeFactory = decorateeFactory;
         }
         
         public void Handle(T command) {
@@ -514,7 +518,7 @@ Since this is a scenario that is really hard to solve without library support, S
             ThreadPool.QueueUserWorkItem(state => {
                 try {
                     // Create new handler in this thread.
-                    ICommandHandler<T> handler = this.factory.Invoke();
+                    ICommandHandler<T> handler = this.decorateeFactory.Invoke();
                     handler.Handle(command);
                 } catch (Exception ex) {
                     // log the exception
@@ -523,7 +527,7 @@ Since this is a scenario that is really hard to solve without library support, S
         }
     }
 
-This special decorator can be registered just as any other decorator:
+This special decorator is registered just as any other decorator:
 
 .. code-block:: c#
 
@@ -532,7 +536,7 @@ This special decorator can be registered just as any other decorator:
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-However, since the *AsyncCommandHandlerDecorator<T>* solely has singleton dependencies (the *Func<T>* is a singleton), and creates a new decorated instance each time it's called, we can even register it as a singleton itself:
+However, in this instance the *AsyncCommandHandlerDecorator<T>* has only singleton dependencies (*Func<T>* is a singleton) and creates a new decorated instance each time it's called so we can register it as a singleton:
 
 .. code-block:: c#
 
@@ -541,7 +545,7 @@ However, since the *AsyncCommandHandlerDecorator<T>* solely has singleton depend
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-When mixing this with other (synchronous) decorators, you'll get an extremely powerful and pluggable system:
+Mixing this decorator with other (synchronous) decorators, you'll have an extremely powerful and pluggable system:
 
 .. code-block:: c#
 
@@ -566,9 +570,13 @@ When mixing this with other (synchronous) decorators, you'll get an extremely po
         typeof(ICommandHandler<>),
         typeof(ValidationCommandHandlerDecorator<>));
 
-This configuration has an interesting mix of decorator registrations. The registration of the *AsyncCommandHandlerDecorator<T>* allows (some of) the command handlers to be executed on the background (while others -who's name does not start with 'Async'- still run synchronously), but before execution, all commands are validated synchronously (to allow communicating validation errors to the caller). And all handlers (even the asynchronous ones) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock).
+This configuration has an interesting mix of decorator registrations.
 
-Another useful application for *Func<T>* decoratees, is when a command needs to be executed in an isolated fashion, to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:
+#. The registration of the *AsyncCommandHandlerDecorator<T>* allows (a subset of) command handlers to be executed in the background (while any command handler with a name does not start with 'Async' will execute synchronously)
+#. Prior to this point all commands are validated synchronously (to allow communicating validation errors to the caller)
+#. All handlers (sync and async) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock
+
+Another useful application for *Func<T>* decoratees is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:
 
 .. code-block:: c#
 
@@ -593,7 +601,7 @@ Another useful application for *Func<T>* decoratees, is when a command needs to 
         }
     }
     
-This proxy class starts a new :ref:`lifetime scope lifestyle <PerLifetimeScope>` and resolve the decoratee within that scope. This proxy can be registered as follows:
+This proxy class starts a new :ref:`lifetime scope lifestyle <PerLifetimeScope>` and resolves the decoratee within that new scope. The proxy can be registered as follows:
 
 .. code-block:: c#
 
@@ -603,9 +611,9 @@ This proxy class starts a new :ref:`lifetime scope lifestyle <PerLifetimeScope>`
 
 .. container:: Note
 
-    **Note**: Since the *LifetimeScopeCommandHandlerProxy<T>* only depends on singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it can be safely registered as singleton itself.
+    **Note**: Since the *LifetimeScopeCommandHandlerProxy<T>* only depends on singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it too can safely be registered as singleton.
 		
-Since the typical application will not use the lifetime scope, but rather a scope specific to the application type (such as a :ref:`web request <PerWebRequest>`, :ref:`web api request <PerWebAPIRequest>` or :ref:`WCF operation <PerWcfOperation>` lifestyles), a :ref:`hybrid lifestyle <Hybrid>` needs to be defined that allows object graphs to be resolved in this mixed-request scenario:
+Since a typical application will not use the lifetime scope, but would prefer a scope specific to the application type (such as a :ref:`web request <PerWebRequest>`, :ref:`web api request <PerWebAPIRequest>` or :ref:`WCF operation <PerWcfOperation>` lifestyles), a special :ref:`hybrid lifestyle <Hybrid>` needs to be defined that allows object graphs to be resolved in this mixed-request scenario:
 
 .. code-block:: c#
 
@@ -616,9 +624,9 @@ Since the typical application will not use the lifetime scope, but rather a scop
 
     container.Register<IUnitOfWork, DbUnitOfWork>(hybridLifestyle);
 
-In contrast to the example in :ref:`hybrid lifestyle section <Hybrid>`, the hybrid lifestyle that is created in the example above, prefers the *LifetimeScopeLifestyle* over the web request lifestyle. This is required, because the *LifetimeScopeCommandHandlerProxy<T>* is used to isolate the execution of commands, while letting the code run on the web request thread.
+In contrast to the example in :ref:`hybrid lifestyle section <Hybrid>`, the hybrid lifestyle defined here prefers the *LifetimeScopeLifestyle* over the web request lifestyle. This is because the *LifetimeScopeCommandHandlerProxy<T>* is used to isolate the execution of commands, while letting the code fall back to running on the web request thread when required.
 
-Obviously, if you run (part of) your commands on a background thread, but use registrations with a :ref:`scoped lifestyle <Scoped>`, you will have use both the *LifetimeScopeCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together. This can be seen in the following configuration:
+Obviously, if you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use for both the *LifetimeScopeCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
 
 .. code-block:: c#
 
@@ -643,7 +651,7 @@ Obviously, if you run (part of) your commands on a background thread, but use re
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-In the previous configuration, all commands are executed in an isolated context, while on top of that, some of the commands are executed on a background thread.
+With this configuration all commands are executed in an isolated context and some are also executed on a background thread.
 
 .. _Decorated-Collections:
 

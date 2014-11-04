@@ -589,14 +589,16 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
 <strong>Tip</strong>: <a class="reference internal" href="RuntimeDecorators.html"><em>This extension method</em></a> allows registering decorators that can be applied based on runtime conditions (such as the role of the current user).</div>
 <div class="section" id="decorators-with-func-t-decoratee-factories">
 <span id="decorators-with-func-factories"></span><h3>Decorators with Func&lt;T&gt; decoratee factories<a class="headerlink" href="#decorators-with-func-t-decoratee-factories" title="Permalink to this headline">¶</a></h3>
-<p>In certain scenarios, it is needed to postpone building part of the object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be <a class="reference internal" href="howto.html#multi-threaded-applications"><em>executed on a different thread</em></a>, or when instances need to be created in a certain <a class="reference internal" href="lifetimes.html#scoped"><em>scope</em></a> or (security) context.</p>
-<p>When building a &#8216;normal&#8217; object graph with dependencies, you can easily delay building a part of the graph by letting a service depend on a factory. This allows building that part of the object graph to be postponed until the time the type starts using the factory. When working with decorators however, injecting a factory to postpone the creation of the decorated instance will not work. Take for instance a <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> that allows executing a command handler on a different thread. We could let the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> depend on a <em>CommandHandlerFactory&lt;T&gt;</em>, and let this factory call back into the container to retrieve a new <em>ICommandHandler&lt;T&gt;</em>. Unfortunately this would fail, since requesting an <em>ICommandHandler&lt;T&gt;</em> would again wrap this instance with a new <em>AsyncCommandHandlerDecorator&lt;T&gt;</em>, and we&#8217;d end up recursively creating the same instance and causing a stack overflow.</p>
-<p>Since this is a scenario that is really hard to solve without library support, Simple Injector allows injecting a <em>Func&lt;T&gt;</em> delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance. Taking the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> as example, it could be implemented as follows:</p>
+<p>There are certain scenarios where it is necessary to postpone the building of part of an object graph. For instance when a service needs to control the lifetime of a dependency, needs multiple instances, when instances need to be <a class="reference internal" href="howto.html#multi-threaded-applications"><em>executed on a different thread</em></a>, or when instances need to be created within a certain <a class="reference internal" href="lifetimes.html#scoped"><em>scope</em></a> or context (e.g. security).</p>
+<p>You can easily delay the building of part of the graph by depending on a factory; the factory allows building that part of the object graph to be postponed until the moment the type is actually required. However, when working with decorators, injecting a factory to postpone the creation of the decorated instance will not work. This is best demonstrated with an example.</p>
+<p>Take for instance a <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> that executes a command handler on a different thread. We could let the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> depend on a <em>CommandHandlerFactory&lt;T&gt;</em>, and let this factory call back into the container to retrieve a new <em>ICommandHandler&lt;T&gt;</em> but this would fail, since requesting an <em>ICommandHandler&lt;T&gt;</em> would again wrap the new instance with a <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> and we&#8217;d end up recursively creating the same instance type again and again resulting in a stack overflow.</p>
+<p>This particular scenario is really hard to solve without library support and as such Simple Injector allows injecting a <em>Func&lt;T&gt;</em> delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance and avoids the recursive decoration explained above.</p>
+<p>Taking the same <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> as an example, it could be implemented as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">AsyncCommandHandlerDecorator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">{</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">Func</span><span class="p">&lt;</span><span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">factory</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">Func</span><span class="p">&lt;</span><span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">decorateeFactory</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="nf">AsyncCommandHandlerDecorator</span><span class="p">(</span><span class="n">Func</span><span class="p">&lt;</span><span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">factory</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="n">factory</span> <span class="p">=</span> <span class="n">factory</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nf">AsyncCommandHandlerDecorator</span><span class="p">(</span><span class="n">Func</span><span class="p">&lt;</span><span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">decorateeFactory</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">decorateeFactory</span> <span class="p">=</span> <span class="n">decorateeFactory</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="k">public</span> <span class="k">void</span> <span class="nf">Handle</span><span class="p">(</span><span class="n">T</span> <span class="n">command</span><span class="p">)</span> <span class="p">{</span>
@@ -604,7 +606,7 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
         <span class="n">ThreadPool</span><span class="p">.</span><span class="n">QueueUserWorkItem</span><span class="p">(</span><span class="n">state</span> <span class="p">=&gt;</span> <span class="p">{</span>
             <span class="k">try</span> <span class="p">{</span>
                 <span class="c1">// Create new handler in this thread.</span>
-                <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">factory</span><span class="p">.</span><span class="n">Invoke</span><span class="p">();</span>
+                <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">decorateeFactory</span><span class="p">.</span><span class="n">Invoke</span><span class="p">();</span>
                 <span class="n">handler</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
             <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="p">)</span> <span class="p">{</span>
                 <span class="c1">// log the exception</span>
@@ -614,21 +616,21 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>This special decorator can be registered just as any other decorator:</p>
+<p>This special decorator is registered just as any other decorator:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">AsyncCommandHandlerDecorator</span><span class="p">&lt;&gt;),</span>
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">StartsWith</span><span class="p">(</span><span class="s">&quot;Async&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>However, since the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> solely has singleton dependencies (the <em>Func&lt;T&gt;</em> is a singleton), and creates a new decorated instance each time it&#8217;s called, we can even register it as a singleton itself:</p>
+<p>However, in this instance the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> has only singleton dependencies (<em>Func&lt;T&gt;</em> is a singleton) and creates a new decorated instance each time it&#8217;s called so we can register it as a singleton:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">AsyncCommandHandlerDecorator</span><span class="p">&lt;&gt;),</span>
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">StartsWith</span><span class="p">(</span><span class="s">&quot;Async&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>When mixing this with other (synchronous) decorators, you&#8217;ll get an extremely powerful and pluggable system:</p>
+<p>Mixing this decorator with other (synchronous) decorators, you&#8217;ll have an extremely powerful and pluggable system:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterManyForOpenGeneric</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
@@ -651,7 +653,77 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
     <span class="k">typeof</span><span class="p">(</span><span class="n">ValidationCommandHandlerDecorator</span><span class="p">&lt;&gt;));</span>
 </pre></div>
 </div>
-<p>This configuration has an interesting mix of decorator registrations. The registration of the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> allows (some of) the command handlers to be executed on the background (while others -who&#8217;s name does not start with &#8216;Async&#8217;- still run synchronously), but before execution, all commands are validated synchronously (to allow communicating validation errors to the caller). And all handlers (even the asynchronous ones) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock).</p>
+<p>This configuration has an interesting mix of decorator registrations.</p>
+<ol class="arabic simple">
+<li>The registration of the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> allows (a subset of) command handlers to be executed in the background (while any command handler with a name does not start with &#8216;Async&#8217; will execute synchronously)</li>
+<li>Prior to this point all commands are validated synchronously (to allow communicating validation errors to the caller)</li>
+<li>All handlers (sync and async) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock</li>
+</ol>
+<p>Another useful application for <em>Func&lt;T&gt;</em> decoratees is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">SimpleInjector.Extensions.LifetimeScoping</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">LifetimeScopeCommandHandlerProxy</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="n">Container</span> <span class="n">container</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">Func</span><span class="p">&lt;</span><span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">decorateeFactory</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">LifetimeScopeCommandHandlerProxy</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">,</span>
+        <span class="n">Func</span><span class="p">&lt;</span><span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">decorateeFactory</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">decorateeFactory</span> <span class="p">=</span> <span class="n">decorateeFactory</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Handle</span><span class="p">(</span><span class="n">T</span> <span class="n">command</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Start a new scope.</span>
+        <span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span> <span class="p">{</span>
+            <span class="c1">// Create the decorateeFactory within the scope.</span>
+            <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">decorateeFactory</span><span class="p">.</span><span class="n">Invoke</span><span class="p">();</span>
+            <span class="n">handler</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This proxy class starts a new <a class="reference internal" href="lifetimes.html#perlifetimescope"><em>lifetime scope lifestyle</em></a> and resolves the decoratee within that new scope. The proxy can be registered as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleDecorator</span><span class="p">(</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">LifetimeScopeCommandHandlerProxy</span><span class="p">&lt;&gt;));</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong>: Since the <em>LifetimeScopeCommandHandlerProxy&lt;T&gt;</em> only depends on singletons (both the <em>Container</em> and the <em>Func&lt;ICommandHandler&lt;T&gt;&gt;</em> are singletons), it too can safely be registered as singleton.</div>
+<p>Since a typical application will not use the lifetime scope, but would prefer a scope specific to the application type (such as a <a class="reference internal" href="lifetimes.html#perwebrequest"><em>web request</em></a>, <a class="reference internal" href="lifetimes.html#perwebapirequest"><em>web api request</em></a> or <a class="reference internal" href="lifetimes.html#perwcfoperation"><em>WCF operation</em></a> lifestyles), a special <a class="reference internal" href="lifetimes.html#hybrid"><em>hybrid lifestyle</em></a> needs to be defined that allows object graphs to be resolved in this mixed-request scenario:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">ScopedLifestyle</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateHybrid</span><span class="p">(</span>
+    <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentLifetimeScope</span><span class="p">()</span> <span class="p">!=</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">trueLifestyle</span><span class="p">:</span> <span class="k">new</span> <span class="n">LifetimeScopeLifestyle</span><span class="p">(),</span>
+    <span class="n">falseLifestyle</span><span class="p">:</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">());</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">DbUnitOfWork</span><span class="p">&gt;(</span><span class="n">hybridLifestyle</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In contrast to the example in <a class="reference internal" href="lifetimes.html#hybrid"><em>hybrid lifestyle section</em></a>, the hybrid lifestyle defined here prefers the <em>LifetimeScopeLifestyle</em> over the web request lifestyle. This is because the <em>LifetimeScopeCommandHandlerProxy&lt;T&gt;</em> is used to isolate the execution of commands, while letting the code fall back to running on the web request thread when required.</p>
+<p>Obviously, if you run (part of) your commands on a background thread and also use registrations with a <a class="reference internal" href="lifetimes.html#scoped"><em>scoped lifestyle</em></a> you will have a use for both the <em>LifetimeScopeCommandHandlerProxy&lt;T&gt;</em> and <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> together which can be seen in the following configuration:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateHybrid</span><span class="p">(</span>
+    <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentLifetimeScope</span><span class="p">()</span> <span class="p">!=</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">trueLifestyle</span><span class="p">:</span> <span class="k">new</span> <span class="n">LifetimeScopeLifestyle</span><span class="p">(),</span>
+    <span class="n">falseLifestyle</span><span class="p">:</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">());</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">DbUnitOfWork</span><span class="p">&gt;(</span><span class="n">hybridLifestyle</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IRepository</span><span class="p">&lt;</span><span class="n">User</span><span class="p">&gt;,</span> <span class="n">UserRepository</span><span class="p">&gt;(</span><span class="n">hybridLifestyle</span><span class="p">);</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterManyForOpenGeneric</span><span class="p">(</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleDecorator</span><span class="p">(</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">LifetimeScopeCommandHandlerProxy</span><span class="p">&lt;&gt;));</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleDecorator</span><span class="p">(</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">AsyncCommandHandlerDecorator</span><span class="p">&lt;&gt;),</span>
+    <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">StartsWith</span><span class="p">(</span><span class="s">&quot;Async&quot;</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>With this configuration all commands are executed in an isolated context and some are also executed on a background thread.</p>
 </div>
 <div class="section" id="decorated-collections">
 <span id="id7"></span><h3>Decorated collections<a class="headerlink" href="#decorated-collections" title="Permalink to this headline">¶</a></h3>
