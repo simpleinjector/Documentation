@@ -568,6 +568,83 @@ When mixing this with other (synchronous) decorators, you'll get an extremely po
 
 This configuration has an interesting mix of decorator registrations. The registration of the *AsyncCommandHandlerDecorator<T>* allows (some of) the command handlers to be executed on the background (while others -who's name does not start with 'Async'- still run synchronously), but before execution, all commands are validated synchronously (to allow communicating validation errors to the caller). And all handlers (even the asynchronous ones) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock).
 
+Another useful application for *Func<T>* decoratees, is when a command needs to be executed in an isolated fashion, to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:
+
+.. code-block:: c#
+
+    using SimpleInjector.Extensions.LifetimeScoping;
+
+    public class LifetimeScopeCommandHandlerProxy<T> : ICommandHandler<T> {
+        private Container container;
+        private readonly Func<ICommandHandler<T>> decorateeFactory;
+
+        public LifetimeScopeCommandHandlerProxy(Container container,
+            Func<ICommandHandler<T>> decorateeFactory) {
+            this.decorateeFactory = decorateeFactory;
+        }
+        
+        public void Handle(T command) {
+            // Start a new scope.
+            using (container.BeginLifetimeScope()) {
+                // Create the decorateeFactory within the scope.
+                ICommandHandler<T> handler = this.decorateeFactory.Invoke();
+                handler.Handle(command);
+            });
+        }
+    }
+    
+This proxy class starts a new :ref:`lifetime scope lifestyle <PerLifetimeScope>` and resolve the decoratee within that scope. This proxy can be registered as follows:
+
+.. code-block:: c#
+
+    container.RegisterSingleDecorator(
+        typeof(ICommandHandler<>),
+        typeof(LifetimeScopeCommandHandlerProxy<>));
+
+.. container:: Note
+
+    **Note**: Since the *LifetimeScopeCommandHandlerProxy<T>* only depends on singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it can be safely registered as singleton itself.
+		
+Since the typical application will not use the lifetime scope, but rather a scope specific to the application type (such as a :ref:`web request <PerWebRequest>`, :ref:`web api request <PerWebAPIRequest>` or :ref:`WCF operation <PerWcfOperation>` lifestyles), a :ref:`hybrid lifestyle <Hybrid>` needs to be defined that allows object graphs to be resolved in this mixed-request scenario:
+
+.. code-block:: c#
+
+    ScopedLifestyle scopedLifestyle = Lifestyle.CreateHybrid(
+        () => container.GetCurrentLifetimeScope() != null,
+        trueLifestyle: new LifetimeScopeLifestyle(),
+        falseLifestyle: new WebRequestLifestyle());
+
+    container.Register<IUnitOfWork, DbUnitOfWork>(hybridLifestyle);
+
+In contrast to the example in :ref:`hybrid lifestyle section <Hybrid>`, the hybrid lifestyle that is created in the example above, prefers the *LifetimeScopeLifestyle* over the web request lifestyle. This is required, because the *LifetimeScopeCommandHandlerProxy<T>* is used to isolate the execution of commands, while letting the code run on the web request thread.
+
+Obviously, if you run (part of) your commands on a background thread, but use registrations with a :ref:`scoped lifestyle <Scoped>`, you will have use both the *LifetimeScopeCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together. This can be seen in the following configuration:
+
+.. code-block:: c#
+
+    var scopedLifestyle = Lifestyle.CreateHybrid(
+        () => container.GetCurrentLifetimeScope() != null,
+        trueLifestyle: new LifetimeScopeLifestyle(),
+        falseLifestyle: new WebRequestLifestyle());
+
+    container.Register<IUnitOfWork, DbUnitOfWork>(hybridLifestyle);
+    container.Register<IRepository<User>, UserRepository>(hybridLifestyle);
+        
+    container.RegisterManyForOpenGeneric(
+        typeof(ICommandHandler<>), 
+        typeof(ICommandHandler<>).Assembly);
+
+    container.RegisterSingleDecorator(
+        typeof(ICommandHandler<>),
+        typeof(LifetimeScopeCommandHandlerProxy<>));
+        
+    container.RegisterSingleDecorator(
+        typeof(ICommandHandler<>),
+        typeof(AsyncCommandHandlerDecorator<>),
+        c => c.ImplementationType.Name.StartsWith("Async"));
+
+In the previous configuration, all commands are executed in an isolated context, while on top of that, some of the commands are executed on a background thread.
+
 .. _Decorated-Collections:
 
 Decorated collections
