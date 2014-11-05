@@ -496,22 +496,22 @@ Simple Injector has no built-in hybrid lifestyles, but has a simple mechanism fo
 
 .. code-block:: c#
 
-    var hybridLifestyle = Lifestyle.CreateHybrid(
-        lifestyleSelector: () => HttpContext.Current != null,
-        trueLifestyle: new WebRequestLifestyle(),
-        falseLifestyle: new LifetimeScopeLifestyle());
+    ScopedLifestyle scopedLifestyle = Lifestyle.CreateHybrid(
+        lifestyleSelector: () => container.GetCurrentLifetimeScope() != null,
+        trueLifestyle: new LifetimeScopeLifestyle(),
+        falseLifestyle: new WebRequestLifestyle());
 
     // The created lifestyle can be reused for many registrations.
     container.Register<IUserRepository, SqlUserRepository>(hybridLifestyle);
     container.Register<ICustomerRepository, SqlCustomerRepository>(hybridLifestyle);
 
-In the example a hybrid lifestyle is defined wrapping the :ref:`Web Request <PerWebRequest>` lifestyle and the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle. The supplied *lifestyleSelector* predicate returns *true* when the container should use the *Web Request* lifestyle and *false* when the *Per Lifetime Scope* lifestyle should be selected.
+In the example a hybrid lifestyle is defined wrapping the :ref:`Web Request <PerWebRequest>` lifestyle and the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle. The supplied *lifestyleSelector* predicate returns *true* when the container should use the *Lifetime Scope* lifestyle and *false* when the *Web Request* lifestyle should be selected.
 
-A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations run outside the context of an *HttpContext* (in a background thread for instance). Please note though that when the lifestyle doesn't have to change throughout the lifetime of the application, a hybrid lifestyle is not needed. A normal lifestyle can be registered instead:
+A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations need to be run in isolation (which their own instances of scoped registrations such as unit of works) or run outside the context of an *HttpContext* (in a background thread for instance). Please note though that when the lifestyle doesn't have to change throughout the lifetime of the application, a hybrid lifestyle is not needed. A normal lifestyle can be registered instead:
 
 .. code-block:: c#
 
-    var lifestyle =
+    ScopedLifestyle lifestyle =
         RunsOnWebServer ? new WebRequestLifestyle() : new LifetimeScopeLifestyle();
 
     container.Register<IUserRepository, SqlUserRepository>(lifestyle);

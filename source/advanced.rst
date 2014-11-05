@@ -536,7 +536,7 @@ This special decorator is registered just as any other decorator:
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-However, in this instance the *AsyncCommandHandlerDecorator<T>* has only singleton dependencies (*Func<T>* is a singleton) and creates a new decorated instance each time it's called so we can register it as a singleton:
+The *AsyncCommandHandlerDecorator<T>* however, has only singleton dependencies (both the *Container* and the *Func<T>* are singletons) and the *Func<ICommandHandler<T>>* factory always calls back into the container to register a decorated instance conforming the decoratee's lifestyle, each time it's called. If for instance the decoratee is registered as transient, each call to the factory will result in a new instance. It is therefore safe to register this decorator as a singleton:
 
 .. code-block:: c#
 
@@ -545,7 +545,7 @@ However, in this instance the *AsyncCommandHandlerDecorator<T>* has only singlet
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-Mixing this decorator with other (synchronous) decorators, you'll have an extremely powerful and pluggable system:
+When mixing this decorator with other (synchronous) decorators, you'll get an extremely powerful and pluggable system:
 
 .. code-block:: c#
 
@@ -572,11 +572,11 @@ Mixing this decorator with other (synchronous) decorators, you'll have an extrem
 
 This configuration has an interesting mix of decorator registrations.
 
-#. The registration of the *AsyncCommandHandlerDecorator<T>* allows (a subset of) command handlers to be executed in the background (while any command handler with a name does not start with 'Async' will execute synchronously)
+#. The registration of the *AsyncCommandHandlerDecorator<T>* allows (a subset of) command handlers to be executed in the background (while any command handler with a name that does not start with 'Async' will execute synchronously)
 #. Prior to this point all commands are validated synchronously (to allow communicating validation errors to the caller)
 #. All handlers (sync and async) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock
 
-Another useful application for *Func<T>* decoratees is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:
+Another useful application for *Func<T>* decoratee factories is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:
 
 .. code-block:: c#
 
@@ -588,20 +588,21 @@ Another useful application for *Func<T>* decoratees is when a command needs to b
 
         public LifetimeScopeCommandHandlerProxy(Container container,
             Func<ICommandHandler<T>> decorateeFactory) {
+            this.container = container;
             this.decorateeFactory = decorateeFactory;
         }
-        
+
         public void Handle(T command) {
             // Start a new scope.
             using (container.BeginLifetimeScope()) {
                 // Create the decorateeFactory within the scope.
                 ICommandHandler<T> handler = this.decorateeFactory.Invoke();
                 handler.Handle(command);
-            });
+            };
         }
     }
     
-This proxy class starts a new :ref:`lifetime scope lifestyle <PerLifetimeScope>` and resolves the decoratee within that new scope. The proxy can be registered as follows:
+This proxy class starts a new :ref:`lifetime scope lifestyle <PerLifetimeScope>` and resolves the decoratee within that new scope using the factory. The use of the factory ensures that the decoratee is resolved according to its lifestyle, independent of the lifestyle of our proxy class. The proxy can be registered as follows:
 
 .. code-block:: c#
 
@@ -618,20 +619,18 @@ Since a typical application will not use the lifetime scope, but would prefer a 
 .. code-block:: c#
 
     ScopedLifestyle scopedLifestyle = Lifestyle.CreateHybrid(
-        () => container.GetCurrentLifetimeScope() != null,
+        lifestyleSelector: () => container.GetCurrentLifetimeScope() != null,
         trueLifestyle: new LifetimeScopeLifestyle(),
         falseLifestyle: new WebRequestLifestyle());
 
-    container.Register<IUnitOfWork, DbUnitOfWork>(hybridLifestyle);
+    container.Register<IUnitOfWork, DbUnitOfWork>(scopedLifestyle);
 
-In contrast to the example in :ref:`hybrid lifestyle section <Hybrid>`, the hybrid lifestyle defined here prefers the *LifetimeScopeLifestyle* over the web request lifestyle. This is because the *LifetimeScopeCommandHandlerProxy<T>* is used to isolate the execution of commands, while letting the code fall back to running on the web request thread when required.
-
-Obviously, if you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use for both the *LifetimeScopeCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
+Obviously, if you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use both the *LifetimeScopeCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
 
 .. code-block:: c#
 
     var scopedLifestyle = Lifestyle.CreateHybrid(
-        () => container.GetCurrentLifetimeScope() != null,
+        lifestyleSelector: () => container.GetCurrentLifetimeScope() != null,
         trueLifestyle: new LifetimeScopeLifestyle(),
         falseLifestyle: new WebRequestLifestyle());
 
