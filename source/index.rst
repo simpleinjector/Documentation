@@ -8,6 +8,8 @@
 Welcome to Simple Injector's documentation!
 ===========================================
 
+THIS IS A TEST
+
 Contents:
 
 .. toctree::
