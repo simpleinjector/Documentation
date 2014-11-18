@@ -106,7 +106,7 @@ The example below is a very basic MVC Controller:
 Resolving instances
 ===================
 
-Simple Injector supports two scenarios for retrieve component instances:
+Simple Injector supports two scenarios for retrieving component instances:
 
 1. **Getting an object by a specified type**
 
