@@ -411,7 +411,7 @@ The following code shows an example of the use of automatic constructor injectio
 
 .. container:: Note
 
-    **Note**: Because *UserService* is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can significantly simplify the *Container*'s configuration for more complex scenarios. Alwasy keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
+    **Note**: Because *UserService* is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can significantly simplify the *Container*'s configuration for more complex scenarios. Always keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
 
 .. _More-Information:
 
