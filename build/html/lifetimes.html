@@ -426,7 +426,7 @@ Only one instance will be created by the container during the lifetime of the WC
 <div class="section" id="per-lifetime-scope">
 <span id="perlifetimescope"></span><h2>Per Lifetime Scope<a class="headerlink" href="#per-lifetime-scope" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
-Within a certain (explicitly defined) scope, there will be only one instance of a given service type and the instance will be disposed when the scope ends (unless specified otherwise).</div>
+Within a certain (explicitly defined) scope, there will be only one instance of a given service type and the instance will be disposed when the scope ends (unless specified otherwise). A created scope is specific to one particular thread, and can&#8217;t be moved across threads.</div>
 <p>Lifetime Scoping is supported as an extension package for Simple Injector. It is available as <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Extensions.LifetimeScoping">Lifetime Scoping Extensions NuGet package</a> and is part of the default download on CodePlex as <strong>SimpleInjector.Extensions.LifetimeScoping.dll</strong>. The extension package adds multiple <strong>RegisterLifetimeScope</strong> extension method overloads and a <strong>LifetimeScopeLifestyle</strong> class, which allow to register services with the <em>Lifetime Scope</em> lifestyle:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterLifetimeScope</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;();</span>
 
@@ -481,13 +481,13 @@ Within a certain (explicitly defined) scope, there will be only one instance of 
 <div class="section" id="per-execution-context-scope">
 <span id="perexecutioncontextscope"></span><h2>Per Execution Context Scope<a class="headerlink" href="#per-execution-context-scope" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
-There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends (unless specified otherwise).</div>
-<p>This scope will automatically flow with the logical flow of control of asynchronous methods. This lifestyle is especially suited for client applications that work with the new asynchronous programming model. For Web API there&#8217;s a <a class="reference internal" href="#perwebapirequest"><em>Per Web API Request lifestyle</em></a> (which actually uses this Execution Context Scope lifestyle under the covers).</p>
+There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends (unless specified otherwise). This scope will automatically flow with the logical flow of control of asynchronous methods.</div>
+<p>This lifestyle is especially suited for client applications that work with the new asynchronous programming model. For Web API there&#8217;s a <a class="reference internal" href="#perwebapirequest"><em>Per Web API Request lifestyle</em></a> (which actually uses this Execution Context Scope lifestyle under the covers).</p>
 <p>Execution Context Scoping is an extension package for Simple Injector. It is available as <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Extensions.ExecutionContextScoping">Execution Context Extensions NuGet package</a> and is part of the default download on CodePlex as <strong>SimpleInjector.Extensions.ExecutionContextScoping.dll</strong>. The extension package adds multiple <strong>RegisterExecutionContextScope</strong> extension method overloads and a <strong>ExecutionContextScopeLifestyle</strong> class, which allow to register services with the <em>Execution Context Scope</em> lifestyle:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterExecutionContextScope</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;();</span>
 
 <span class="c1">// Or alternatively</span>
-    <span class="n">ver</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ExecutionContextScopeLifestyle</span><span class="p">();</span>
+    <span class="kt">var</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ExecutionContextScopeLifestyle</span><span class="p">();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;(</span><span class="n">scopedLifestyle</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -506,16 +506,16 @@ There will be only one instance of a given service type within a certain (explic
 </div>
 <div class="note container">
 <strong>Note</strong>: A scope is specific to the asynchronous flow. A method call on a different (unrelated) thread, will get its own scope.</div>
-<p>Outside the context of a lifetime scope no instances can be created. An exception is thrown when this happens.</p>
+<p>Outside the context of an active execution context scope no instances can be created. An exception is thrown when this happens.</p>
 <p>Scopes can be nested and each scope will get its own set of instances:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span> <span class="p">{</span>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginExecutionContextScope</span><span class="p">())</span> <span class="p">{</span>
     <span class="kt">var</span> <span class="n">outer1</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
     <span class="k">await</span> <span class="nf">SomeAsyncOperation</span><span class="p">();</span>
     <span class="kt">var</span> <span class="n">outer2</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
 
     <span class="n">Assert</span><span class="p">.</span><span class="n">AreSame</span><span class="p">(</span><span class="n">outer1</span><span class="p">,</span> <span class="n">outer2</span><span class="p">);</span>
 
-    <span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginLifetimeScope</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginExecutionContextScope</span><span class="p">())</span> <span class="p">{</span>
         <span class="kt">var</span> <span class="n">inner1</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">&gt;();</span>
 
         <span class="k">await</span> <span class="nf">SomeOtherAsyncOperation</span><span class="p">();</span>

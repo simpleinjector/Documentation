@@ -10,17 +10,21 @@ A registration has been made with the Transient lifestyle for a component that i
 Warning Description
 ===================
 
-Components that implement IDisposable usuable need deterministic clean-up, but Simple Injector does not track and dispose components that are registered with the transient lifestyle.
+A component that implements *IDisposable* would usually need deterministic clean-up but Simple Injector does not implicitly track and dispose components registered with the transient lifestyle.
 
 How to Fix Violations
 =====================
 
-Register the component with the :ref:`scoped lifestyle <Scoped>` that is appropriate for the application you are working on. Scoped lifestyles ensure Dispose is called when an active scope ends.
+Register the component with the :ref:`scoped lifestyle <Scoped>` that is appropriate for the application you are working on. Scoped lifestyles ensure *Dispose* is called when an active scope ends.
 
 When to Ignore Warnings
 =======================
 
-This warning can safely be ignored when either Dispose is called by application code, there's some manual registration that ensures the disposal, or when not disposing is not a problem.
+This warning can safely be ignored when:
+
+- *Dispose* is called by the application code
+- some manual registration ensures disposal
+- not disposing is not a problem.
 
 Example
 =======

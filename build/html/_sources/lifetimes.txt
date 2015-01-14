@@ -294,7 +294,7 @@ Per Lifetime Scope
 
 .. container:: Note
     
-    Within a certain (explicitly defined) scope, there will be only one instance of a given service type and the instance will be disposed when the scope ends (unless specified otherwise).
+    Within a certain (explicitly defined) scope, there will be only one instance of a given service type and the instance will be disposed when the scope ends (unless specified otherwise). A created scope is specific to one particular thread, and can't be moved across threads.
 
 Lifetime Scoping is supported as an extension package for Simple Injector. It is available as `Lifetime Scoping Extensions NuGet package <https://nuget.org/packages/SimpleInjector.Extensions.LifetimeScoping>`_ and is part of the default download on CodePlex as **SimpleInjector.Extensions.LifetimeScoping.dll**. The extension package adds multiple **RegisterLifetimeScope** extension method overloads and a **LifetimeScopeLifestyle** class, which allow to register services with the *Lifetime Scope* lifestyle:
 
@@ -370,9 +370,9 @@ Per Execution Context Scope
 
 .. container:: Note
     
-    There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends (unless specified otherwise).
+    There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends (unless specified otherwise). This scope will automatically flow with the logical flow of control of asynchronous methods.
 
-This scope will automatically flow with the logical flow of control of asynchronous methods. This lifestyle is especially suited for client applications that work with the new asynchronous programming model. For Web API there's a :ref:`Per Web API Request lifestyle <PerWebAPIRequest>` (which actually uses this Execution Context Scope lifestyle under the covers).
+This lifestyle is especially suited for client applications that work with the new asynchronous programming model. For Web API there's a :ref:`Per Web API Request lifestyle <PerWebAPIRequest>` (which actually uses this Execution Context Scope lifestyle under the covers).
 
 Execution Context Scoping is an extension package for Simple Injector. It is available as `Execution Context Extensions NuGet package <https://nuget.org/packages/SimpleInjector.Extensions.ExecutionContextScoping>`_ and is part of the default download on CodePlex as **SimpleInjector.Extensions.ExecutionContextScoping.dll**. The extension package adds multiple **RegisterExecutionContextScope** extension method overloads and a **ExecutionContextScopeLifestyle** class, which allow to register services with the *Execution Context Scope* lifestyle:
 
@@ -381,7 +381,7 @@ Execution Context Scoping is an extension package for Simple Injector. It is ava
     container.RegisterExecutionContextScope<IUnitOfWork, NorthwindContext>();
 
     // Or alternatively
-	ver scopedLifestyle = new ExecutionContextScopeLifestyle();
+	var scopedLifestyle = new ExecutionContextScopeLifestyle();
     container.Register<IUnitOfWork, NorthwindContext>(scopedLifestyle);
 
 Within an explicitly defined scope, there will be only one instance of a service that is defined with the *Execution Context Scope* lifestyle:
@@ -403,20 +403,20 @@ Within an explicitly defined scope, there will be only one instance of a service
 
     **Note**: A scope is specific to the asynchronous flow. A method call on a different (unrelated) thread, will get its own scope.
 
-Outside the context of a lifetime scope no instances can be created. An exception is thrown when this happens.
+Outside the context of an active execution context scope no instances can be created. An exception is thrown when this happens.
 
 Scopes can be nested and each scope will get its own set of instances:
 
 .. code-block:: c#
 
-    using (container.BeginLifetimeScope()) {
+    using (container.BeginExecutionContextScope()) {
         var outer1 = container.GetInstance<IUnitOfWork>();
         await SomeAsyncOperation();
         var outer2 = container.GetInstance<IUnitOfWork>();
 
         Assert.AreSame(outer1, outer2);
 
-        using (container.BeginLifetimeScope()) {
+        using (container.BeginExecutionContextScope()) {
             var inner1 = container.GetInstance<IUnitOfWork>();
             
             await SomeOtherAsyncOperation();

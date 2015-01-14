@@ -57,8 +57,8 @@ With this code in place, we can now write our *Form* and *UserControl* classes a
         }
 
         private void button1_Click(object sender, EventArgs e) {
-            if (this.UserContext.IsAdministrator) {
-                this.UserRepository.ControlSomeStuff();
+            if (this.userContext.IsAdministrator) {
+                this.userRepository.ControlSomeStuff();
             }
         }
     }

@@ -250,8 +250,10 @@
 
         <span class="k">void</span> <span class="n">IHttpModule</span><span class="p">.</span><span class="n">Init</span><span class="p">(</span><span class="n">HttpApplication</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
             <span class="n">context</span><span class="p">.</span><span class="n">PreRequestHandlerExecute</span> <span class="p">+=</span> <span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">Context</span><span class="p">.</span><span class="n">CurrentHandler</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="n">Global</span><span class="p">.</span><span class="n">InitializeHandler</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">Context</span><span class="p">.</span><span class="n">CurrentHandler</span><span class="p">);</span>
+                <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">Context</span><span class="p">.</span><span class="n">CurrentHandler</span><span class="p">;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">handler</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">&amp;&amp;</span>
+                    <span class="p">!</span><span class="n">handler</span><span class="p">.</span><span class="n">GetType</span><span class="p">().</span><span class="n">Assembly</span><span class="p">.</span><span class="n">FullName</span><span class="p">.</span><span class="n">StartsWith</span><span class="p">(</span><span class="s">&quot;System.Web&quot;</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="n">Global</span><span class="p">.</span><span class="n">InitializeHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">);</span>
                 <span class="p">}</span>
             <span class="p">};</span>
         <span class="p">}</span>

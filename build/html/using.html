@@ -227,7 +227,7 @@
 <div class="note container">
 <strong>Tip</strong>: You should typically create a single <em>Container</em> instance for the whole application (one instance per app domain); <em>Container</em> instances are thread-safe.</div>
 <div class="note container">
-<strong>Warning</strong>: Registering types in a <em>Container</em> instance should be done from one single thread. Requesting instances from the <em>Container</em> is thread-safe but <a class="reference external" href="https://simpleinjector.codeplex.com/discussions/349908]">registration is not</a>.</div>
+<strong>Warning</strong>: Registering types in a <em>Container</em> instance should be done from one single thread. Requesting instances from the <em>Container</em> is thread-safe but <a class="reference external" href="https://simpleinjector.codeplex.com/discussions/349908">registration is not</a>.</div>
 <div class="note container">
 <strong>Warning</strong>: Do not create an infinite number of <em>Container</em> instances (such as one instance per request). Doing so will drain the performance of your application. The library is optimized for using a very limited number of <em>Container</em> instances. Creating and initializing <em>Container</em> instance has a large overhead, (but the <em>Container</em> is <a class="reference external" href="https://simpleinjector.codeplex.com/discussions/326621">extremely fast</a> once initialized.</div>
 <p>Creating and configuring a <em>Container</em> is done by newing up an instance and calling the <strong>RegisterXXX</strong> overloads to register each of your services:</p>
@@ -299,7 +299,7 @@
 </div>
 <div class="section" id="resolving-instances">
 <span id="id2"></span><h2>Resolving instances<a class="headerlink" href="#resolving-instances" title="Permalink to this headline">¶</a></h2>
-<p>Simple Injector supports two scenarios for retrieve component instances:</p>
+<p>Simple Injector supports two scenarios for retrieving component instances:</p>
 <ol class="arabic simple">
 <li><strong>Getting an object by a specified type</strong></li>
 </ol>
@@ -539,7 +539,7 @@ By referencing the <em>Container</em> instance within the delegate, the <em>Cont
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: Because <em>UserService</em> is a concrete type, calling <em>container.GetInstance&lt;UserService&gt;()</em> without registering it explicitly will work. This feature can significantly simplify the <em>Container</em>&#8216;s configuration for more complex scenarios. Alwasy keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.</div>
+<strong>Note</strong>: Because <em>UserService</em> is a concrete type, calling <em>container.GetInstance&lt;UserService&gt;()</em> without registering it explicitly will work. This feature can significantly simplify the <em>Container</em>&#8216;s configuration for more complex scenarios. Always keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.</div>
 </div>
 <div class="section" id="more-information">
 <span id="id3"></span><h2>More information<a class="headerlink" href="#more-information" title="Permalink to this headline">¶</a></h2>

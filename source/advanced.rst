@@ -897,7 +897,7 @@ Covariance and Contravariance
 
 Since version 4.0 of the .NET framework, the type system allows `Covariance and Contravariance in Generics <https://msdn.microsoft.com/en-us/library/dd799517.aspx>`_ (especially interfaces and delegates). This allows for instance, to use a *IEnumerable<string>* as an *IEnumerable<object>* (covariance), or to use an *Action<object>* as an *Action<string>* (contravariance).
 
-In some circumstances, the application design can benefit from the use of covariance and contravariance (or variance for short) and it would be beneficial when the DI container returns services that are 'compatible' to the requested service, even although the requested service type itself is not explicitly registered. To stick with the previous example, the container could return an *IEnumerable<string>* even when an *IEnumerable<object>* is requested.
+In some circumstances, the application design can benefit from the use of covariance and contravariance (or variance for short) and it would be beneficial if the container returned services that were 'compatible' with the requested service, even when the requested service type itself is not explicitly registered. To stick with the previous example, the container could return an *IEnumerable<string>* even when an *IEnumerable<object>* is requested.
 
 When resolving a collection, Simple Injector will resolve all assignable (variant) implementations of the requested service type as part of the requested collection.
 
@@ -920,7 +920,7 @@ Take a look at the following application design around the *IEventHandler<in TEv
         public CustomerMovedEvent(Guid customerId) : base(customerId) { }    
     }
 
-    public class SendFlowerToMovedCustomer : IEventHandler<CustomerMovedEvent> {
+    public class SendFlowersToMovedCustomer : IEventHandler<CustomerMovedEvent> {
         public void Handle(CustomerMovedEvent e) { ... }
     }
 
@@ -928,7 +928,7 @@ Take a look at the following application design around the *IEventHandler<in TEv
         public void Handle(CustomerMovedEvent e) { ... }
     }	
 
-The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbroadEvent* (where *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*) two concrete event handlers *SendFlowerToMovedCustomer* and *WarnShippingDepartmentAboutMove*. These classes can be registered using the following registration:
+The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbroadEvent* (where *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*) and two concrete event handlers *SendFlowersToMovedCustomer* and *WarnShippingDepartmentAboutMove*. These classes can be registered using the following registration:
 
 .. code-block:: c#
 
@@ -936,11 +936,11 @@ The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbr
     container.RegisterManyForOpenGeneric(typeof(IValidator<>),
         container.RegisterAll,
         typeof(IValidator<>).Assembly);
-		
+
     // Usage
     var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
-	
-	foreach (var handler in handlers) {
+
+    foreach (var handler in handlers) {
         Console.WriteLine(handler.GetType().Name);
     }
 	
@@ -948,18 +948,18 @@ With the given classes, the code snippet above will give the following output:
 
 .. code-block:: c#
 
-    SendFlowerToMovedCustomer
+    SendFlowersToMovedCustomer
     WarnShippingDepartmentAboutMove
 	
-Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEvent>*, the container returned both the registered *IEventHandler<CustomerMovedEvent>* and the registered *IEventHandler<CustomerMovedAbroadEvent>*. Simple Injector did this because the *IEventHandler<in TEvent>* interface was defined with the *in* keyword, which makes *SendFlowerToMovedCustomer* assignable to *IEventHandler<CustomerMovedAbroadEvent>* (since *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*, *SendFlowerToMovedCustomer* can also process *CustomerMovedAbroadEvent* events). 
+Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEvent>*, the container returned *IEventHandler<CustomerMovedEvent>* and *IEventHandler<CustomerMovedAbroadEvent>*. Simple Injector did this because the *IEventHandler<in TEvent>* interface was defined with the *in* keyword, which makes *SendFlowerToMovedCustomer* assignable to *IEventHandler<CustomerMovedAbroadEvent>* (since *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*, *SendFlowerToMovedCustomer* can also process *CustomerMovedAbroadEvent* events). 
 
 .. container:: Note
 
-    **Tip**: If you don't want Simple Injector to resolve variant registrations as well, removing all *in* and *out* keywords from the interface definition will prevent Simple Injector from doing so.
+    **Tip**: If you don't want Simple Injector to resolve variant registrations remove the *in* and *out* keywords from the interface definition. I.e. the *in* and *out* keywords are the trigger for Simple Injector to apply variance.
 
 .. container:: Note
 	
-	**Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In case you resolve a single instance using *GetInstance<T>*, Simple Injector will not return an assignable type if the exact type is not registered.
+	**Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered.
 
 .. _Plugins:
 
