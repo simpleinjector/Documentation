@@ -32,8 +32,10 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
 
             void IHttpModule.Init(HttpApplication context) {
                 context.PreRequestHandlerExecute += (sender, e) => {
-                    if (context.Context.CurrentHandler != null) {
-                        Global.InitializeHandler(context.Context.CurrentHandler);
+                    var handler = context.Context.CurrentHandler;
+                    if (handler != null &&
+                        !handler.GetType().Assembly.FullName.StartsWith("System.Web")) {
+                        Global.InitializeHandler(handler);
                     }
                 };
             }

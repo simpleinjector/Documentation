@@ -230,15 +230,20 @@
 </div>
 <div class="section" id="warning-description">
 <h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
-<p>Components that implement IDisposable usuable need deterministic clean-up, but Simple Injector does not track and dispose components that are registered with the transient lifestyle.</p>
+<p>A component that implements <em>IDisposable</em> would usually need deterministic clean-up but Simple Injector does not implicitly track and dispose components registered with the transient lifestyle.</p>
 </div>
 <div class="section" id="how-to-fix-violations">
 <h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
-<p>Register the component with the <a class="reference internal" href="lifetimes.html#scoped"><em>scoped lifestyle</em></a> that is appropriate for the application you are working on. Scoped lifestyles ensure Dispose is called when an active scope ends.</p>
+<p>Register the component with the <a class="reference internal" href="lifetimes.html#scoped"><em>scoped lifestyle</em></a> that is appropriate for the application you are working on. Scoped lifestyles ensure <em>Dispose</em> is called when an active scope ends.</p>
 </div>
 <div class="section" id="when-to-ignore-warnings">
 <h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
-<p>This warning can safely be ignored when either Dispose is called by application code, there&#8217;s some manual registration that ensures the disposal, or when not disposing is not a problem.</p>
+<p>This warning can safely be ignored when:</p>
+<ul class="simple">
+<li><em>Dispose</em> is called by the application code</li>
+<li>some manual registration ensures disposal</li>
+<li>not disposing is not a problem.</li>
+</ul>
 </div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>

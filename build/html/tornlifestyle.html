@@ -230,16 +230,15 @@
 </div>
 <div class="section" id="warning-description">
 <h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
-<p>When multiple registrations with the same lifestyle map to the same component, this component is said to have a torn lifestyle. The component is known to be torn, because each registration will get its own instance of the given component, which might result in multiple instances of that component within a certain scope.</p>
-<p>When a component is torn, the application might be wired incorrectly because the flagged component gets multiple instances in a certain scope. This can result in unexpected behavior.</p>
+<p>When multiple registrations with the same lifestyle map to the same component the component is said to have a torn lifestyle. The component is considered torn because each registration will get its own instance of the given component, which can potentially result in multiple instances of the component within a lifetime scope. When the registrations are torn the application may be wired incorrectly which could lead to unexpected behavior.</p>
 </div>
 <div class="section" id="how-to-fix-violations">
 <h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
-<p>Create a Registration instance for that component using Lifestyle.CreateRegistration and use that for both registrations.</p>
+<p>Create a <em>Registration</em> instance for that component using <em>Lifestyle.CreateRegistration</em> and use that for both registrations.</p>
 </div>
 <div class="section" id="when-to-ignore-warnings">
 <h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
-<p>This warning can safely be ignored your intention is to have multiple instances of the flagged component within such scope.</p>
+<p>This warning can safely be ignored your intention is to have multiple instances of the flagged component (one for each registration) in the same scope.</p>
 </div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
@@ -252,7 +251,7 @@
 <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>The <em>FooBar</em> component is registered as <strong>Singleton</strong> twice; once for <strong>IFoo</strong> and once for <strong>IBar</strong>. Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.</p>
+<p>The <em>FooBar</em> component is registered as <strong>Singleton</strong> twice; once for <em>IFoo</em> and once for <em>IBar</em>. Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.</p>
 <img alt="Diagnostics debugger view watch window with the torn lifestyle warnings" src="_images/tornlifestyle.png" />
 <p>The issue can be fixed as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
