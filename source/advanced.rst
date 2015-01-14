@@ -322,7 +322,7 @@ In most cases however, manually supplying the **RegisterAll** with a list of typ
 Unregistered type resolution
 ============================
 
-Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the change of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the :ref:`registration of open generic types <Registration-Of-Open-Generic-Types>`. Other examples of possible scenarios that can be built on top of this event are :ref:`resolving array and lists <Resolve-Arrays-And-Lists>` and :ref:`covariance and contravariance <Covariance-Contravariance>`. Those scenarios are described here in the advanced scenarios page.
+Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the chance of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the :ref:`registration of open generic types <Registration-Of-Open-Generic-Types>`. Other examples of possible scenarios that can be built on top of this event are :ref:`resolving array and lists <Resolve-Arrays-And-Lists>` and :ref:`covariance and contravariance <Covariance-Contravariance>`. Those scenarios are described here in the advanced scenarios page.
 
 For more information about how to use this event, please take a look at the `ResolveUnregisteredType event documentation <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ in the `reference library <https://simpleinjector.org/ReferenceLibrary/>`_.
 
@@ -332,7 +332,7 @@ For more information about how to use this event, please take a look at the `Res
 Context based injection
 =======================
 
-Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don't. Simple Injector does *not* contain such a feature out of the box, but this ability can easily be added by using the :doc:`context based injection extension method <ContextDependentExtensions>` code snippet.
+Context based injection is the ability to inject a particular dependency based on the context it lives in (or change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don't. Simple Injector does *not* contain such a feature out of the box, but this ability can easily be added by using the :doc:`context based injection extension method <ContextDependentExtensions>` code snippet.
 
 .. container:: Note
 

@@ -18,7 +18,7 @@ Simple Injector's main type is the `Container <https://simpleinjector.org/Refere
 
 .. container:: Note
 
-    **Warning**: Registering types in a *Container* instance should be done from one single thread. Requesting instances from the *Container* is thread-safe but `registration is not <https://simpleinjector.codeplex.com/discussions/349908]>`_.
+    **Warning**: Registering types in a *Container* instance should be done from one single thread. Requesting instances from the *Container* is thread-safe but `registration is not <https://simpleinjector.codeplex.com/discussions/349908>`_.
 
 .. container:: Note
 
@@ -106,7 +106,7 @@ The example below is a very basic MVC Controller:
 Resolving instances
 ===================
 
-Simple Injector supports two scenarios for retrieve component instances:
+Simple Injector supports two scenarios for retrieving component instances:
 
 1. **Getting an object by a specified type**
 
@@ -411,7 +411,7 @@ The following code shows an example of the use of automatic constructor injectio
 
 .. container:: Note
 
-    **Note**: Because *UserService* is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can significantly simplify the *Container*'s configuration for more complex scenarios. Alwasy keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
+    **Note**: Because *UserService* is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can significantly simplify the *Container*'s configuration for more complex scenarios. Always keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
 
 .. _More-Information:
 
