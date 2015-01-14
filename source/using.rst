@@ -18,7 +18,7 @@ Simple Injector's main type is the `Container <https://simpleinjector.org/Refere
 
 .. container:: Note
 
-    **Warning**: Registering types in a *Container* instance should be done from one single thread. Requesting instances from the *Container* is thread-safe but `registration is not <https://simpleinjector.codeplex.com/discussions/349908]>`_.
+    **Warning**: Registering types in a *Container* instance should be done from one single thread. Requesting instances from the *Container* is thread-safe but `registration is not <https://simpleinjector.codeplex.com/discussions/349908>`_.
 
 .. container:: Note
 
