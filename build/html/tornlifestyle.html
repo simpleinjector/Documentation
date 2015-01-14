@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Diagnostic Services &mdash; Simple Injector 2 documentation</title>
+  <title>Diagnostic Warning - Torn Lifestyle &mdash; Simple Injector 2 documentation</title>
   
 
   
@@ -29,8 +29,9 @@
 
   
     <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
-        <link rel="next" title="Diagnostic Warning - Potential Lifestyle Mismatches" href="PotentialLifestyleMismatches.html"/>
-        <link rel="prev" title="Windows Presentation Foundation Integration Guide" href="wpfintegration.html"/> 
+        <link rel="up" title="Diagnostic Services" href="diagnostics.html"/>
+        <link rel="next" title="Diagnostic Warning - Disposable Transient Components" href="disposabletransientcomponent.html"/>
+        <link rel="prev" title="Diagnostic Warning - Container-registered Types" href="ContainerRegisteredTypes.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -100,10 +101,10 @@
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Diagnostic Services</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#limitations">Limitations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#supported-warnings">Supported Warnings</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
@@ -208,10 +209,12 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Diagnostic Services</li>
+          <li><a href="diagnostics.html">Diagnostic Services</a> &raquo;</li>
+      
+    <li>Diagnostic Warning - Torn Lifestyle</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/diagnostics.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/tornlifestyle.txt" rel="nofollow"> View page source</a>
         
       </li>
   </ul>
@@ -219,110 +222,64 @@
 </div>
           <div role="main">
             
-  <div class="section" id="diagnostic-services">
-<h1>Diagnostic Services<a class="headerlink" href="#diagnostic-services" title="Permalink to this headline">¶</a></h1>
-<p>The <strong>Diagnostic Services</strong> allow you to analyze the container&#8217;s configuration to search for common configuration mistakes.</p>
-<div class="section" id="how-to-view-diagnostic-results">
-<h2>How to view diagnostic results<a class="headerlink" href="#how-to-view-diagnostic-results" title="Permalink to this headline">¶</a></h2>
-<p>There are two ways to view the diagnostic results - results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.</p>
-<p>Diagnostic results are available during debugging in Visual Studio after calling <em>Container.Verify()</em>. Set a breakpoint after the line that calls <strong>Verify()</strong> and when the breakpoint breaks, hover over the <em>Container</em> instance with the mouse. The debugger context menu will appear for the <em>Container</em> variable which you can unfold to view the diagnostic results. This might look like this:</p>
-<img alt="Diagnostics debugger view context menu" src="_images/diagnosticsdebuggerview.png" />
-<p>Another option is to add the <strong>container</strong> variable to the Visual Studio watch window by right clicking on the variable and selecting &#8216;Add Watch&#8217; in the context menu:</p>
-<img alt="Diagnostics debugger view watch window" src="_images/diagnostics2.png" />
-<p>The debugger views also allow visualizing your application&#8217;s dependency graphs. This can give you a good view of what the end result of your DI configuration is. By drilling into the list of <strong>Registrations</strong> or <strong>Root Registrations</strong>, you can select the text visualizer (the magnifying glass icon) on the <strong>DependencyGraph</strong> property on any of the lister registrations:</p>
-<img alt="Viewing dependency graphs" src="_images/dependencygraph.png" />
-<p>This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the <strong>SimpleInjector.Diagnostics.dll</strong>. This dll is part of the core NuGet package. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="na">[TestMethod]</span>
-<span class="k">public</span> <span class="k">void</span> <span class="nf">Container_Always_ContainsNoDiagnosticWarnings</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// Arrange</span>
-    <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="n">Bootstrapper</span><span class="p">.</span><span class="n">GetInitializedContainer</span><span class="p">();</span>
+  <div class="section" id="diagnostic-warning-torn-lifestyle">
+<h1>Diagnostic Warning - Torn Lifestyle<a class="headerlink" href="#diagnostic-warning-torn-lifestyle" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="cause">
+<h2>Cause<a class="headerlink" href="#cause" title="Permalink to this headline">¶</a></h2>
+<p>Multiple registrations with the same lifestyle map to the same component.</p>
+</div>
+<div class="section" id="warning-description">
+<h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
+<p>When multiple registrations with the same lifestyle map to the same component, this component is said to have a torn lifestyle. The component is known to be torn, because each registration will get its own instance of the given component, which might result in multiple instances of that component within a certain scope.</p>
+<p>When a component is torn, the application might be wired incorrectly because the flagged component gets multiple instances in a certain scope. This can result in unexpected behavior.</p>
+</div>
+<div class="section" id="how-to-fix-violations">
+<h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
+<p>Create a Registration instance for that component using Lifestyle.CreateRegistration and use that for both registrations.</p>
+</div>
+<div class="section" id="when-to-ignore-warnings">
+<h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
+<p>This warning can safely be ignored your intention is to have multiple instances of the flagged component within such scope.</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>The following example shows a configuration that will trigger the warning:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
 
-    <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IFoo</span><span class="p">,</span> <span class="n">FooBar</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IBar</span><span class="p">,</span> <span class="n">FooBar</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
 
-    <span class="c1">// Assert</span>
-    <span class="kt">var</span> <span class="n">results</span> <span class="p">=</span> <span class="n">Analyzer</span><span class="p">.</span><span class="n">Analyze</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The <em>FooBar</em> component is registered as <strong>Singleton</strong> twice; once for <strong>IFoo</strong> and once for <strong>IBar</strong>. Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.</p>
+<img alt="Diagnostics debugger view watch window with the torn lifestyle warnings" src="_images/tornlifestyle.png" />
+<p>The issue can be fixed as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
 
-    <span class="n">Assert</span><span class="p">.</span><span class="n">IsFalse</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">Any</span><span class="p">(),</span> <span class="n">Environment</span><span class="p">.</span><span class="n">NewLine</span> <span class="p">+</span>
-        <span class="kt">string</span><span class="p">.</span><span class="n">Join</span><span class="p">(</span><span class="n">Environment</span><span class="p">.</span><span class="n">NewLine</span><span class="p">,</span>
-            <span class="k">from</span> <span class="n">result</span> <span class="k">in</span> <span class="n">results</span>
-            <span class="k">select</span> <span class="n">result</span><span class="p">.</span><span class="n">Description</span><span class="p">));</span>
+<span class="kt">var</span> <span class="n">registration</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">.</span><span class="n">CreateRegistration</span><span class="p">&lt;</span><span class="n">FooBar</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">);</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">AddRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IFoo</span><span class="p">),</span> <span class="n">registration</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">AddRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IBar</span><span class="p">),</span> <span class="n">registration</span><span class="p">);</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The following example shows how to query the Diagnostic API for Torn Lifestyles:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Diagnostics;</span>
+
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="cm">/* get verified container */</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">results</span> <span class="p">=</span> <span class="n">Analyzer</span><span class="p">.</span><span class="n">Analyze</span><span class="p">(</span><span class="n">container</span><span class="p">).</span><span class="n">OfType</span><span class="p">&lt;</span><span class="n">TornLifestyleDiagnosticResult</span><span class="p">&gt;();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">result</span> <span class="k">in</span> <span class="n">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">Description</span><span class="p">);</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Component name: &quot;</span> <span class="p">+</span> <span class="n">result</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">);</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Lifestyle of component: &quot;</span> <span class="p">+</span> <span class="n">result</span><span class="p">.</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Name</span><span class="p">);</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Affected registrations: &quot;</span> <span class="p">+</span>
+        <span class="kt">string</span><span class="p">.</span><span class="n">Join</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">AffectedRegistrations</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">r</span> <span class="p">=&gt;</span> <span class="n">r</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">.</span><span class="n">Name</span><span class="p">)));</span>
 <span class="p">}</span>
 </pre></div>
-</div>
-</div>
-<div class="section" id="limitations">
-<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
-<div class="note container">
-<strong>Warning</strong>: Although the <em>Container</em> can spot several configuration mistakes, be aware that there will always be ways to make configuration errors that the Diagnostic Services cannot identify. Wiring your dependencies is a delicate matter and should be done with care. Always follow best practices.</div>
-<p>The <strong>Diagnostic Services</strong> work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as analyzing constructor arguments) can be analyzed. The <em>Container</em> uses the following information for analysis:</p>
-<ul class="simple">
-<li>Constructor arguments of types that are created by the container (auto-wired types).</li>
-<li>Dependencies added by <a class="reference internal" href="advanced.html#decorators"><em>Decorators</em></a>.</li>
-<li>Dependencies that are not registered explicitly but are referenced as constructor argument (this included types that got created through unregistered type resolution).</li>
-</ul>
-<p>The Diagnostic Services <strong>cannot</strong> analyze the following:</p>
-<ul class="simple">
-<li>Types that are completely unknown, because these types are not registered explicitly and no registered type depends on them. In general you should register all root types (types that are requested directly by calling <strong>GetInstance&lt;T&gt;()</strong>, such as MVC Controllers) explicitly.</li>
-<li>Open-generic registrations that are resolved as root type (no registered type depends on them). Since the container uses unregistered type resolution, those registrations will be unknown untill they are resolved. Prefer registering each closed-generic version explicitly, or add unit tests to verify that these root types can be resolved.</li>
-<li>Dependencies added using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> method:</li>
-</ul>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(</span><span class="n">service</span> <span class="p">=&gt;</span> <span class="p">{</span>
-    <span class="c1">// These dependencies will be unknown during diagnosis</span>
-    <span class="n">service</span><span class="p">.</span><span class="n">Dependency</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Dependency</span><span class="p">();</span>
-    <span class="n">service</span><span class="p">.</span><span class="n">TimeProvider</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">ITimeProvider</span><span class="p">&gt;()</span>
-<span class="p">});</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li>Types that are created manually by registering a <em>Func&lt;T&gt;</em> delegate using one of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_Register__1_2.htm">Register&lt;TService&gt;(Func&lt;TService&gt;)</a> overloads, for instance:</li>
-</ul>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">MyService</span><span class="p">(</span>
-    <span class="c1">// These dependencies will be unknown during diagnosis</span>
-    <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(),</span>
-    <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">ITimeProvider</span><span class="p">&gt;()));</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li>Any dependencies that are injected using the (now deprecated) <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_InjectProperties.htm">InjectProperties</a> method will not be seen as dependencies of the type they are injected into.</li>
-<li>Dependencies that are resolved by requesting them manually from the <em>Container</em>, for instance by injecting the <em>Container</em> into a class and then calling <em>container.GetInstance&lt;T&gt;()</em> from within that class:</li>
-</ul>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span> <span class="p">:</span> <span class="n">IService</span> <span class="p">{</span>
-    <span class="k">private</span> <span class="n">ITimeProvider</span> <span class="n">provider</span><span class="p">;</span>
-
-    <span class="c1">// Type depends on the container (don&#39;t do this)</span>
-    <span class="k">public</span> <span class="nf">MyService</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// This dependency will be unknown during diagnosis</span>
-        <span class="k">this</span><span class="p">.</span><span class="n">provider</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">ITimeProvider</span><span class="p">&gt;();</span>
-    <span class="p">}</span>
-<span class="p">});</span>
-</pre></div>
-</div>
-<div class="note container">
-<strong>Tip</strong>: Try to prevent depending on any framework features listed above because they all prevent you from having a <a class="reference internal" href="howto.html#verify-configuration"><em>verifiable configuration</em></a> and trustworthy diagnostic results.</div>
-</div>
-<div class="section" id="supported-warnings">
-<h2>Supported Warnings<a class="headerlink" href="#supported-warnings" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="PotentialLifestyleMismatches.html">Potential Lifestyle Mismatches</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ShortCircuitedDependencies.html">Short Circuited Dependencies</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="PotentialSingleResponsibilityViolations.html">Potential Single Responsibility Violations</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ContainerRegisteredTypes.html">Container-Registered Types</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tornlifestyle.html">Torn Lifestyle</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="disposabletransientcomponent.html">Disposable Transient Components</a><ul class="simple">
-</ul>
-</li>
-</ul>
 </div>
 </div>
 </div>
@@ -333,10 +290,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="PotentialLifestyleMismatches.html" class="btn btn-neutral float-right" title="Diagnostic Warning - Potential Lifestyle Mismatches"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="disposabletransientcomponent.html" class="btn btn-neutral float-right" title="Diagnostic Warning - Disposable Transient Components"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="wpfintegration.html" class="btn btn-neutral" title="Windows Presentation Foundation Integration Guide"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ContainerRegisteredTypes.html" class="btn btn-neutral" title="Diagnostic Warning - Container-registered Types"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
