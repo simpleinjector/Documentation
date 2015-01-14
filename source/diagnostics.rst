@@ -109,3 +109,5 @@ Supported Warnings
     Short Circuited Dependencies <ShortCircuitedDependencies>
     Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
     Container-Registered Types <ContainerRegisteredTypes>
+    Torn Lifestyle <tornlifestyle> 
+    Disposable Transient Components <disposabletransientcomponent>

@@ -623,14 +623,14 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">StartsWith</span><span class="p">(</span><span class="s">&quot;Async&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>However, in this instance the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> has only singleton dependencies (<em>Func&lt;T&gt;</em> is a singleton) and creates a new decorated instance each time it&#8217;s called so we can register it as a singleton:</p>
+<p>The <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> however, has only singleton dependencies (both the <em>Container</em> and the <em>Func&lt;T&gt;</em> are singletons) and the <em>Func&lt;ICommandHandler&lt;T&gt;&gt;</em> factory always calls back into the container to register a decorated instance conforming the decoratee&#8217;s lifestyle, each time it&#8217;s called. If for instance the decoratee is registered as transient, each call to the factory will result in a new instance. It is therefore safe to register this decorator as a singleton:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">AsyncCommandHandlerDecorator</span><span class="p">&lt;&gt;),</span>
     <span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">StartsWith</span><span class="p">(</span><span class="s">&quot;Async&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>Mixing this decorator with other (synchronous) decorators, you&#8217;ll have an extremely powerful and pluggable system:</p>
+<p>When mixing this decorator with other (synchronous) decorators, you&#8217;ll get an extremely powerful and pluggable system:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterManyForOpenGeneric</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
@@ -655,11 +655,11 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
 </div>
 <p>This configuration has an interesting mix of decorator registrations.</p>
 <ol class="arabic simple">
-<li>The registration of the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> allows (a subset of) command handlers to be executed in the background (while any command handler with a name does not start with &#8216;Async&#8217; will execute synchronously)</li>
+<li>The registration of the <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> allows (a subset of) command handlers to be executed in the background (while any command handler with a name that does not start with &#8216;Async&#8217; will execute synchronously)</li>
 <li>Prior to this point all commands are validated synchronously (to allow communicating validation errors to the caller)</li>
 <li>All handlers (sync and async) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock</li>
 </ol>
-<p>Another useful application for <em>Func&lt;T&gt;</em> decoratees is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:</p>
+<p>Another useful application for <em>Func&lt;T&gt;</em> decoratee factories is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">SimpleInjector.Extensions.LifetimeScoping</span><span class="p">;</span>
 
 <span class="k">public</span> <span class="k">class</span> <span class="nc">LifetimeScopeCommandHandlerProxy</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">{</span>
@@ -668,6 +668,7 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
 
     <span class="k">public</span> <span class="nf">LifetimeScopeCommandHandlerProxy</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">,</span>
         <span class="n">Func</span><span class="p">&lt;</span><span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">decorateeFactory</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">container</span> <span class="p">=</span> <span class="n">container</span><span class="p">;</span>
         <span class="k">this</span><span class="p">.</span><span class="n">decorateeFactory</span> <span class="p">=</span> <span class="n">decorateeFactory</span><span class="p">;</span>
     <span class="p">}</span>
 
@@ -677,12 +678,12 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
             <span class="c1">// Create the decorateeFactory within the scope.</span>
             <span class="n">ICommandHandler</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">decorateeFactory</span><span class="p">.</span><span class="n">Invoke</span><span class="p">();</span>
             <span class="n">handler</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
-        <span class="p">});</span>
+        <span class="p">};</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>This proxy class starts a new <a class="reference internal" href="lifetimes.html#perlifetimescope"><em>lifetime scope lifestyle</em></a> and resolves the decoratee within that new scope. The proxy can be registered as follows:</p>
+<p>This proxy class starts a new <a class="reference internal" href="lifetimes.html#perlifetimescope"><em>lifetime scope lifestyle</em></a> and resolves the decoratee within that new scope using the factory. The use of the factory ensures that the decoratee is resolved according to its lifestyle, independent of the lifestyle of our proxy class. The proxy can be registered as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleDecorator</span><span class="p">(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">&lt;&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">LifetimeScopeCommandHandlerProxy</span><span class="p">&lt;&gt;));</span>
@@ -692,17 +693,16 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
 <strong>Note</strong>: Since the <em>LifetimeScopeCommandHandlerProxy&lt;T&gt;</em> only depends on singletons (both the <em>Container</em> and the <em>Func&lt;ICommandHandler&lt;T&gt;&gt;</em> are singletons), it too can safely be registered as singleton.</div>
 <p>Since a typical application will not use the lifetime scope, but would prefer a scope specific to the application type (such as a <a class="reference internal" href="lifetimes.html#perwebrequest"><em>web request</em></a>, <a class="reference internal" href="lifetimes.html#perwebapirequest"><em>web api request</em></a> or <a class="reference internal" href="lifetimes.html#perwcfoperation"><em>WCF operation</em></a> lifestyles), a special <a class="reference internal" href="lifetimes.html#hybrid"><em>hybrid lifestyle</em></a> needs to be defined that allows object graphs to be resolved in this mixed-request scenario:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">ScopedLifestyle</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateHybrid</span><span class="p">(</span>
-    <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentLifetimeScope</span><span class="p">()</span> <span class="p">!=</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">lifestyleSelector</span><span class="p">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentLifetimeScope</span><span class="p">()</span> <span class="p">!=</span> <span class="k">null</span><span class="p">,</span>
     <span class="n">trueLifestyle</span><span class="p">:</span> <span class="k">new</span> <span class="n">LifetimeScopeLifestyle</span><span class="p">(),</span>
     <span class="n">falseLifestyle</span><span class="p">:</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">());</span>
 
-<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">DbUnitOfWork</span><span class="p">&gt;(</span><span class="n">hybridLifestyle</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">DbUnitOfWork</span><span class="p">&gt;(</span><span class="n">scopedLifestyle</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In contrast to the example in <a class="reference internal" href="lifetimes.html#hybrid"><em>hybrid lifestyle section</em></a>, the hybrid lifestyle defined here prefers the <em>LifetimeScopeLifestyle</em> over the web request lifestyle. This is because the <em>LifetimeScopeCommandHandlerProxy&lt;T&gt;</em> is used to isolate the execution of commands, while letting the code fall back to running on the web request thread when required.</p>
-<p>Obviously, if you run (part of) your commands on a background thread and also use registrations with a <a class="reference internal" href="lifetimes.html#scoped"><em>scoped lifestyle</em></a> you will have a use for both the <em>LifetimeScopeCommandHandlerProxy&lt;T&gt;</em> and <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> together which can be seen in the following configuration:</p>
+<p>Obviously, if you run (part of) your commands on a background thread and also use registrations with a <a class="reference internal" href="lifetimes.html#scoped"><em>scoped lifestyle</em></a> you will have a use both the <em>LifetimeScopeCommandHandlerProxy&lt;T&gt;</em> and <em>AsyncCommandHandlerDecorator&lt;T&gt;</em> together which can be seen in the following configuration:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateHybrid</span><span class="p">(</span>
-    <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentLifetimeScope</span><span class="p">()</span> <span class="p">!=</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">lifestyleSelector</span><span class="p">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentLifetimeScope</span><span class="p">()</span> <span class="p">!=</span> <span class="k">null</span><span class="p">,</span>
     <span class="n">trueLifestyle</span><span class="p">:</span> <span class="k">new</span> <span class="n">LifetimeScopeLifestyle</span><span class="p">(),</span>
     <span class="n">falseLifestyle</span><span class="p">:</span> <span class="k">new</span> <span class="n">WebRequestLifestyle</span><span class="p">());</span>
 
@@ -897,60 +897,57 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
 <div class="section" id="covariance-and-contravariance">
 <span id="covariance-contravariance"></span><h2>Covariance and Contravariance<a class="headerlink" href="#covariance-and-contravariance" title="Permalink to this headline">¶</a></h2>
 <p>Since version 4.0 of the .NET framework, the type system allows <a class="reference external" href="https://msdn.microsoft.com/en-us/library/dd799517.aspx">Covariance and Contravariance in Generics</a> (especially interfaces and delegates). This allows for instance, to use a <em>IEnumerable&lt;string&gt;</em> as an <em>IEnumerable&lt;object&gt;</em> (covariance), or to use an <em>Action&lt;object&gt;</em> as an <em>Action&lt;string&gt;</em> (contravariance).</p>
-<p>In some circumstances, the application design can benefit from the use of covariance and contravariance (or variance for short) and it would be beneficial when the IoC container returns services that are &#8216;compatible&#8217; to the requested service, even although the requested service is not registered. To stick with the previous example, the container could return an <em>IEnumerable&lt;string&gt;</em> even when an <em>IEnumerable&lt;object&gt;</em> is requested.</p>
-<p>By default, Simple Injector does not return variant implementations of given services, but Simple Injector can be extended to behave this way. The actual way to write this extension depends on the requirements of the application.</p>
+<p>In some circumstances, the application design can benefit from the use of covariance and contravariance (or variance for short) and it would be beneficial when the DI container returns services that are &#8216;compatible&#8217; to the requested service, even although the requested service type itself is not explicitly registered. To stick with the previous example, the container could return an <em>IEnumerable&lt;string&gt;</em> even when an <em>IEnumerable&lt;object&gt;</em> is requested.</p>
+<p>When resolving a collection, Simple Injector will resolve all assignable (variant) implementations of the requested service type as part of the requested collection.</p>
 <p>Take a look at the following application design around the <em>IEventHandler&lt;in TEvent&gt;</em> interface:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">IEventHandler</span><span class="p">&lt;</span><span class="k">in</span> <span class="n">TEvent</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">void</span> <span class="nf">Handle</span><span class="p">(</span><span class="n">TEvent</span> <span class="n">e</span><span class="p">);</span>
 <span class="p">}</span>
 
 <span class="k">public</span> <span class="k">class</span> <span class="nc">CustomerMovedEvent</span> <span class="p">{</span>
-    <span class="k">public</span> <span class="kt">int</span> <span class="n">CustomerId</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-    <span class="k">public</span> <span class="n">Address</span> <span class="n">NewAddress</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="k">readonly</span> <span class="n">Guid</span> <span class="n">CustomerId</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nf">CustomerMovedEvent</span><span class="p">(</span><span class="n">Guid</span> <span class="n">customerId</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">CustomerId</span> <span class="p">=</span> <span class="n">customerId</span><span class="p">;</span>
+    <span class="p">}</span>
 <span class="p">}</span>
 
 <span class="k">public</span> <span class="k">class</span> <span class="nc">CustomerMovedAbroadEvent</span> <span class="p">:</span> <span class="n">CustomerMovedEvent</span> <span class="p">{</span>
-    <span class="k">public</span> <span class="n">Country</span> <span class="n">Country</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="nf">CustomerMovedEvent</span><span class="p">(</span><span class="n">Guid</span> <span class="n">customerId</span><span class="p">)</span> <span class="p">:</span> <span class="k">base</span><span class="p">(</span><span class="n">customerId</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">CustomerMovedEventHandler</span> <span class="p">:</span> <span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedEvent</span><span class="p">&gt;</span> <span class="p">{</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">SendFlowerToMovedCustomer</span> <span class="p">:</span> <span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedEvent</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Handle</span><span class="p">(</span><span class="n">CustomerMovedEvent</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">WarnShippingDepartmentAboutMove</span> <span class="p">:</span> <span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedAbroadEvent</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">public</span> <span class="k">void</span> <span class="nf">Handle</span><span class="p">(</span><span class="n">CustomerMovedEvent</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The design contains two event classes <em>CustomerMovedEvent</em> and <em>CustomerMovedAbroadEvent</em> (where <em>CustomerMovedAbroadEvent</em> inherits from <em>CustomerMovedEvent</em>) one concrete event handler <em>CustomerMovedEventHandler</em> and a generic interface for event handlers.</p>
-<p>We can configure the container in such way that not only a request for <em>IEventHandler&lt;CustomerMovedEvent&gt;</em> results in a <em>CustomerMovedEventHandler,</em> but also a request for <em>IEventHandler&lt;CustomerMovedAbroadEvent&gt;</em> results in that same <em>CustomerMovedEventHandler</em> (because <em>CustomerMovedEventHandler</em> also accepts <em>CustomerMovedAbroadEvents</em>).</p>
-<p>There are multiple ways to achieve this. Here&#8217;s one:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">CustomerMovedEventHandler</span><span class="p">&gt;();</span>
+<p>The design contains two event classes <em>CustomerMovedEvent</em> and <em>CustomerMovedAbroadEvent</em> (where <em>CustomerMovedAbroadEvent</em> inherits from <em>CustomerMovedEvent</em>) two concrete event handlers <em>SendFlowerToMovedCustomer</em> and <em>WarnShippingDepartmentAboutMove</em>. These classes can be registered using the following registration:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Configuration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterManyForOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">,</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
 
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IEventHandler</span><span class="p">&lt;&gt;),</span>
-    <span class="k">typeof</span><span class="p">(</span><span class="n">ContravarianceEventHandler</span><span class="p">&lt;&gt;));</span>
-</pre></div>
-</div>
-<p>This registration depends on the custom <em>ContravarianceEventHandler&lt;TEvent&gt;</em> that should be placed close to the registration itself:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">ContravarianceEventHandler</span><span class="p">&lt;</span><span class="n">TEvent</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">TEvent</span><span class="p">&gt;</span> <span class="p">{</span>
-    <span class="k">private</span> <span class="n">Registration</span> <span class="n">registration</span><span class="p">;</span>
+<span class="c1">// Usage</span>
+<span class="kt">var</span> <span class="n">handlers</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">&lt;</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedAbroadEvent</span><span class="p">&gt;&gt;();</span>
 
-    <span class="k">public</span> <span class="nf">ContravarianceEventHandler</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// NOTE: GetCurrentRegistrations has a perf characteristic of O(n), so</span>
-        <span class="c1">// make sure this type is registered as singleton.</span>
-        <span class="n">registration</span> <span class="p">=</span> <span class="p">(</span>
-            <span class="k">from</span> <span class="n">reg</span> <span class="k">in</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentRegistrations</span><span class="p">()</span>
-            <span class="k">where</span> <span class="nf">typeof</span><span class="p">(</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">TEvent</span><span class="p">&gt;).</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">)</span>
-            <span class="k">select</span> <span class="n">reg</span><span class="p">)</span>
-            <span class="p">.</span><span class="n">Single</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">void</span> <span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">TEvent</span><span class="p">&gt;.</span><span class="n">Handle</span><span class="p">(</span><span class="n">TEvent</span> <span class="n">e</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="p">(</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">TEvent</span><span class="p">&gt;)</span><span class="k">this</span><span class="p">.</span><span class="n">registration</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">();</span>
-        <span class="n">handler</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
-    <span class="p">}</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">handler</span> <span class="k">in</span> <span class="n">handlers</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">handler</span><span class="p">.</span><span class="n">GetType</span><span class="p">().</span><span class="n">Name</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The registration ensures that every time an <em>IEventHandler&lt;TEvent&gt;</em> is requested, a <em>ContravarianceEventHandler&lt;TEvent&gt;</em> is returned. The <em>ContravarianceEventHandler&lt;TEvent&gt;</em> will on creation query the container for a single service type that implements the specified <em>IEventHandler&lt;TEvent&gt;</em>. Because the <em>CustomerMovedEventHandler</em> is the only registered event handler for <em>IEventHandler&lt;CustomerMovedEvent&gt;</em>, the <em>ContravarianceEventHandler&lt;CustomerMovedEvent&gt;</em> will find that type and call it.</p>
-<p>This is just one example and one way of adding variance support. For a more elaborate discussion on this subject, please read the following article: <a class="reference external" href="https://cuttingedge.it/blogs/steven/pivot/entry.php?id=90">Adding Covariance and Contravariance to Simple Injector</a>.</p>
+<p>With the given classes, the code snippet above will give the following output:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">SendFlowerToMovedCustomer</span>
+<span class="n">WarnShippingDepartmentAboutMove</span>
+</pre></div>
+</div>
+<p>Although we requested all registrations for <em>IEventHandler&lt;CustomerMovedAbroadEvent&gt;</em>, the container returned both the registered <em>IEventHandler&lt;CustomerMovedEvent&gt;</em> and the registered <em>IEventHandler&lt;CustomerMovedAbroadEvent&gt;</em>. Simple Injector did this because the <em>IEventHandler&lt;in TEvent&gt;</em> interface was defined with the <em>in</em> keyword, which makes <em>SendFlowerToMovedCustomer</em> assignable to <em>IEventHandler&lt;CustomerMovedAbroadEvent&gt;</em> (since <em>CustomerMovedAbroadEvent</em> inherits from <em>CustomerMovedEvent</em>, <em>SendFlowerToMovedCustomer</em> can also process <em>CustomerMovedAbroadEvent</em> events).</p>
+<div class="note container">
+<strong>Tip</strong>: If you don&#8217;t want Simple Injector to resolve variant registrations as well, removing all <em>in</em> and <em>out</em> keywords from the interface definition will prevent Simple Injector from doing so.</div>
+<div class="note container">
+<strong>Note</strong>: Simple Injector only resolves variant implementations for collections that are registered using the <em>RegisterAll</em> overloads. In case you resolve a single instance using <em>GetInstance&lt;T&gt;</em>, Simple Injector will not return an assignable type if the exact type is not registered.</div>
 </div>
 <div class="section" id="registering-plugins-dynamically">
 <span id="plugins"></span><h2>Registering plugins dynamically<a class="headerlink" href="#registering-plugins-dynamically" title="Permalink to this headline">¶</a></h2>

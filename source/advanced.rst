@@ -897,9 +897,9 @@ Covariance and Contravariance
 
 Since version 4.0 of the .NET framework, the type system allows `Covariance and Contravariance in Generics <https://msdn.microsoft.com/en-us/library/dd799517.aspx>`_ (especially interfaces and delegates). This allows for instance, to use a *IEnumerable<string>* as an *IEnumerable<object>* (covariance), or to use an *Action<object>* as an *Action<string>* (contravariance).
 
-In some circumstances, the application design can benefit from the use of covariance and contravariance (or variance for short) and it would be beneficial when the IoC container returns services that are 'compatible' to the requested service, even although the requested service is not registered. To stick with the previous example, the container could return an *IEnumerable<string>* even when an *IEnumerable<object>* is requested.
+In some circumstances, the application design can benefit from the use of covariance and contravariance (or variance for short) and it would be beneficial when the DI container returns services that are 'compatible' to the requested service, even although the requested service type itself is not explicitly registered. To stick with the previous example, the container could return an *IEnumerable<string>* even when an *IEnumerable<object>* is requested.
 
-By default, Simple Injector does not return variant implementations of given services, but Simple Injector can be extended to behave this way. The actual way to write this extension depends on the requirements of the application.
+When resolving a collection, Simple Injector will resolve all assignable (variant) implementations of the requested service type as part of the requested collection.
 
 Take a look at the following application design around the *IEventHandler<in TEvent>* interface:
 
@@ -910,58 +910,56 @@ Take a look at the following application design around the *IEventHandler<in TEv
     }
 
     public class CustomerMovedEvent {
-        public int CustomerId { get; set; }
-        public Address NewAddress { get; set; }
+        public readonly Guid CustomerId;
+        public CustomerMovedEvent(Guid customerId) {
+            this.CustomerId = customerId;
+        }
     }
 
     public class CustomerMovedAbroadEvent : CustomerMovedEvent {
-        public Country Country { get; set; }
+        public CustomerMovedEvent(Guid customerId) : base(customerId) { }    
     }
 
-    public class CustomerMovedEventHandler : IEventHandler<CustomerMovedEvent> {
+    public class SendFlowerToMovedCustomer : IEventHandler<CustomerMovedEvent> {
         public void Handle(CustomerMovedEvent e) { ... }
     }
 
-The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbroadEvent* (where *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*) one concrete event handler *CustomerMovedEventHandler* and a generic interface for event handlers.
+    public class WarnShippingDepartmentAboutMove : IEventHandler<CustomerMovedAbroadEvent> {
+        public void Handle(CustomerMovedEvent e) { ... }
+    }	
 
-We can configure the container in such way that not only a request for *IEventHandler<CustomerMovedEvent>* results in a *CustomerMovedEventHandler,* but also a request for *IEventHandler<CustomerMovedAbroadEvent>* results in that same *CustomerMovedEventHandler* (because *CustomerMovedEventHandler* also accepts *CustomerMovedAbroadEvents*).
-
-There are multiple ways to achieve this. Here's one:
-
-.. code-block:: c#
-
-    container.Register<CustomerMovedEventHandler>();
-
-    container.RegisterSingleOpenGeneric(typeof(IEventHandler<>), 
-        typeof(ContravarianceEventHandler<>));
-
-This registration depends on the custom *ContravarianceEventHandler<TEvent>* that should be placed close to the registration itself:
+The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbroadEvent* (where *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*) two concrete event handlers *SendFlowerToMovedCustomer* and *WarnShippingDepartmentAboutMove*. These classes can be registered using the following registration:
 
 .. code-block:: c#
 
-    public sealed class ContravarianceEventHandler<TEvent> : IEventHandler<TEvent> {
-        private Registration registration;
-
-        public ContravarianceEventHandler(Container container) {
-            // NOTE: GetCurrentRegistrations has a perf characteristic of O(n), so
-            // make sure this type is registered as singleton.
-            registration = (
-                from reg in container.GetCurrentRegistrations()
-                where typeof(IEventHandler<TEvent>).IsAssignableFrom(reg.ServiceType)
-                select reg)
-                .Single();
-        }
-
-        void IEventHandler<TEvent>.Handle(TEvent e)
-        {
-            var handler = (IEventHandler<TEvent>)this.registration.GetInstance();
-            handler.Handle(e);
-        }
+    // Configuration
+    container.RegisterManyForOpenGeneric(typeof(IValidator<>),
+        container.RegisterAll,
+        typeof(IValidator<>).Assembly);
+		
+    // Usage
+    var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
+	
+	foreach (var handler in handlers) {
+        Console.WriteLine(handler.GetType().Name);
     }
+	
+With the given classes, the code snippet above will give the following output:
 
-The registration ensures that every time an *IEventHandler<TEvent>* is requested, a *ContravarianceEventHandler<TEvent>* is returned. The *ContravarianceEventHandler<TEvent>* will on creation query the container for a single service type that implements the specified *IEventHandler<TEvent>*. Because the *CustomerMovedEventHandler* is the only registered event handler for *IEventHandler<CustomerMovedEvent>*, the *ContravarianceEventHandler<CustomerMovedEvent>* will find that type and call it.
+.. code-block:: c#
 
-This is just one example and one way of adding variance support. For a more elaborate discussion on this subject, please read the following article: `Adding Covariance and Contravariance to Simple Injector <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=90>`_.
+    SendFlowerToMovedCustomer
+    WarnShippingDepartmentAboutMove
+	
+Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEvent>*, the container returned both the registered *IEventHandler<CustomerMovedEvent>* and the registered *IEventHandler<CustomerMovedAbroadEvent>*. Simple Injector did this because the *IEventHandler<in TEvent>* interface was defined with the *in* keyword, which makes *SendFlowerToMovedCustomer* assignable to *IEventHandler<CustomerMovedAbroadEvent>* (since *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*, *SendFlowerToMovedCustomer* can also process *CustomerMovedAbroadEvent* events). 
+
+.. container:: Note
+
+    **Tip**: If you don't want Simple Injector to resolve variant registrations as well, removing all *in* and *out* keywords from the interface definition will prevent Simple Injector from doing so.
+
+.. container:: Note
+	
+	**Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In case you resolve a single instance using *GetInstance<T>*, Simple Injector will not return an assignable type if the exact type is not registered.
 
 .. _Plugins:
 
