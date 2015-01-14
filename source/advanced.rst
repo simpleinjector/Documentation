@@ -332,7 +332,7 @@ For more information about how to use this event, please take a look at the `Res
 Context based injection
 =======================
 
-Context based injection is the ability to inject a particular dependency based on the context it lives in (for change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don't. Simple Injector does *not* contain such a feature out of the box, but this ability can easily be added by using the :doc:`context based injection extension method <ContextDependentExtensions>` code snippet.
+Context based injection is the ability to inject a particular dependency based on the context it lives in (or change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don't. Simple Injector does *not* contain such a feature out of the box, but this ability can easily be added by using the :doc:`context based injection extension method <ContextDependentExtensions>` code snippet.
 
 .. container:: Note
 
