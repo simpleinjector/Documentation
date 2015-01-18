@@ -6,9 +6,10 @@ Appendix
     :maxdepth: 1
 
     Runtime Decorators <RuntimeDecorators>
-	Interception Extensions <InterceptionExtensions>
-	Collection Registration Extensions <CollectionRegistrationExtensions>
-	Context Dependent Extensions <ContextDependentExtensions>
-	T4MVC <t4mvc>
-	InjectProperties is Deprecated <injectproperties-is-deprecated>
-	RegisterMvcAttributeFilterProvider is Deprecated <registermvcattributefilterprovider-is-deprecated>
+    Interception Extensions <InterceptionExtensions>
+    Collection Registration Extensions <CollectionRegistrationExtensions>
+    Context Dependent Extensions <ContextDependentExtensions>
+    Variance Extensions <varianceextensions>
+    T4MVC <t4mvc>
+    InjectProperties is Deprecated <injectproperties-is-deprecated>
+    RegisterMvcAttributeFilterProvider is Deprecated <registermvcattributefilterprovider-is-deprecated>

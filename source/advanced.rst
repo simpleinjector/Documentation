@@ -959,7 +959,7 @@ Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEv
 
 .. container:: Note
 	
-	**Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered.
+    **Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered. Simple Injector does not support this, because there could be multiple assignable implementations and Simple Injector does not know which registration the user expects. An extension method similar to :doc:`this example <varianceextensions>` can be used to add support for this.
 
 .. _Plugins:
 
