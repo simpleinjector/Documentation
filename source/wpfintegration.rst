@@ -2,30 +2,42 @@
 Windows Presentation Foundation Integration Guide
 =================================================
 
-WPF was not designed with dependency injection in mind. Instead of doing constructor injection, there are alternatives. The simplest thing to register the container in the *App* class, store the container in a static field and let *Window* instances request their dependencies from within their default constructor.
+The first step is to properly configure the *App.xaml* markup:
 
-Here is an example of how your *App* code behind could look like:
+.. code-block:: xaml
+
+    <Application x:Class="SimpleInjectorWPF.App"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 Startup="Application_Startup">
+        <!-- Remove the StartupUri property, replace with Startup event handler -->
+        <Application.Resources>
+         
+        </Application.Resources>
+    </Application>
+
+Then *App.xaml.cs* will need to be modified to allow for registration:
 
 .. code-block:: c#
 
     using System.Windows;
     using SimpleInjector;
 
-    public partial class App : Application
-    {
+    public partial class App : Application {
         private static Container container;
 
-        [System.Diagnostics.DebuggerStepThrough]
-        public static TService GetInstance<TService>() where TService : class {
-            return container.GetInstance<TService>();
-        }
-
-        protected override void OnStartup(StartupEventArgs e) {
-            base.OnStartup(e);
+        private void Application_Startup(object sender, StartupEventArgs e) {
             Bootstrap();
+            
+            var window = container.GetInstance<MainWindow>();
+            
+            // Initialize window here, or register an initializer in the 'Bootstrap' method.
+            //
+            
+            window.Show();
         }
 
-        private static void Bootstrap()  {
+        private static void Bootstrap() {
             // Create the container as usual.
             var container = new Container();
 
@@ -35,26 +47,34 @@ Here is an example of how your *App* code behind could look like:
 
             // Optionally verify the container.
             container.Verify();
-
-            // Store the container for use by the application.
-            App.container = container;
         }
     }
-
-With the static *App.GetInstance<T>* method, we can request instances from our *Window* constructors:
+    
+Constructor injection can be used as normal on the *MainWindow* and any other windows:
 
 .. code-block:: c#
 
     using System.Windows;
 
     public partial class MainWindow : Window {
-        private readonly IUserRepository userRepository;
-        private readonly IUserContext userContext;
-
-        public MainWindow() {
-            this.userRepository = App.GetInstance<IUserRepository>();
-            this.userContext = App.GetInstance<IUserContext>();
-
+        public MainWindow(MainWindowViewModel viewModel) {
             InitializeComponent();
+
+            // Assign to the data context so binding can be used.
+            base.DataContext = viewModel;
+        }
+    }
+
+    public class MainWindowViewModel {
+        private IUserRepository userRepository;
+        private IUserContext userContext;
+
+        public IEnumerable<IUser> Users {
+            get { return userRepository.GetAll(); }
+        }
+
+        public MainWindowViewModel(IUserRepository userRepository, IUserContext userContext) {
+            this.userRepository = userRepository;
+            this.userContext = userContext;
         }
     }
