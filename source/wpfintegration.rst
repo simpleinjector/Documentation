@@ -39,7 +39,7 @@ Then *App.xaml.cs* will need to be modified to allow for registration:
 
         private static void Bootstrap() {
             // Create the container as usual.
-            var container = new Container();
+            container = new Container();
 
             // Register your types, for instance:
             container.RegisterSingle<IUserRepository, SqlUserRepository>();
