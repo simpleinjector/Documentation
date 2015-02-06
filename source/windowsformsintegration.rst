@@ -17,10 +17,10 @@ The following code snippet is an example of how to register Simple Injector cont
 
         [STAThread]
         static void Main() {
-            Bootstrap();
-
+        
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Bootstrap();
             Application.Run(container.GetInstance<Form1>());
         }
 
@@ -31,13 +31,10 @@ The following code snippet is an example of how to register Simple Injector cont
             // Register your types, for instance:
             container.RegisterSingle<IUserRepository, SqlUserRepository>();
             container.Register<IUserContext, WinFormsUserContext>();
-			container.Register<Form1>();
+	    container.Register<Form1>();	
 
             // Optionally verify the container.
             container.Verify();
-			
-            // Register the Container class.
-            Program.container = container;
         }
     }
 
