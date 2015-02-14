@@ -15,6 +15,7 @@ Our :doc:`design principles <principles>` have influenced the direction of the d
 * :ref:`No out-of-the-box support for interception <No-interception>`
 * :ref:`Limited batch-registration API <Limited-batch-registration>`
 * :ref:`No per-thread lifestyle <No-per-thread-lifestyle>`
+* :ref:`Allow only a single constructor <One-constructor>`
 
 .. _Container-is-locked:
 
@@ -187,3 +188,17 @@ A web request will typically begin with a call to **GetInstance** which will loa
 Since these instances are registered as Per Thread, they are probably not suited to be used in another thread. They are almost certainly not thread-safe (otherwise they would be registered as Singleton). Since the first thread that initially started the request is already free to pick up new requests, we can run into the situation where two threads access those Per Thread instances simultaneously. This will lead to race conditions and bugs that are hard to diagnose and find.
 
 So in general, using Per Thread is a bad idea and that's why Simple Injector does not support it. If you wish, you can always shoot yourself in the foot by implementing such a custom lifestyle, but don't blame us :-)
+
+.. _One-constructor:
+
+Allow only a single constructor
+===============================
+
+Out of the box, Simple Injector only allows building up types that contain a single public constructor, because we want to adhere to the following principles:
+
+* :ref:`Push developers into best practices <Push-developers-into-best-practices>`
+* :ref:`Never fail silently <Never-fail-silently>`
+
+Having multiple public constructors on the components that you resolve is an anti-pattern. This anti-pattern is described in more detail `here <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=97>`_
+
+This doesn't mean that it is impossible to do auto-wiring on types with multiple public constructors, but with Simple Injector this behavior will have to be :ref:`explicitly configured <Overriding-Constructor-Resolution-Behavior>`.

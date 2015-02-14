@@ -128,7 +128,7 @@ This implementation can be implemented as follows:
 Injecting dependencies into Web API filter attributes
 -----------------------------------------------------
 
-Web API caches filter attribute instances indefinitely per action, effectively making them singletons. This makes them unsuited for dependency injection, since the attributes dependencies will be accidentally promoted to singleton as well, which can cause all sorts of concurrency issues.
+Web API caches filter attribute instances indefinitely per action, effectively making them singletons. This makes them unsuited for dependency injection, since the attribute's dependencies will be accidentally promoted to singleton as well, which can cause all sorts of concurrency issues.
 
 Since dependency injection is not an option here, an other mechanism is advised. There are basically two options here. Which one is best depends on the amount of filter attributes your application needs. If the number of attributes is limited (to a few), the simplest solution is to revert to the Service Locator pattern within your attributes. If the number of attributes is larger, it might be better to make attributes passive.
 
@@ -145,9 +145,9 @@ The following example visualizes this:
     public class MinimumAgeActionFilter : FilterAttribute {
         public readonly int MinimumAge;
 
-		public MinimumAgeActionFilter(int minimumAge) {
-			this.MinimumAge = minimumAge;
-		}
+        public MinimumAgeActionFilter(int minimumAge) {
+            this.MinimumAge = minimumAge;
+        }
 
         public override Task OnActionExecutingAsync(HttpActionContext actionContext,
             CancellationToken cancellationToken)
@@ -155,14 +155,14 @@ The following example visualizes this:
             var checker = DependencyResolver.Current.GetService(typeof(IMinimumAgeChecker))
                 as IMinimumAgeChecker;
 
-			checker.VerifyCurrentUserAge(this.MinimumAge);
+            checker.VerifyCurrentUserAge(this.MinimumAge);
 
             return TaskHelpers.Completed();
         }
     }
 
 By moving all the logic and dependencies out of the attribute, the attribute becomes a small infrastructural piece of code; a humble object that simply forwards the call to the real service.
-	
+    
 If the number of required filter attributes grows, a different model might be in place. In that case you might want to make your attributes passive as explained `here <http://blog.ploeh.dk/2014/06/13/passive-attributes/`_ and `here <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=98`_. Both articles describe different ways to achieve attribute passivity. 
 
 .. _Injecting-dependencies-into-Web-API-message-handlers:
