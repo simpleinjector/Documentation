@@ -23,6 +23,7 @@ Interception Extensions
     public interface IInvocation {
         object InvocationTarget { get; }
         object ReturnValue { get; set; }
+        object[] Args { get; }
         void Proceed();
         MethodBase GetConcreteMethod();
     }
@@ -223,21 +224,22 @@ Interception Extensions
             }
 
             private IMessage InvokeMethodCall(IMethodCallMessage message) {
-                var invocation = new Invocation { Proxy = this, Message = message };
+                var invocation = new Invocation { Proxy = this, Message = message, Args = message.Args };
 
                 invocation.Proceeding += (s, e) => {
                     invocation.ReturnValue = message.MethodBase.Invoke(
-                        this.realInstance, message.Args);
+                        this.realInstance, invocation.Args);
                 };
 
                 this.interceptor.Intercept(invocation);
-                return new ReturnMessage(invocation.ReturnValue, null, 0, null, message);
+                return new ReturnMessage(invocation.ReturnValue, invocation.Args, invocation.Args.Length, null, message);
             }
 
             private class Invocation : IInvocation {
                 public event EventHandler Proceeding;
                 public InterceptorProxy Proxy { get; set; }
                 public IMethodCallMessage Message { get; set; }
+                public object[] Args { get; set; }
                 public object ReturnValue { get; set; }
                 public object InvocationTarget {
                     get { return this.Proxy.realInstance; }
