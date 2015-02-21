@@ -10,7 +10,7 @@ Multiple registrations with the same lifestyle map to the same component.
 Warning Description
 ===================
 
-When multiple registrations with the same lifestyle map to the same component the component is said to have a torn lifestyle. The component is considered torn because each registration will get its own instance of the given component, which can potentially result in multiple instances of the component within a lifetime scope. When the registrations are torn the application may be wired incorrectly which could lead to unexpected behavior.
+When multiple registrations with the same lifestyle map to the same component the component is said to have a torn lifestyle. The component is considered torn because each registration will get its own instance of the given component, which can potentially result in multiple instances of the component within a single :ref:`scope <Scoped>`. When the registrations are torn the application may be wired incorrectly which could lead to unexpected behavior.
 
 How to Fix Violations
 =====================
