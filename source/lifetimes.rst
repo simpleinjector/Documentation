@@ -381,7 +381,7 @@ Execution Context Scoping is an extension package for Simple Injector. It is ava
     container.RegisterExecutionContextScope<IUnitOfWork, NorthwindContext>();
 
     // Or alternatively
-	var scopedLifestyle = new ExecutionContextScopeLifestyle();
+    var scopedLifestyle = new ExecutionContextScopeLifestyle();
     container.Register<IUnitOfWork, NorthwindContext>(scopedLifestyle);
 
 Within an explicitly defined scope, there will be only one instance of a service that is defined with the *Execution Context Scope* lifestyle:
