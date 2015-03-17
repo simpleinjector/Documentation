@@ -2,7 +2,7 @@
 Windows Presentation Foundation Integration Guide
 =================================================
 
-To allow Simple Injector to build up *Window* classes with their dependencies, please follow the given steps below.
+Simple Injector can build up *Window* classes with their dependencies. Use the following steps as a how-to guide:
 
 Step 1:
 -------
@@ -22,7 +22,7 @@ Change the App.xaml markup by removing the *StartUri* property:
 Step 2:
 -------
 
-Add a *Program.cs* file to your project as entry point of the application:
+Add a *Program.cs* file to your project to be the new entry point for the application:
 
 .. code-block:: c#
 
@@ -36,7 +36,7 @@ Add a *Program.cs* file to your project as entry point of the application:
         static void Main() {
             var container = Bootstrap();
 
-            // Possible other configuration, e.g. of your desired MVVM toolkit.
+            // ANy additional other configuration, e.g. of your desired MVVM toolkit.
 
             RunApplication(container);
         }
@@ -72,7 +72,7 @@ Add a *Program.cs* file to your project as entry point of the application:
 Step 3:
 -------
 
-In the properties of your project, change the 'Startup object' to the newly added *Program* class, as shown in the following screen shot:
+Change the 'Startup object' in the properties of your project to be the newly created *Program* class:
 
 .. image:: images/wpfstartupobject.png
    :alt: 'Startup object' settings in the application's properties
@@ -80,7 +80,7 @@ In the properties of your project, change the 'Startup object' to the newly adde
 Usage
 -----
 
-After performing the previous steps, constructor injection can be used on the *MainWindow* and any other windows and their view models. Example:
+Constructor injection can now be used in any windows (e.g. *MainWindow*) and view models:
 
 .. code-block:: c#
 
