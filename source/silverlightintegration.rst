@@ -2,7 +2,7 @@
 Silverlight Integration Guide
 =============================
 
-To allow Simple Injector to build up *Page* classes with their dependencies, it's just a matter of adding a *Bootstrap()* method to the *App* class and resolving the *MainPage* during *Application_Startup*:
+Configuring Simple Injector to build up *Page* classes with their dependencies is simply a matter of adding a *Bootstrap()* method to the *App* class and resolving the *MainPage* during *Application_Startup*:
 
 .. code-block:: c#
 
@@ -45,7 +45,7 @@ To allow Simple Injector to build up *Page* classes with their dependencies, it'
 Usage
 -----
 
-After this, constructor injection can be used on the *MainPage* and any other pages and their view models. Example:
+Constructor injection can now be used in any pages (e.g. *MainPage*) and view models:
 
 .. code-block:: c#
 
