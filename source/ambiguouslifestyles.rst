@@ -1,3 +1,5 @@
+.. _ambiguouslifestyles:
+
 =========================================
 Diagnostic Warning - Ambiguous Lifestyles
 =========================================
@@ -10,7 +12,7 @@ Multiple registrations with the different lifestyles map to the same component.
 Warning Description
 ===================
 
-When multiple registrations with a different lifestyle map to the same component, the component is said to have ambiguous lifestyles. Having one single component with multiple lifestyles, will cause instances of that component to be cached in different ways and this can lead to behavior that you might not expect.
+When multiple registrations with a different lifestyle map to the same component, the component is said to have ambiguous lifestyles. Having one single component with multiple lifestyles will cause instances of that component to be cached in different ways and this can lead to behavior that you might not expect.
 
 For instance, having a single component that is registered both as Singleton and as Transient hardly ever makes sense, because the singleton registration implies that it is thread-safe, while the transient registration means that it, or one of its dependencies, is not thread-safe and should not be reused. One of the registrations of this component will likely be wrong.
 

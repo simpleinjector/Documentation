@@ -20,6 +20,11 @@ This warning signals the possible use of a short circuited dependency in a compo
 
 When a component depends on a short circuited dependency, the application might be wired incorrectly because the flagged component gets a different instance of that concrete type than other components in the application will get. This can result in incorrect behavior.
 
+.. container:: Note
+
+    **Note**: This warning is a specialized version of the :ref:`Ambiguous Lifestyles <ambiguouslifestyles>` warning.
+
+
 How to Fix Violations
 =====================
 
@@ -82,7 +87,3 @@ The following example shows how to query the Diagnostic API for Short Circuited 
             Console.WriteLine("-" + expected.ServiceType.FullName);
         }
     }
-
-.. container:: Note
-
-    **Note**: The Diagnostic API is new in Simple Injector v2.4.

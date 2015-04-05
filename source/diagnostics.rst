@@ -19,12 +19,16 @@ Another option is to add the **container** variable to the Visual Studio watch w
 .. image:: images/diagnostics2.png 
    :alt: Diagnostics debugger view watch window
 
-The debugger views also allow visualizing your application's dependency graphs. This can give you a good view of what the end result of your DI configuration is. By drilling into the list of **Registrations** or **Root Registrations**, you can select the text visualizer (the magnifying glass icon) on the **DependencyGraph** property on any of the lister registrations:
+The debugger views also allow visualizing your application's dependency graphs. This can give you a good view of what the end result of your DI configuration is. By drilling into the list of **Registrations** or **Root Registrations**, you can select the text visualizer (the magnifying glass icon) on the **DependencyGraph** property on any of the listed registrations:
 
 .. image:: images/dependencygraph.png 
    :alt: Viewing dependency graphs  
-   
-This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the **SimpleInjector.Diagnostics.dll**. This dll is part of the core NuGet package. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:
+
+.. container:: Note
+
+    **Note**: **Root Registrations** are registrations that are not depended upon by any other registration (or at least, not that Simple Injector can statically determine). They form the starting point of an object graph and are usually the types that are directly resolved from the container.
+
+This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the **SimpleInjector.Diagnostics** namespace. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:
 
 .. code-block:: c#
 
@@ -43,7 +47,51 @@ This same information can be requested programmatically by using the Diagnostic 
                 from result in results
                 select result.Description));
     }
+	
+Instead of interacting with the Diagnostic API directly, you can force the container to fail fast during verification in case one of the more severe warnings is detected:
 
+.. code-block:: c#
+
+	var container = Bootstrapper.GetInitializedContainer();
+
+	container.Verify(VerificationOption.VerifyAndDiagnose);
+
+When calling *Verify(VerificationOption.VerifyAndDiagnose)*, the container will check for the warning types that are most likely to cause bugs in your application. By calling this overload during application startup, or inside an integration test, you'll keep the feedback cycle as short as possible, and you'll get notified about possible bugs that otherwise might have stayed undetected for much too long.
+	
+
+Suppressing warnings
+====================
+
+There are rare cases that you want to ignore the warning system for specific registrations. There are scenarios where you are sure that the presented warning does not cause any harm in your case and changing the application's design is not feasible. In such situation you can suppress warnings on a case by case basis. This prevents a call to *Verify(VerificationOption.VerifyAndDiagnose)* from throwing an exception, it prevents the warning from popping up in the debugger, and it prevents the *Analyzer.Analyze()* method from returning that warning.
+
+A warning can be suppressed by disabling a specific warning type on a *Registration* object. Example:
+
+.. code-block:: c#
+
+    var registration =
+        Lifestyle.Transient.CreateRegistration(typeof(HomeController), container);
+
+    container.AddRegistration(typeof(HomeController), registration);
+
+    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+
+In the previous code sample, a *Registration* instance for the *HomeController* type is created and registered in the container. This *Registration* instance is explicitly marked to suppress the diagnostic warning type **Disposable Transient Component**.
+
+Suppressing this warning type for an MVC controller makes sense, because the MVC framework will ensure proper disposal of MVC controllers.
+
+Alternatively, you can also request an already made registered and suppress a warning on that:
+	
+.. code-block:: c#
+
+    var registration = container.GetRegistration(typeof(HomeController)).Registration;
+
+    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+
+.. container:: Note
+
+    **Tip**: *RegisterMvcControllers* extension method of the **SimpleInjector.Integration.Web.Mvc.dll** will batch-register all MVC controllers and will automatically suppress the **Disposable Transient Component** warning on controller types.
+
+	
 Limitations
 ===========
 
@@ -51,7 +99,7 @@ Limitations
 
     **Warning**: Although the *Container* can spot several configuration mistakes, be aware that there will always be ways to make configuration errors that the Diagnostic Services cannot identify. Wiring your dependencies is a delicate matter and should be done with care. Always follow best practices.
 
-The **Diagnostic Services** work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as analyzing constructor arguments) can be analyzed. The *Container* uses the following information for analysis:
+The **Diagnostic Services** work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as  constructor arguments) can be analyzed. The *Container* uses the following information for analysis:
 
 * Constructor arguments of types that are created by the container (auto-wired types).
 * Dependencies added by :ref:`Decorators`.
@@ -60,7 +108,7 @@ The **Diagnostic Services** work by analyzing all information that is known by t
 The Diagnostic Services **cannot** analyze the following:
 
 * Types that are completely unknown, because these types are not registered explicitly and no registered type depends on them. In general you should register all root types (types that are requested directly by calling **GetInstance<T>()**, such as MVC Controllers) explicitly.
-* Open-generic registrations that are resolved as root type (no registered type depends on them). Since the container uses unregistered type resolution, those registrations will be unknown untill they are resolved. Prefer registering each closed-generic version explicitly, or add unit tests to verify that these root types can be resolved.
+* Open-generic registrations that are resolved as root type (no registered type depends on them). Since the container uses unregistered type resolution, those registrations will be unknown until they are resolved. Prefer registering each closed-generic version explicitly, or add unit tests to verify that these root types can be resolved.
 * Dependencies added using the `RegisterInitializer <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm>`_ method:
 
 .. code-block:: c#
@@ -80,7 +128,6 @@ The Diagnostic Services **cannot** analyze the following:
         container.GetInstance<ILogger>(),
         container.GetInstance<ITimeProvider>()));
 
-* Any dependencies that are injected using the (now deprecated) `InjectProperties <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_InjectProperties.htm>`_ method will not be seen as dependencies of the type they are injected into.
 * Dependencies that are resolved by requesting them manually from the *Container*, for instance by injecting the *Container* into a class and then calling *container.GetInstance<T>()* from within that class:
 
 .. code-block:: c#
@@ -97,7 +144,7 @@ The Diagnostic Services **cannot** analyze the following:
 
 .. container:: Note
 
-    **Tip**: Try to prevent depending on any framework features listed above because they all prevent you from having a :ref:`verifiable configuration <Verify-Configuration>` and trustworthy diagnostic results.
+    **Tip**: Try to prevent depending on any features listed above because they all prevent you from having a :ref:`verifiable configuration <Verify-Configuration>` and trustworthy diagnostic results.
 
 Supported Warnings
 ==================
@@ -110,5 +157,5 @@ Supported Warnings
     Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
     Container-Registered Types <ContainerRegisteredTypes>
     Torn Lifestyle <tornlifestyle>
-	Ambigious Lifestyles <ambiguouslifestyles>
+	Ambiguous Lifestyles <ambiguouslifestyles>
     Disposable Transient Components <disposabletransientcomponent>

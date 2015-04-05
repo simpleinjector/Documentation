@@ -14,7 +14,7 @@ Psychological studies show that the human mind has difficulty dealing with more 
 
 So in general, components should only depend on a few other components. When a component depends on many other components (usually caused by constructor over-injection), it might indicate that the component has too many responsibilities. In other words it might be a sign that the component violates the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). Violations of the SRP will often lead to maintainability issues later on in the application lifecycle.
 
-The general consensus is that a constructor with more than 4 or 5 dependencies is a code smell. To prevent too many false positives, the threshold for the Diagnostic Services is 6 dependencies, so you'll start to see warnings on types with 7 or more dependencies.
+The general consensus is that a constructor with more than 4 or 5 dependencies is a code smell. To prevent too many false positives, the threshold for the Diagnostic Services is 7 dependencies, so you'll start to see warnings on types with 8 or more dependencies.
 
 How to Fix Violations
 =====================
@@ -32,6 +32,15 @@ When to Ignore Warnings
 
 This warning can safely be ignored when the type in question does not violate the SRP and the number of dependencies is stable (does not change often).
 
+The warning can be suppressed on a per-registration basis as follows:
+	
+.. code-block:: c#
+
+    Registration registration = container.GetRegistration(typeof(IFoo)).Registration;
+
+    registration.SuppressDiagnosticWarning(DiagnosticType.SingleResponsibilityViolation);
+
+	
 Example
 =======
 
@@ -46,11 +55,12 @@ Example
             IBarService barService,
             ICoffeeMaker coffeeMaker,
             IKitchenSink kitchenSink,
-            IIceCubeProducer iceCubeProducer) {
+            IIceCubeProducer iceCubeProducer,
+            IWaterCooker waterCooker) {
         }
     }
 
-The **Foo** class has 7 dependencies and when it is registered in the container, it will result in the warning. Here is an example of this warning in the watch window:
+The **Foo** class has 8 dependencies and when it is registered in the container, it will result in the warning. Here is an example of this warning in the watch window:
 
 .. image:: images/srp.png 
    :alt: Debugger watch window showing the SRP violation
