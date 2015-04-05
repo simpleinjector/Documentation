@@ -97,12 +97,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -166,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -177,12 +180,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -251,7 +255,7 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: Instead of having a WCF service layer consisting of many service classes and methods, consider a design that consists of just a single service class with a single method as explained in <a class="reference external" href="http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=95">this article</a>. A design where operations are communicated through messages allows the creation of highly maintainable WCF services. With such a design, this integration package will be ??redundant.</div>
+<strong>Note</strong>: Instead of having a WCF service layer consisting of many service classes and methods, consider a design that consists of just a single service class with a single method as explained in <a class="reference external" href="http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=95">this article</a>. A design where operations are communicated through messages allows the creation of highly maintainable WCF services. With such a design, this integration package will be redundant.</div>
 <div class="section" id="was-hosting-and-non-http-activation">
 <h2>WAS Hosting and Non-HTTP Activation<a class="headerlink" href="#was-hosting-and-non-http-activation" title="Permalink to this headline">¶</a></h2>
 <p>When hosting WCF Services in WAS (Windows Activation Service), you are not given an opportunity to build your container in the Application_Start event defined in your Global.asax because WAS doesn&#8217;t use the standard ASP.NET pipeline. A workaround for this is to move the container initialization to a static constructor</p>
@@ -272,7 +276,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Your custom <em>ServiceHostFactory</em> can no use the static <strong>Bootstrapper.Container</strong> field:</p>
+<p>Your custom <em>ServiceHostFactory</em> can now use the static <strong>Bootstrapper.Container</strong> field:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">WcfServiceFactory</span> <span class="p">:</span> <span class="n">SimpleInjectorServiceHostFactory</span> <span class="p">{</span>
     <span class="k">protected</span> <span class="k">override</span> <span class="n">ServiceHost</span> <span class="nf">CreateServiceHost</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">,</span>
         <span class="n">Uri</span><span class="p">[]</span> <span class="n">baseAddresses</span><span class="p">)</span> <span class="p">{</span>
@@ -316,7 +320,6 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx">InstanceContextMode enumeration</a>. Components that are registered <em>PerWcfOperation</em> live as long as the WCF service class they are injected into.</p>
 <p>For each service class, you should supply a factory attribute in the .SVC file of each service class. For instance:</p>
 <div class="highlight-xml"><div class="highlight"><pre>&lt;%@ ServiceHost
     Service=&quot;UserService&quot;
@@ -326,8 +329,6 @@
 %&gt;
 </pre></div>
 </div>
-<div class="note container">
-<strong>Note</strong>: Instead of having a WCF service layer consisting of many service classes and methods, consider a design that consists of just a single service class with a single method as explained in <a class="reference external" href="http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=95">this article</a>. A design where operations are communicated through messages allows the creation of highly maintainable WCF services. With such a design, this integration package will be ??redundant.</div>
 </div>
 </div>
 

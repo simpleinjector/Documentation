@@ -30,7 +30,7 @@
   
     <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
         <link rel="up" title="Diagnostic Services" href="diagnostics.html"/>
-        <link rel="next" title="Diagnostic Warning - Disposable Transient Components" href="disposabletransientcomponent.html"/>
+        <link rel="next" title="Diagnostic Warning - Ambiguous Lifestyles" href="ambiguouslifestyles.html"/>
         <link rel="prev" title="Diagnostic Warning - Container-registered Types" href="ContainerRegisteredTypes.html"/> 
 
   
@@ -97,12 +97,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -166,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -177,12 +180,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -230,15 +234,22 @@
 </div>
 <div class="section" id="warning-description">
 <h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
-<p>When multiple registrations with the same lifestyle map to the same component the component is said to have a torn lifestyle. The component is considered torn because each registration will get its own instance of the given component, which can potentially result in multiple instances of the component within a lifetime scope. When the registrations are torn the application may be wired incorrectly which could lead to unexpected behavior.</p>
+<p>When multiple registrations with the same lifestyle map to the same component, the component is said to have a torn lifestyle. The component is considered torn because each registration will get its own instance of the given component, which can potentially result in multiple instances of the component within a single <a class="reference internal" href="lifetimes.html#scoped"><em>scope</em></a>. When the registrations are torn the application may be wired incorrectly which could lead to unexpected behavior.</p>
 </div>
 <div class="section" id="how-to-fix-violations">
 <h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
-<p>Create a <em>Registration</em> instance for that component using <em>Lifestyle.CreateRegistration</em> and use that for both registrations.</p>
+<p>Create a <em>Registration</em> instance for that component using <em>Lifestyle.CreateRegistration</em> and use that for both registrations. Alternatively, consider making both registrations <em>Transient</em>.</p>
 </div>
 <div class="section" id="when-to-ignore-warnings">
 <h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
 <p>This warning can safely be ignored your intention is to have multiple instances of the flagged component (one for each registration) in the same scope.</p>
+<p>The warning can be suppressed on a per-registration basis as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">fooRegistration</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IFoo</span><span class="p">)).</span><span class="n">Registration</span><span class="p">;</span>
+<span class="kt">var</span> <span class="n">barRegistration</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IBar</span><span class="p">)).</span><span class="n">Registration</span><span class="p">;</span>
+<span class="n">fooRegistration</span><span class="p">.</span><span class="n">SuppressDiagnosticWarning</span><span class="p">(</span><span class="n">DiagnosticType</span><span class="p">.</span><span class="n">TornLifestyle</span><span class="p">);</span>
+<span class="n">barRegistration</span><span class="p">.</span><span class="n">SuppressDiagnosticWarning</span><span class="p">(</span><span class="n">DiagnosticType</span><span class="p">.</span><span class="n">TornLifestyle</span><span class="p">);</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
@@ -289,7 +300,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="disposabletransientcomponent.html" class="btn btn-neutral float-right" title="Diagnostic Warning - Disposable Transient Components"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="ambiguouslifestyles.html" class="btn btn-neutral float-right" title="Diagnostic Warning - Ambiguous Lifestyles"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="ContainerRegisteredTypes.html" class="btn btn-neutral" title="Diagnostic Warning - Container-registered Types"><span class="fa fa-arrow-circle-left"></span> Previous</a>

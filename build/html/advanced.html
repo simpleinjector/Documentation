@@ -96,12 +96,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -165,6 +167,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -176,12 +179,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -423,7 +427,7 @@
 <span class="p">});</span>
 </pre></div>
 </div>
-<p>In the previous example a set of <em>IValidator&lt;T&gt;</em> implementations are supplied to the <strong>RegisterAll</strong> overload. This list contains one generic implementation, namely <em>DataAnnotationsValidator&lt;T&gt;</em>. This leads to a registration that is equivalent to the following manual registration:</p>
+<p>In the previous example a set of <em>IValidator&lt;T&gt;</em> implementations is supplied to the <strong>RegisterAll</strong> overload. This list contains one generic implementation, namely <em>DataAnnotationsValidator&lt;T&gt;</em>. This leads to a registration that is equivalent to the following manual registration:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">IValidator</span><span class="p">&lt;</span><span class="n">Customer</span><span class="p">&gt;&gt;(</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">DataAnnotationsValidator</span><span class="p">&lt;</span><span class="n">Customer</span><span class="p">&gt;),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">CustomerValidator</span><span class="p">),</span>
@@ -441,17 +445,27 @@
 <p>In other words, the supplied non-generic types are grouped by their closed <em>IValidator&lt;T&gt;</em> interface and the <em>DataAnnotationsValidator&lt;T&gt;</em> is applied to every group. This leads to three seperate <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> registrations. One for each closed-generic <em>IValidator&lt;T&gt;</em> type.</p>
 <div class="note container">
 <strong>Note</strong>: <strong>RegisterAll</strong> is guaranteed to preserve the order of the types that you supply.</div>
-<p>But besides these three <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> registrations, an invisible fourth registration is made. This is a registration that hooks onto the <strong>unregistered type resolution</strong> and this will ensure that any time an <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> for a <em>T</em> that is anything other than <em>Customer</em>, <em>Employee</em> and <em>Order</em>, an <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> is returned that contains the closed-generic versions of the supplied open-generic types; <em>DataAnnotationsValidator&lt;T&gt;</em> in the given example.</p>
+<p>But besides these three <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> registrations, an invisible fourth registration is made. This is a registration that hooks onto the <strong>unregistered type resolution</strong> event and this will ensure that any time an <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> for a <em>T</em> that is anything other than <em>Customer</em>, <em>Employee</em> and <em>Order</em>, an <em>IEnumerable&lt;IValidator&lt;T&gt;&gt;</em> is returned that contains the closed-generic versions of the supplied open-generic types; <em>DataAnnotationsValidator&lt;T&gt;</em> in the given example.</p>
 <div class="note container">
 <strong>Note</strong>: This will work equally well when the open generic types contain type constraints. In that case those types will be applied conditionally to the collections based on their generic type constraints.</div>
-<p>In most cases however, manually supplying the <strong>RegisterAll</strong> with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of the <strong>GetTypesToRegister</strong> of the <em>OpenGenericBatchRegistrationExtensions</em> class to find the types for us:</p>
+<p>In most cases however, manually supplying the <strong>RegisterAll</strong> with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the <strong>RegisterAll</strong> overloads that accepts the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Extensions_BatchRegistrationCallback.htm">BatchRegistrationCallback</a> delegate and append the open generic type separately:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Extension method from the SimpleInjector.Advanced namespace.</span>
+<span class="n">container</span><span class="p">.</span><span class="n">AppendToCollection</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">DataAnnotationsValidator</span><span class="p">&lt;&gt;));</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterManyForOpenGeneric</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span>
+    <span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">implTypes</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">implTypes</span><span class="p">),</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Alternatively, we can make use of the <strong>GetTypesToRegister</strong>  method of the <em>OpenGenericBatchRegistrationExtensions</em> class to find the types for us:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">List</span><span class="p">&lt;</span><span class="n">Type</span><span class="p">&gt;</span> <span class="n">typesToRegister</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Type</span><span class="p">&gt;</span> <span class="p">{</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">DataAnnotationsValidator</span><span class="p">&lt;&gt;)</span>
 <span class="p">};</span>
 
 <span class="n">typesToRegister</span><span class="p">.</span><span class="n">AddRange</span><span class="p">(</span>
     <span class="n">OpenGenericBatchRegistrationExtensions</span><span class="p">.</span><span class="n">GetTypesToRegister</span><span class="p">(</span><span class="n">container</span><span class="p">,</span>
-        <span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span> <span class="n">AppDomain</span><span class="p">.</span><span class="n">CurrentDomain</span><span class="p">.</span><span class="n">GetAssemblies</span><span class="p">()));</span>
+        <span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span>
+        <span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;).</span><span class="n">Assembly</span><span class="p">));</span>
 
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IValidator</span><span class="p">&lt;&gt;),</span> <span class="n">typesToRegister</span><span class="p">);</span>
 </pre></div>
@@ -933,7 +947,7 @@ The <strong>RegisterManyForOpenGeneric</strong> overloads that accept a list of 
 <span class="c1">// Usage</span>
 <span class="kt">var</span> <span class="n">handlers</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetAllInstances</span><span class="p">&lt;</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedAbroadEvent</span><span class="p">&gt;&gt;();</span>
 
-    <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">handler</span> <span class="k">in</span> <span class="n">handlers</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">handler</span> <span class="k">in</span> <span class="n">handlers</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">handler</span><span class="p">.</span><span class="n">GetType</span><span class="p">().</span><span class="n">Name</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>

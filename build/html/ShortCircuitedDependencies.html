@@ -97,12 +97,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -166,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -177,12 +180,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -239,6 +243,8 @@
 <li>and where the lifestyle of this explicit registration differs from the unregistered type (in normal cases this means that the explicit registration is not <strong>Transient</strong>)</li>
 </ul>
 <p>When a component depends on a short circuited dependency, the application might be wired incorrectly because the flagged component gets a different instance of that concrete type than other components in the application will get. This can result in incorrect behavior.</p>
+<div class="note container">
+<strong>Note</strong>: This warning is a specialized version of the <a class="reference internal" href="ambiguouslifestyles.html#ambiguouslifestyles"><em>Ambiguous Lifestyles</em></a> warning.</div>
 </div>
 <div class="section" id="how-to-fix-violations">
 <h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
@@ -291,8 +297,6 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="note container">
-<strong>Note</strong>: The Diagnostic API is new in Simple Injector v2.4.</div>
 </div>
 </div>
 

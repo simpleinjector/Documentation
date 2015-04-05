@@ -97,12 +97,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -166,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -177,12 +180,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -232,7 +236,7 @@
 <h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
 <p>Psychological studies show that the human mind has difficulty dealing with more than seven things at once. This is related to the concept of <a class="reference external" href="http://it.toolbox.com/blogs/enterprise-solutions/design-principles-fanin-vs-fanout-16088">High Fan In - Low Fan Out</a>. Lowering the number of dependencies (fan out) that a class has can therefore reduce complexity and increase maintainability of such class.</p>
 <p>So in general, components should only depend on a few other components. When a component depends on many other components (usually caused by constructor over-injection), it might indicate that the component has too many responsibilities. In other words it might be a sign that the component violates the <a class="reference external" href="https://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> (SRP). Violations of the SRP will often lead to maintainability issues later on in the application lifecycle.</p>
-<p>The general consensus is that a constructor with more than 4 or 5 dependencies is a code smell. To prevent too many false positives, the threshold for the Diagnostic Services is 6 dependencies, so you&#8217;ll start to see warnings on types with 7 or more dependencies.</p>
+<p>The general consensus is that a constructor with more than 4 or 5 dependencies is a code smell. To prevent too many false positives, the threshold for the Diagnostic Services is 7 dependencies, so you&#8217;ll start to see warnings on types with 8 or more dependencies.</p>
 </div>
 <div class="section" id="how-to-fix-violations">
 <h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
@@ -244,6 +248,12 @@
 <div class="section" id="when-to-ignore-warnings">
 <h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
 <p>This warning can safely be ignored when the type in question does not violate the SRP and the number of dependencies is stable (does not change often).</p>
+<p>The warning can be suppressed on a per-registration basis as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">Registration</span> <span class="n">registration</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IFoo</span><span class="p">)).</span><span class="n">Registration</span><span class="p">;</span>
+
+<span class="n">registration</span><span class="p">.</span><span class="n">SuppressDiagnosticWarning</span><span class="p">(</span><span class="n">DiagnosticType</span><span class="p">.</span><span class="n">SingleResponsibilityViolation</span><span class="p">);</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
@@ -256,12 +266,13 @@
         <span class="n">IBarService</span> <span class="n">barService</span><span class="p">,</span>
         <span class="n">ICoffeeMaker</span> <span class="n">coffeeMaker</span><span class="p">,</span>
         <span class="n">IKitchenSink</span> <span class="n">kitchenSink</span><span class="p">,</span>
-        <span class="n">IIceCubeProducer</span> <span class="n">iceCubeProducer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">IIceCubeProducer</span> <span class="n">iceCubeProducer</span><span class="p">,</span>
+        <span class="n">IWaterCooker</span> <span class="n">waterCooker</span><span class="p">)</span> <span class="p">{</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <strong>Foo</strong> class has 7 dependencies and when it is registered in the container, it will result in the warning. Here is an example of this warning in the watch window:</p>
+<p>The <strong>Foo</strong> class has 8 dependencies and when it is registered in the container, it will result in the warning. Here is an example of this warning in the watch window:</p>
 <img alt="Debugger watch window showing the SRP violation" src="_images/srp.png" />
 <p>The following example shows how to query the Diagnostic API for possible Single Responsibility Violations:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Diagnostics;</span>

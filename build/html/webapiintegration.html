@@ -97,12 +97,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -166,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -177,12 +180,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -229,7 +233,7 @@
 <strong>Note</strong>: To be able to run the Web API integration packages, <a class="reference external" href="https://stackoverflow.com/questions/22392032/are-there-any-technical-reasons-simpleinjector-cannot-support-webapi-on-net-4-0">you need</a> <em>.NET 4.5</em> or above.</div>
 <div class="section" id="basic-setup">
 <span id="web-api-basic-setup"></span><h2>Basic setup<a class="headerlink" href="#basic-setup" title="Permalink to this headline">¶</a></h2>
-<p>The following code snippet shows how to use the use the integration package (note that the quick start package injects this code for you).</p>
+<p>The following code snippet shows how to use the integration package (note that the quick start package injects this code for you).</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// You&#39;ll need to include the following namespaces</span>
 <span class="k">using</span> <span class="nn">System.Web.Http</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
@@ -256,7 +260,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>With this configuration, ASP.NET Web API will create new <em>IHttpController</em> instances through the container. Because controllers are concrete classes, the container will be able to create them without any registration. However, to be able to <a class="reference internal" href="diagnostics.html"><em>diagnose</em></a> and <a class="reference internal" href="howto.html#verify-configuration"><em>verify</em></a> the container&#8217;s configuration, it is important to register all root types explicitly.</p>
+<p>With this configuration, ASP.NET Web API will create new <em>IHttpController</em> instances through the container. Because controllers are concrete classes, the container will be able to create them without any registration. However, to be able to <a class="reference internal" href="howto.html#verify-configuration"><em>verify</em></a> and <a class="reference internal" href="diagnostics.html"><em>diagnose</em></a> the container&#8217;s configuration, it is important to register all root types explicitly.</p>
 <div class="note container">
 <strong>Note</strong>: For Web API applications the use of the <strong>WebApiRequestLifestyle</strong> is advised over the <strong>WebRequestLifestyle</strong>. Please take a look at the <a class="reference internal" href="lifetimes.html#webapirequest-vs-webrequest"><em>Web API Request Object Lifestyle Management wiki page</em></a> for more information.</div>
 <p>Given the configuration above, an actual controller could look like this:</p>
@@ -321,12 +325,37 @@
 </div>
 <div class="section" id="injecting-dependencies-into-web-api-filter-attributes">
 <span id="id1"></span><h3>Injecting dependencies into Web API filter attributes<a class="headerlink" href="#injecting-dependencies-into-web-api-filter-attributes" title="Permalink to this headline">¶</a></h3>
-<p>Simple Injector allows integrating Web API filter attributes with the Simple Injector pipeline. This means that Simple Injector can inject properties into those attributes and allow any registered initializer delegates to be applied to those attributes. Constructor injection however is out of the picture. Since it is the reflection API of the CLR that is responsible for creating attributes, it&#8217;s impossible to inject dependencies into the attribute&#8217;s constructor.</p>
-<p>To allow attributes to be integrated into the Simple Injector pipeline, you have to register a custom filter provider as follows:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterWebApiFilterProvider</span><span class="p">(</span><span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">);</span>
+<p>Web API caches filter attribute instances indefinitely per action, effectively making them singletons. This makes them unsuited for dependency injection, since the attribute&#8217;s dependencies will be accidentally promoted to singleton as well, which can cause all sorts of concurrency issues.</p>
+<p>Since dependency injection is not an option here, an other mechanism is advised. There are basically two options here. Which one is best depends on the amount of filter attributes your application needs. If the number of attributes is limited (to a few), the simplest solution is to revert to the Service Locator pattern within your attributes. If the number of attributes is larger, it might be better to make attributes passive.</p>
+<p>Reverting to the Service Locator pattern means that you need to do the following:</p>
+<ul class="simple">
+<li>Extract all the attribute&#8217;s logic -with its dependencies- into a new service class.</li>
+<li>Resolve this service from within the filter attribute&#8217;s <cite>OnActionExecXXX</cite> methods, but don&#8217;t store the resolved service in a private field.</li>
+<li>Call the service&#8217;s method.</li>
+</ul>
+<p>The following example visualizes this:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MinimumAgeActionFilter</span> <span class="p">:</span> <span class="n">FilterAttribute</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">readonly</span> <span class="kt">int</span> <span class="n">MinimumAge</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">MinimumAgeActionFilter</span><span class="p">(</span><span class="kt">int</span> <span class="n">minimumAge</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">MinimumAge</span> <span class="p">=</span> <span class="n">minimumAge</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">override</span> <span class="n">Task</span> <span class="nf">OnActionExecutingAsync</span><span class="p">(</span><span class="n">HttpActionContext</span> <span class="n">actionContext</span><span class="p">,</span>
+        <span class="n">CancellationToken</span> <span class="n">cancellationToken</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">checker</span> <span class="p">=</span> <span class="n">GlobalConfiguration</span><span class="p">.</span><span class="n">Configuration</span><span class="p">.</span><span class="n">DependencyResolver</span><span class="p">.</span><span class="n">GetService</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IMinimumAgeChecker</span><span class="p">))</span>
+            <span class="k">as</span> <span class="n">IMinimumAgeChecker</span><span class="p">;</span>
+
+        <span class="n">checker</span><span class="p">.</span><span class="n">VerifyCurrentUserAge</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">MinimumAge</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="n">TaskHelpers</span><span class="p">.</span><span class="n">Completed</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>This ensures that attributes are initialized by Simple Injector according to the container&#8217;s configuration. This by itself however, doesn&#8217;t do much, since Simple Injector will not inject any properties by default. By registering a custom <strong>IPropertySelectionBehavior</strong> however, you can property injection to take place on attributes. An example of such custom behavior is given <a class="reference internal" href="advanced.html#importpropertyselectionbehavior"><em>here</em></a> in the advanced sections of the wiki.</p>
+<p>By moving all the logic and dependencies out of the attribute, the attribute becomes a small infrastructural piece of code; a humble object that simply forwards the call to the real service.</p>
+<p>If the number of required filter attributes grows, a different model might be in place. In that case you might want to make your attributes <a class="reference external" href="http://blog.ploeh.dk/2014/06/13/passive-attributes/">passive</a> as explained <a class="reference external" href="https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=98">here</a>.</p>
 </div>
 <div class="section" id="injecting-dependencies-into-web-api-message-handlers">
 <span id="id2"></span><h3>Injecting dependencies into Web API message handlers<a class="headerlink" href="#injecting-dependencies-into-web-api-message-handlers" title="Permalink to this headline">¶</a></h3>

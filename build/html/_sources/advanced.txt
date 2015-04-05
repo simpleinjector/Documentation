@@ -269,7 +269,7 @@ To register collections that contain both non-generic and open-generic component
         typeof(OrderValidator) // implements IValidator<Order>
     });
 
-In the previous example a set of *IValidator<T>* implementations are supplied to the **RegisterAll** overload. This list contains one generic implementation, namely *DataAnnotationsValidator<T>*. This leads to a registration that is equivalent to the following manual registration:
+In the previous example a set of *IValidator<T>* implementations is supplied to the **RegisterAll** overload. This list contains one generic implementation, namely *DataAnnotationsValidator<T>*. This leads to a registration that is equivalent to the following manual registration:
 
 .. code-block:: c#
 
@@ -290,15 +290,26 @@ In other words, the supplied non-generic types are grouped by their closed *IVal
 
 .. container:: Note
 
-    **Note**: **RegisterAll** is guaranteed to preserve the order of the types that you supply.	
-		
-But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible fourth registration is made. This is a registration that hooks onto the **unregistered type resolution** and this will ensure that any time an *IEnumerable<IValidator<T>>* for a *T* that is anything other than *Customer*, *Employee* and *Order*, an *IEnumerable<IValidator<T>>* is returned that contains the closed-generic versions of the supplied open-generic types; *DataAnnotationsValidator<T>* in the given example.
+    **Note**: **RegisterAll** is guaranteed to preserve the order of the types that you supply.    
+        
+But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible fourth registration is made. This is a registration that hooks onto the **unregistered type resolution** event and this will ensure that any time an *IEnumerable<IValidator<T>>* for a *T* that is anything other than *Customer*, *Employee* and *Order*, an *IEnumerable<IValidator<T>>* is returned that contains the closed-generic versions of the supplied open-generic types; *DataAnnotationsValidator<T>* in the given example.
 
 .. container:: Note
 
     **Note**: This will work equally well when the open generic types contain type constraints. In that case those types will be applied conditionally to the collections based on their generic type constraints.
 
-In most cases however, manually supplying the **RegisterAll** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of the **GetTypesToRegister** of the *OpenGenericBatchRegistrationExtensions* class to find the types for us:
+In most cases however, manually supplying the **RegisterAll** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the **RegisterAll** overloads that accepts the `BatchRegistrationCallback <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Extensions_BatchRegistrationCallback.htm>`_ delegate and append the open generic type separately:
+
+.. code-block:: c#
+
+    // Extension method from the SimpleInjector.Advanced namespace.
+    container.AppendToCollection(typeof(IValidator<>), typeof(DataAnnotationsValidator<>));
+
+    container.RegisterManyForOpenGeneric(typeof(IValidator<>),
+        (serviceType, implTypes) => container.RegisterAll(serviceType, implTypes),
+        typeof(IValidator<>).Assembly);        
+
+Alternatively, we can make use of the **GetTypesToRegister**  method of the *OpenGenericBatchRegistrationExtensions* class to find the types for us:
 
 .. code-block:: c#
 
@@ -308,7 +319,8 @@ In most cases however, manually supplying the **RegisterAll** with a list of typ
     
     typesToRegister.AddRange(
         OpenGenericBatchRegistrationExtensions.GetTypesToRegister(container,
-            typeof(IValidator<>), AppDomain.CurrentDomain.GetAssemblies()));
+            typeof(IValidator<>), 
+            typeof(IValidator<>).Assembly));
 
     container.RegisterAll(typeof(IValidator<>), typesToRegister);
         
@@ -522,7 +534,7 @@ Taking the same *AsyncCommandHandlerDecorator<T>* as an example, it could be imp
                     handler.Handle(command);
                 } catch (Exception ex) {
                     // log the exception
-                }			
+                }            
             });
         }
     }
@@ -613,7 +625,7 @@ This proxy class starts a new :ref:`lifetime scope lifestyle <PerLifetimeScope>`
 .. container:: Note
 
     **Note**: Since the *LifetimeScopeCommandHandlerProxy<T>* only depends on singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it too can safely be registered as singleton.
-		
+        
 Since a typical application will not use the lifetime scope, but would prefer a scope specific to the application type (such as a :ref:`web request <PerWebRequest>`, :ref:`web api request <PerWebAPIRequest>` or :ref:`WCF operation <PerWcfOperation>` lifestyles), a special :ref:`hybrid lifestyle <Hybrid>` needs to be defined that allows object graphs to be resolved in this mixed-request scenario:
 
 .. code-block:: c#
@@ -726,19 +738,19 @@ Sometimes however you might want to apply a decorator unconditionally, but let t
             TransactionType transactionType = this.decoratorContext.ImplementationType
                 .GetCustomAttribute<TransactionAttribute>()
                 .TransactionType;
-            	
+                
             using (var transaction = this.transactionBuilder.BeginTransaction(transactionType)) {
                 this.decoratee.Handle(command);
             }
         }
     }
-	
+    
 The previous code snippet shows a decorator that applies a transaction behavior to command handlers. The decorator is injected with the **DecoratorContext** class which supplies the decorator with contextual information about the other decorators in the chain and the actual implementation type. In this example the decorator expects a *TransactionAttribute* to be applied to the wrapped command handler implementation and it starts the correct transaction type based on this information.
 
 If the attribute was applied to the command class instead of the command handler, this decorator would been able to gather this information without the use of the **DecoratorContext**. This would however leak implementation details into the command, since which type of transaction a handler should run is clearly an implementation detail and is of no concern to the consumer of that command. Placing that attribute on the handler instead of the command is therefore a much more reasonable thing to do.
 
 The decorator would also be able to get the attribute by using the injected decoratee, but this would only work when the decorator would directly wrap the handler. This would make the system quite fragile, since it would break once you start placing other decorator in between this decorator and the handler, which is a very likely thing to happen.
-	
+    
 .. _Decorator-registration-factories:
 
 Decorator registration factories
@@ -926,7 +938,7 @@ Take a look at the following application design around the *IEventHandler<in TEv
 
     public class WarnShippingDepartmentAboutMove : IEventHandler<CustomerMovedAbroadEvent> {
         public void Handle(CustomerMovedEvent e) { ... }
-    }	
+    }    
 
 The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbroadEvent* (where *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*) and two concrete event handlers *SendFlowersToMovedCustomer* and *WarnShippingDepartmentAboutMove*. These classes can be registered using the following registration:
 
@@ -940,17 +952,17 @@ The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbr
     // Usage
     var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
 
-	foreach (var handler in handlers) {
+    foreach (var handler in handlers) {
         Console.WriteLine(handler.GetType().Name);
     }
-	
+    
 With the given classes, the code snippet above will give the following output:
 
 .. code-block:: c#
 
     SendFlowersToMovedCustomer
     WarnShippingDepartmentAboutMove
-	
+    
 Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEvent>*, the container returned *IEventHandler<CustomerMovedEvent>* and *IEventHandler<CustomerMovedAbroadEvent>*. Simple Injector did this because the *IEventHandler<in TEvent>* interface was defined with the *in* keyword, which makes *SendFlowerToMovedCustomer* assignable to *IEventHandler<CustomerMovedAbroadEvent>* (since *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*, *SendFlowerToMovedCustomer* can also process *CustomerMovedAbroadEvent* events). 
 
 .. container:: Note
@@ -958,8 +970,8 @@ Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEv
     **Tip**: If you don't want Simple Injector to resolve variant registrations remove the *in* and *out* keywords from the interface definition. I.e. the *in* and *out* keywords are the trigger for Simple Injector to apply variance.
 
 .. container:: Note
-	
-	**Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered.
+    
+    **Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered.
 
 .. _Plugins:
 

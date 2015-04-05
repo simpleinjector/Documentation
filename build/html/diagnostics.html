@@ -30,7 +30,7 @@
   
     <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
         <link rel="next" title="Diagnostic Warning - Potential Lifestyle Mismatches" href="PotentialLifestyleMismatches.html"/>
-        <link rel="prev" title="Windows Presentation Foundation Integration Guide" href="wpfintegration.html"/> 
+        <link rel="prev" title="Silverlight Integration Guide" href="silverlightintegration.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -96,12 +96,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#limitations">Limitations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -165,6 +167,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -176,12 +179,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -229,9 +233,11 @@
 <img alt="Diagnostics debugger view context menu" src="_images/diagnosticsdebuggerview.png" />
 <p>Another option is to add the <strong>container</strong> variable to the Visual Studio watch window by right clicking on the variable and selecting &#8216;Add Watch&#8217; in the context menu:</p>
 <img alt="Diagnostics debugger view watch window" src="_images/diagnostics2.png" />
-<p>The debugger views also allow visualizing your application&#8217;s dependency graphs. This can give you a good view of what the end result of your DI configuration is. By drilling into the list of <strong>Registrations</strong> or <strong>Root Registrations</strong>, you can select the text visualizer (the magnifying glass icon) on the <strong>DependencyGraph</strong> property on any of the lister registrations:</p>
+<p>The debugger views also allow visualizing your application&#8217;s dependency graphs. This can give you a good view of what the end result of your DI configuration is. By drilling into the list of <strong>Registrations</strong> or <strong>Root Registrations</strong>, you can select the text visualizer (the magnifying glass icon) on the <strong>DependencyGraph</strong> property on any of the listed registrations:</p>
 <img alt="Viewing dependency graphs" src="_images/dependencygraph.png" />
-<p>This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the <strong>SimpleInjector.Diagnostics.dll</strong>. This dll is part of the core NuGet package. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:</p>
+<div class="note container">
+<strong>Note</strong>: <strong>Root Registrations</strong> are registrations that are not depended upon by any other registration (or at least, not that Simple Injector can statically determine). They form the starting point of an object graph and are usually the types that are directly resolved from the container.</div>
+<p>This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the <strong>SimpleInjector.Diagnostics</strong> namespace. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="na">[TestMethod]</span>
 <span class="k">public</span> <span class="k">void</span> <span class="nf">Container_Always_ContainsNoDiagnosticWarnings</span><span class="p">()</span> <span class="p">{</span>
     <span class="c1">// Arrange</span>
@@ -249,12 +255,42 @@
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>Instead of interacting with the Diagnostic API directly, you can force the container to fail fast during verification in case one of the more severe warnings is detected:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="n">Bootstrapper</span><span class="p">.</span><span class="n">GetInitializedContainer</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">(</span><span class="n">VerificationOption</span><span class="p">.</span><span class="n">VerifyAndDiagnose</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>When calling <em>Verify(VerificationOption.VerifyAndDiagnose)</em>, the container will check for the warning types that are most likely to cause bugs in your application. By calling this overload during application startup, or inside an integration test, you&#8217;ll keep the feedback cycle as short as possible, and you&#8217;ll get notified about possible bugs that otherwise might have stayed undetected for much too long.</p>
+</div>
+<div class="section" id="suppressing-warnings">
+<h2>Suppressing warnings<a class="headerlink" href="#suppressing-warnings" title="Permalink to this headline">¶</a></h2>
+<p>There are rare cases that you want to ignore the warning system for specific registrations. There are scenarios where you are sure that the presented warning does not cause any harm in your case and changing the application&#8217;s design is not feasible. In such situation you can suppress warnings on a case by case basis. This prevents a call to <em>Verify(VerificationOption.VerifyAndDiagnose)</em> from throwing an exception, it prevents the warning from popping up in the debugger, and it prevents the <em>Analyzer.Analyze()</em> method from returning that warning.</p>
+<p>A warning can be suppressed by disabling a specific warning type on a <em>Registration</em> object. Example:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">registration</span> <span class="p">=</span>
+    <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">.</span><span class="n">CreateRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">HomeController</span><span class="p">),</span> <span class="n">container</span><span class="p">);</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">AddRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">HomeController</span><span class="p">),</span> <span class="n">registration</span><span class="p">);</span>
+
+<span class="n">registration</span><span class="p">.</span><span class="n">SuppressDiagnosticWarning</span><span class="p">(</span><span class="n">DiagnosticType</span><span class="p">.</span><span class="n">DisposableTransientComponent</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In the previous code sample, a <em>Registration</em> instance for the <em>HomeController</em> type is created and registered in the container. This <em>Registration</em> instance is explicitly marked to suppress the diagnostic warning type <strong>Disposable Transient Component</strong>.</p>
+<p>Suppressing this warning type for an MVC controller makes sense, because the MVC framework will ensure proper disposal of MVC controllers.</p>
+<p>Alternatively, you can also request an already made registered and suppress a warning on that:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">registration</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">HomeController</span><span class="p">)).</span><span class="n">Registration</span><span class="p">;</span>
+
+<span class="n">registration</span><span class="p">.</span><span class="n">SuppressDiagnosticWarning</span><span class="p">(</span><span class="n">DiagnosticType</span><span class="p">.</span><span class="n">DisposableTransientComponent</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="note container">
+<strong>Tip</strong>: <em>RegisterMvcControllers</em> extension method of the <strong>SimpleInjector.Integration.Web.Mvc.dll</strong> will batch-register all MVC controllers and will automatically suppress the <strong>Disposable Transient Component</strong> warning on controller types.</div>
 </div>
 <div class="section" id="limitations">
 <h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 <strong>Warning</strong>: Although the <em>Container</em> can spot several configuration mistakes, be aware that there will always be ways to make configuration errors that the Diagnostic Services cannot identify. Wiring your dependencies is a delicate matter and should be done with care. Always follow best practices.</div>
-<p>The <strong>Diagnostic Services</strong> work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as analyzing constructor arguments) can be analyzed. The <em>Container</em> uses the following information for analysis:</p>
+<p>The <strong>Diagnostic Services</strong> work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as  constructor arguments) can be analyzed. The <em>Container</em> uses the following information for analysis:</p>
 <ul class="simple">
 <li>Constructor arguments of types that are created by the container (auto-wired types).</li>
 <li>Dependencies added by <a class="reference internal" href="advanced.html#decorators"><em>Decorators</em></a>.</li>
@@ -263,7 +299,7 @@
 <p>The Diagnostic Services <strong>cannot</strong> analyze the following:</p>
 <ul class="simple">
 <li>Types that are completely unknown, because these types are not registered explicitly and no registered type depends on them. In general you should register all root types (types that are requested directly by calling <strong>GetInstance&lt;T&gt;()</strong>, such as MVC Controllers) explicitly.</li>
-<li>Open-generic registrations that are resolved as root type (no registered type depends on them). Since the container uses unregistered type resolution, those registrations will be unknown untill they are resolved. Prefer registering each closed-generic version explicitly, or add unit tests to verify that these root types can be resolved.</li>
+<li>Open-generic registrations that are resolved as root type (no registered type depends on them). Since the container uses unregistered type resolution, those registrations will be unknown until they are resolved. Prefer registering each closed-generic version explicitly, or add unit tests to verify that these root types can be resolved.</li>
 <li>Dependencies added using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> method:</li>
 </ul>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterInitializer</span><span class="p">&lt;</span><span class="n">IService</span><span class="p">&gt;(</span><span class="n">service</span> <span class="p">=&gt;</span> <span class="p">{</span>
@@ -283,7 +319,6 @@
 </pre></div>
 </div>
 <ul class="simple">
-<li>Any dependencies that are injected using the (now deprecated) <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_InjectProperties.htm">InjectProperties</a> method will not be seen as dependencies of the type they are injected into.</li>
 <li>Dependencies that are resolved by requesting them manually from the <em>Container</em>, for instance by injecting the <em>Container</em> into a class and then calling <em>container.GetInstance&lt;T&gt;()</em> from within that class:</li>
 </ul>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span> <span class="p">:</span> <span class="n">IService</span> <span class="p">{</span>
@@ -298,7 +333,7 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Tip</strong>: Try to prevent depending on any framework features listed above because they all prevent you from having a <a class="reference internal" href="howto.html#verify-configuration"><em>verifiable configuration</em></a> and trustworthy diagnostic results.</div>
+<strong>Tip</strong>: Try to prevent depending on any features listed above because they all prevent you from having a <a class="reference internal" href="howto.html#verify-configuration"><em>verifiable configuration</em></a> and trustworthy diagnostic results.</div>
 </div>
 <div class="section" id="supported-warnings">
 <h2>Supported Warnings<a class="headerlink" href="#supported-warnings" title="Permalink to this headline">¶</a></h2>
@@ -319,6 +354,9 @@
 <li class="toctree-l1"><a class="reference internal" href="tornlifestyle.html">Torn Lifestyle</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="ambiguouslifestyles.html">    Ambiguous Lifestyles</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="disposabletransientcomponent.html">Disposable Transient Components</a><ul class="simple">
 </ul>
 </li>
@@ -336,7 +374,7 @@
         <a href="PotentialLifestyleMismatches.html" class="btn btn-neutral float-right" title="Diagnostic Warning - Potential Lifestyle Mismatches"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="wpfintegration.html" class="btn btn-neutral" title="Windows Presentation Foundation Integration Guide"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="silverlightintegration.html" class="btn btn-neutral" title="Silverlight Integration Guide"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

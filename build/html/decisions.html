@@ -96,12 +96,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -165,6 +167,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -176,12 +179,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -232,6 +236,7 @@
 <li><a class="reference internal" href="#no-interception"><em>No out-of-the-box support for interception</em></a></li>
 <li><a class="reference internal" href="#limited-batch-registration"><em>Limited batch-registration API</em></a></li>
 <li><a class="reference internal" href="#no-per-thread-lifestyle"><em>No per-thread lifestyle</em></a></li>
+<li><a class="reference internal" href="#one-constructor"><em>Allow only a single constructor</em></a></li>
 </ul>
 <div class="section" id="the-container-is-locked-after-the-first-call-to-resolve">
 <span id="container-is-locked"></span><h2>The container is locked after the first call to resolve<a class="headerlink" href="#the-container-is-locked-after-the-first-call-to-resolve" title="Permalink to this headline">¶</a></h2>
@@ -356,6 +361,16 @@ With implicit property injection, the container injects any public writable prop
 <p>A web request will typically begin with a call to <strong>GetInstance</strong> which will load the complete object graph including any services registered with the Per Thread lifestyle. At some point during the operation the call is postponed (due to the asynchronous nature of the ASP.NET framework). At some future moment in time ASP.NET will resume processing this call on a different thread and at this point we have a problem - some of the objects in our object graph are tied up on another thread, possibly doing something else for another operation. What a mess!</p>
 <p>Since these instances are registered as Per Thread, they are probably not suited to be used in another thread. They are almost certainly not thread-safe (otherwise they would be registered as Singleton). Since the first thread that initially started the request is already free to pick up new requests, we can run into the situation where two threads access those Per Thread instances simultaneously. This will lead to race conditions and bugs that are hard to diagnose and find.</p>
 <p>So in general, using Per Thread is a bad idea and that&#8217;s why Simple Injector does not support it. If you wish, you can always shoot yourself in the foot by implementing such a custom lifestyle, but don&#8217;t blame us :-)</p>
+</div>
+<div class="section" id="allow-only-a-single-constructor">
+<span id="one-constructor"></span><h2>Allow only a single constructor<a class="headerlink" href="#allow-only-a-single-constructor" title="Permalink to this headline">¶</a></h2>
+<p>Out of the box, Simple Injector only allows building up types that contain a single public constructor, because we want to adhere to the following principles:</p>
+<ul class="simple">
+<li><a class="reference internal" href="principles.html#push-developers-into-best-practices"><em>Push developers into best practices</em></a></li>
+<li><a class="reference internal" href="principles.html#never-fail-silently"><em>Never fail silently</em></a></li>
+</ul>
+<p>Having multiple public constructors on the components that you resolve is an anti-pattern. This anti-pattern is described in more detail <a class="reference external" href="https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=97">here</a></p>
+<p>This doesn&#8217;t mean that it is impossible to do auto-wiring on types with multiple public constructors, but with Simple Injector this behavior will have to be <a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior"><em>explicitly configured</em></a>.</p>
 </div>
 </div>
 

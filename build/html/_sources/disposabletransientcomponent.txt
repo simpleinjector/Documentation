@@ -17,6 +17,7 @@ How to Fix Violations
 
 Register the component with the :ref:`scoped lifestyle <Scoped>` that is appropriate for the application you are working on. Scoped lifestyles ensure *Dispose* is called when an active scope ends.
 
+
 When to Ignore Warnings
 =======================
 
@@ -25,6 +26,15 @@ This warning can safely be ignored when:
 - *Dispose* is called by the application code
 - some manual registration ensures disposal
 - not disposing is not a problem.
+
+The warning can be suppressed on a per-registration basis as follows:
+	
+.. code-block:: c#
+
+    Registration registration = container.GetRegistration(typeof(IService)).Registration;
+
+    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+
 
 Example
 =======

@@ -96,12 +96,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -165,6 +167,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -176,12 +179,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -487,7 +491,7 @@ There will be only one instance of a given service type within a certain (explic
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterExecutionContextScope</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;();</span>
 
 <span class="c1">// Or alternatively</span>
-    <span class="kt">var</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ExecutionContextScopeLifestyle</span><span class="p">();</span>
+<span class="kt">var</span> <span class="n">scopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ExecutionContextScopeLifestyle</span><span class="p">();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">NorthwindContext</span><span class="p">&gt;(</span><span class="n">scopedLifestyle</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -547,7 +551,7 @@ There will be only one instance of a given service type within a certain (explic
 <span id="pergraph"></span><h2>Per Graph<a class="headerlink" href="#per-graph" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
 For each explicit call to <strong>Container.GetInstance&lt;T&gt;</strong> a new instance of the service type will be created, but the instance will be reused within the object graph that gets constructed.</div>
-<p>Compared to <strong>Transient</strong>, there will be just a single instance per explicit call to the container, while <strong>Transient</strong> services can have multiple new instances per explicit call to the container. This lifestyle can be simulated by using one of the <a class="reference internal" href="#scoped"><em>Scoped</em></a> lifestyles.</p>
+<p>Compared to <strong>Transient</strong>, there will be just a single instance per explicit call to the container, while <strong>Transient</strong> services can have multiple new instances per explicit call to the container. This lifestyle is not supported by Simple Injector but can be simulated by using one of the <a class="reference internal" href="#scoped"><em>Scoped</em></a> lifestyles.</p>
 </div>
 <div class="section" id="per-thread">
 <span id="perthread"></span><h2>Per Thread<a class="headerlink" href="#per-thread" title="Permalink to this headline">¶</a></h2>

@@ -9,11 +9,11 @@ Simple Injector contains `Simple Injector ASP.NET Web API Integration Quick Star
     **Note**: To be able to run the Web API integration packages, `you need <https://stackoverflow.com/questions/22392032/are-there-any-technical-reasons-simpleinjector-cannot-support-webapi-on-net-4-0>`_ *.NET 4.5* or above.
 
 .. _Web-API-basic-setup:
-	
+    
 Basic setup
 ===========
 
-The following code snippet shows how to use the use the integration package (note that the quick start package injects this code for you).
+The following code snippet shows how to use the integration package (note that the quick start package injects this code for you).
 
 .. code-block:: c#
 
@@ -42,7 +42,7 @@ The following code snippet shows how to use the use the integration package (not
         // Here your usual Web API configuration stuff.
     }
 
-With this configuration, ASP.NET Web API will create new *IHttpController* instances through the container. Because controllers are concrete classes, the container will be able to create them without any registration. However, to be able to :doc:`diagnose <diagnostics>` and :ref:`verify <Verify-Configuration>` the container's configuration, it is important to register all root types explicitly.
+With this configuration, ASP.NET Web API will create new *IHttpController* instances through the container. Because controllers are concrete classes, the container will be able to create them without any registration. However, to be able to :ref:`verify <Verify-Configuration>` and :doc:`diagnose <diagnostics>` the container's configuration, it is important to register all root types explicitly.
 
 .. container:: Note
 
@@ -73,8 +73,8 @@ Given the configuration above, an actual controller could look like this:
         }
     }
 
-.. _Web-API-extra-features:	
-	
+.. _Web-API-extra-features:    
+    
 Extra features
 ==============
 
@@ -124,19 +124,46 @@ This implementation can be implemented as follows:
     container.RegisterWebApiRequest<IRequestMessageProvider, RequestMessageProvider>();
 
 .. _Injecting-dependencies-into-Web-API-filter-attributes:
-	
+    
 Injecting dependencies into Web API filter attributes
 -----------------------------------------------------
 
-Simple Injector allows integrating Web API filter attributes with the Simple Injector pipeline. This means that Simple Injector can inject properties into those attributes and allow any registered initializer delegates to be applied to those attributes. Constructor injection however is out of the picture. Since it is the reflection API of the CLR that is responsible for creating attributes, it's impossible to inject dependencies into the attribute's constructor.
+Web API caches filter attribute instances indefinitely per action, effectively making them singletons. This makes them unsuited for dependency injection, since the attribute's dependencies will be accidentally promoted to singleton as well, which can cause all sorts of concurrency issues.
 
-To allow attributes to be integrated into the Simple Injector pipeline, you have to register a custom filter provider as follows:
+Since dependency injection is not an option here, an other mechanism is advised. There are basically two options here. Which one is best depends on the amount of filter attributes your application needs. If the number of attributes is limited (to a few), the simplest solution is to revert to the Service Locator pattern within your attributes. If the number of attributes is larger, it might be better to make attributes passive.
+
+Reverting to the Service Locator pattern means that you need to do the following:
+
+* Extract all the attribute's logic -with its dependencies- into a new service class.
+* Resolve this service from within the filter attribute's `OnActionExecXXX` methods, but don't store the resolved service in a private field.
+* Call the service's method.
+
+The following example visualizes this:
 
 .. code-block:: c#
 
-    container.RegisterWebApiFilterProvider(GlobalConfiguration.Configuration);
+    public class MinimumAgeActionFilter : FilterAttribute {
+        public readonly int MinimumAge;
 
-This ensures that attributes are initialized by Simple Injector according to the container's configuration. This by itself however, doesn't do much, since Simple Injector will not inject any properties by default. By registering a custom **IPropertySelectionBehavior** however, you can property injection to take place on attributes. An example of such custom behavior is given :ref:`here <ImportPropertySelectionBehavior>` in the advanced sections of the wiki.
+        public MinimumAgeActionFilter(int minimumAge) {
+            this.MinimumAge = minimumAge;
+        }
+
+        public override Task OnActionExecutingAsync(HttpActionContext actionContext,
+            CancellationToken cancellationToken)
+        {
+            var checker = GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IMinimumAgeChecker))
+                as IMinimumAgeChecker;
+
+            checker.VerifyCurrentUserAge(this.MinimumAge);
+
+            return TaskHelpers.Completed();
+        }
+    }
+
+By moving all the logic and dependencies out of the attribute, the attribute becomes a small infrastructural piece of code; a humble object that simply forwards the call to the real service.
+    
+If the number of required filter attributes grows, a different model might be in place. In that case you might want to make your attributes `passive <http://blog.ploeh.dk/2014/06/13/passive-attributes/>`_ as explained `here <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=98>`_.
 
 .. _Injecting-dependencies-into-Web-API-message-handlers:
 
@@ -180,12 +207,12 @@ The solution is to define a proxy class that sits in between. Since Web API lack
             return invoker.SendAsync(request, cancellationToken);
         }
     }
-	
+    
 This *DelegatingHandlerProxy<THandler>* can be added as singleton to the global *MessageHandlers* collection, and it will resolve the given *THandler* on each request, allowing it to be resolved according to its lifestyle. 
 
 .. container:: Note
 
-	**Warning**: Prevent registering any *THandler* with a lifestyle longer than the request, since message handlers are **not** thread-safe (just look at the assignment of *InnerHandler* in the *SendAsync* method and you'll understand why).
+    **Warning**: Prevent registering any *THandler* with a lifestyle longer than the request, since message handlers are **not** thread-safe (just look at the assignment of *InnerHandler* in the *SendAsync* method and you'll understand why).
 
 The *DelegatingHandlerProxy<THandler>* can be used as follows:
 

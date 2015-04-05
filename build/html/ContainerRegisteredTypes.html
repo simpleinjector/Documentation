@@ -97,12 +97,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF and Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -166,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -177,12 +180,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -230,8 +234,8 @@
 </div>
 <div class="section" id="warning-description">
 <h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
-<p>The <em>Container-Tegistered Types</em> warning shows all concrete types that weren&#8217;t registered explicitly, but registered by the container as transient for you, because they were referenced by another component&#8217;s constructor or were resolved through a direct call to <em>container.GetIntance&lt;T&gt;()</em> (inside a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> registered delegate for instance).</p>
-<p>This warning deserves your attention, since it might indicate that you program to implementations, instead of abstractions. Although the <a class="reference internal" href="PotentialLifestyleMismatches.html"><em>Potential Lifestyle Mismatches</em></a> and <a class="reference internal" href="ShortCircuitedDependencies.html"><em>Short Circuited Dependencies</em></a> warnings are a very strong signal of a configuration problem, this <em>Container-Tegistered Types</em> warnings is just a point of attention.</p>
+<p>The <em>Container-Registered Types</em> warning shows all concrete types that weren&#8217;t registered explicitly, but registered by the container as transient for you, because they were referenced by another component&#8217;s constructor or were resolved through a direct call to <em>container.GetIntance&lt;T&gt;()</em> (inside a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> registered delegate for instance).</p>
+<p>This warning deserves your attention, since it might indicate that you program to implementations, instead of abstractions. Although the <a class="reference internal" href="PotentialLifestyleMismatches.html"><em>Potential Lifestyle Mismatches</em></a> and <a class="reference internal" href="ShortCircuitedDependencies.html"><em>Short Circuited Dependencies</em></a> warnings are a very strong signal of a configuration problem, this <em>Container-Registered Types</em> warnings is just a point of attention.</p>
 </div>
 <div class="section" id="how-to-fix-violations">
 <h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
@@ -240,6 +244,12 @@
 <div class="section" id="when-to-ignore-warnings">
 <h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
 <p>If your intention is to resolve those types as transient and don&#8217;t depend directly on their concrete types, this warning can in general be ignored safely.</p>
+<p>The warning can be suppressed on a per-registration basis as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">registration</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">HomeController</span><span class="p">)).</span><span class="n">Registration</span><span class="p">;</span>
+
+<span class="n">registration</span><span class="p">.</span><span class="n">SuppressDiagnosticWarning</span><span class="p">(</span><span class="n">DiagnosticType</span><span class="p">.</span><span class="n">ContainerRegisteredComponent</span><span class="p">);</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>

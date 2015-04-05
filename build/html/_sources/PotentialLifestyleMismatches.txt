@@ -84,10 +84,6 @@ The following example shows how to query the Diagnostic API for Potential Lifeti
 	        result.Relationship.Dependency.Lifestyle.Name);
 	}
 
-.. container:: Note
-
-    **Note**: The Diagnostic API is new in Simple Injector v2.4.
-
 What about Hybrid lifestyles?
 =============================
 
@@ -104,7 +100,7 @@ A :ref:`Hybrid lifestyle <Hybrid>` is a mix between two or more other lifestyles
 
     **Note** that this example is quite bizarre, since it is a very unlikely combination of lifestyles to mix together, but it serves us well for the purpose of this explanation.
 
-As explained, components should only depend on longer lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of `someCondition`. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).
+As explained, components should only depend equal length or longer lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of `someCondition`. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).
 
 From the Diagnostic Services' perspective, a component can only safely depend on a hybrid lifestyled service if the consuming component's lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid lifestyled component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the **longest** lifestyle is used in the comparison when the hybrid is part of the consuming component, and the **shortest** lifestyle is used when the hybrid is part of the dependency.
 

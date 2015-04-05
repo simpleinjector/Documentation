@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Diagnostic Warning - Ambiguous Lifestyles &mdash; Simple Injector 2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
+        <link rel="up" title="Diagnostic Services" href="diagnostics.html"/>
+        <link rel="next" title="Diagnostic Warning - Disposable Transient Components" href="disposabletransientcomponent.html"/>
+        <link rel="prev" title="Diagnostic Warning - Torn Lifestyle" href="tornlifestyle.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> Simple Injector</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#a-quick-example">A Quick Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#more-information">More information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using Simple Injector</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="using.html#resolving-instances">Resolving instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#configuring-simple-injector">Configuring Simple Injector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#more-information">More information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lifetimes.html">Object Lifetime Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#transient">Transient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#singleton">Singleton</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#scoped">Scoped</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-web-request">Per Web Request</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-web-api-request">Per Web API Request</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope">Per Execution Context Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-thread">Per Thread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-http-session">Per HTTP Session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#hybrid">Hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#developing-a-custom-lifestyle">Developing a Custom Lifestyle</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#register-factory-delegates">Register factory delegates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-instances-by-key">Resolve instances by key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Scenarios</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#generics">Generics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#batch-automatic-registration">Batch / Automatic registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#registration-of-open-generic-types">Registration of open generic types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#mixing-collections-of-open-generic-and-non-generic-components">Mixing collections of open-generic and non-generic components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#unregistered-type-resolution">Unregistered type resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#context-based-injection">Context based injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#decorators">Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#interception">Interception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#property-injection">Property injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#covariance-and-contravariance">Covariance and Contravariance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#registering-plugins-dynamically">Registering plugins dynamically</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-property-injection-behavior">Overriding Property Injection Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#resolving-unregistered-types">Resolving Unregistered Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#registration-pipeline">Registration Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#resolve-pipeline">Resolve Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="principles.html">Design Principles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#make-simple-use-cases-easy-make-complex-use-cases-possible">Make simple use cases easy, make complex use cases possible</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#push-developers-into-best-practices">Push developers into best practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#fast-by-default">Fast by default</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#don-t-force-vendor-lock-in">Don&#8217;t force vendor lock-in</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#never-fail-silently">Never fail silently</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#features-should-be-intuitive">Features should be intuitive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#communicate-errors-clearly-and-describe-how-to-solve-them">Communicate errors clearly and describe how to solve them</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="decisions.html">Design Decisions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#the-container-is-locked-after-the-first-call-to-resolve">The container is locked after the first call to resolve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#don-t-allow-resolving-scoped-instances-outside-an-active-scope">Don&#8217;t allow resolving scoped instances outside an active scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="legal.html#simple-injector-license">Simple Injector License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="legal.html#contributions">Contributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="legal.html#simple-injector-trademark-policy">Simple Injector Trademark Policy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Simple Injector</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="diagnostics.html">Diagnostic Services</a> &raquo;</li>
+      
+    <li>Diagnostic Warning - Ambiguous Lifestyles</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/ambiguouslifestyles.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="diagnostic-warning-ambiguous-lifestyles">
+<span id="ambiguouslifestyles"></span><h1>Diagnostic Warning - Ambiguous Lifestyles<a class="headerlink" href="#diagnostic-warning-ambiguous-lifestyles" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="cause">
+<h2>Cause<a class="headerlink" href="#cause" title="Permalink to this headline">¶</a></h2>
+<p>Multiple registrations with the different lifestyles map to the same component.</p>
+</div>
+<div class="section" id="warning-description">
+<h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
+<p>When multiple registrations with a different lifestyle map to the same component, the component is said to have ambiguous lifestyles. Having one single component with multiple lifestyles will cause instances of that component to be cached in different ways and this can lead to behavior that you might not expect.</p>
+<p>For instance, having a single component that is registered both as Singleton and as Transient hardly ever makes sense, because the singleton registration implies that it is thread-safe, while the transient registration means that it, or one of its dependencies, is not thread-safe and should not be reused. One of the registrations of this component will likely be wrong.</p>
+</div>
+<div class="section" id="how-to-fix-violations">
+<h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
+<p>Create a <em>Registration</em> instance for that component using <em>Lifestyle.CreateRegistration</em> and use that for both registrations.</p>
+<p>In case you really intended to have this single component to be registered with two different lifestyles, this is a clear indication that the component should actually be split into multiple smaller components, each with their specific lifestyle.</p>
+</div>
+<div class="section" id="when-to-ignore-warnings">
+<h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
+<p>Do not ignore these warnings. False positives for this warning are rare and even when they occur, the registration or the application design can always be changed in a way that the warning disappears.</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>The following example shows a configuration that will trigger the warning:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IFoo</span><span class="p">,</span> <span class="n">FooBar</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IBar</span><span class="p">,</span> <span class="n">FooBar</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The <em>FooBar</em> component is registered once as <strong>Singleton</strong> for <em>IFoo</em> and once as <strong>Transient</strong> for <em>IBar</em>. Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.</p>
+<img alt="Diagnostics debugger view watch window with the ambiguous lifestyle warnings" src="_images/ambiguouslifestyles.png" />
+<p>The issue can be fixed as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="kt">var</span> <span class="n">registration</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">.</span><span class="n">CreateRegistration</span><span class="p">&lt;</span><span class="n">FooBar</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">);</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">AddRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IFoo</span><span class="p">),</span> <span class="n">registration</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">AddRegistration</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IBar</span><span class="p">),</span> <span class="n">registration</span><span class="p">);</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Another way to fix this issue is by splitting <em>FooBar</em> into multiple smaller components.</p>
+<p>The following example shows how to query the Diagnostic API for Torn Lifestyles:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Diagnostics;</span>
+
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="cm">/* get verified container */</span><span class="p">;</span>
+
+<span class="kt">var</span> <span class="n">results</span> <span class="p">=</span> <span class="n">Analyzer</span><span class="p">.</span><span class="n">Analyze</span><span class="p">(</span><span class="n">container</span><span class="p">).</span><span class="n">OfType</span><span class="p">&lt;</span><span class="n">AmbiguousLifestylesDiagnosticResult</span><span class="p">&gt;();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">result</span> <span class="k">in</span> <span class="n">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">Description</span><span class="p">);</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Component name: &quot;</span> <span class="p">+</span> <span class="n">result</span><span class="p">.</span><span class="n">ImplementationType</span><span class="p">.</span><span class="n">Name</span><span class="p">);</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Lifestyles of component: &quot;</span> <span class="p">+</span>
+        <span class="kt">string</span><span class="p">.</span><span class="n">Join</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">Lifestyles</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">l</span> <span class="p">=&gt;</span> <span class="n">l</span><span class="p">.</span><span class="n">Name</span><span class="p">)));</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Conflicting registrations: &quot;</span> <span class="p">+</span>
+        <span class="kt">string</span><span class="p">.</span><span class="n">Join</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">ConflictingRegistrations</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span>
+            <span class="n">r</span> <span class="p">=&gt;</span> <span class="n">r</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">.</span><span class="n">Name</span><span class="p">)));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="disposabletransientcomponent.html" class="btn btn-neutral float-right" title="Diagnostic Warning - Disposable Transient Components"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tornlifestyle.html" class="btn btn-neutral" title="Diagnostic Warning - Torn Lifestyle"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Simple Injector Contributors.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -30,7 +30,7 @@
   
     <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
         <link rel="up" title="Integration Guide" href="integration.html"/>
-        <link rel="next" title="Diagnostic Services" href="diagnostics.html"/>
+        <link rel="next" title="Silverlight Integration Guide" href="silverlightintegration.html"/>
         <link rel="prev" title="WCF Integration Guide" href="wcfintegration.html"/> 
 
   
@@ -97,12 +97,14 @@
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">    WPF and Silverlight</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
@@ -166,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
@@ -177,12 +180,13 @@
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">    Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">    Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">    Context Dependent Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">    T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">    InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">    RegisterMvcAttributeFilterProvider is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -224,57 +228,103 @@
             
   <div class="section" id="windows-presentation-foundation-integration-guide">
 <h1>Windows Presentation Foundation Integration Guide<a class="headerlink" href="#windows-presentation-foundation-integration-guide" title="Permalink to this headline">¶</a></h1>
-<p>WPF was not designed with dependency injection in mind. Instead of doing constructor injection, there are alternatives. The simplest thing to register the container in the <em>App</em> class, store the container in a static field and let <em>Window</em> instances request their dependencies from within their default constructor.</p>
-<p>Here is an example of how your <em>App</em> code behind could look like:</p>
-<div class="highlight-c#"><div class="highlight"><pre>using System.Windows;
-using SimpleInjector;
-
-public partial class App : Application
-{
-    private static Container container;
-
-    [System.Diagnostics.DebuggerStepThrough]
-    public static TService GetInstance&lt;TService&gt;() where TService : class {
-        return container.GetInstance&lt;TService&gt;();
-    }
-
-    protected override void OnStartup(StartupEventArgs e) {
-        base.OnStartup(e);
-        Bootstrap();
-    }
-
-    private static void Bootstrap()  {
-        // Create the container as usual.
-        var container = new Container();
-
-        // Register your types, for instance:
-        container.RegisterSingle&lt;IUserRepository, SqlUserRepository&gt;();
-        container.Register&lt;IUserContext, WpfUserContext&gt;();
-
-        // Optionally verify the container.
-        container.Verify();
-
-        // Store the container for use by the application.
-        App.container = container;
-    }
-}
+<p>Simple Injector can build up <em>Window</em> classes with their dependencies. Use the following steps as a how-to guide:</p>
+<div class="section" id="step-1">
+<h2>Step 1:<a class="headerlink" href="#step-1" title="Permalink to this headline">¶</a></h2>
+<p>Change the App.xaml markup by removing the <em>StartUri</em> property:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;Application</span> <span class="na">x:Class=</span><span class="s">&quot;SimpleInjectorWPF.App&quot;</span>
+             <span class="na">xmlns=</span><span class="s">&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;</span>
+             <span class="na">xmlns:x=</span><span class="s">&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;</span><span class="nt">&gt;</span>
+    <span class="c">&lt;!-- Remove the StartupUri property, start the application from a static Main --&gt;</span>
+    <span class="nt">&lt;Application.Resources&gt;</span>
+    <span class="nt">&lt;/Application.Resources&gt;</span>
+<span class="nt">&lt;/Application&gt;</span>
 </pre></div>
 </div>
-<p>With the static <em>App.GetInstance&lt;T&gt;</em> method, we can request instances from our <em>Window</em> constructors:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System.Windows</span><span class="p">;</span>
+</div>
+<div class="section" id="step-2">
+<h2>Step 2:<a class="headerlink" href="#step-2" title="Permalink to this headline">¶</a></h2>
+<p>Add a <em>Program.cs</em> file to your project to be the new entry point for the application:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Windows</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
 
-<span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">MainWindow</span> <span class="p">:</span> <span class="n">Window</span> <span class="p">{</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserRepository</span> <span class="n">userRepository</span><span class="p">;</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserContext</span> <span class="n">userContext</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+<span class="na">    [STAThread]</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="n">Bootstrap</span><span class="p">();</span>
 
-    <span class="k">public</span> <span class="nf">MainWindow</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="n">userRepository</span> <span class="p">=</span> <span class="n">App</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">&gt;();</span>
-        <span class="k">this</span><span class="p">.</span><span class="n">userContext</span> <span class="p">=</span> <span class="n">App</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">&gt;();</span>
+        <span class="c1">// ANy additional other configuration, e.g. of your desired MVVM toolkit.</span>
 
-        <span class="n">InitializeComponent</span><span class="p">();</span>
+        <span class="n">RunApplication</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">static</span> <span class="n">Container</span> <span class="nf">Bootstrap</span><span class="p">()</span> <span class="p">{</span>
+        <span class="c1">// Create the container as usual.</span>
+        <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+        <span class="c1">// Register your types, for instance:</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IQueryProcessor</span><span class="p">,</span> <span class="n">QueryProcessor</span><span class="p">&gt;();</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserContext</span><span class="p">,</span> <span class="n">WpfUserContext</span><span class="p">&gt;();</span>
+
+        <span class="c1">// Register your windows and view models:</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">MainWindow</span><span class="p">&gt;();</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">MainWindowViewModel</span><span class="p">&gt;();</span>
+
+        <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+        <span class="k">return</span> <span class="n">container</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">RunApplication</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">app</span> <span class="p">=</span> <span class="k">new</span> <span class="n">App</span><span class="p">();</span>
+            <span class="kt">var</span> <span class="n">mainWindow</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">MainWindow</span><span class="p">&gt;();</span>
+            <span class="n">app</span><span class="p">.</span><span class="n">Run</span><span class="p">(</span><span class="n">mainWindow</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">//Log the exception and exit</span>
+        <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="step-3">
+<h2>Step 3:<a class="headerlink" href="#step-3" title="Permalink to this headline">¶</a></h2>
+<p>Change the &#8216;Startup object&#8217; in the properties of your project to be the newly created <em>Program</em> class:</p>
+<img alt="'Startup object' settings in the application's properties" src="_images/wpfstartupobject.png" />
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Constructor injection can now be used in any windows (e.g. <em>MainWindow</em>) and view models:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System.Windows</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">MainWindow</span> <span class="p">:</span> <span class="n">Window</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="nf">MainWindow</span><span class="p">(</span><span class="n">MainWindowViewModel</span> <span class="n">viewModel</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">InitializeComponent</span><span class="p">();</span>
+
+        <span class="c1">// Assign to the data context so binding can be used.</span>
+        <span class="k">base</span><span class="p">.</span><span class="n">DataContext</span> <span class="p">=</span> <span class="n">viewModel</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">MainWindowViewModel</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IQueryProcessor</span> <span class="n">queryProcessor</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserContext</span> <span class="n">userContext</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">MainWindowViewModel</span><span class="p">(</span><span class="n">IQueryProcessor</span> <span class="n">queryProcessor</span><span class="p">,</span>
+        <span class="n">IUserContext</span> <span class="n">userContext</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">queryProcessor</span> <span class="p">=</span> <span class="n">queryProcessor</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">userContext</span> <span class="p">=</span> <span class="n">userContext</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">IUser</span><span class="p">&gt;</span> <span class="n">Users</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">queryProcessor</span><span class="p">.</span><span class="n">Execute</span><span class="p">(</span><span class="k">new</span> <span class="n">GetAllUsers</span><span class="p">());</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -284,7 +334,7 @@ public partial class App : Application
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="diagnostics.html" class="btn btn-neutral float-right" title="Diagnostic Services"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="silverlightintegration.html" class="btn btn-neutral float-right" title="Silverlight Integration Guide"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="wcfintegration.html" class="btn btn-neutral" title="WCF Integration Guide"><span class="fa fa-arrow-circle-left"></span> Previous</a>

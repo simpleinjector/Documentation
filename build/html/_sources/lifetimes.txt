@@ -381,7 +381,7 @@ Execution Context Scoping is an extension package for Simple Injector. It is ava
     container.RegisterExecutionContextScope<IUnitOfWork, NorthwindContext>();
 
     // Or alternatively
-	var scopedLifestyle = new ExecutionContextScopeLifestyle();
+    var scopedLifestyle = new ExecutionContextScopeLifestyle();
     container.Register<IUnitOfWork, NorthwindContext>(scopedLifestyle);
 
 Within an explicitly defined scope, there will be only one instance of a service that is defined with the *Execution Context Scope* lifestyle:
@@ -459,7 +459,7 @@ Per Graph
     
     For each explicit call to **Container.GetInstance<T>** a new instance of the service type will be created, but the instance will be reused within the object graph that gets constructed.
 
-Compared to **Transient**, there will be just a single instance per explicit call to the container, while **Transient** services can have multiple new instances per explicit call to the container. This lifestyle can be simulated by using one of the :ref:`Scoped <Scoped>` lifestyles.
+Compared to **Transient**, there will be just a single instance per explicit call to the container, while **Transient** services can have multiple new instances per explicit call to the container. This lifestyle is not supported by Simple Injector but can be simulated by using one of the :ref:`Scoped <Scoped>` lifestyles.
 
 .. _PerThread:
 
