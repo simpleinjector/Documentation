@@ -739,7 +739,7 @@ Sometimes however you might want to apply a decorator unconditionally, but let t
                 .GetCustomAttribute<TransactionAttribute>()
                 .TransactionType;
                 
-            using (var transaction = this.transactionBuilder.BeginTransaction(transactionType)) {
+            using (var ta = this.transactionBuilder.BeginTransaction(transactionType)) {
                 this.decoratee.Handle(command);
             }
         }
