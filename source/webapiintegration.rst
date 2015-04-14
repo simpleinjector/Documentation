@@ -152,8 +152,8 @@ The following example visualizes this:
         public override Task OnActionExecutingAsync(HttpActionContext actionContext,
             CancellationToken cancellationToken)
         {
-            var checker = GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IMinimumAgeChecker))
-                as IMinimumAgeChecker;
+            var checker = GlobalConfiguration.Configuration.DependencyResolver
+                .GetService(typeof(IMinimumAgeChecker)) as IMinimumAgeChecker;
 
             checker.VerifyCurrentUserAge(this.MinimumAge);
 
