@@ -42,7 +42,7 @@ Besides this basic integration, other tips and tricks can be applied to integrat
 Getting the current request's IOwinContext
 ------------------------------------------
 
-When working with OWIN you will accidentally find yourself wanting access to the current *IOwinContext*. Retrieving the current *IOwinContext* is easy as using the following code snippet:
+When working with OWIN you will occasionally find yourself wanting access to the current *IOwinContext*. Retrieving the current *IOwinContext* is easy as using the following code snippet:
 
 .. code-block:: c#
 
