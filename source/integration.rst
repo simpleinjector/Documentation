@@ -10,6 +10,7 @@ Simple Injector can be used in a wide range of .NET technologies, both server si
 	ASP.NET MVC <mvcintegration>
 	ASP.NET Web API <webapiintegration>
 	ASP.NET Web Forms <webformsintegration>
+	OWIN <owinintegration>
 	Windows Forms <windowsformsintegration>
 	WCF <wcfintegration>
 	WPF <wpfintegration>
@@ -27,7 +28,7 @@ Besides integration with standard .NET technologies, Simple Injector can be inte
 * `Web Forms MVP <https://stackoverflow.com/questions/15123515/pass-runtime-value-to-constructor-using-simpleinjector>`_
 * `Nancy <https://simpleinjector.codeplex.com/discussions/541398>`_
 * `Castle DynamicProxy Interception <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_
-* `OWIN <https://simpleinjector.codeplex.com/discussions/564822>`_
+* `ASP.NET Identity Framework <https://simpleinjector.codeplex.com/discussions/564822>`_
 * `Drum <https://stackoverflow.com/questions/26661621/how-to-register-drum-urimaker-using-simple-injector>`_
 
 Patterns
