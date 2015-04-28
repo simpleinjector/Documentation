@@ -945,9 +945,9 @@ The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbr
 .. code-block:: c#
 
     // Configuration
-    container.RegisterManyForOpenGeneric(typeof(IValidator<>),
+    container.RegisterManyForOpenGeneric(typeof(IEventHandler<>),
         container.RegisterAll,
-        typeof(IValidator<>).Assembly);
+        typeof(IEventHandler<>).Assembly);
 
     // Usage
     var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
