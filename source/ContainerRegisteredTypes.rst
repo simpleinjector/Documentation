@@ -53,7 +53,7 @@ Example
 	    }
 	}
 
-The given example registers a *HomeController* class that depends on an unregistered *SqlUserRepository* class. Injecting a concrete type can lead to a lot of problems, such as:
+The given example registers a *HomeController* class that depends on an unregistered *SqlUserRepository* class. Injecting a concrete type can lead to problems, such as:
 
 * It makes the *HomeController* hard to test, since concrete types are often hard to fake (or when using a mocking framework that fixes this, would still result in unit tests that contain a lot of configuration for the mocking framework, instead of pure test logic) making the unit tests hard to read and hard to maintain.
 * It makes it harder to reuse the class, since it expects a certain implementation of its dependency.

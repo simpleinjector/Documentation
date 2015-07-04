@@ -8,7 +8,7 @@ Although its name may not imply it, Simple Injector is capable of handling many 
 
     **Note**: After including the **SimpleInjector.dll** in your project, you will have to add the **SimpleInjector.Extensions** namespace to your code to be able to use the majority of features that are presented in this wiki page.
 
-This page discusses the following subjects:
+This chapter discusses the following subjects:
 
 * :ref:`Generics <Generics>`
 * :ref:`Batch registration / Automatic registration <Batch-Registration>`
@@ -42,7 +42,7 @@ Generics
 Batch / Automatic registration
 ==============================
 
-Batch or automatic registration is a way of registering a set of related types in one go based on some convention. This features removes the need to constantly update the container's configuration each and every time a new type is added. The following example show a series of manually registered repositories: 
+Batch or automatic registration is a way of registering a set of (related) types in one go based on some convention. This features removes the need to constantly update the container's configuration each and every time a new type is added. The following example show a series of manually registered repositories: 
 
 .. code-block:: c#
 
@@ -78,7 +78,7 @@ Another interesting scenario is registering multiple implementations of a generi
         ValidationResults Validate(T instance);
     }
 
-Your application might contain many implementations of this interface for validating Customers, Employees, Products, Orders, etc. Without batch registration you would probably end up with a set registration similar to those we've already seen:
+Your application might contain many implementations of this interface for validating Customers, Employees, Products, Orders, etc. Without batch registration you would probably end up with a set registrations similar to those we've already seen:
 
 .. code-block:: c#
 
@@ -290,7 +290,7 @@ In other words, the supplied non-generic types are grouped by their closed *IVal
 
 .. container:: Note
 
-    **Note**: **RegisterAll** is guaranteed to preserve the order of the types that you supply.    
+    **Note**: **RegisterAll** is guaranteed to preserve the order of the types that you supply.
         
 But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible fourth registration is made. This is a registration that hooks onto the **unregistered type resolution** event and this will ensure that any time an *IEnumerable<IValidator<T>>* for a *T* that is anything other than *Customer*, *Employee* and *Order*, an *IEnumerable<IValidator<T>>* is returned that contains the closed-generic versions of the supplied open-generic types; *DataAnnotationsValidator<T>* in the given example.
 
@@ -396,7 +396,7 @@ In the previous code snippet we registered a *Func<DependencyContext, ILogger>* 
 Decorators
 ==========
 
-The `SOLID <https://en.wikipedia.org/wiki/SOLID>`_ principles give us important guidance when it comes to writing maintainable software. The 'O' of the 'SOLID' acronym stands for the `Open/closed Principle <https://en.wikipedia.org/wiki/Open/closed_principle>`_ which states that classes should be open for extension, but closed for modification. Designing systems around the Open/closed principle means that new behavior can be plugged into the system, without the need to change any existing parts, making the change of breaking existing code much smaller.
+The `SOLID <https://en.wikipedia.org/wiki/SOLID>`_ principles give us important guidance when it comes to writing maintainable software. The 'O' of the 'SOLID' acronym stands for the `Open/closed Principle <https://en.wikipedia.org/wiki/Open/closed_principle>`_ which states that classes should be open for extension, but closed for modification. Designing systems around the Open/closed principle means that new behavior can be plugged into the system, without the need to change any existing parts, making the chance of breaking existing code much smaller and prevent having to make sweeping changes throughout the code base.
 
 
 One of the ways to add new functionality (such as `cross-cutting concerns <https://en.wikipedia.org/wiki/Cross-cutting_concern>`_) to classes is by the use of the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the :ref:`Registration of open generic types <Registration-Of-Open-Generic-Types>` section of this page or for instance the use of an generic *ICommandHandler<TCommand>* interface.
@@ -495,11 +495,7 @@ There's an overload of the **RegisterDecorator** available that allows you to su
         typeof(AccessValidationCommandHandlerDecorator<>),
         context => !context.ImplementationType.Namespace.EndsWith("Admins"));
 
-The given context contains several properties that allows you to analyze whether a decorator should be applied to a given service type, such as the current closed generic service type (using the *ServiceType* property) and the concrete type that will be created (using the *ImplementationType* property). The predicate will (under normal circumstances) be called only once per generic type, so there is no performance penalty for using it.
-
-.. container:: Note
-
-    **Tip**: :doc:`This extension method <RuntimeDecorators>` allows registering decorators that can be applied based on runtime conditions (such as the role of the current user).
+The given context contains several properties that allows you to analyze whether a decorator should be applied to a given service type, such as the current closed generic service type (using the *ServiceType* property) and the concrete type that will be created (using the *ImplementationType* property). The predicate will (under normal circumstances) be called only once per closed generic type, so there is no performance penalty for using it.
 
 .. _Decorators-with-Func-factories:
 
@@ -548,13 +544,14 @@ This special decorator is registered just as any other decorator:
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-The *AsyncCommandHandlerDecorator<T>* however, has only singleton dependencies (both the *Container* and the *Func<T>* are singletons) and the *Func<ICommandHandler<T>>* factory always calls back into the container to register a decorated instance conforming the decoratee's lifestyle, each time it's called. If for instance the decoratee is registered as transient, each call to the factory will result in a new instance. It is therefore safe to register this decorator as a singleton:
+The *AsyncCommandHandlerDecorator<T>* however, has only singleton dependencies (the *Func<T>* is a singleton) and the *Func<ICommandHandler<T>>* factory always calls back into the container to register a decorated instance conforming the decoratee's lifestyle, each time it's called. If for instance the decoratee is registered as transient, each call to the factory will result in a new instance. It is therefore safe to register this decorator as a singleton:
 
 .. code-block:: c#
 
-    container.RegisterSingleDecorator(
+    container.RegisterDecorator(
         typeof(ICommandHandler<>),
         typeof(AsyncCommandHandlerDecorator<>),
+        Lifestyle.Singleton,
         c => c.ImplementationType.Name.StartsWith("Async"));
 
 When mixing this decorator with other (synchronous) decorators, you'll get an extremely powerful and pluggable system:
@@ -573,9 +570,10 @@ When mixing this decorator with other (synchronous) decorators, you'll get an ex
         typeof(ICommandHandler<>),
         typeof(DeadlockRetryCommandHandlerDecorator<>));
 
-    container.RegisterSingleDecorator(
+    container.RegisterDecorator(
         typeof(ICommandHandler<>),
         typeof(AsyncCommandHandlerDecorator<>),
+        Lifestyle.Singleton,
         c => c.ImplementationType.Name.StartsWith("Async"));
         
     container.RegisterDecorator(
@@ -595,7 +593,7 @@ Another useful application for *Func<T>* decoratee factories is when a command n
     using SimpleInjector.Extensions.LifetimeScoping;
 
     public class LifetimeScopeCommandHandlerProxy<T> : ICommandHandler<T> {
-        private Container container;
+        private readonly Container container;
         private readonly Func<ICommandHandler<T>> decorateeFactory;
 
         public LifetimeScopeCommandHandlerProxy(Container container,
@@ -618,9 +616,10 @@ This proxy class starts a new :ref:`lifetime scope lifestyle <PerLifetimeScope>`
 
 .. code-block:: c#
 
-    container.RegisterSingleDecorator(
+    container.RegisterDecorator(
         typeof(ICommandHandler<>),
-        typeof(LifetimeScopeCommandHandlerProxy<>));
+        typeof(LifetimeScopeCommandHandlerProxy<>),
+        Lifestyle.Singleton);
 
 .. container:: Note
 
@@ -641,7 +640,7 @@ Obviously, if you run (part of) your commands on a background thread and also us
 
 .. code-block:: c#
 
-    var scopedLifestyle = Lifestyle.CreateHybrid(
+    var hybridLifestyle = Lifestyle.CreateHybrid(
         lifestyleSelector: () => container.GetCurrentLifetimeScope() != null,
         trueLifestyle: new LifetimeScopeLifestyle(),
         falseLifestyle: new WebRequestLifestyle());
@@ -653,13 +652,15 @@ Obviously, if you run (part of) your commands on a background thread and also us
         typeof(ICommandHandler<>), 
         typeof(ICommandHandler<>).Assembly);
 
-    container.RegisterSingleDecorator(
+    container.RegisterDecorator(
         typeof(ICommandHandler<>),
-        typeof(LifetimeScopeCommandHandlerProxy<>));
+        typeof(LifetimeScopeCommandHandlerProxy<>),
+        Lifestyle.Singleton);
         
-    container.RegisterSingleDecorator(
+    container.RegisterDecorator(
         typeof(ICommandHandler<>),
         typeof(AsyncCommandHandlerDecorator<>),
+        Lifestyle.Singleton,
         c => c.ImplementationType.Name.StartsWith("Async"));
 
 With this configuration all commands are executed in an isolated context and some are also executed on a background thread.
@@ -679,10 +680,10 @@ When registering a decorator, Simple Injector will automatically decorate any co
         
     container.RegisterDecorator(
         typeof(IEventHandler<>),
-        typeof(ValidationEventHandlerDecorator<>),
+        typeof(TransactionEventHandlerDecorator<>),
         c => SomeCondition);
 
-The previous registration registers a collection of *IEventHandler<CustomerMovedEvent>* services. Those services are decorated with a *ValidationEventHandlerDecorator<TEvent>* when the supplied predicate holds.
+The previous registration registers a collection of *IEventHandler<CustomerMovedEvent>* services. Those services are decorated with a *TransactionEventHandlerDecorator<TEvent>* when the supplied predicate holds.
 
 For collections of elements that are created by the container (container controlled), the predicate is checked for each element in the collection. For collections of uncontrolled elements (a list of items that is not created by the container), the predicate is checked once for the whole collection. This means that controlled collections can be partially decorated. Taking the previous example for instance, you could let the *CustomerMovedEventHandler* be decorated, while leaving the *NotifyStaffWhenCustomerMovedEventHandler* undecorated (determined by the supplied predicate).
 
@@ -718,29 +719,28 @@ As we shown before, you can apply a decorator conditionally based on a predicate
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-Sometimes however you might want to apply a decorator unconditionally, but let the decorator act at runtime based on this contextual information. You can do this by injecting the **DecoratorContext** into the decorator's constructor as cam be seem in the following example:
+Sometimes however you might want to apply a decorator unconditionally, but let the decorator act at runtime based on this contextual information. You can do this by injecting the **DecoratorContext** into the decorator's constructor as can be seem in the following example:
 
 .. code-block:: c#
 
     public class TransactionCommandHandlerDecorator<T> : ICommandHandler<T> {
-        private readonly DecoratorContext decoratorContext;
-        private readonly ICommandHandler<T> decoratee;
         private readonly ITransactionBuilder transactionBuilder;
+        private readonly ICommandHandler<T> decoratee;
+        private readonly TransactionType transactionType;
 
         public TransactionCommandHandlerDecorator(DecoratorContext decoratorContext,
-            ICommandHandler<T> decoratee, ITransactionBuilder transactionBuilder) {
-            this.decoratorContext = decoratorContext;
-            this.decoratee = decoratee;
+            ITransactionBuilder transactionBuilder, ICommandHandler<T> decoratee) {
             this.transactionBuilder = transactionBuilder;
+            this.decoratee = decoratee;
+            this.transactionType = decoratorContext.ImplementationType
+                .GetCustomAttribute<TransactionAttribute>()
+                .TransactionType;
         }
         
         public void Handle(T command) {
-            TransactionType transactionType = this.decoratorContext.ImplementationType
-                .GetCustomAttribute<TransactionAttribute>()
-                .TransactionType;
-                
-            using (var ta = this.transactionBuilder.BeginTransaction(transactionType)) {
+            using (var ta = this.transactionBuilder.BeginTransaction(this.transactionType)) {
                 this.decoratee.Handle(command);
+                ta.Complete();
             }
         }
     }
@@ -839,7 +839,8 @@ Simple Injector does not inject any properties into types that get resolved by t
 
 **Implicit property injection**
 
-Some containers (such as Castle Windsor) implicitly inject public writable properties by default for any instance you resolve. They do this by mapping those properties to configured types. When no such registration exists, or when the property doesn't have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that **implicit property injection** is simply too uuhh...  implicit :-). Silently skipping properties that can't be mapped can lead to a DI configuration that can't be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified.
+Some containers (such as Castle Windsor) implicitly inject public writable properties by default for any instance you resolve. They do this by mapping those properties to configured types. When no such registration exists, or when the property doesn't have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that **implicit property injection** is simply too uuhh... implicit :-). Silently skipping properties that can't be mapped can lead to a DI configuration that can't be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified.
+
 
 .. _Explicit-Property-Injection:
 
@@ -866,6 +867,7 @@ In the previous example an *Action<T>* delegate is registered that will be calle
 .. container:: Note
 
     **Note**: although this method can also be used injecting services, please note that the :doc:`Diagnostic Services <diagnostics>` will be unable to see and analyze that dependency.
+
 
 .. _ImportPropertySelectionBehavior:
 
@@ -970,8 +972,12 @@ Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEv
     **Tip**: If you don't want Simple Injector to resolve variant registrations remove the *in* and *out* keywords from the interface definition. I.e. the *in* and *out* keywords are the trigger for Simple Injector to apply variance.
 
 .. container:: Note
+
+    **Tip**: Don't mark generic type arguments with *in* and *out* keywords by default, even if Resharper tells you to. Most of the generic abstractions you define will always have exactly one non-generic implementation but marking the interface with *in* and *out* keywords communicates that covariance and contravariance is expected and there could therefore be multiple applicable implementations. This will confuse the reader of your code. Only apply these keywords if variance is actually required. You should typically not use variance when defining *ICommandHandler<TCommand>* or *IQueryHandler<TQuery, TResult>*, but it might make sense for *IEventHandler<in TEvent>* and *IValidator<in T>*.
     
-    **Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered.
+.. container:: Note
+    
+    **Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered, because this could easily lead to ambiguity; Simple Injector will not know which implementation to select.
 
 .. _Plugins:
 
@@ -1000,4 +1006,4 @@ Applications with a plugin architecture often allow special plugin assemblies to
 
     container.RegisterAll<IPlugin>(pluginTypes);
 
-The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all publicly exposed concrete types that implements *IPlugin* will be registered using the **RegisterAll** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.
+The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all publicly exposed concrete types that implement *IPlugin* will be registered using the **RegisterAll** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.

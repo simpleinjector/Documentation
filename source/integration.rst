@@ -2,19 +2,19 @@
 Integration Guide
 =================
 
-Simple Injector can be used in a wide range of .NET technologies, both server side as client side. Jump directly to to the integration page for the application framework of your choice. When the framework of your choice is not listed, doesn't mean it isn't supported, but just that we didn't have the time write it :-)
+Simple Injector can be used in a wide range of .NET technologies, both server side as client side. Jump directly to the integration page for the application framework of your choice. When the framework of your choice is not listed, doesn't mean it isn't supported, but just that we didn't have the time write it :-)
 
 .. toctree::
     :maxdepth: 1
 
-	ASP.NET MVC <mvcintegration>
-	ASP.NET Web API <webapiintegration>
-	ASP.NET Web Forms <webformsintegration>
-	OWIN <owinintegration>
-	Windows Forms <windowsformsintegration>
-	WCF <wcfintegration>
-	WPF <wpfintegration>
-	Silverlight <silverlightintegration>
+    ASP.NET MVC <mvcintegration>
+    ASP.NET Web API <webapiintegration>
+    ASP.NET Web Forms <webformsintegration>
+    OWIN <owinintegration>
+    Windows Forms <windowsformsintegration>
+    WCF <wcfintegration>
+    WPF <wpfintegration>
+    Silverlight <silverlightintegration>
 
 Besides integration with standard .NET technologies, Simple Injector can be integrated with a wide range of other technologies. Here are a few links to help you get started quickly:
 
