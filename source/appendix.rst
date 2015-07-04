@@ -7,7 +7,6 @@ Appendix
 
     Runtime Decorators <RuntimeDecorators>
     Interception Extensions <InterceptionExtensions>
-    Collection Registration Extensions <CollectionRegistrationExtensions>
     Context Dependent Extensions <ContextDependentExtensions>
     Variance Extensions <varianceextensions>
     T4MVC <t4mvc>

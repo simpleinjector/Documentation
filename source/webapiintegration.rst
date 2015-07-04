@@ -103,17 +103,15 @@ This abstraction can be injected into your services, which can call the *Current
 
 .. code-block:: c#
 
-    // Register this class per Web API request
     private sealed class RequestMessageProvider : IRequestMessageProvider {
-        private readonly Lazy<HttpRequestMessage> message;
+        private readonly Container container;
         
         public RequestMessageProvider(Container container) {
-            this.message = new Lazy<HttpRequestMessage>(
-                () => container.GetCurrentHttpRequestMessage());
+            this.container = container;
         }
 
         public HttpRequestMessage CurrentMessage {
-            get { return this.message.Value; }
+            get { return this.container.GetCurrentHttpRequestMessage(); }
         }
     }
 
@@ -121,7 +119,7 @@ This implementation can be implemented as follows:
 
 .. code-block:: c#
 
-    container.RegisterWebApiRequest<IRequestMessageProvider, RequestMessageProvider>();
+    container.Register<IRequestMessageProvider, RequestMessageProvider>(Lifestyle.Singleton);
 
 .. _Injecting-dependencies-into-Web-API-filter-attributes:
     
@@ -200,7 +198,9 @@ The solution is to define a proxy class that sits in between. Since Web API lack
 
             var handler = this.container.GetInstance<THandler>();
 
-            handler.InnerHandler = this.InnerHandler;
+            if (!object.ReferenceEquals(handler.InnerHandler, this.InnerHandler)) {
+                handler.InnerHandler = this.InnerHandler;
+            }
 
             var invoker = new HttpMessageInvoker(handler);
         
@@ -208,11 +208,7 @@ The solution is to define a proxy class that sits in between. Since Web API lack
         }
     }
     
-This *DelegatingHandlerProxy<THandler>* can be added as singleton to the global *MessageHandlers* collection, and it will resolve the given *THandler* on each request, allowing it to be resolved according to its lifestyle. 
-
-.. container:: Note
-
-    **Warning**: Prevent registering any *THandler* with a lifestyle longer than the request, since message handlers are **not** thread-safe (just look at the assignment of *InnerHandler* in the *SendAsync* method and you'll understand why).
+This *DelegatingHandlerProxy<THandler>* can be added as singleton to the global *MessageHandlers* collection, and it will resolve the given *THandler* on each request, allowing it to be resolved according to its lifestyle.
 
 The *DelegatingHandlerProxy<THandler>* can be used as follows:
 

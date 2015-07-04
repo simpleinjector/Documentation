@@ -25,7 +25,8 @@ This warning can safely be ignored when:
 
 - *Dispose* is called by the application code
 - some manual registration ensures disposal
-- not disposing is not a problem.
+- a framework (such as ASP.NET) guarantees disposal of the component
+- not disposing is not an issue.
 
 The warning can be suppressed on a per-registration basis as follows:
 	

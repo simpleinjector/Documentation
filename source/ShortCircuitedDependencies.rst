@@ -13,22 +13,17 @@ Warning Description
 This warning signals the possible use of a short circuited dependency in a component. A short circuited dependency is:
 
 * a concrete type
-* that is not registered by itself
-* that is referenced by another component (most likely using a constructor argument)
+* that is not registered as itself (i.e. not registered as **Register<TConcrete>** or its non-generic equivalent)
+* and is referenced by another component (most likely using a constructor argument)
 * and exists as *TImplementation* in an explicitly made **Register<TService, TImplementation>()** registration (or its non-generic equivalent)
-* and where the lifestyle of this explicit registration differs from the unregistered type (in normal cases this means that the explicit registration is not **Transient**)
+* and where the lifestyle of this explicit registration differs from the unregistered type (under normal circumstances this means that the explicit registration is not **Transient**)
 
 When a component depends on a short circuited dependency, the application might be wired incorrectly because the flagged component gets a different instance of that concrete type than other components in the application will get. This can result in incorrect behavior.
-
-.. container:: Note
-
-    **Note**: This warning is a specialized version of the :ref:`Ambiguous Lifestyles <ambiguouslifestyles>` warning.
-
 
 How to Fix Violations
 =====================
 
-Let the component depend on the abstraction described in the warning message instead of depending directly on the concrete type. If the warning is a false positive and the component (and all other components that depend directly on this concrete type) should indeed get a transient instance of that concrete type, register the concrete type explicitly in the contain using the transient lifestyle.
+Let the component depend on the abstraction described in the warning message instead of depending directly on the concrete type. If the warning is a false positive and the component (and all other components that depend directly on this concrete type) should indeed get a transient instance of that concrete type, register the concrete type explicitly in the container using the transient lifestyle.
 
 When to Ignore Warnings
 =======================

@@ -36,7 +36,7 @@ Add a *Program.cs* file to your project to be the new entry point for the applic
         static void Main() {
             var container = Bootstrap();
 
-            // ANy additional other configuration, e.g. of your desired MVVM toolkit.
+            // Any additional other configuration, e.g. of your desired MVVM toolkit.
 
             RunApplication(container);
         }
@@ -46,7 +46,7 @@ Add a *Program.cs* file to your project to be the new entry point for the applic
             var container = new Container();
 
             // Register your types, for instance:
-            container.RegisterSingle<IQueryProcessor, QueryProcessor>();
+            container.Register<IQueryProcessor, QueryProcessor>(Lifestyle.Singleton);
             container.Register<IUserContext, WpfUserContext>();
 
             // Register your windows and view models:

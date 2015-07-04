@@ -31,10 +31,10 @@ In most situations it makes little sense to change the configuration once the ap
 
 Allowing the ability to alter the DI configuration while the application is running could easily cause strange, hard to debug, and hard to verify behavior. This may also mean the application has numerous hard references to the container and this is something we work hard to prevent. Attempting to alter the configuration when running a multi-threaded application would lead to very un-deterministic behavior, even if the container itself is thread-safe.
 
-Imagine the scenario where you want to replace some *FileLogger* component for a different implementation with the same *ILogger* interface. If there's a different registration that directly or indirectly depends on this registration, replacing the *ILogger* might not work as you would expect. If the depending registration is registered as singleton, for example, the container should guarantee that only one instance will be created. When you are allowed to change the implementation of *ILogger* after a singleton instance already holds a reference to the "old" registered implementation the container has 2 choices - neither of which are correct:
+Imagine the scenario where you want to replace some *FileLogger* component for a different implementation with the same *ILogger* interface. If there's a component that directly or indirectly depends on *ILogger*, replacing the *ILogger* implementation might not work as you would expect. If the consuming component is registered as singleton, for example, the container should guarantee that only one instance of this component will be created. When you are allowed to change the implementation of *ILogger* after a singleton instance already holds a reference to the "old" registered implementation the container has 2 choices - neither of which are correct:
 
-#. Return the cached instance of the registration that has a reference to the "wrong" *ILogger*.
-#. Create and cache a new instance of that registration and, in doing so, break the promise of the type being registered as a singleton and the guarantee that the container will always return the same instance.
+#. Return the cached instance of the consuming component that has a reference to the "wrong" *ILogger* implementation.
+#. Create and cache a new instance of that component and, in doing so, break the promise of the type being registered as a singleton and the guarantee that the container will always return the same instance.
 
 The description above is a simple to grasp example of dealing with the runtime replacement of services. But adding new registrations can also cause things to go wrong in unexpected ways. A simple example would be where the container has previously supplied the object graph with a default implementation resolved through unregistered type resolution.
 
@@ -47,6 +47,8 @@ Do note that container lock-down still allows runtime registrations. A few commo
 #. Resolving an unregistered concrete type from the container. The container will auto-register that type for you as transient registration.
 #. Using :ref:`unregistered type resolution <Unregistered-Type-Resolution>` the container will be able to at a later time resolve new types.
 #. The `Lifestyle.CreateProducer <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Lifestyle_CreateProducer.htm>`_ overloads can be called at any point in time to create new **InstanceProducer** instances that allow building new registrations.
+
+All these options provide users with a safe way to add registrations at a later point in time, without the risks described above.
 
 .. _Separate-collections:
 
@@ -66,7 +68,7 @@ This design differentiates vastly from how other DI libraries work. Most librari
 
 In general, your services should not depend on an *IEnumerable<ISomeService>*, especially when your application has multiple services that need to work with *ISomeService*. The problem with injecting *IEnumerable* into multiple consumers is that you will have to iterate that collection in multiple places. This forces the consumers to know about having multiple implementations and how to iterate and process that collection. As far as the consumer is concerned this should be an implementation detail. If you ever need to change the way a collection is processed you will have to go through the application, since this logic will have be duplicated throughout the system.
 
-Instead of injecting an *IEnumerable* a consumer should instead depend on a single abstraction and you can achieve this using a `Composite <https://en.wikipedia.org/wiki/Composite_pattern>`_ Implementation that wraps the actual collection and contains the logic of processing the collection. Registering composite implementation is so much easier with Simple Injector because of the clear separation between a single implementation and a collection of implementations. Take the following configuration for example, where we register a collection of *ILogger* implementations and a single composite implementation for use in the rest of our code:
+Instead of injecting an *IEnumerable*, a consumer should instead depend on a single abstraction and you can achieve this using a `Composite <https://en.wikipedia.org/wiki/Composite_pattern>`_ Implementation that wraps the actual collection and contains the logic of processing the collection. Registering composite implementation is so much easier with Simple Injector because of the clear separation between a single implementation and a collection of implementations. Take the following configuration for example, where we register a collection of *ILogger* implementations and a single composite implementation for use in the rest of our code:
 
 .. code-block:: c#
 
@@ -75,7 +77,7 @@ Instead of injecting an *IEnumerable* a consumer should instead depend on a sing
         typeof(SqlLogger),
         typeof(EventLogLogger));
     
-	container.Register<ILogger, CompositeLogger>();
+    container.Register<ILogger, CompositeLogger>();
 
 .. _No-support-for-XML:
 
@@ -86,7 +88,7 @@ While designing Simple Injector, we decided to *not* provide an XML based config
 
 * :ref:`Push developers into best practices <Push-developers-into-best-practices>` and having a XML centered configuration is *not* best practice
 
-XML based configuration is brittle, error prone and always provides a subset of what you can achieve with code based configuration. General consensus is to use code based configuration as much as possible and only fall back to file based configuration for the parts of the configuration that really need to be customizable after deployment. These are normally just a few registrations since the majority of changes would still require developer interaction (write unit tests or recompiling for instance). Even for those few lines that do need to be configurable, it's a bad idea to require the fully qualified type name in a configuration file. A configuration switch (true/false or simple enum) is more than enough. You can read the configured value in your code based configuration and this allows you to keep the type names in your code. This allows you to refactor easily and gives you compile-time support.
+XML based configuration is brittle, error prone and always provides a subset of what you can achieve with code based configuration. General consensus is to use code based configuration as much as possible and only fall back to file based configuration for the parts of the configuration that really need to be customizable after deployment. These are normally just a few registrations since the majority of changes would still require developer interaction (write unit tests or recompile for instance). Even for those few lines that do need to be configurable, it's a bad idea to require the fully qualified type name in a configuration file. A configuration switch (true/false or simple enum) is more than enough. You can read the configured value in your code based configuration, this allows you to keep the type names in your code. This allows you to refactor easily, gives you compile-time support and is much more friendly to the person having to change this configuration file.
 
 .. _Never-force-release:
 
@@ -151,7 +153,7 @@ Simple Injector tries to push developers into good design, and the use of interc
 
 Simple Injector is designed to be fast by default. Applying decorators in Simple Injector is just as fast as normal injection, while applying interceptors has a much higher cost, since it involves the use of reflection.
 
-To be able to intercept, you will need to take a dependency on your interception library, since this library defines an *IInterceptor* interface or something similar (such as Castle's *IInterceptor* or Unity's *ICallHandler*). Decorators on the other hand can be created without asking you to take a dependency on an external library. Since vendor lock-in should be avoided the Simple Injector library doesn't define any interfaces or attributes to be used at the application level.
+To be able to intercept, you will need to take a dependency on your interception library, since this library defines an *IInterceptor* interface or something similar (such as Castle's *IInterceptor* or Unity's *ICallHandler*). Decorators on the other hand can be created without asking you to take a dependency on an external library. Since vendor lock-in should be avoided, Simple Injector doesn't define any interfaces or attributes to be used at the application level.
 
 .. _Limited-batch-registration:
 

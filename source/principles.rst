@@ -21,14 +21,14 @@ The design principles:
 Make simple use cases easy, make complex use cases possible
 ===========================================================
 
-This guideline comes directly from the `Framework Design Guidelines <http://www.amazon.com/Framework-Design-Guidelines-Conventions-Libraries/dp/0321545613>`_ and is an important guidance for us. Commonly used features should be easy to implement, even for a new user, but the framework must be flexible and extensible enough to support complex scenarios.
+This guideline comes directly from the `Framework Design Guidelines <http://www.amazon.com/Framework-Design-Guidelines-Conventions-Libraries/dp/0321545613>`_ and is an important guidance for us. Commonly used features should be easy to implement, even for a new user, but the library must be flexible and extensible enough to support complex scenarios.
 
 .. _Push-developers-into-best-practices:
 
 Push developers into best practices
 ===================================
 
-We believe in good design and best practices. When it comes to Dependency Injection, we believe that we know quite a bit about applying design patterns correctly and also how to prevent applying patterns incorrectly. We have designed Simple Injector in a way that promotes these best practices. Occasional we may explicitly choose to **not** implement certain features because they don't steer the developer in the right direction. Our intention has always been to build a framework that makes it difficult to shoot yourself in the foot!
+We believe in good design and best practices. When it comes to Dependency Injection, we believe that we know quite a bit about applying design patterns correctly and also how to prevent applying patterns incorrectly. We have designed Simple Injector in a way that promotes these best practices. Occasional we may explicitly choose to **not** implement certain features because they don't steer the developer in the right direction. Our intention has always been to build a library that makes it difficult to shoot yourself in the foot!
 
 .. _Fast-by-default:
 

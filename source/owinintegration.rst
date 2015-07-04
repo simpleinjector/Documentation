@@ -16,11 +16,13 @@ To allow scoped instances to be resolved during an OWIN request, the following r
     using SimpleInjector;
     using SimpleInjector.Extensions.ExecutionContextScoping;
 
-    app.Use(async (context, next) => {
-        using (container.BeginExecutionContextScope()) {
-            await next();
-        }
-    });
+    public void Configuration(IAppBuilder app) {
+        app.Use(async (context, next) => {
+            using (container.BeginExecutionContextScope()) {
+                await next();
+            }
+        });
+    }
 
 Scoped instances need to be registered with the `ExecutionContextScope` lifestyle:
 
