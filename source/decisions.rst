@@ -143,7 +143,7 @@ This doesn't mean that you can't do property injection with Simple Injector, but
 No out-of-the-box support for interception
 ==========================================
 
-Simple Injector does support interception out-of-the box, because we want to:
+Simple Injector does not support interception out-of-the box, because we want to:
 
 * :ref:`Push developers into best practices <Push-developers-into-best-practices>`
 * :ref:`Fast by default <Fast-by-default>`
