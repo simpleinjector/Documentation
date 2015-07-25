@@ -26,10 +26,10 @@ The following code snippet shows how to use the integration package (note that t
     protected void Application_Start() {
         // Create the container as usual.
         var container = new Container();
+        container.Options.DefaultScopedLifestyle = new WebApiRequestLifestyle();
 
-        // Register your types, for instance using the RegisterWebApiRequest
-        // extension from the integration package:
-        container.RegisterWebApiRequest<IUserRepository, SqlUserRepository>();
+        // Register your types, for instance using the scoped lifestyle:
+        container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
 
         // This is an extension method from the integration package.
         container.RegisterWebApiControllers(GlobalConfiguration.Configuration);
@@ -78,7 +78,7 @@ Given the configuration above, an actual controller could look like this:
 Extra features
 ==============
 
-The basic features of the Web API integration package are the **SimpleInjectorWebApiDependencyResolver** class and the **WebApiRequestLifestyle** with its **RegisterWebApiRequest** extension methods. Besides these basic features, the integration package contains extra features that can make your life easier.
+The basic features of the Web API integration package are the **SimpleInjectorWebApiDependencyResolver** class and the **WebApiRequestLifestyle** and **RegisterWebApiControllers** extension methods. Besides these basic features, the integration package contains extra features that can make your life easier.
 
 .. _Getting-the-current-requests-HttpRequestMessage:
 
@@ -119,7 +119,7 @@ This implementation can be implemented as follows:
 
 .. code-block:: c#
 
-    container.Register<IRequestMessageProvider, RequestMessageProvider>(Lifestyle.Singleton);
+    container.RegisterSingleton<IRequestMessageProvider>(new RequestMessageProvider(container));
 
 .. _Injecting-dependencies-into-Web-API-filter-attributes:
     

@@ -11,10 +11,11 @@ After installing this NuGet package, it must be initialized in the start-up path
     protected void Application_Start(object sender, EventArgs e) {
         // Create the container as usual.
         var container = new Container();
+        container.Options.DefaultScopedLifestyle = new WcfOperationLifestyle();
         
         // Register your types, for instance:
         container.Register<IUserRepository, SqlUserRepository>();
-        container.RegisterPerWcfOperation<IUnitOfWork, EfUnitOfWork>();
+        container.Register<IUnitOfWork, EfUnitOfWork>(Lifestyle.Scoped);
 
         // Register the container to the SimpleInjectorServiceHostFactory.
         SimpleInjectorServiceHostFactory.SetContainer(container);
@@ -22,7 +23,7 @@ After installing this NuGet package, it must be initialized in the start-up path
 
 .. container:: Note
 
-    **Warning**: Instead of what the name of the **WcfOperationLifestyle** class and the **RegisterPerWcfOperation** methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registered *PerWcfOperation* live as long as the WCF service class they are injected into.
+    **Warning**: Instead of what the name of the **WcfOperationLifestyle** class seems to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registered *PerWcfOperation* live as long as the WCF service class they are injected into.
 
 For each service class, you should supply a factory attribute in the .SVC file of each service class. For instance:
 
@@ -42,7 +43,7 @@ For each service class, you should supply a factory attribute in the .SVC file o
 WAS Hosting and Non-HTTP Activation
 ===================================
 
-When hosting WCF Services in WAS (Windows Activation Service), you are not given an opportunity to build your container in the Application_Start event defined in your Global.asax because WAS doesn't use the standard ASP.NET pipeline. A workaround for this is to move the container initialization to a static constructor
+When hosting WCF Services in WAS (Windows Activation Service), you are not given an opportunity to build your container in the Application_Start event defined in your Global.asax because WAS doesn't use the standard ASP.NET pipeline. A workaround for this is to move the container initialization to a static constructor:
 
 .. code-block:: c#
 
@@ -51,10 +52,11 @@ When hosting WCF Services in WAS (Windows Activation Service), you are not given
      
         static Bootstrapper() {
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new WcfOperationLifestyle();
      
             // register all your components with the container here:
             // container.Register<IService1, Service1>()
-            // container.RegisterLifetimeScope<IDataContext,DataContext>();
+            // container.Register<IDataContext, DataContext>(Lifestyle.Scoped);
      
             container.Verify();
      
@@ -77,7 +79,7 @@ Your custom *ServiceHostFactory* can now use the static **Bootstrapper.Container
     }
 
 Optionally, you can apply your custom service behaviors and contract behaviors to the service host:
-	
+    
 .. code-block:: c#
      
     public class WcfServiceFactory : SimpleInjectorServiceHostFactory {

@@ -172,7 +172,7 @@ This enables explicit property injection on all properties that are marked with 
 
 .. container:: Note
 
-    **Tip**: Dependencies injected by the container through the **IPropertySelectionBehavior** will be analyzed by the :doc:`Diagnostic <diagnostics>`.
+    **Tip**: Dependencies injected by the container through the **IPropertySelectionBehavior** will be analyzed by the :doc:`Diagnostic <diagnostics>`, just like any constructor dependency is analyzed.
 
 Implicit property injection can be enabled by creating an **IPropertySelectionBehavior** implementation that queries the container to check whether the property's type to be registered in the container:
 
@@ -216,7 +216,7 @@ Implicit property injection can be enabled by creating an **IPropertySelectionBe
 Overriding Parameter Injection Behavior
 =======================================
 
-Simple Injector does not allow injecting primitive types (such as integers and string) into constructors. The **IConstructorInjectionBehavior** interface is defined by the library to change this default behavior.
+Simple Injector does not allow injecting primitive types (such as integers and string) into constructors. The **IDependencyInjectionBehavior** interface is defined by the library to change this default behavior.
 
 The following article contains more information about changing the library's default behavior: `Primitive Dependencies with the Simple Injector <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=94>`_.
 
@@ -225,7 +225,7 @@ The following article contains more information about changing the library's def
 Resolving Unregistered Types
 ============================
 
-Unregistered type resolution is the ability to get notified by the container when a type is requested that is currently unregistered in the container. This gives you the change of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the :ref:`registration of open generic types <Registration-Of-Open-Generic-Types>`. Other examples of possible scenarios that can be built on top of this event are :ref:`resolving array and lists <Resolve-Arrays-And-Lists>` and :ref:`covariance and contravariance <Covariance-Contravariance>`. Those scenarios are described here in the advanced scenarios page.
+Unregistered type resolution is the ability to get notified by the container when a type is requested that is currently unregistered in the container. This gives you the change of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing enabling support for :ref:`decorators <Decorators>`.
 
 For more information about how to use this event, please look at the `ResolveUnregisteredType event documentation <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ in the `reference library <https://simpleinjector.org/ReferenceLibrary/>`_.
 
@@ -234,7 +234,7 @@ For more information about how to use this event, please look at the `ResolveUnr
 Overriding Lifestyle Selection Behavior
 =======================================
 
-By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the **Transient** lifestyle. Since Simple Injector 2.6 this behavior can be overridden and this is especially useful in batch-registration scenarios.
+By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the **Transient** lifestyle. This behavior can be overridden and this is especially useful in batch-registration scenarios.
 
 Here are some examples of registration calls that all register types as *transient*:
 
@@ -242,12 +242,10 @@ Here are some examples of registration calls that all register types as *transie
 
     container.Register<IUserContext, AspNetUserContext>();
     container.Register<ITimeProvider>(() => new RealTimeProvider());
-    container.RegisterAll<ILogger>(typeof(SqlLogger), typeof(FileLogger));
-    container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>),
-        typeof(ICommandHandler<>).Assembly);
-    container.RegisterDecorator(typeof(ICommandHandler<>),
-        typeof(LoggingCommandHandlerDecorator<>));
-    container.RegisterOpenGeneric(typeof(IValidator<>), typeof(NullValidator<>));
+    container.RegisterCollection<ILogger>(new[] { typeof(SqlLogger), typeof(FileLogger) });
+    container.Register(typeof(IHandler<>), new[] { typeof(IHandler<>).Assembly });
+    container.RegisterDecorator(typeof(IHandler<>), typeof(LoggingHandlerDecorator<>));
+    container.RegisterConditional(typeof(IValidator<>), typeof(NullVal<>), c => !c.Handled);
     container.RegisterMvcControllers();
     container.RegisterWcfServices();
     container.RegisterWebApiControllers(GlobalConfiguration.Configuration);
@@ -262,9 +260,9 @@ In this case we need to override the way Simple Injector does lifestyle selectio
         Lifestyle SelectLifestyle(Type serviceType, Type implementationType);
     }
 
-When no lifestyle is explicitly supplied by the user, Simple Injector will call into the registered **ILifestyleSelectionBehavior** when the type is registered to allow the **ILifestyleSelectionBehavior** implementation to select the proper lifestyle. The default behavior can be replaced by setting the *Container.Options.LifestyleSelectionBehavior* property.
+When no lifestyle is explicitly supplied by the user, Simple Injector will call into the registered **ILifestyleSelectionBehavior** when the type is registered to allow the **ILifestyleSelectionBehavior** implementation to select the proper lifestyle. The default behavior can be replaced by setting the **Container.Options.LifestyleSelectionBehavior** property.
 
-The following (not very useful) example changes the lifestyle selection behavior to always register those instances as singleton:
+The following example changes the lifestyle selection behavior to always register those instances as singleton:
 
 .. code-block:: c#
 
@@ -281,8 +279,7 @@ The following (not very useful) example changes the lifestyle selection behavior
 
     // Usage
     var container = new Container();
-    container.Options.LifestyleSelectionBehavior = 
-        new SingletonLifestyleSelectionBehavior();
+    container.Options.LifestyleSelectionBehavior = new SingletonLifestyleSelectionBehavior();
 
 The following example changes the lifestyle selection behavior to pick the lifestyle based on an attribute:
 
@@ -308,21 +305,14 @@ The following example changes the lifestyle selection behavior to pick the lifes
     // Custom lifestyle selection behavior
     public class AttributeBasedLifestyleSelectionBehavior : ILifestyleSelectionBehavior {
         private const CreationPolicy DefaultPolicy = CreationPolicy.Transient;
-        private readonly ScopedLifestyle scopedLifestyle;
-
-        public AttributeBasedLifestyleSelectionBehavior(ScopedLifestyle scopedLifestyle) {
-            this.scopedLifestyle = scopedLifestyle;
-        }
 
         public Lifestyle SelectLifestyle(Type serviceType, Type implementationType) {
             var attribute = implementationType.GetCustomAttribute<CreationPolicyAttribute>()
                 ?? serviceType.GetCustomAttribute<CreationPolicyAttribute>();
 
-            var policy = attribute == null ? DefaultPolicy : attribute.Policy;
-
-            switch (policy) {
+            switch (attribute != null ? attribute.Policy : DefaultPolicy) {
                 case CreationPolicy.Singleton: return Lifestyle.Singleton;
-                case CreationPolicy.Scoped: return this.scopedLifestyle;
+                case CreationPolicy.Scoped: return Lifestyle.Scoped;
                 default: return Lifestyle.Transient;
             }
         }
@@ -330,12 +320,10 @@ The following example changes the lifestyle selection behavior to pick the lifes
 
     // Usage
     var container = new Container();
-
-    // Create a scope lifestyle (if needed)
-    ScopedLifestyle scopedLifestyle = new WebRequestLifestyle();
+    container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
 
     container.Options.LifestyleSelectionBehavior =
-        new AttributeBasedLifestyleSelectionBehavior(scopedLifestyle);
+        new AttributeBasedLifestyleSelectionBehavior();
         
     container.Register<IUserContext, AspNetUserContext>();
 
@@ -399,15 +387,13 @@ Interception of Resolved Object Graphs
 
 Simple Injector allows registering a delegate that will be called every time an instance is resolved directly from the container. This allows executing code just before and after an object graph gets resolved. This allows plugging in monitoring or diagnosing the container.
 
-The Glimpse plugin for Simple Injector for instance, makes use of this hook to allow displaying information about which objects where resolved during a web request.
+The `Glimpse plugin for Simple Injector <https://www.nuget.org/packages/Glimpse.SimpleInjector/>`_ for instance, makes use of this hook to allow displaying information about which objects where resolved during a web request.
 
 The following example shows the **Options.RegisterResolveInterceptor** method in action:
 
 .. code-block:: c#
     
-    container.Options.RegisterResolveInterceptor(
-        CollectResolvedInstance,
-        c => true);
+    container.Options.RegisterResolveInterceptor(CollectResolvedInstance, c => true);
         
     private static object CollectResolvedInstance(InitializationContext context, 
         Func<object> instanceProducer)
@@ -423,7 +409,7 @@ The following example shows the **Options.RegisterResolveInterceptor** method in
         return instance;
     }
 
-The example above shows the registration code from the Glimpse plugin component. It registers an interception delegate to the *CollectResolvedInstance* method by calling *container.Options.RegisterResolveInterceptor*. The *c => true* lambda informs Simple Injector that the *CollectResolvedInstance* method should always for every service that is being resolved. This makes sense for the Glimpse plugin, because the user would want to get a complete view of what is being resolved during that request.
+The example above shows the registration code from the Glimpse plugin component. It registers an interception delegate to the *CollectResolvedInstance* method by calling *container.Options.RegisterResolveInterceptor*. The *c => true* lambda informs Simple Injector that the *CollectResolvedInstance* method should always be applied for every service that is being resolved. This makes sense for the Glimpse plugin, because the user would want to get a complete view of what is being resolved during that request.
 
 When a user calls **Container.GetInstance** or **InstanceProducer.GetInstance**, instead of creating the requested instance, Simple Injector will call the *CollectResolvedInstance* method and supplies to that method:
 

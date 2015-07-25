@@ -7,6 +7,10 @@ The **Diagnostic Services** allow you to analyze the container's configuration t
 How to view diagnostic results
 ==============================
 
+.. container:: Note
+
+    **Note**: In Simple Injector 3, the container now by default checks for diagnostic errors when calling **Verify()**. In case of a diagnostic error, the container's **Verify()** method will throw a **DiagnosticVerificationException**.
+
 There are two ways to view the diagnostic results - results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.
 
 Diagnostic results are available during debugging in Visual Studio after calling *Container.Verify()*. Set a breakpoint after the line that calls **Verify()** and when the breakpoint breaks, hover over the *Container* instance with the mouse. The debugger context menu will appear for the *Container* variable which you can unfold to view the diagnostic results. This might look like this:
@@ -37,9 +41,9 @@ This same information can be requested programmatically by using the Diagnostic 
         // Arrange
         var container = Bootstrapper.GetInitializedContainer();
 
-        container.Verify();
+        container.Verify(VerificationOption.VerifyOnly);
 
-    	// Assert
+        // Assert
         var results = Analyzer.Analyze(container);
 
         Assert.IsFalse(results.Any(), Environment.NewLine +
@@ -47,17 +51,17 @@ This same information can be requested programmatically by using the Diagnostic 
                 from result in results
                 select result.Description));
     }
-	
+
 Instead of interacting with the Diagnostic API directly, you can force the container to fail fast during verification in case one of the more severe warnings is detected:
 
 .. code-block:: c#
 
-	var container = Bootstrapper.GetInitializedContainer();
+    var container = Bootstrapper.GetInitializedContainer();
 
-	container.Verify(VerificationOption.VerifyAndDiagnose);
+    container.Verify();
 
-When calling *Verify(VerificationOption.VerifyAndDiagnose)*, the container will check for the warning types that are most likely to cause bugs in your application. By calling this overload during application startup, or inside an integration test, you'll keep the feedback cycle as short as possible, and you'll get notified about possible bugs that otherwise might have stayed undetected for much too long.
-	
+A call to *Verify()* defaults to *Verify(VerificationOption.VerifyAndDiagnose)*. When called, the container will check for the warning types that are most likely to cause bugs in your application. By calling this overload during application startup, or inside an integration test, you'll keep the feedback cycle as short as possible, and you'll get notified about possible bugs that otherwise might have stayed undetected for much too long.
+
 
 Suppressing warnings
 ====================
@@ -80,7 +84,7 @@ In the previous code sample, a *Registration* instance for the *HomeController* 
 Suppressing this warning type for an MVC controller makes sense, because the MVC framework will ensure proper disposal of MVC controllers.
 
 Alternatively, you can also request an already made registered and suppress a warning on that:
-	
+
 .. code-block:: c#
 
     var registration = container.GetRegistration(typeof(HomeController)).Registration;
@@ -91,7 +95,7 @@ Alternatively, you can also request an already made registered and suppress a wa
 
     **Tip**: *RegisterMvcControllers* extension method of the **SimpleInjector.Integration.Web.Mvc.dll** will batch-register all MVC controllers and will automatically suppress the **Disposable Transient Component** warning on controller types.
 
-	
+
 Limitations
 ===========
 
@@ -152,10 +156,10 @@ Supported Warnings
 .. toctree::
     :titlesonly:
 
-    Potential Lifestyle Mismatches <PotentialLifestyleMismatches>
+    Lifestyle Mismatches <LifestyleMismatches>
     Short Circuited Dependencies <ShortCircuitedDependencies>
     Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
     Container-Registered Types <ContainerRegisteredTypes>
     Torn Lifestyle <tornlifestyle>
-	Ambiguous Lifestyles <ambiguouslifestyles>
+    Ambiguous Lifestyles <ambiguouslifestyles>
     Disposable Transient Components <disposabletransientcomponent>

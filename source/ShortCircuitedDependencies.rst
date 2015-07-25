@@ -2,6 +2,11 @@
 Diagnostic Warning - Short Circuited Dependencies
 =================================================
 
+Severity
+========
+
+Warning
+
 Cause
 =====
 
@@ -35,9 +40,7 @@ Example
 
 .. code-block:: c#
 
-    var container = new Container();
-
-    container.RegisterPerWebRequest<IUnitOfWork, MyUnitOfWork>();
+    container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Scoped);
     container.Register<HomeController>();
 
     // Definition of HomeController
@@ -49,7 +52,7 @@ Example
         }
     }
 
-In this example *HomeController* depends on *MyUnitOfWork*. *MyUnitOfWork* however is not registered explicitly, but *IUnitOfWork* is. Furthermore *IUnitOfWork* is registered with the *WebRequestLifestyle*. However, since *MyUnitOfWork* is a concrete unregistered type, the container will create it on your behalf with the **Transient** lifestyle. This will typically be a problem, since during a request, the *HomeController* will get a different instance than other types that depend on *IUnitOfWork* while the intended use of *IUnitOfWork* is to have a single instance per web request.
+In this example *HomeController* depends on *MyUnitOfWork*. *MyUnitOfWork* however is not registered explicitly, but *IUnitOfWork* is. Furthermore *IUnitOfWork* is registered with a scoped lifestyle. However, since *MyUnitOfWork* is a concrete unregistered type, the container will create it on your behalf with the **Transient** lifestyle. This will typically be a problem, since during a request, the *HomeController* will get a different instance than other types that depend on *IUnitOfWork* while the intended use of *IUnitOfWork* is to have a single instance per web request.
 
 For Unit of Work implementations this is typically a problem, since the unit of work defines an atomic operation and creating multiple instances of such a unit of work in a single web request means that the work is split up in multiple (database) transactions (breaking consistency) or could result in part of the work not being committed at all.
 
