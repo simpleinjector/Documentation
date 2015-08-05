@@ -67,6 +67,6 @@ The following code snippet can be used to register this *IOwinContextProvider* a
     app.Use(async (context, next) => {
         CallContext.LogicalSetData("IOwinContext", context);
         await next();
-    };
+    });
     
     container.RegisterSingle<IOwinContextProvider>(new CallContextOwinContextProvider());
