@@ -38,7 +38,7 @@ In situations where a service needs to create multiple instances of a certain co
     }
 
     // Registration
-    container.RegisterSingle<IMyServiceFactory>(new ServiceFactory());
+    container.RegisterSingleton<IMyServiceFactory>(new ServiceFactory());
 
     // Usage
     public class MyService {
@@ -64,7 +64,7 @@ Instead of creating specific interfaces for your factories, you can also choose 
 .. code-block:: c#
 
     // Registration
-    container.RegisterSingle<Func<IMyService>>(() => new MyServiceImpl());
+    container.RegisterSingleton<Func<IMyService>>(() => new MyServiceImpl());
 
     // Usage
     public class MyService {
@@ -100,8 +100,8 @@ When you choose *Func<T>* delegates over specific factory interfaces you can def
         where TImpl : class, TService
     {
         lifestyle = lifestyle ?? Lifestyle.Transient;
-        var producer = lifesyle.CreateProducer<TService, TImpl>(container);
-        container.RegisterSingle<Func<TService>>(() => (TService)producer.GetInstance());
+        var producer = lifestyle.CreateProducer<TService, TImpl>(container);
+        container.RegisterSingleton<Func<TService>>(producer.GetInstance);
     }
 
     // Registration
@@ -345,7 +345,7 @@ The advantage of this method is that it completely integrates with the *Containe
 Resolve arrays and lists
 ========================
 
-Simple Injector allows the registration of collections of elements using the `RegisterAll <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm>`_ method overloads. Collections can be resolved by any of the **GetAllInstances<T>()** methods, by calling *GetInstance<IEnumerable<T>>()*, or by defining an *IEnumerable<T>*, *ICollection<T>*, *IList<T>*, *IReadOnlyCollection<T>*, *IReadOnlyList<T>* or array parameter in the constructor of a type that is created using automatic constructor injection.
+Simple Injector allows the registration of collections of elements using the `RegisterCollection <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterCollection.htm>`_ method overloads. Collections can be resolved by any of the **GetAllInstances<T>()** methods, by calling *GetInstance<IEnumerable<T>>()*, or by defining an *IEnumerable<T>*, *ICollection<T>*, *IList<T>*, *IReadOnlyCollection<T>*, *IReadOnlyList<T>* or array parameter in the constructor of a type that is created using automatic constructor injection.
 
 .. container:: Note
 
@@ -405,7 +405,7 @@ The first line creates a **Registration** instance for the *Impl*, in this case 
 
 .. container:: Note
 
-    **Note:** This is different from having three **RegisterSingle** registrations, since that will results three separate singletons.
+    **Note:** This is different from having three **RegisterSingleton** registrations, since that will results three separate singletons.
 
 .. _Override-Existing-Registrations:
 
@@ -414,7 +414,7 @@ Override existing registrations
 
 The default behavior of Simple Injector is to fail when a service is registered for a second time. Most of the time the developer didn't intend to override a previous registration and allowing this would lead to a configuration that would pass the container's verification, but doesn't behave as expected.
 
-:ref:`This design decision <Separate-collections>` differs from most other DI libraries, where adding new registrations results in appending the collection of registrations for that abstraction. Registering collections in Simple Injector is an explicit action done using one of the `RegisterAll <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm>`_ method overloads.
+:ref:`This design decision <Separate-collections>` differs from most other DI libraries, where adding new registrations results in appending the collection of registrations for that abstraction. Registering collections in Simple Injector is an explicit action done using one of the `RegisterCollection <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterCollection.htm>`_ method overloads.
 
 There are certain scenarios however where overriding is useful. An example of such is a bootstrapper project for a business layer that is reused in multiple applications (in both a web application, web service, and Windows service for instance). Not having a business layer specific bootstrapper project would mean the complete DI configuration would be duplicated in the startup path of each application, which would lead to code duplication. In that situation the applications would roughly have the same configuration, with a few adjustments.
 
@@ -455,7 +455,7 @@ The previous example created a *Container* instance that allows overriding. It i
 Verify the container's configuration
 ====================================
 
-Dependency Injection promotes the concept of programming against abstractions. This makes your code much easier to test, easier to change and more maintainable. However, since the code itself isn't responsible for maintaining the dependencies between implementations, the compiler will not be able to verify whether the dependency graph is correct.
+Dependency Injection promotes the concept of programming against abstractions. This makes your code much easier to test, easier to change and maintain. However, since the code itself isn't responsible for maintaining the dependencies between implementations, the compiler will not be able to verify whether the dependency graph is correct.
 
 When starting to use a Dependency Injection container, many developers see their application fail when it is deployed in staging or sometimes even production, because of container misconfigurations. This makes developers often conclude that dependency injection is bad, since the dependency graph cannot be verified. This conclusion however, is incorrect. Although it is impossible for the compiler to verify the dependency graph, verifying the dependency graph is still possible and advisable.
 
@@ -468,7 +468,7 @@ Calling the **Verify()** method however, is just part of the story. It is very e
 #. Register all root objects explicitly. For instance, register all ASP.NET MVC Controller instances explicitly in the container (Controller instances are requested directly and are therefore called 'root objects'). This way the container can check the complete dependency graph starting from the root object when you call **Verify()**. Prefer registering all root objects in an automated fashion, for instance by using reflection to find all root types. The `Simple Injector ASP.NET MVC Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Web.Mvc>`_ for instance, contains a `RegisterMvcControllers <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_SimpleInjectorMvcExtensions_RegisterMvcControllers.htm>`_ extension method that will do this for you and the `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ contains a similar `RegisterWcfServices <https://simpleinjector.org/ReferenceLibrary.v2/?topic=html/M_SimpleInjector_SimpleInjectorWcfExtensions_RegisterWcfServices.htm>`_ extension method for this purpose.
 #. If registering root objects is not possible or feasible, test the creation of each root object manually during start-up. With ASP.NET Web Form Page classes for instance, you will probably call the container (directly or indirectly) from within their constructor (since Page classes must unfortunately have a default constructor). The key here again is finding them all in once using reflection. By finding all Page classes using reflection and instantiating them, you'll find out (during app start-up or through automated testing) whether there is a problem with your DI configuration or not. The :doc:`Web Forms Integration <webformsintegration>` guide contains an example of how to verify page classes.
 #. There are scenarios where some dependencies cannot yet be created during application start-up. To ensure that the application can be started normally and the rest of the DI configuration can still be verified, abstract those dependencies behind a proxy or abstract factory. Try to keep those unverifiable dependencies to a minimum and keep good track of them, because you will probably have to test them manually or using an integration test.
-#. But even when all registrations can be resolved succesfully by the container, that still doesn't mean your configuration is correct. It is very easy to accidentally misconfigure the container in a way that only shows up late in the development process. Simple Injector contains :doc:`Diagnostics Services <diagnostics>` to help you spot common configuration mistakes. It is advicable to analyze the container using these services from time to time or write an automated test that does this for you.
+#. But even when all registrations can be resolved successfully by the container, that still doesn't mean your configuration is correct. It is very easy to accidentally misconfigure the container in a way that only shows up late in the development process. Simple Injector contains :doc:`Diagnostics Services <diagnostics>` to help you spot common configuration mistakes. With Simple Injector 3, most of the diagnostic warnings are integrated into the verification mechanism. This means that a call to **Verify()** will also check for diagnostic warnings for you. It is advisable to analyze the container by calling **Verify** or by using the diagnostic services either during application startup or as part of an automated test that does this for you.
 
 .. _Multi-Threaded-Applications:
 
@@ -487,7 +487,11 @@ Dependency injection however, can actually help in writing multi-threaded applic
 
 .. container:: Note
 
-    **Tip:** Take a close look at the 'Potential Lifestyle Mismatches' warnings in the :doc:`Diagnostic Services <diagnostics>`. Lifestyle mismatches are a source of concurrency bugs.
+    **Tip:** Take a close look at the 'Lifestyle Mismatches' warnings in the :doc:`Diagnostic Services <diagnostics>`. Lifestyle mismatches are a source of concurrency bugs.
+
+.. container:: Note
+
+    **Note:** By default, Simple Injector 3 will check for Lifestyle Mismatches for you when you resolve a service. In other words, Simple Injector will fail fast when there is a Lifestyle Mismatch in your configuration.
 
 In a multi-threaded application, each thread should get its own object graph. This means that you should typically call *container.GetInstance<T>()* once at the beginning of the thread's execution to get the root object for processing that thread (or request). The container will build an object graph with all root object's dependencies. Some of those dependencies will be singletons; shared between all threads. Other dependencies might be transient; a new instance is created per dependency. Other dependencies might be thread-specific, request-specific, or with some other lifestyle. The application code itself is unaware of the way the dependencies are registered and that's the way it is supposed to be.
 
@@ -552,7 +556,6 @@ In the Composition Root, instead of registering the *MailSender*, we register th
 
     container.Register<ILogger, FileLogger>(Lifestyle.Singleton);
     container.Register<IMailSender, RealMailSender>();
-    container.RegisterDecorator(typeof(IMailSender), typeof(AsyncMailSenderProxy),
-        Lifestyle.Singleton);
+    container.RegisterDecorator<IMailSender, AsyncMailSenderProxy>(Lifestyle.Singleton);
 
 In this case the container will ensure that when an *IMailSender* is requested, a single *AsyncMailSenderProxy* is returned with a *Func<IMailSender>* delegate that will create a new *RealMailSender* when requested. The `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ and `RegisterSingleDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterSingleDecorator.htm>`_ overloads natively understand how to handle *Func<Decoratee>* dependencies. The :ref:`Decorators <Decorators>` section of the :doc:`Advanced Scenarios <advanced>` wiki page explains more about registering decorators.

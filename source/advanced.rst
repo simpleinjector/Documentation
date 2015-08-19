@@ -2,11 +2,7 @@
 Advanced Scenarios
 ==================
 
-Although its name may not imply it, Simple Injector is capable of handling many advanced scenarios. Either through writing custom code, copying  code from this wiki, or via the extension points that can be found in the *SimpleInjector.Extensions* namespace of the core library.
-
-.. container:: Note
-
-    **Note**: After including the **SimpleInjector.dll** in your project, you will have to add the **SimpleInjector.Extensions** namespace to your code to be able to use the majority of features that are presented in this wiki page.
+Although its name may not imply it, Simple Injector is capable of handling many advanced scenarios.
 
 This chapter discusses the following subjects:
 
@@ -88,30 +84,28 @@ Your application might contain many implementations of this interface for valida
     container.Register<IValidator<Product>, ProductValidator>();
     // and the list goes on...
 
-By using the extension methods for batch registration of open generic types from the **SimpleInjector.Extensions** namespace the same registrations can be made in a single line of code:
+By using the **Register** overload for batch registration, the same registrations can be made in a single line of code:
 
 .. code-block:: c#
 
-    container.RegisterManyForOpenGeneric(typeof(IValidator<>),
-        typeof(IValidator<>).Assembly);
+    container.Register(typeof(IValidator<>), new[] { typeof(IValidator<>).Assembly });
 
-By default **RegisterManyForOpenGeneric** searches the supplied assembly for all types that implement the *IValidator<T>* interface and registers each type by their specific (closed generic) interface. It even works for types that implement multiple closed versions of the given interface.
+By default **Register** searches the supplied assemblies for all types that implement the *IValidator<T>* interface and registers each type by their specific (closed generic) interface. It even works for types that implement multiple closed versions of the given interface.
 
 .. container:: Note
 
-    **Note**: There are numerous **RegisterManyForOpenGeneric** `overloads <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_OpenGenericBatchRegistrationExtensions_RegisterManyForOpenGeneric.htm>`_ available that take a list of *System.Type* instances, instead a list of *Assembly* instances.
+    **Note**: There is a **Register** overload available that take a list of *System.Type* instances, instead a list of *Assembly* instances and there is a **GetTypesToRegister** method that allows retrieving a list of types based on a given service type for a set of given assemblies.
 
-Above are a couple of examples of the things you can do with batch registration. A more advanced scenario could be the registration of multiple implementations of the same closed generic type to a common interface, i.e. a set of types that all implement the same interface. There are so many possible variations of this scenario that Simple Injector does not contain an explicit method to handle this. What it does contain, however, are multiple overloads of the **RegisterManyForOpenGeneric** method that allow you to supply a callback delegate that enables you make the registrations yourself. 
+Above are a couple of examples of the things you can do with batch registration. A more advanced scenario could be the registration of multiple implementations of the same closed generic type to a common interface, i.e. a set of types that all implement the same interface.
 
 As an example, imagine the scenario where you have a *CustomerValidator* type and a *GoldCustomerValidator* type and they both implement *IValidator<Customer>* and you want to register them both at the same time. The earlier registration methods would throw an exception alerting you to the fact that you have multiple types implementing the same closed generic type. The following registration however, does enable this scenario:
 
 .. code-block:: c#
 
-    container.RegisterManyForOpenGeneric(typeof(IValidator<>),
-        (serviceType, implTypes) => container.RegisterAll(serviceType, implTypes),
-        typeof(IValidator<>).Assembly);
+    var assemblies = new[] { typeof(IValidator<>).Assembly };
+    container.RegisterCollection(typeof(IValidator<>), assemblies);
 
-The code snippet registers all types from the given assembly that implement *IValidator<T>*. As we now have multiple implementations the container cannot inject a single instance of *IValidator<T>* and because of this, we need to supply a callback delegate. This allows us to override the way the registration is made, and allows us to make a registration for a collection. Because we register a collection, we can no longer call *container.GetInstance<IValidator<T>>()*. Instead instances can be retrieved by having an *IEnumerable<IValidator<T>>* constructor argument or by calling *container.GetAllInstances<IValidator<T>>()*.
+The code snippet registers all types from the given assembly that implement *IValidator<T>*. As we now have multiple implementations the container cannot inject a single instance of *IValidator<T>* and because of this, we need to register collections. Because we register a collection, we can no longer call *container.GetInstance<IValidator<T>>()*. Instead instances can be retrieved by having an *IEnumerable<IValidator<T>>* constructor argument or by calling *container.GetAllInstances<IValidator<T>>()*.
 
 It is not generally regarded as best practice to have an *IEnumerable<IValidator<T>>* dependency in multiple class constructors (or accessed from the  container directly). Depending on a set of types complicates your application design, can lead to code duplication. This can often be simplified with an alternate configuration. A better way is to have a single composite type that wraps *IEnumerable<IValidator<T>>* and presents it to the consumer as a single instance, in this case a *CompositeValidator<T>*:
 
@@ -140,7 +134,7 @@ This *CompositeValidator<T>* can be registered as follows:
 
 .. code-block:: c#
 
-    container.RegisterOpenGeneric(typeof(IValidate<>), typeof(CompositeValidator<>),
+    container.Register(typeof(IValidate<>), typeof(CompositeValidator<>),
         Lifestyle.Singleton);
 
 This registration maps the open generic *IValidator<T>* interface to the open generic *CompositeValidator<T>* implementation. Because the *CompositeValidator<T>* contains an *IEnumerable<IValidator<T>>* dependency, the registered types will be injected into its constructor. This allows you to let the rest of the application simply depend on the *IValidator<T>*, while registering a collection of *IValidator<T>* implementations under the covers.
@@ -170,15 +164,14 @@ As the previous section explained, this can be rewritten to the following one-li
 
 .. code-block:: c#
 
-    container.RegisterManyForOpenGeneric(typeof(IValidate<>),
-        typeof(IValidate<>).Assembly);
+    container.Register(typeof(IValidate<>), new[] { typeof(IValidate<>).Assembly });
 
 Sometimes you'll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The *IValidate<T>* is a good example. It is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this we would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:
  
 .. code-block:: c#
 
     // Implementation of the Null Object pattern.
-    class NullValidator<T> : IValidate<T> {
+    sealed class NullValidator<T> : IValidate<T> {
         public ValidationResults Validate(T instance) {
             return ValidationResults.Valid;
         }
@@ -194,40 +187,42 @@ We could configure the container to use this *NullValidator<T>* for any entity t
     container.Register<IValidate<Mothership>, NullValidator<Mothership>>();
     // and the list goes on...
 
-This repeated registration is, of course, not very practical. Falling back to such a default implementation is a good example for *unregistered type resolution*. Simple Injector contains an event that you can hook into that allows you to fallback to a default implementation. The `RegisterOpenGeneric <https://simpleinjector.org/ReferenceLibrary/?topic=html/Methods_T_SimpleInjector_Extensions_OpenGenericRegistrationExtensions.htm>`_ extension method is built on top of this event to handle this specific scenario. The *NullValidator<T>* would be registered as follows:
+This repeated registration is, of course, not very practical. We might be tempted to again fix this as follows:
 
 .. code-block:: c#
 
-    // using SimpleInjector.Extensions;
-    container.RegisterOpenGeneric(typeof(IValidate<>), typeof(NullValidator<>));
-
-The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for *IValidate<Department>*, for example, will return a *NullValidator<Department>* instance each time.
-
-.. container:: Note
-
-    **Note**: Because the use of unregistered type resolution will only get called for types that are not explicitly registered this allows for the default implementation to be overridden with specific implementations. The **RegisterManyForOpenGeneric** method does not use unregistered type resolution; it explicitly registers all the concrete types it finds in the given assemblies. Those types will therefore always be returned, giving a very convenient and easy to grasp mix.
-
-There's an advanced version of **RegisterOpenGeneric** overload that allows applying the open generic type conditionally, based on a supplied predicate. Example:
+    container.Register(typeof(IValidate<>), typeof(NullValidator<>));
+	
+This willl however not work, because this registration will try to map any closed *IValidate<T>* abstraction to the *NullValidator<T>* implementation, but other registrations (such as *ProductValidator* and *OrderValidator*) already exist. What we need here is to make *NullValidator<T>* as fallback registration and Simple Injector allows this using the **RegisterConditional** method overloads:
 
 .. code-block:: c#
 
-    container.RegisterOpenGeneric(typeof(IValidator<>), typeof(LeftValidator<>),
+    container.RegisterConditional(typeof(IValidate<>), typeof(NullValidator<>),
+        c => !c.Handled);
+
+The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for *IValidate<Department>*, for example, will return a *NullValidator<Department>* instance each time. The **RegisterConditional** is supplied with a predicate. In this case the predicate checks whether there already is a different registration that handles the requested service type. In that case the predicate returns falls and the registration is not applied.
+
+This predicate can also be used to apply types conditionally based on a number of contextual arguments. Here's an example:
+
+.. code-block:: c#
+
+    container.RegisterConditional(typeof(IValidator<>), typeof(LeftValidator<>),
         c => c.ServiceType.GetGenericArguments().Single().Namespace.Contains("Left"));
 
-    container.RegisterOpenGeneric(typeof(IValidator<>), typeof(RightValidator<>),
+    container.RegisterConditional(typeof(IValidator<>), typeof(RightValidator<>),
         c => c.ServiceType.GetGenericArguments().Single().Namespace.Contains("Right"));
 
 Simple Injector protects you from defining invalid registrations by ensuring that given the registrations do not overlap. Building on the last code snippet, imagine accidentally defining a type in the namespace "MyCompany.LeftRight". In this case both open-generic implementations would apply, but Simple Injector will never silently pick one. It will throw an exception instead.
 
-There are some cases where want to have a fallback implementation in the case that no other implementation was applied and this can be achieved by checking the **Handled** property of the predicate's **OpenGenericPredicateContext** object:
+As discussed before, the **PredicateContext.Handled** property can be used to implement a fallback mechanism. A more complex example is given below:
 
 .. code-block:: c#
 
-    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadOnlyRepository<>),
+    container.RegisterConditional(typeof(IRepository<>), typeof(ReadOnlyRepository<>),
         c => typeof(IReadOnlyEntity).IsAssignableFrom(
-            c.ServiceType.GetGenericArguments().Single()));
+            c.ServiceType.GetGenericArguments()[0]));
 
-    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>),
+    container.RegisterConditional(typeof(IRepository<>), typeof(ReadWriteRepository<>),
         c => !c.Handled);
 
 In the case above we tell Simple Injector to only apply the *ReadOnlyRepository<T>* registration in case the given *T* implements *IReadOnlyEntity*. Although applying the predicate can be useful, in this particular case it's better to apply a generic type constraint to *ReadOnlyRepository<T>*. Simple Injector will automatically apply the registered type conditionally based on it generic type constraints. So if we apply the generic type constraint to the *ReadOnlyRepository<T>* we can remove the predicate:
@@ -236,17 +231,17 @@ In the case above we tell Simple Injector to only apply the *ReadOnlyRepository<
 
     class ReadOnlyRepository<T> : IRepository<T> where T : IReadOnlyEntity { }
 
-    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadOnlyRepository<>));
-    container.RegisterOpenGeneric(typeof(IRepository<>), typeof(ReadWriteRepository<>),
+    container.Register(typeof(IRepository<>), typeof(ReadOnlyRepository<>));
+    container.RegisterConditional(typeof(IRepository<>), typeof(ReadWriteRepository<>),
         c => !c.Handled);
 
-The final option in Simple Injector is to supply the **RegisterOpenGeneric** method with a partially-closed generic type:
+The final option in Simple Injector is to supply the **Register** or **RegisterConditional** methods with a partially-closed generic type:
 
 .. code-block:: c#
 
     // SomeValidator<List<T>>
     var partiallyClosedType = typeof(SomeValidator<>).MakeGenericType(typeof(List<>));
-    container.RegisterOpenGeneric(typeof(IValidator<>), partiallyClosedType);
+    container.Register(typeof(IValidator<>), partiallyClosedType);
 
 The type *SomeValidator<List<T>>* is called *partially-closed*, since although its generic type argument has been filled in with a type, it still contains a generic type argument. Simple Injector will be able to apply these constraints, just as it handles any other generic type constraints.
 
@@ -255,13 +250,13 @@ The type *SomeValidator<List<T>>* is called *partially-closed*, since although i
 Mixing collections of open-generic and non-generic components
 =============================================================
 
-The **RegisterManyForOpenGeneric** overloads that take in a list of assemblies only select non-generic implementations of the given open-generic type. Open-generic implementations are skipped, because they often need special attention.
+The **Register** overload that take in a list of assemblies only select non-generic implementations of the given open-generic type. Open-generic implementations are skipped, because they often need special attention.
 
-To register collections that contain both non-generic and open-generic components a **RegisterAll** overload is available that accept a list of Type instances. For instance:
+To register collections that contain both non-generic and open-generic components a **RegisterCollection** overload is available that accept a list of Type instances. For instance:
 
 .. code-block:: c#
 
-    container.RegisterAll(typeof(IValidator<>), new[] {
+    container.RegisterCollection(typeof(IValidator<>), new[] {
         typeof(DataAnnotationsValidator<>), // open generic
         typeof(CustomerValidator), // implements IValidator<Customer>
         typeof(GoldCustomerValidator), // implements IValidator<Customer>
@@ -269,28 +264,28 @@ To register collections that contain both non-generic and open-generic component
         typeof(OrderValidator) // implements IValidator<Order>
     });
 
-In the previous example a set of *IValidator<T>* implementations is supplied to the **RegisterAll** overload. This list contains one generic implementation, namely *DataAnnotationsValidator<T>*. This leads to a registration that is equivalent to the following manual registration:
+In the previous example a set of *IValidator<T>* implementations is supplied to the **RegisterCollection** overload. This list contains one generic implementation, namely *DataAnnotationsValidator<T>*. This leads to a registration that is equivalent to the following manual registration:
 
 .. code-block:: c#
 
-    container.RegisterAll<IValidator<Customer>>(
+    container.RegisterCollection<IValidator<Customer>>(
         typeof(DataAnnotationsValidator<Customer>),
         typeof(CustomerValidator),
         typeof(GoldCustomerValidator));
         
-    container.RegisterAll<IValidator<Employee>>(
+    container.RegisterCollection<IValidator<Employee>>(
         typeof(DataAnnotationsValidator<Employee>),
         typeof(EmployeeValidator));
         
-    container.RegisterAll<IValidator<Order>>(
+    container.RegisterCollection<IValidator<Order>>(
         typeof(DataAnnotationsValidator<Order>),
         typeof(OrderValidator));
 
-In other words, the supplied non-generic types are grouped by their closed *IValidator<T>* interface and the *DataAnnotationsValidator<T>* is applied to every group. This leads to three seperate *IEnumerable<IValidator<T>>* registrations. One for each closed-generic *IValidator<T>* type.
+In other words, the supplied non-generic types are grouped by their closed *IValidator<T>* interface and the *DataAnnotationsValidator<T>* is applied to every group. This leads to three separate *IEnumerable<IValidator<T>>* registrations. One for each closed-generic *IValidator<T>* type.
 
 .. container:: Note
 
-    **Note**: **RegisterAll** is guaranteed to preserve the order of the types that you supply.
+    **Note**: **RegisterCollection** is guaranteed to preserve the order of the types that you supply.
         
 But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible fourth registration is made. This is a registration that hooks onto the **unregistered type resolution** event and this will ensure that any time an *IEnumerable<IValidator<T>>* for a *T* that is anything other than *Customer*, *Employee* and *Order*, an *IEnumerable<IValidator<T>>* is returned that contains the closed-generic versions of the supplied open-generic types; *DataAnnotationsValidator<T>* in the given example.
 
@@ -298,18 +293,17 @@ But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible
 
     **Note**: This will work equally well when the open generic types contain type constraints. In that case those types will be applied conditionally to the collections based on their generic type constraints.
 
-In most cases however, manually supplying the **RegisterAll** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the **RegisterAll** overloads that accepts the `BatchRegistrationCallback <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Extensions_BatchRegistrationCallback.htm>`_ delegate and append the open generic type separately:
+In most cases however, manually supplying the **RegisterCollection** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the **RegisterCollection** overloads that accepts the `BatchRegistrationCallback <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Extensions_BatchRegistrationCallback.htm>`_ delegate and append the open generic type separately:
 
 .. code-block:: c#
 
     // Extension method from the SimpleInjector.Advanced namespace.
     container.AppendToCollection(typeof(IValidator<>), typeof(DataAnnotationsValidator<>));
 
-    container.RegisterManyForOpenGeneric(typeof(IValidator<>),
-        (serviceType, implTypes) => container.RegisterAll(serviceType, implTypes),
-        typeof(IValidator<>).Assembly);        
+    container.RegisterCollection(typeof(IValidator<>),
+        new[] { typeof(IValidator<>).Assembly });
 
-Alternatively, we can make use of the **GetTypesToRegister**  method of the *OpenGenericBatchRegistrationExtensions* class to find the types for us:
+Alternatively, we can make use of the Container's **GetTypesToRegister** to find the types for us:
 
 .. code-block:: c#
 
@@ -317,16 +311,14 @@ Alternatively, we can make use of the **GetTypesToRegister**  method of the *Ope
         typeof(DataAnnotationsValidator<>)
     };
     
-    typesToRegister.AddRange(
-        OpenGenericBatchRegistrationExtensions.GetTypesToRegister(container,
-            typeof(IValidator<>), 
-            typeof(IValidator<>).Assembly));
+    var assemblies = new[] { typeof(IValidator<>).Assembly) };
+    typesToRegister.AddRange(container.GetTypesToRegister(typeof(IValidator<>), assemblies));
 
-    container.RegisterAll(typeof(IValidator<>), typesToRegister);
+    container.RegisterCollection(typeof(IValidator<>), typesToRegister);
         
 .. container:: Note
 
-    The **RegisterManyForOpenGeneric** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well.
+    The **Register** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well.
 
 
 .. _Unregistered-Type-Resolution:
@@ -334,7 +326,7 @@ Alternatively, we can make use of the **GetTypesToRegister**  method of the *Ope
 Unregistered type resolution
 ============================
 
-Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the chance of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing the :ref:`registration of open generic types <Registration-Of-Open-Generic-Types>`. Other examples of possible scenarios that can be built on top of this event are :ref:`resolving array and lists <Resolve-Arrays-And-Lists>` and :ref:`covariance and contravariance <Covariance-Contravariance>`. Those scenarios are described here in the advanced scenarios page.
+Unregistered type resolution is the ability to get notified by the container when a type that is currently unregistered in the container, is requested for the first time. This gives the user (or extension point) the chance of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios.
 
 For more information about how to use this event, please take a look at the `ResolveUnregisteredType event documentation <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ in the `reference library <https://simpleinjector.org/ReferenceLibrary/>`_.
 
@@ -344,7 +336,7 @@ For more information about how to use this event, please take a look at the `Res
 Context based injection
 =======================
 
-Context based injection is the ability to inject a particular dependency based on the context it lives in (or change the implementation based on the type it is injected into). This context is often supplied by the container. Some DI libraries contain a feature that allows this, while others don't. Simple Injector does *not* contain such a feature out of the box, but this ability can easily be added by using the :doc:`context based injection extension method <ContextDependentExtensions>` code snippet.
+Context based injection is the ability to inject a particular dependency based on the context it lives in (or change the implementation based on the type it is injected into). Simple Injector contains the **RegisterConditional** method overloads that enable context based injection.
 
 .. container:: Note
 
@@ -370,22 +362,21 @@ The most common scenario is to base the type of the injected dependency on the t
         public Consumer2(ILogger logger) { }
     }
 
-In this case we want to inject a *Logger<Consumer1>* into *Consumer1* and a *Logger<Consumer2>* into *Consumer2*. By using the previous :doc:`context based injection extension method <ContextDependentExtensions>`, we can accomplish this as follows:
+In this case we want to inject a *Logger<Consumer1>* into *Consumer1* and a *Logger<Consumer2>* into *Consumer2*. By using the **RegisterConditional** overload that accepts a *implementation type factory delegate*, we can accomplish this as follows:
 
 .. code-block:: c#
 
-    container.RegisterWithContext<ILogger>(dependencyContext => {
-        var type = typeof(Logger<>).MakeGenericType(
-            dependencyContext.ImplementationType);
-        
-        return (ILogger)container.GetInstance(type);
-    });
+    container.RegisterConditional(
+        typeof(ILogger),
+        c => typeof(Logger<>).MakeGenericType(c.Consumer.ImplementationType),
+        Lifestyle.Transient,
+        c => true);
 
-In the previous code snippet we registered a *Func<DependencyContext, ILogger>* delegate, that will get called each time a *ILogger* dependency gets resolved. The *DependencyContext* instance that gets supplied to that instance, contains the *ServiceType* and *ImplementationType* into which the *ILogger* is getting injected.
+In the previous code snippet we supply the **RegisterConditional** method with a lambda presenting a *Func<TypeFactoryContext, Type>* delegate that allows building the exact implementation type based on contextual information. In this case we use the implementation type of the consuming component to build the correct closed *Logger<T>* type. We also supply the method with a predicate, but in this case we make the registration unconditional by returning true from the predicate.
 
 .. container:: Note
 
-    **Note**: Although building a generic type using MakeGenericType is relatively slow, the call to the *Func<DependencyContext, TService>* delegate itself is about as cheap as calling a *Func<TService>* delegate. If performance of the MakeGenericType gets a problem, you can always cache the generated types, cache **InstanceProducer** instances, or cache *ILogger* instances (note that caching the *ILogger* instances will make them singletons).
+    **Note**: Although building a generic type using MakeGenericType is relatively slow, the call to the *Func<TypeFactoryContext, Type>* delegate itself has a one-time cost. The factory delegate will usually be called a finite number of times. After an object graph has been built, the delegate will not be called again when that same object graph is resolved.
 
 .. container:: Note
 
@@ -446,31 +437,29 @@ The *ValidationCommandHandlerDecorator<TCommand>* depends on an *IValidator* int
         }
     }
 
-The implementations of the *ICommandHandler<T>* interface can be registered using the `RegisterManyForOpenGeneric <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_OpenGenericBatchRegistrationExtensions_RegisterManyForOpenGeneric.htm>`_ extension method:
+The implementations of the *ICommandHandler<T>* interface can be registered using the **Register** method overload that takes in a list of assemblies:
 
 .. code-block:: c#
 
-    // using SimpleInjector.Extensions;
-    container.RegisterManyForOpenGeneric(
+    container.Register(
         typeof(ICommandHandler<>), 
-        typeof(ICommandHandler<>).Assembly);
+        new[] { typeof(ICommandHandler<>).Assembly });
 
-By using the following extension method, you can wrap the *ValidationCommandHandlerDecorator<TCommand>* around each and every *ICommandHandler<TCommand>* implementation:
+By using the following method, you can wrap the *ValidationCommandHandlerDecorator<TCommand>* around each and every *ICommandHandler<TCommand>* implementation:
 
 .. code-block:: c#
 
-    // using SimpleInjector.Extensions;
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
         typeof(ValidationCommandHandlerDecorator<>));
 
-Multiple decorators can be wrapped by calling the `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ method multiple times, as the following registration shows:
+Multiple decorators can be wrapped by calling the **RegisterDecorator** method multiple times, as the following registration shows:
 
 .. code-block:: c#
 
-    container.RegisterManyForOpenGeneric(
+    container.Register(
         typeof(ICommandHandler<>), 
-        typeof(ICommandHandler<>).Assembly);
+        new[] { typeof(ICommandHandler<>).Assembly });
         
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
@@ -558,9 +547,9 @@ When mixing this decorator with other (synchronous) decorators, you'll get an ex
 
 .. code-block:: c#
 
-    container.RegisterManyForOpenGeneric(
+    container.Register(
         typeof(ICommandHandler<>), 
-        typeof(ICommandHandler<>).Assembly);
+        new[] { typeof(ICommandHandler<>).Assembly });
         
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
@@ -640,17 +629,17 @@ Obviously, if you run (part of) your commands on a background thread and also us
 
 .. code-block:: c#
 
-    var hybridLifestyle = Lifestyle.CreateHybrid(
+    container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
         lifestyleSelector: () => container.GetCurrentLifetimeScope() != null,
         trueLifestyle: new LifetimeScopeLifestyle(),
         falseLifestyle: new WebRequestLifestyle());
 
-    container.Register<IUnitOfWork, DbUnitOfWork>(hybridLifestyle);
-    container.Register<IRepository<User>, UserRepository>(hybridLifestyle);
+    container.Register<IUnitOfWork, DbUnitOfWork>(Lifestyle.Scoped);
+    container.Register<IRepository<User>, UserRepository>(Lifestyle.Scoped);
         
-    container.RegisterManyForOpenGeneric(
+    container.Register(
         typeof(ICommandHandler<>), 
-        typeof(ICommandHandler<>).Assembly);
+        new[] { typeof(ICommandHandler<>).Assembly });
 
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
@@ -674,9 +663,10 @@ When registering a decorator, Simple Injector will automatically decorate any co
 
 .. code-block:: c#
 
-    container.RegisterAll<IEventHandler<CustomerMovedEvent>>(
+    container.RegisterCollection<IEventHandler<CustomerMovedEvent>>(new[] {
         typeof(CustomerMovedEventHandler),
-        typeof(NotifyStaffWhenCustomerMovedEventHandler));
+        typeof(NotifyStaffWhenCustomerMovedEventHandler)
+	});
         
     container.RegisterDecorator(
         typeof(IEventHandler<>),
@@ -697,13 +687,13 @@ When a collection is uncontrolled, it means that the lifetime of its elements ar
             new NotifyStaffWhenCustomerMovedEventHandler(),
         };
 
-    container.RegisterAll<IEventHandler<CustomerMovedEvent>>(handlers);
+    container.RegisterCollection<IEventHandler<CustomerMovedEvent>>(handlers);
 
 Although this registration contains a list of singletons, the container has no way of knowing this. The collection could easily have been a dynamic (an ever changing) collection. In this case, the container calls the registered predicate once (and supplies the predicate with the *IEventHandler<CusotmerMovedEvent>* type) and if the predicate returns true, each element in the collection is decorated with a decorator instance.
 
 .. container:: Note
 
-    **Warning**: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can't help you in doing :doc:`diagnostics <diagnostics>`. Since the lifetime of those items is unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the **RegisterAll** overloads that take a collection of *System.Type* instances.
+    **Warning**: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can't help you in doing :doc:`diagnostics <diagnostics>`. Since the lifetime of those items is unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the **RegisterCollection** overloads that take a collection of *System.Type* instances.
 
 .. _Using-contextual-information-inside-decorators:
 
@@ -756,7 +746,7 @@ The decorator would also be able to get the attribute by using the injected deco
 Decorator registration factories
 --------------------------------
 
-In some advanced scenarios, it can be useful to depend the actual decorator type based on some contextual information. Simple Injector contains a **RegisterDecorator** overload that accepts a factory delegate that allows building the exact decorator type based on the actual type being decorated.
+In some advanced scenarios, it can be useful to depend the actual decorator type based on some contextual information. There is a **RegisterDecorator** overload that accepts a factory delegate that allows building the exact decorator type based on the actual type being decorated.
 
 Take the following registration for instance:
 
@@ -777,7 +767,11 @@ This example registers a decorator for the *IEventHandler<TEvent>* abstraction. 
 Interception
 ============
 
-Interception is the ability to intercept a call from a consumer to a service, and add or change behavior. The `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_ describes a form of interception, but when it comes to applying cross-cutting concerns, you might end up writing decorators for many service interfaces, but with the exact same code. If this is happening, it is time to explore the possibilities of interception.
+Interception is the ability to intercept a call from a consumer to a service, and add or change behavior. The `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_ describes a form of interception, but when it comes to applying cross-cutting concerns, you might end up writing decorators for many service interfaces, but with the exact same code. If this is happening, it's time to take a close look at your design. If for what ever reason, it's impossible for you to make the required improvements to your design, your second best bet is to explore the possibilities of interception.
+
+.. container:: Note
+
+    **Warning**: Simple Injector has :ref:`no out-of-the-box support for interception <No-interception>` because the use of interception is an indication of a sub optimal design and we are keen on pushing developers into best practices. Whenever possible, choose to improve your design to make decoration possible.	
 
 Using the :doc:`Interception extensions <InterceptionExtensions>` code snippets, you can add the ability to do interception with Simple Injector. Using the given code, you can for instance define a *MonitoringInterceptor* that allows logging the execution time of the called service method:
 
@@ -947,9 +941,8 @@ The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbr
 .. code-block:: c#
 
     // Configuration
-    container.RegisterManyForOpenGeneric(typeof(IEventHandler<>),
-        container.RegisterAll,
-        typeof(IEventHandler<>).Assembly);
+    container.RegisterCollection(typeof(IEventHandler<>),
+        new[] { typeof(IEventHandler<>).Assembly });
 
     // Usage
     var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
@@ -960,7 +953,7 @@ The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbr
     
 With the given classes, the code snippet above will give the following output:
 
-.. code-block:: c#
+.. code-block
 
     SendFlowersToMovedCustomer
     WarnShippingDepartmentAboutMove
@@ -977,7 +970,7 @@ Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEv
     
 .. container:: Note
     
-    **Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterAll* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered, because this could easily lead to ambiguity; Simple Injector will not know which implementation to select.
+    **Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterCollection* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered, because this could easily lead to ambiguity; Simple Injector will not know which implementation to select.
 
 .. _Plugins:
 
@@ -996,14 +989,8 @@ Applications with a plugin architecture often allow special plugin assemblies to
         where file.Extension.ToLower() == ".dll"
         select Assembly.LoadFile(file.FullName);
 
-    var pluginTypes =
-        from assembly in pluginAssemblies
-        from type in assembly.GetExportedTypes()
-        where typeof(IPlugin).IsAssignableFrom(type)
-        where !type.IsAbstract
-        where !type.IsGenericTypeDefinition
-        select type;
+    var pluginTypes = container.GetTypesToRegister(typeof(IPlugin), pluginAssemblies);
 
-    container.RegisterAll<IPlugin>(pluginTypes);
+    container.RegisterCollection<IPlugin>(pluginTypes);
 
-The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all publicly exposed concrete types that implement *IPlugin* will be registered using the **RegisterAll** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.
+The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all publicly exposed concrete types that implement *IPlugin* will be registered using the **RegisterCollection** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.

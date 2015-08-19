@@ -2,6 +2,11 @@
 Diagnostic Warning - Disposable Transient Components
 ====================================================
 
+Severity
+========
+
+Warning
+
 Cause
 =====
 
@@ -58,13 +63,13 @@ The issue can be fixed as follows:
 
 .. code-block:: c#
 
+    var container = new Container();
     // Select the scoped lifestyle that is appropriate for the application
     // you are building. For instance:
-    ScopedLifestyle scopedLifestyle = new WebRequestLifestyle();
-    var container = new Container();
+    container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
 
     // DisposableService implements IDisposable
-    container.Register<IService, DisposableService>(scopedLifestyle);
+    container.Register<IService, DisposableService>(Lifestyle.Scoped);
 
     container.Verify();
    

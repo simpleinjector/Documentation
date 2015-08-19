@@ -1,6 +1,11 @@
-===================================================
-Diagnostic Warning - Potential Lifestyle Mismatches
-===================================================
+=========================================
+Diagnostic Warning - Lifestyle Mismatches
+=========================================
+
+Severity
+========
+
+Warning
 
 Cause
 =====
@@ -15,16 +20,17 @@ In general, components should only depend on other components that are configure
 The Diagnostic Services detect this kind of misconfiguration and report it. The container will be able to compare all built-in lifestyles (and sometimes even custom lifestyles). Here is an overview of the built-in lifestyles ordered by their length:
 
 * :ref:`Transient <Transient>`
-* :ref:`Lifetime Scope <PerLifetimeScope>`
-* :ref:`Execution Context Scope <PerExecutionContextScope>`
-* :ref:`WCF Operation <PerWcfOperation>`
-* :ref:`Web Request <PerWebRequest>`
-* :ref:`Web API Request <PerWebAPIRequest>`
+* :ref:`Scoped <Scoped>`
 * :ref:`Singleton <Singleton>`
 
 .. container:: Note
 
     **Note**: This kind of error is also known as `Captive Dependency <http://blog.ploeh.dk/2014/06/02/captive-dependency/>`_.
+    
+.. container:: Note
+
+    **Note** Lifestyle mismatches are such a common source of bugs, that in Simple Injector 3, the container always checks for mismatches the first time a component is resolved, no matter whether you call *Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
+
 
 How to Fix Violations
 =====================
@@ -47,42 +53,42 @@ The following example shows a configuration that will trigger the warning:
 
 .. code-block:: c#
 
-	var container = new Container();
+    var container = new Container();
 
-	container.Register<IUserRepository, InMemoryUserRepository>(Lifestyle.Transient);
+    container.Register<IUserRepository, InMemoryUserRepository>(Lifestyle.Transient);
 
-	// RealUserService depends on IUserRepository
-	container.RegisterSingle<RealUserService>();
+    // RealUserService depends on IUserRepository
+    container.RegisterSingleton<RealUserService>();
 
-	// FakeUserService depends on IUserRepository
-	container.RegisterSingle<FakeUserService>();
+    // FakeUserService depends on IUserRepository
+    container.RegisterSingleton<FakeUserService>();
 
-	container.Verify();
+    container.Verify();
 
 The *RealUserService* component is registered as **Singleton** but it depends on *IUserRepository* which is configured with the shorter **Transient** lifestyle. Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.
 
 .. image:: images/lifestylemismatch.png 
    :alt: Diagnostics debugger view watch window with lifestyle mismatches
 
-The following example shows how to query the Diagnostic API for Potential Lifetime Mismatches:
+The following example shows how to query the Diagnostic API for Lifetime Mismatches:
 
 .. code-block:: c#
 
-	// using SimpleInjector.Diagnostics;
+    // using SimpleInjector.Diagnostics;
 
-	var container = /* get verified container */;
+    var container = /* get verified container */;
 
-	var results = Analyzer.Analyze(container)
-	    .OfType<PotentialLifestyleMismatchDiagnosticResult>();
-	    
-	foreach (var result in results) {
-	    Console.WriteLine(result.Description);
-	    Console.WriteLine("Lifestyle of service: " + 
-	        result.Relationship.Lifestyle.Name);
+    var results = Analyzer.Analyze(container)
+        .OfType<LifestyleMismatchDiagnosticResult>();
+        
+    foreach (var result in results) {
+        Console.WriteLine(result.Description);
+        Console.WriteLine("Lifestyle of service: " + 
+            result.Relationship.Lifestyle.Name);
 
-	    Console.WriteLine("Lifestyle of service's dependency: " +
-	        result.Relationship.Dependency.Lifestyle.Name);
-	}
+        Console.WriteLine("Lifestyle of service's dependency: " +
+            result.Relationship.Dependency.Lifestyle.Name);
+    }
 
 What about Hybrid lifestyles?
 =============================
@@ -91,10 +97,10 @@ A :ref:`Hybrid lifestyle <Hybrid>` is a mix between two or more other lifestyles
 
 .. code-block:: c#
 
-	var hybrid = Lifestyle.CreateHybrid(
-	    lifestyleSelector: () => someCondition,
-	    trueLifestyle: Lifestyle.Transient,
-	    falseLifestyle: Lifestyle.Singleton);
+    var hybrid = Lifestyle.CreateHybrid(
+        lifestyleSelector: () => someCondition,
+        trueLifestyle: Lifestyle.Transient,
+        falseLifestyle: Lifestyle.Singleton);
 
 .. container:: Note
 

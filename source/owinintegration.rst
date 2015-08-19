@@ -28,9 +28,10 @@ Scoped instances need to be registered with the `ExecutionContextScope` lifestyl
 
 .. code-block:: c#
 
-    var scopedLifestyle = new ExecutionContextScopeLifestyle();
- 
-    container.Register<IUnitOfWork, MyUnitOfWork>(scopedLifestyle);
+    var container = new Container();
+    container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
+    
+    container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Scoped);
     
 .. _OWIN-extra-features:    
     
@@ -69,4 +70,4 @@ The following code snippet can be used to register this *IOwinContextProvider* a
         await next();
     });
     
-    container.RegisterSingle<IOwinContextProvider>(new CallContextOwinContextProvider());
+    container.RegisterSingleton<IOwinContextProvider>(new CallContextOwinContextProvider());

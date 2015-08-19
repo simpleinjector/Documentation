@@ -2,6 +2,11 @@
 Diagnostic Warning - Potential Single Responsibility Violations
 ===============================================================
 
+Severity
+========
+
+Information
+
 Cause
 =====
 

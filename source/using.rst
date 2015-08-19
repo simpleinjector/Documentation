@@ -39,15 +39,16 @@ Ideally, the only place in an application that should directly reference and use
 
     **Tip**: For more information about usage of Simple Injector for a specific technology, please see the :doc:`integration`.
 
-The usage of Simple Injector consists of four or five steps:
+The usage of Simple Injector consists of four to six steps:
 
 #. Create a new container
 #. Configure the container (*Register*)
 #. [Optionally] verify the container
 #. Store the container for use by the application
 #. Retrieve instances from the container (*Resolve*)
+#. [Optionally] `Dispose` the container instance when the application ends.
 
-The first four steps are performed only once at application startup. The last step is usually performed multiple times (usually once per request) for the majority of applications. The first three steps are platform agnostic but the last two steps depend on a mix of personal preference and which presentation framework is being used. Below is an example for the configuration of an ASP.NET MVC application:
+The first four steps are performed only once at application startup. The fifth step is usually performed multiple times (usually once per request) for the majority of applications. The first three steps are platform agnostic but the last three steps depend on a mix of personal preference and which presentation framework is being used. Below is an example for the configuration of an ASP.NET MVC application:
 
 .. code-block:: c#
 
@@ -156,7 +157,7 @@ The following example configures a single instance of a manually created object 
 .. code-block:: c#
 
     // Configuration
-    container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+    container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
     // Usage
     IUserRepository repository = container.GetInstance<IUserRepository>();
@@ -229,7 +230,7 @@ By supplying a delegate, types can be registered that cannot be created by using
 
 **Initializing auto-wired instances:**
 
-For types that need to be injected we recommend that you define a single public constructor that contains all dependencies. In scenarios where constructor injection is not possible, property injection is your fallback option. The previous example showed an example of property injection but our preferred approach is to use the **RegisterInitializer** method:
+For types that need to be injected we recommend that you define a single public constructor that contains all dependencies. In scenarios where its impossible to fully configure a type using constructor injection, the *RegisterInitializer* method can be used to add additional initialization for such type. The previous example showed an example of property injection but a more preferred approach is to use the **RegisterInitializer** method:
 
 .. code-block:: c#
 
@@ -271,20 +272,20 @@ Simple Injector contains several methods for registering and resolving collectio
     // Configuration
     // Registering a list of instances that will be created by the container.
     // Supplying a collection of types is the preferred way of registering collections.
-    container.RegisterAll<ILogger>(new[] { typeof(IMailLogger), typeof(SqlLogger) });
+    container.RegisterCollection<ILogger>(new[] { typeof(IMailLogger), typeof(SqlLogger) });
 
     // Register a fixed list (these instances should be thread-safe).
-    container.RegisterAll<ILogger>(new[] { new MailLogger(), new SqlLogger() });
+    container.RegisterCollection<ILogger>(new[] { new MailLogger(), new SqlLogger() });
 
     // Using a collection from another subsystem
-    container.RegisterAll<ILogger>(Logger.Providers);
+    container.RegisterCollection<ILogger>(Logger.Providers);
 
     // Usage
     var loggers = container.GetAllInstances<ILogger>();
 
 .. container:: Note
 
-    **Note**:  When zero instances are registered using *RegisterAll*, each call to *Container.GetAllInstances* will return an empty list.
+    **Note**:  When zero instances are registered using *RegisterCollection*, each call to *Container.GetAllInstances* will return an empty list.
 
 Just as with normal types, Simple Injector can inject collections of instances into constructors:
 
@@ -307,14 +308,14 @@ Just as with normal types, Simple Injector can inject collections of instances i
     }
 
     // Configuration
-    container.RegisterAll<ILogger>(new[] { typeof(MailLogger)), typeof(SqlLogger) });
+    container.RegisterCollection<ILogger>(new[] { typeof(MailLogger)), typeof(SqlLogger) });
     container.Register<IService, Service>(Lifestyle.Singleton);
 
     // Usage
     var service = container.GetInstance<IService>();
     service.DoStuff();
 
-The **RegisterAll** overloads that take a collection of *Type* instances rely on the *Container* to create an instance of each type just as it would for individual registrations. This means that the same rules we have seen above apply to each item in the collection. Take a look at the following configuration:
+The **RegisterCollection** overloads that take a collection of *Type* instances rely on the *Container* to create an instance of each type just as it would for individual registrations. This means that the same rules we have seen above apply to each item in the collection. Take a look at the following configuration:
 
 .. code-block:: c#
 
@@ -322,7 +323,7 @@ The **RegisterAll** overloads that take a collection of *Type* instances rely on
     container.Register<MailLogger>(Lifestyle.Singleton);
     container.Register<ILogger, FileLogger>();
 
-    container.RegisterAll<ILogger>(new[] {
+    container.RegisterCollection<ILogger>(new[] {
         typeof(MailLogger), 
         typeof(SqlLogger), 
         typeof(ILogger)
@@ -330,7 +331,7 @@ The **RegisterAll** overloads that take a collection of *Type* instances rely on
 
 When the registered collection of *ILogger* instances are resolved the *Container* will resolve each and every one of them applying all the specific rules of their configuration. When no registration exists, the type is created with the default **Transient** lifestyle (*transient* means that a new instance is created every time the returned collection is iterated). In the example, the *MailLogger* type is registered as **Singleton**, and so each resolved *ILogger* collection will always have the same instance of *MailLogger* in their collection.
 
-Since the creation is forwarded, abstract types can also be registered using **RegisterAll**. In the above example the *ILogger* type itself is registered using **RegisterAll**. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of *ILogger* instances as well. A more usual scenario however is the use of a composite as shown next.
+Since the creation is forwarded, abstract types can also be registered using **RegisterCollection**. In the above example the *ILogger* type itself is registered using **RegisterCollection**. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of *ILogger* instances as well. A more usual scenario however is the use of a composite as shown next.
 
 While resolving collections is useful and also works with :ref:`automatic constructor injection <Automatic-constructor-injection>`, the registration of *Composites* is preferred over the use of collections as constructor arguments in application code. Register a composite whenever possible, as shown in the example below:
 
@@ -354,7 +355,7 @@ While resolving collections is useful and also works with :ref:`automatic constr
     // Configuration
     container.Register<IService, Service>(Lifestyle.Singleton);
     container.Register<ILogger, CompositeLogger>(Lifestyle.Singleton);
-    container.RegisterAll<ILogger>(new[] { typeof(MailLogger), typeof(SqlLogger) });
+    container.RegisterCollection<ILogger>(new[] { typeof(MailLogger), typeof(SqlLogger) });
 
     // Usage
     var service = container.GetInstance<IService>();

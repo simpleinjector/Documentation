@@ -2,6 +2,11 @@
 Diagnostic Warning - Torn Lifestyle
 ===================================
 
+Severity
+========
+
+Warning
+
 Cause
 =====
 

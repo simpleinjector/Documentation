@@ -4,6 +4,11 @@
 Diagnostic Warning - Ambiguous Lifestyles
 =========================================
 
+Severity
+========
+
+Warning
+
 Cause
 =====
 
