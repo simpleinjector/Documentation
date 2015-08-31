@@ -80,7 +80,7 @@ Change the 'Startup object' in the properties of your project to be the newly cr
 Usage
 -----
 
-Constructor injection can now be used in any windows (e.g. *MainWindow*) and view models:
+Constructor injection can now be used in any window (e.g. *MainWindow*) and view model:
 
 .. code-block:: c#
 
