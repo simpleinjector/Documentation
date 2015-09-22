@@ -37,3 +37,7 @@ The following code snippet shows how to use the use the integration package (not
     	
         DependencyResolver.SetResolver(new SimpleInjectorDependencyResolver(container));
     }
+	
+.. container:: Note
+
+	For an example of how to apply decorators to MVC controllers, please take a look at `this Stackoverflow question <https://stackoverflow.com/questions/32118849>`_.
