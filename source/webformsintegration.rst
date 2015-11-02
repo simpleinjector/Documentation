@@ -33,9 +33,12 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
             void IHttpModule.Init(HttpApplication context) {
                 context.PreRequestHandlerExecute += (sender, e) => {
                     var handler = context.Context.CurrentHandler;
-                    if (handler != null &&
-                        !handler.GetType().Assembly.FullName.StartsWith("System.Web")) {
-                        Global.InitializeHandler(handler);
+                    if (handler != null) {
+                        string name = handler.GetType().Assembly.FullName;
+                        if (!name.StartsWith("System.Web") &&
+                            !name.StartsWith("Microsoft")) {
+                            Global.InitializeHandler(handler);
+                        }
                     }
                 };
             }
@@ -89,7 +92,13 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                     where !type.IsAbstract && !type.IsGenericType
                     select type;
 
-                pageTypes.ToList().ForEach(container.Register);
+                foreach (Type type in pageTypes) {
+                    var registration = Lifestyle.Transient.CreateRegistration(type, container);
+                    registration.SuppressDiagnosticWarning(
+                        DiagnosticType.DisposableTransientComponent,
+                        "ASP.NET creates and disposes page classes for us.");
+                    container.AddRegistration(type, registration);
+                }                
             }
 
             class ImportAttributePropertySelectionBehavior : IPropertySelectionBehavior {
