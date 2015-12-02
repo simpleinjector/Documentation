@@ -55,11 +55,6 @@ The following bit more advanced example changes the constructor resolution behav
 
 .. code-block:: c#
 
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using SimpleInjector.Advanced;
-
     public class MostResolvableConstructorBehavior : IConstructorResolutionBehavior {
         private readonly Container container;
 
@@ -68,23 +63,39 @@ The following bit more advanced example changes the constructor resolution behav
         }
 
         private bool IsCalledDuringRegistrationPhase {
+            [DebuggerStepThrough]
             get { return !this.container.IsLocked(); }
         }
 
-        public ConstructorInfo GetConstructor(Type serviceType,
-            Type implementationType) {
+        [DebuggerStepThrough]
+        public ConstructorInfo GetConstructor(Type service, Type implementation) {
+            var constructors = implementation.GetConstructors();
             return (
-                from ctor in implementationType.GetConstructors()
+                from ctor in constructors
                 let parameters = ctor.GetParameters()
+                where this.IsCalledDuringRegistrationPhase
+                    || constructors.Length == 1
+                    || parameters.All(p => this.CanBeResolved(p, service, implementation))
                 orderby parameters.Length descending
-                where this.IsCalledDuringRegistrationPhase || 
-                    parameters.All(this.CanBeResolved)
                 select ctor)
                 .First();
         }
 
-        private bool CanBeResolved(ParameterInfo p) {
-            return this.container.GetRegistration(p.ParameterType) != null;
+        [DebuggerStepThrough]
+        private bool CanBeResolved(ParameterInfo p, Type service, Type implementation) {
+            return this.container.GetRegistration(p.ParameterType) != null ||
+                this.CanBuildType(p, service, implementation);
+        }
+
+        [DebuggerStepThrough]
+        private bool CanBuildType(ParameterInfo p, Type service, Type implementation) {
+            try {
+                this.container.Options.DependencyInjectionBehavior.BuildExpression(
+                    new InjectionConsumerInfo(service, implementation, p));
+                return true;
+            } catch (ActivationException) {
+                return false;
+            }
         }
     }
 
