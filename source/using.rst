@@ -18,11 +18,11 @@ Simple Injector's main type is the `Container <https://simpleinjector.org/Refere
 
 .. container:: Note
 
-    **Warning**: Registering types in a *Container* instance should be done from one single thread. Requesting instances from the *Container* is thread-safe but `registration is not <https://simpleinjector.codeplex.com/discussions/349908>`_.
+    **Warning**: Registering types in a *Container* instance should be done from one single thread. Requesting instances from the *Container* is thread-safe but registration of types is not.
 
 .. container:: Note
 
-    **Warning**: Do not create an infinite number of *Container* instances (such as one instance per request). Doing so will drain the performance of your application. The library is optimized for using a very limited number of *Container* instances. Creating and initializing *Container* instance has a large overhead, (but the *Container* is `extremely fast <https://simpleinjector.codeplex.com/discussions/326621>`_ once initialized.
+    **Warning**: Do not create an infinite number of *Container* instances (such as one instance per request). Doing so will drain the performance of your application. The library is optimized for using a very limited number of *Container* instances. Creating and initializing *Container* instances has a large overhead, but resolving from the *Container* is extremely fast once initialized.
 
 Creating and configuring a *Container* is done by newing up an instance and calling the **RegisterXXX** overloads to register each of your services:
 

@@ -26,7 +26,7 @@ Besides integration with standard .NET technologies, Simple Injector can be inte
 * `Quartz.NET <https://stackoverflow.com/questions/14562176/constructor-injection-with-quartz-net-and-simple-injector>`_
 * `Membus <https://stackoverflow.com/questions/16123641/membus-and-ioc-simpleinjector-wiring-command-handlers-automatically-by-interfa>`_
 * `Web Forms MVP <https://stackoverflow.com/questions/15123515/pass-runtime-value-to-constructor-using-simpleinjector>`_
-* `Nancy <https://simpleinjector.codeplex.com/discussions/541398>`_
+* `Nancy <https://github.com/NancyFx/Nancy/issues/1227#issuecomment-163279040>`_
 * `Castle DynamicProxy Interception <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_
 * `ASP.NET Identity Framework <https://simpleinjector.codeplex.com/discussions/564822>`_
 * `Drum <https://stackoverflow.com/questions/26661621/how-to-register-drum-urimaker-using-simple-injector>`_

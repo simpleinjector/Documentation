@@ -20,7 +20,7 @@ Overriding Constructor Resolution Behavior
 
 Out of the box, Simple Injector only allows the creation of classes that contain a single public constructor. This behavior is chosen deliberately because `having multiple constructors is an anti-pattern <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=97>`_.
 
-There are some exceptional circumstances though, where we don't control the amount of public constructors a type has. Code generators for instance, can have this annoying side effect. Earlier versions of the `T4MVC <https://t4mvc.codeplex.com>`_ template for instance did this.
+There are some exceptional circumstances though, where we don't control the amount of public constructors a type has. Code generators for instance, can have this annoying side effect. Earlier versions of the `T4MVC <https://github.com/T4MVC/T4MVC>`_ template for instance did this.
 
 In these rare cases we need to override the way Simple Injector does its constructor overload resolution. This can be done by creating custom implementation of **IConstructorResolutionBehavior**. The default behavior can be replaced by setting the *Container.Options.ConstructorResolutionBehavior* property.
 
