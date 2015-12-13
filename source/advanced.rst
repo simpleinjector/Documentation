@@ -896,7 +896,7 @@ This enables explicit property injection on all properties that are marked with 
 
 .. container:: Note
 
-    **Note**: The **IPropertySelectionBehavior** extension mechanism can also be used to implement implicit property injection. There's `an example of this <https://simpleinjector.codeplex.com/SourceControl/latest#SimpleInjector.CodeSamples/ImplicitPropertyInjectionExtensions.cs>`_ in the source code. Doing so however is not advised because of the reasons given above.
+    **Note**: The **IPropertySelectionBehavior** extension mechanism can also be used to implement implicit property injection. There's `an example of this <https://github.com/simpleinjector/SimpleInjector/blob/master/SimpleInjector.CodeSamples/ImplicitPropertyInjectionExtensions.cs>`_ in the source code. Doing so however is not advised because of the reasons given above.
 
 .. _Covariance-Contravariance:
 

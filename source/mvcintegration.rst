@@ -2,7 +2,7 @@
 ASP.NET MVC Integration Guide
 =============================
 
-Simple Injector contains `Simple Injector MVC Integration Quick Start NuGet package <https://nuget.org/packages/SimpleInjector.MVC3>`_. If you're not using NuGet, you can include the **SimpleInjector.Integration.Web.Mvc.dll** in your MVC application, which is part of the standard CodePlex download.
+Simple Injector contains `Simple Injector MVC Integration Quick Start NuGet package <https://nuget.org/packages/SimpleInjector.MVC3>`_. If you're not using NuGet, you can include the **SimpleInjector.Integration.Web.Mvc.dll** in your MVC application, which is part of the standard download.
 
 .. container:: Note
 

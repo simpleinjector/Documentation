@@ -478,7 +478,7 @@ Work with dependency injection in multi-threaded applications
 
 .. container:: Note
 
-    **Note:** Simple Injector is designed for use in highly-concurrent applications and the container `is thread-safe <https://simpleinjector.codeplex.com/discussions/349908>`_. Its lock-free design allows it to scale linearly with the number of threads and processors in your system.
+    **Note:** Simple Injector is designed for use in highly-concurrent applications and the container is thread-safe_. Its lock-free design allows it to scale linearly with the number of threads and processors in your system.
 
 Many applications and application frameworks are inherently multi-threaded. Working in multi-threaded applications forces developers to take special care. It is easy for a less experienced developer to introduce a race condition in the code. Even although some frameworks such as ASP.NET make it easy to write thread-safe code, introducing a simple static field could break thread-safety.
 

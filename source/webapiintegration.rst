@@ -2,7 +2,7 @@
 ASP.NET Web API Integration Guide
 =================================
 
-Simple Injector contains `Simple Injector ASP.NET Web API Integration Quick Start NuGet package for IIS-hosted applications <https://www.nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_. If you're not using NuGet, you must include both the **SimpleInjector.Integration.WebApi.dll** and **SimpleInjector.Extensions.ExecutionContextScoping.dll** in your Web API application, which is part of the standard CodePlex download.
+Simple Injector contains `Simple Injector ASP.NET Web API Integration Quick Start NuGet package for IIS-hosted applications <https://www.nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_. If you're not using NuGet, you must include both the **SimpleInjector.Integration.WebApi.dll** and **SimpleInjector.Extensions.ExecutionContextScoping.dll** in your Web API application, which is part of the standard download on Github.
 
 .. container:: Note
 
