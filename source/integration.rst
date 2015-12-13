@@ -7,6 +7,7 @@ Simple Injector can be used in a wide range of .NET technologies, both server si
 .. toctree::
     :maxdepth: 1
 
+    ASP.NET 5 (beta!) <aspnetintegration>
     ASP.NET MVC <mvcintegration>
     ASP.NET Web API <webapiintegration>
     ASP.NET Web Forms <webformsintegration>
