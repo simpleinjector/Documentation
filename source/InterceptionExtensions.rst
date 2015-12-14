@@ -234,18 +234,41 @@ Interception Extensions
                 return msg;
             }
 
-            private IMessage InvokeMethodCall(IMethodCallMessage message) {
-                var invocation = 
-                    new Invocation { Proxy = this, Message = message, Arguments = message.Args };
+           private IMessage InvokeMethodCall(IMethodCallMessage message)
+            {
+                var invocation = new Invocation
+                {
+                    Proxy = this,
+                    Message = message,
+                    Arguments = message.Args
+                };
 
-                invocation.Proceeding += () => {
-                    invocation.ReturnValue = message.MethodBase.Invoke(
-                        this.realInstance, invocation.Arguments);
+                var exception = default(Exception);
+
+                invocation.Proceeding += () =>
+                {
+                    try
+                    {
+                        invocation.ReturnValue = message.MethodBase.Invoke(
+                                                this.realInstance, invocation.Arguments);
+                    }
+                    catch (Exception ex)
+                    {
+                        exception = ex;
+                    }
                 };
 
                 this.interceptor.Intercept(invocation);
-                return new ReturnMessage(invocation.ReturnValue, invocation.Arguments,
-                    invocation.Arguments.Length, null, message);
+
+                if (exception == default(Exception))
+                {
+                    return new ReturnMessage(invocation.ReturnValue, invocation.Arguments,
+                        invocation.Arguments.Length, null, message);
+                }
+                else
+                {
+                    return new ReturnMessage(exception, message);
+                }
             }
 
             private IMessage Bypass(IMethodCallMessage message) {
