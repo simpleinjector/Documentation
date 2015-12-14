@@ -2,7 +2,7 @@
 ASP.NET 5 Integration Guide (beta!)
 ===================================
 
-Simple Injector contains `Simple Injector ASP.NET 5 Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNet>`_.
+Simple Injector now offers the `Simple Injector ASP.NET 5 Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNet>`_.
 
 The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
 
@@ -60,13 +60,13 @@ The following code snippet shows how to use the integration package to apply Sim
 Working with the default Visual Studio 2015 ASP.NET 5 template
 ==============================================================
 
-The default Visual Studio 2015 template for ASP.NET 5, injects a lot of code into your project. This code contains classes such as a `HomeController`, `AccountController`, and empty `AuthMessageSender` and `AuthMessageSender` classes. When using this default template, you will have to make some adjustments to get your code working with Simple Injector.
+The default Visual Studio 2015 template for ASP.NET 5 injects a lot of code into your project: classes such as a `HomeController`, `AccountController` and empty `AuthMessageSender` and `AuthMessageSender` classes. You will have to make some adjustments to the default template to get it to work with Simple Injector.
 
 **Add application services.**
 
-The default template adds registrations for the `IEmailSender` and `ISmsSender` abstractions to the built-in ASP.NET configuration system. Those abstractions however are application services, and no framework component depends on this. Instead only other application components (the `AccountController` and `ManageController` classes) depend on this. So those registrations should be registered in Simple Injector instead.
+The default template adds registrations for the `IEmailSender` and `ISmsSender` abstractions to the built-in ASP.NET configuration system but these abstractions are application services and no framework component depends on them (the application components `AccountController` and `ManageController` depend on them). These 2 registrations should be added to Simple Injector.
 
-Remove the two existing `AddTransient` from the `ConfigureServices` method and replace them with the following registrations in the `InitializeContainer` method:
+Remove the two calls to `AddTransient` from the `ConfigureServices` method and replace them with the following registrations in the `InitializeContainer` method:
 
 .. code-block:: c#
 
@@ -75,9 +75,7 @@ Remove the two existing `AddTransient` from the `ConfigureServices` method and r
     
 **Cross-wire required framework services.**
 
-To adhere to the Dependency Inversion Principle (DIP), you should minimize the dependencies your code has on framework supplied abstractions and classes. The Visual Studio template however, doesn't follow the DIP and lets the generated classes depend on several framework and third party classes and abstractions.
-
-To be able to resolve the `AccountController` and `ManageController` from Simple Injector, those framework types need to be cross-wired into Simple Injector. Cross-wiring means that Simple Injector can forward the request for that type to the built-in ASP.NET configuration system. Add the following lines to the `InitializeContainer` method:
+To adhere to the Dependency Inversion Principle (DIP) you should minimize the dependencies your code has on framework supplied abstractions and classes. The Visual Studio template doesn't follow the DIP and lets the generated classes depend on several framework and third party classes and abstractions. To be able to resolve the `AccountController` and `ManageController` from Simple Injector certain framework types need to be cross-wired into Simple Injector. Cross-wiring means that Simple Injector can forward the request for that type to the built-in ASP.NET configuration system. Add the following lines to the `InitializeContainer` method:
 
 .. code-block:: c#
 
@@ -87,7 +85,7 @@ To be able to resolve the `AccountController` and `ManageController` from Simple
     
 **Working around a bug in Identity Framework.**
 
-The previous registrations would normally be enough, but unfortunately, due to a `bug <https://github.com/aspnet/Identity/issues/674>`_ in the beta's of Identity Framework, Simple Injector's verification will fail when checking the cross-wired `SignInManager<T>`. The `SignInManager<T>`'s constructor incorrectly throws an exception when there's no `HttpContext` available, which is obviously the case when the `SignInManger<T>` is created during application start-up. This bug will be fixed in 3.0.0-rc2 of Identity framework, but in the meantime, we will have to register our own custom `IHttpContextAccessor` to hack around this bug:
+The previous registrations would normally be enough but due to a `bug <https://github.com/aspnet/Identity/issues/674>`_ in the beta's of Identity Framework, Simple Injector's verification will fail when checking the cross-wired `SignInManager<T>` because the `SignInManager<T>`'s constructor incorrectly throws an exception when there's no `HttpContext` available (which is obviously the case when the `SignInManger<T>` is created during application start-up). This bug should be fixed in 3.0.0-rc2 of Identity framework, but in the meantime we need to register a custom `IHttpContextAccessor` to work around the issue:
 
 .. code-block:: c#
 
@@ -102,7 +100,7 @@ The previous registrations would normally be enough, but unfortunately, due to a
         }
     }
     
-This class should replace the framework's original implementation by making the following registration in the `ConfigureServices` method:
+This class can replace the framework's original implementation by making the following registration in the `ConfigureServices` method:
 
 .. code-block:: c#
 
