@@ -23,6 +23,7 @@ Interception Extensions
 
     public interface IInvocation
     {
+        Exception Exception { get; set; }
         object InvocationTarget { get; }
         object ReturnValue { get; set; }
         object[] Arguments { get; }
@@ -234,18 +235,39 @@ Interception Extensions
                 return msg;
             }
 
-            private IMessage InvokeMethodCall(IMethodCallMessage message) {
-                var invocation = 
-                    new Invocation { Proxy = this, Message = message, Arguments = message.Args };
-
-                invocation.Proceeding += () => {
-                    invocation.ReturnValue = message.MethodBase.Invoke(
-                        this.realInstance, invocation.Arguments);
+           private IMessage InvokeMethodCall(IMethodCallMessage message)
+            {
+                var invocation = new Invocation
+                {
+                    Proxy = this,
+                    Message = message,
+                    Arguments = message.Args,
+                    Exception = default(Exception)
+                };
+                
+                invocation.Proceeding += () =>
+                {
+                    try
+                    {
+                        invocation.ReturnValue = message.MethodBase.Invoke(this.realInstance, invocation.Arguments);
+                    }
+                    catch (Exception ex)
+                    {
+                        invocation.Exception = ex;
+                    }
                 };
 
                 this.interceptor.Intercept(invocation);
-                return new ReturnMessage(invocation.ReturnValue, invocation.Arguments,
-                    invocation.Arguments.Length, null, message);
+
+                if (invocation.Exception == default(Exception))
+                {
+                    return new ReturnMessage(invocation.ReturnValue, invocation.Arguments,
+                        invocation.Arguments.Length, null, message);
+                }
+                else
+                {
+                    return new ReturnMessage(invocation.Exception, message);
+                }
             }
 
             private IMessage Bypass(IMethodCallMessage message) {
@@ -261,6 +283,7 @@ Interception Extensions
                 public object[] Arguments { get; set; }
                 public IMethodCallMessage Message { get; set; }
                 public object ReturnValue { get; set; }
+                public Exception Exception { get; set; }
 
                 public object InvocationTarget {
                     get { return this.Proxy.realInstance; }
@@ -310,7 +333,18 @@ After copying the previous code snippet to your project, you can add interceptio
 
             var decoratedType = invocation.InvocationTarget.GetType();
             
-            this.logger.Log(string.Format("{0} executed in {1} ms.",
+            if (invocation.Exception != default(Exception))
+            {
+                // do some thing with exception
+                this.logger.Log(string.Format("{0} executed in {1} ms. Exception: {2}",
+                  decoratedType.Name, watch.ElapsedMilliseconds, invocation.Exception.Message));
+            }
+            else
+            {
+                // do somethink without exception
+                this.logger.Log(string.Format("{0} executed in {1} ms.",
                 decoratedType.Name, watch.ElapsedMiliseconds));
+            }
+           
         }
     }
