@@ -107,3 +107,78 @@ This class can replace the framework's original implementation by making the fol
     // Work around for a Identity Framework bug inside the SignInManager<T> class.
     services.Add(ServiceDescriptor.Instance<IHttpContextAccessor>(
         new NeverNullHttpContextAccessor()));
+	    
+**Everything together**
+
+When we put the given adjustments together, we get the following composition root:
+	
+.. code-block:: c#
+
+    // You'll need to include the following namespaces
+    using SimpleInjector;
+    using SimpleInjector.Extensions.ExecutionContextScoping;
+    using SimpleInjector.Integration.AspNet;
+
+    public class Startup
+    {
+        public Startup(IHostingEnvironment env)
+        {
+            // ASP.NET default stuff here
+        }
+
+        private Container container = new Container();
+
+        // This method gets called by the runtime.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // ASP.NET default stuff here
+
+            services.AddInstance<IControllerActivator>(
+                new SimpleInjectorControllerActivator(container));
+                
+            // Work around for a Identity Framework bug inside the SignInManager<T> class.
+            services.Add(ServiceDescriptor.Instance<IHttpContextAccessor>(
+                new NeverNullHttpContextAccessor()));
+        }
+
+        // Configure is called after ConfigureServices is called.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory fac)
+        {
+            container.Options.DefaultScopedLifestyle = new AspNetRequestLifestyle();
+
+            app.UseSimpleInjectorAspNetRequestScoping(container);
+
+            InitializeContainer(app);
+
+            container.RegisterAspNetControllers(app);
+
+            this.container.Verify();
+
+            // ASP.NET default stuff here
+        }
+
+        private void InitializeContainer(IApplicationBuilder app)
+        {
+            // Add application services. For instance:
+            container.Register<IEmailSender, AuthMessageSender>();
+            container.Register<ISmsSender, AuthMessageSender>();
+            
+            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
+
+            // Cross-wire ASP.NET services (if any). For instance:
+            container.CrossWire<UserManager<ApplicationUser>>(app);
+            container.CrossWire<SignInManager<ApplicationUser>>(app);
+            container.CrossWire<ILoggerFactory>(app);
+        }
+        
+        private sealed class NeverNullHttpContextAccessor : IHttpContextAccessor
+        {
+            AsyncLocal<HttpContext> context = new AsyncLocal<HttpContext>();
+
+            public HttpContext HttpContext
+            {
+                get { return this.context.Value ?? new DefaultHttpContext(); }
+                set { this.context.Value = value; }
+            }
+        }
+    }
