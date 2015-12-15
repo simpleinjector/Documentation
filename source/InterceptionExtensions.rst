@@ -23,6 +23,7 @@ Interception Extensions
 
     public interface IInvocation
     {
+        Exception Exception { get; set; }
         object InvocationTarget { get; }
         object ReturnValue { get; set; }
         object[] Arguments { get; }
@@ -240,34 +241,32 @@ Interception Extensions
                 {
                     Proxy = this,
                     Message = message,
-                    Arguments = message.Args
+                    Arguments = message.Args,
+                    Exception = default(Exception)
                 };
-
-                var exception = default(Exception);
-
+                
                 invocation.Proceeding += () =>
                 {
                     try
                     {
-                        invocation.ReturnValue = message.MethodBase.Invoke(
-                                                this.realInstance, invocation.Arguments);
+                        invocation.ReturnValue = message.MethodBase.Invoke(this.realInstance, invocation.Arguments);
                     }
                     catch (Exception ex)
                     {
-                        exception = ex;
+                        invocation.Exception = ex;
                     }
                 };
 
                 this.interceptor.Intercept(invocation);
 
-                if (exception == default(Exception))
+                if (invocation.Exception == default(Exception))
                 {
                     return new ReturnMessage(invocation.ReturnValue, invocation.Arguments,
                         invocation.Arguments.Length, null, message);
                 }
                 else
                 {
-                    return new ReturnMessage(exception, message);
+                    return new ReturnMessage(invocation.Exception, message);
                 }
             }
 
@@ -284,6 +283,7 @@ Interception Extensions
                 public object[] Arguments { get; set; }
                 public IMethodCallMessage Message { get; set; }
                 public object ReturnValue { get; set; }
+                public Exception Exception { get; set; }
 
                 public object InvocationTarget {
                     get { return this.Proxy.realInstance; }
