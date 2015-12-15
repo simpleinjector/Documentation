@@ -333,7 +333,18 @@ After copying the previous code snippet to your project, you can add interceptio
 
             var decoratedType = invocation.InvocationTarget.GetType();
             
-            this.logger.Log(string.Format("{0} executed in {1} ms.",
+            if (invocation.Exception != default(Exception))
+            {
+                // do some thing with exception
+                this.logger.Log(string.Format("{0} executed in {1} ms. Exception: {2}",
+                  decoratedType.Name, watch.ElapsedMilliseconds, invocation.Exception.Message));
+            }
+            else
+            {
+                // do somethink without exception
+                this.logger.Log(string.Format("{0} executed in {1} ms.",
                 decoratedType.Name, watch.ElapsedMiliseconds));
+            }
+           
         }
     }
