@@ -29,6 +29,8 @@ The following code snippet shows how to use the integration package to apply Sim
 
             services.AddInstance<IControllerActivator>(
                 new SimpleInjectorControllerActivator(container));
+            services.AddInstance<IViewComponentInvokerFactory>(
+                new SimpleInjectorViewComponentInvokerFactory(container));
         }
 
         // Configure is called after ConfigureServices is called.
@@ -41,8 +43,9 @@ The following code snippet shows how to use the integration package to apply Sim
             InitializeContainer(app);
 
             container.RegisterAspNetControllers(app);
+            container.RegisterAspNetViewComponents(app);
         
-            this.container.Verify();
+            container.Verify();
 
             // ASP.NET default stuff here
         }
@@ -135,6 +138,8 @@ When we put the given adjustments together, we get the following composition roo
 
             services.AddInstance<IControllerActivator>(
                 new SimpleInjectorControllerActivator(container));
+            services.AddInstance<IViewComponentInvokerFactory>(
+                new SimpleInjectorViewComponentInvokerFactory(container));
                 
             // Work around for a Identity Framework bug inside the SignInManager<T> class.
             services.Add(ServiceDescriptor.Instance<IHttpContextAccessor>(
@@ -151,8 +156,9 @@ When we put the given adjustments together, we get the following composition roo
             InitializeContainer(app);
 
             container.RegisterAspNetControllers(app);
+			container.RegisterAspNetViewComponents(app);
 
-            this.container.Verify();
+            container.Verify();
 
             // ASP.NET default stuff here
         }
@@ -173,7 +179,7 @@ When we put the given adjustments together, we get the following composition roo
         
         private sealed class NeverNullHttpContextAccessor : IHttpContextAccessor
         {
-            AsyncLocal<HttpContext> context = new AsyncLocal<HttpContext>();
+            private readonly AsyncLocal<HttpContext> context = new AsyncLocal<HttpContext>();
 
             public HttpContext HttpContext
             {
