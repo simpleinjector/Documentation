@@ -8,7 +8,7 @@
 Welcome to Simple Injector's documentation!
 ===========================================
 
-Simple Injector is an easy-to-use Dependency Injection (DI) library for .NET 4+ that supports Silverlight 4+, Windows Phone 8, Windows 8 including Universal apps and Mono. Simple Injector is easily integrated with frameworks such as Web API, MVC, WCF and many others. It’s easy to implement the dependency injection pattern with loosely coupled components using Simple Injector.
+Simple Injector is an easy-to-use Dependency Injection (DI) library for .NET 4+ that supports Silverlight 4+, Windows Phone 8, Windows 8 including Universal apps, CoreCLR and Mono. Simple Injector is easily integrated with frameworks such as Web API, MVC, WCF, ASP.NET 5 and many others. It’s easy to implement the dependency injection pattern with loosely coupled components using Simple Injector.
 
 Use:
 
