@@ -14,7 +14,7 @@ Change the App.xaml markup by removing the *StartUri* property:
     <Application x:Class="SimpleInjectorWPF.App"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-        <!-- Remove the StartupUri property, start the application from a static Main -->
+        <!-- Remove the StartupUri property, start the application from OnStartup method -->
         <Application.Resources>
         </Application.Resources>
     </Application>
@@ -22,34 +22,43 @@ Change the App.xaml markup by removing the *StartUri* property:
 Step 2:
 -------
 
-Add a *Program.cs* file to your project to be the new entry point for the application:
+Cahange the *App.xaml.cs* file to be the entry point for the application:
 
 .. code-block:: c#
 
-    using System;
-    using System.Windows;
     using SimpleInjector;
 
-    static class Program
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
+    public partial class App : Application
     {
-        [STAThread]
-        static void Main() {
-            var container = Bootstrap();
+        private readonly Container container = CreateContainer();
 
-            // Any additional other configuration, e.g. of your desired MVVM toolkit.
-
-            RunApplication(container);
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            
+            base.MainWindow = container.GetInstance<MainWindow>();
+            base.MainWindow.Show();
         }
 
-        private static Container Bootstrap() {
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+            container.Dispose();
+        }
+
+        private static Container CreateContainer()
+        {
             // Create the container as usual.
             var container = new Container();
 
-            // Register your types, for instance:
-            container.Register<IQueryProcessor, QueryProcessor>(Lifestyle.Singleton);
-            container.Register<IUserContext, WpfUserContext>();
+            // Register services
+            container.Register<ILogger, Logger>(Lifestyle.Singleton);
+            container.Register<UserRepository, UserRepository>();
 
-            // Register your windows and view models:
+            // Register windows and view models:
             container.Register<MainWindow>();
             container.Register<MainWindowViewModel>();
 
@@ -57,25 +66,7 @@ Add a *Program.cs* file to your project to be the new entry point for the applic
 
             return container;
         }
-
-        private static void RunApplication(Container container) {
-            try {
-                var app = new App();
-                var mainWindow = container.GetInstance<MainWindow>();
-                app.Run(mainWindow);
-            } catch (Exception ex) {
-                //Log the exception and exit
-            }
-        }
     }
-
-Step 3:
--------
-
-Change the 'Startup object' in the properties of your project to be the newly created *Program* class:
-
-.. image:: images/wpfstartupobject.png
-   :alt: 'Startup object' settings in the application's properties
 
 Usage
 -----
@@ -86,8 +77,10 @@ Constructor injection can now be used in any window (e.g. *MainWindow*) and view
 
     using System.Windows;
 
-    public partial class MainWindow : Window {
-        public MainWindow(MainWindowViewModel viewModel) {
+    public partial class MainWindow : Window 
+    {
+        public MainWindow(MainWindowViewModel viewModel) 
+        {
             InitializeComponent();
 
             // Assign to the data context so binding can be used.
@@ -95,17 +88,17 @@ Constructor injection can now be used in any window (e.g. *MainWindow*) and view
         }
     }
 
-    public class MainWindowViewModel {
-        private readonly IQueryProcessor queryProcessor;
-        private readonly IUserContext userContext;
-
-        public MainWindowViewModel(IQueryProcessor queryProcessor,
-            IUserContext userContext) {
-            this.queryProcessor = queryProcessor;
+    public class MainWindowViewModel
+    {
+        private readonly UserRepository userContext;
+        
+        public MainWindowViewModel(UserRepository userContext)
+        {
             this.userContext = userContext;
         }
 
-        public IEnumerable<IUser> Users {
-            get { return this.queryProcessor.Execute(new GetAllUsers()); }
+        public IEnumerable<User> Users
+        {
+            get { return this.userContext.GetUsers(); }
         }
     }
