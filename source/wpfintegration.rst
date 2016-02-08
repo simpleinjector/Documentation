@@ -56,7 +56,7 @@ Cahange the *App.xaml.cs* file to be the entry point for the application:
 
             // Register services
             container.Register<ILogger, Logger>(Lifestyle.Singleton);
-            container.Register<UserRepository, UserRepository>();
+            container.Register<IUserRepository, UserRepository>();
 
             // Register windows and view models:
             container.Register<MainWindow>();
@@ -90,9 +90,9 @@ Constructor injection can now be used in any window (e.g. *MainWindow*) and view
 
     public class MainWindowViewModel
     {
-        private readonly UserRepository userContext;
+        private readonly IUserRepository userContext;
         
-        public MainWindowViewModel(UserRepository userContext)
+        public MainWindowViewModel(IUserRepository userContext)
         {
             this.userContext = userContext;
         }
