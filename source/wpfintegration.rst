@@ -80,7 +80,7 @@ Change the *App.xaml.cs* file to be the entry point for the application:
 Usage
 -----
 
-Constructor injection can now be used in any window (e.g. *MainWindow*) and view model:
+Constructor injection can now be used in any window and view model (e.g. *MainViewModel*) :
 
 .. code-block:: c#
 
