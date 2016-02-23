@@ -62,8 +62,12 @@ Change the *App.xaml.cs* file to be the entry point for the application:
             container.Register<ILogger, FileSystemLogger>(Lifestyle.Singleton);
             container.Register<IUserContext, SqlUserContext>();
     
-            // views and viewmodels:
-            // Usually, views and viewmodels are concrete types, so you don't have to register them, unless you want to set their Lifrstyle.
+            /*
+                views and viewmodels:
+                Usually, views and viewmodels are concrete types, so you don't have to register them, 
+                unless you want to set their Lifrstyle.
+                For example:
+            */
             container.Register<SomeInfoView>(Lifestyle.Singleton);
             container.Register<SomeInfoViewModel>(Lifestyle.Singleton);
     
