@@ -24,7 +24,7 @@ The following platforms are supported:
 Getting started
 ===============
 
-The easiest way to get started is by installing  `the available NuGet packages <https://www.nuget.org/packages?q=Author%3ASimpleInjector-Contributors&sortOrder=package-download-count>`_ and if you're not a NuGet fan then follow these steps:
+The easiest way to get started is by installing  `the available NuGet packages <https://simpleinjector.org/nuget>`_ and if you're not a NuGet fan then follow these steps:
 
 #. Download the latest **runtime library** from: https://simpleinjector.org/download;
 #. Unpack the downloaded `.zip` file;
