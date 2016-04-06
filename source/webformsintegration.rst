@@ -70,15 +70,13 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                 container.Register<IUserRepository, SqlUserRepository>();
                 container.RegisterPerWebRequest<IUserContext, AspNetUserContext>();
 
-                // Register your Page classes.
+                // Register your Page classes to allow them to be verified and diagnosed.
                 RegisterWebPages(container);
 
                 // 3. Store the container for use by Page classes.
                 Global.container = container;
 
-                // 4. Optionally verify the container's configuration.
-                //    Did you know the container can diagnose your configuration? 
-                //    For more information, go to: https://simpleinjector.org/diagnostics.
+                // 3. Verify the container's configuration.
                 container.Verify();
             }
 
