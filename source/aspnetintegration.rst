@@ -1,8 +1,8 @@
-===================================
-ASP.NET 5 Integration Guide (beta!)
-===================================
+======================================
+ASP.NET Core Integration Guide (beta!)
+======================================
 
-Simple Injector now offers the `Simple Injector ASP.NET 5 Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNet>`_.
+Simple Injector now offers the `Simple Injector ASP.NET Core Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNet>`_.
 
 The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
 
@@ -60,10 +60,10 @@ The following code snippet shows how to use the integration package to apply Sim
         }
     }
 
-Working with the default Visual Studio 2015 ASP.NET 5 template
-==============================================================
+Working with the default Visual Studio 2015 ASP.NET Core template
+=================================================================
 
-The default Visual Studio 2015 template for ASP.NET 5 injects a lot of code into your project: classes such as a `HomeController`, `AccountController` and empty `AuthMessageSender` and `AuthMessageSender` classes. You will have to make some adjustments to the default template to get it to work with Simple Injector.
+The default Visual Studio 2015 template for ASP.NET Core injects a lot of code into your project: classes such as a `HomeController`, `AccountController` and empty `AuthMessageSender` and `AuthMessageSender` classes. You will have to make some adjustments to the default template to get it to work with Simple Injector.
 
 **Add application services.**
 
