@@ -4,7 +4,6 @@ How To
 
 * How to :ref:`Register factory delegates <Register-Factory-Delegates>`
 * How to :ref:`Resolve instances by key <Resolve-Instances-By-Key>`
-* How to :ref:`Resolve arrays and lists <Resolve-Arrays-And-Lists>`
 * How to :ref:`Register multiple interfaces with the same implementation <Register-Multiple-Interfaces-With-The-Same-Implementation>`
 * How to :ref:`Override existing registrations <Override-Existing-Registrations>`
 * How to :ref:`Verify the container's configuration <Verify-Configuration>`
@@ -340,44 +339,6 @@ The registration will then look as follows:
 
 The advantage of this method is that it completely integrates with the *Container*. :ref:`Decorators` can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
 
-.. _Resolve-Arrays-And-Lists:
-
-Resolve arrays and lists
-========================
-
-Simple Injector allows the registration of collections of elements using the `RegisterCollection <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterCollection.htm>`_ method overloads. Collections can be resolved by any of the **GetAllInstances<T>()** methods, by calling *GetInstance<IEnumerable<T>>()*, or by defining an *IEnumerable<T>*, *ICollection<T>*, *IList<T>*, *IReadOnlyCollection<T>*, *IReadOnlyList<T>* or array parameter in the constructor of a type that is created using automatic constructor injection.
-
-.. container:: Note
-
-    **Note:** *IReadOnlyCollection<T>* and *IReadOnlyList<T>* are new in .NET 4.5 and you need the .NET 4.5 build of Simple Injector. These interfaces are *not* supported by the PCL and .NET 4.0 versions of Simple Injector.
-
-Please take a look at your design if you think you need to work with a collection of items. Often you can succeed by creating a composite type that can be injected. Take the following interface for instance:
-
-.. code-block:: c#
-
-    public interface ILogger {
-        void Log(string message);
-    }
-
-Instead of injecting a collection of dependencies, the consumer might not really be interested in the collection, but simply wishes to operate on all elements. In that scenario you can configure your container to inject a composite of that particular type. That composite might look as follows:
-
-.. code-block:: c#
-
-    public sealed class CompositeLogger : ILogger {
-        private readonly IEnumerable<ILogger> loggers;
-
-        public CompositeLogger(IEnumerable<ILogger> loggers) {
-            this.loggers = loggers;
-        }
-
-        public void Log(string message) {
-            foreach (var logger in this.loggers) {
-                logger.Log(message);
-            }
-        }
-    }
-
-A composite allows you to remove this boilerplate iteration logic from the application, which makes the application cleaner and when changes have to be made to the way the collection of loggers is processed, only the composite has to be changed.
 
 .. _Register-Multiple-Interfaces-With-The-Same-Implementation:
 
@@ -564,3 +525,48 @@ In the Composition Root, instead of registering the *MailSender*, we register th
     container.RegisterDecorator<IMailSender, AsyncMailSenderProxy>(Lifestyle.Singleton);
 
 In this case the container will ensure that when an *IMailSender* is requested, a single *AsyncMailSenderProxy* is returned with a *Func<IMailSender>* delegate that will create a new *RealMailSender* when requested. The `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ and `RegisterSingleDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterSingleDecorator.htm>`_ overloads natively understand how to handle *Func<Decoratee>* dependencies. The :ref:`Decorators <Decorators>` section of the :doc:`Advanced Scenarios <advanced>` wiki page explains more about registering decorators.
+
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+.. _Resolve-Arrays-And-Lists:
+
+**Resolve arrays and lists**: The information in this section has been moved to :ref:`here <Collections>`.
+
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
