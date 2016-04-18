@@ -263,7 +263,8 @@ The *Action<T>* delegate that is registered by the **RegisterInitializer** metho
 
 .. _Collections:
 
-**Configuring a collection of instances to be returned:**
+Collections
+===========
 
 Simple Injector contains several methods for registering and resolving collections of types. Here are some examples:
 
@@ -329,7 +330,7 @@ The **RegisterCollection** overloads that take a collection of *Type* instances 
         typeof(ILogger)
     });
 
-When the registered collection of *ILogger* instances are resolved the *Container* will resolve each and every one of them applying all the specific rules of their configuration. When no registration exists, the type is created with the default **Transient** lifestyle (*transient* means that a new instance is created every time the returned collection is iterated). In the example, the *MailLogger* type is registered as **Singleton**, and so each resolved *ILogger* collection will always have the same instance of *MailLogger* in their collection.
+When the registered collection of *ILogger* instances are resolved, the *Container* will resolve each of them applying the specific rules of their configuration. When no registration exists, the type is created with the default **Transient** lifestyle (*transient* means that a new instance is created every time the returned collection is iterated). In the example, the *MailLogger* type is registered as **Singleton**, and so each resolved *ILogger* collection will always have the same instance of *MailLogger* in their collection.
 
 Since the creation is forwarded, abstract types can also be registered using **RegisterCollection**. In the above example the *ILogger* type itself is registered using **RegisterCollection**. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of *ILogger* instances as well. A more usual scenario however is the use of a composite as shown next.
 
@@ -362,6 +363,28 @@ While resolving collections is useful and also works with :ref:`automatic constr
     service.DoStuff();
 
 When using this approach none of your services (except *CompositeLogger*) need a dependency on *IEnumerable<ILogger>* - they can all simply have a dependency on the *ILogger* interface itself.
+
+.. _Collection-types:
+
+Besides *IEnumerable<ILogger>*, Simple Injector natively supports some other collection types as well. The following types are supported:
+
+ - *IEnumerable<T>*
+ - *ICollection<T>*
+ - *IList<T>*
+ - *IReadOnlyCollection<T>*
+ - *IReadOnlyList<T>*
+ - *T[]* (array)
+
+.. container:: Note
+
+    **Note:** The *IReadOnlyCollection<T>* and *IReadOnlyList<T>* interfaces are new in .NET 4.5. Only the .NET 4.5 and .NET Core build of Simple Injector will be able to automatically inject these abstractions into your components. These interfaces are *not* supported by the PCL and .NET 4.0 versions of Simple Injector.
+
+Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>*, *ICollection<T>*, *IList<T>*, *IReadOnlyCollection<T>* and *IReadOnlyList<T>* instances. In reality you should not see the the injected *IEnumerable<T>* as a collection of instances; you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* or *ICollection<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component.
+	
+.. container:: Note
+
+    **Warning**: In contrast to the collection abstractions, an array is registered as transient. An array is a mutable type; a consumer can change the contents of an array. Sharing the array (by making it singleton) might cause unrelated parts of your applications to fail because of changes to the array. Since an array is a concrete type, it can not function as a stream, causing the elements in the array to get the lifetime of the consuming component. This could cause :doc:`lifestyle mismatches <LifestyleMismatches>` when the array wasn't registered as transient.
+	
 
 .. _Verifying-Container:
 
