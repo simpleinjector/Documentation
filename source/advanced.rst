@@ -933,7 +933,7 @@ Take a look at the following application design around the *IEventHandler<in TEv
     }
 
     public class WarnShippingDepartmentAboutMove : IEventHandler<CustomerMovedAbroadEvent> {
-        public void Handle(CustomerMovedEvent e) { ... }
+        public void Handle(CustomerMovedAbroadEvent e) { ... }
     }    
 
 The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbroadEvent* (where *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*) and two concrete event handlers *SendFlowersToMovedCustomer* and *WarnShippingDepartmentAboutMove*. These classes can be registered using the following registration:
