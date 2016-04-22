@@ -556,6 +556,7 @@ In this case the container will ensure that when an *IMailSender* is requested, 
 |
 |
 |
+
 .. _Resolve-Arrays-And-Lists:
 
 **Resolve arrays and lists**: The information in this section has been moved to :ref:`here <Collections>`.
