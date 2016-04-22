@@ -192,7 +192,7 @@ This repeated registration is, of course, not very practical. We might be tempte
 .. code-block:: c#
 
     container.Register(typeof(IValidate<>), typeof(NullValidator<>));
-	
+    
 This willl however not work, because this registration will try to map any closed *IValidate<T>* abstraction to the *NullValidator<T>* implementation, but other registrations (such as *ProductValidator* and *OrderValidator*) already exist. What we need here is to make *NullValidator<T>* as fallback registration and Simple Injector allows this using the **RegisterConditional** method overloads:
 
 .. code-block:: c#
@@ -342,17 +342,31 @@ Context based injection is the ability to inject a particular dependency based o
 
     **Note**: In many cases context based injection is not the best solution, and the design should be reevaluated. In some narrow cases however it can make sense.
 
-The most common scenario is to base the type of the injected dependency on the type of the consumer. Take for instance the following *ILogger* interface with a generic *Logger<T>* class that needs to be injected into several consumers. 
+One of the simplest use cases for **RegisterConditional** is to select an implementation depending on the consumer a dependency is injected into. Take a look at the following registrations for instance:
 
 .. code-block:: c#
 
-    public interface ILogger {
-        void Log(string message);
-    }
+    container.RegisterConditional<ILogger, NullLogger>(
+        c => c.Consumer.ImplementationType == typeof(HomeController));
+    container.RegisterConditional<ILogger, FileLogger>(
+        c => c.Consumer.ImplementationType == typeof(UsersController));
+    container.RegisterConditional<ILogger, DatabaseLogger>(c => !c.Handled);
+    
+Here we register three implementations, namely *NullLogger*, *FileLogger* and *DatabaseLogger*, all of which implement *ILogger*. The registrations are made using a predicate (lambda) describing for which condition they hold. The *NullLogger* will only be injected into the *HomeController* and the *FileLogger* will only be injected into the *UsersController*. The *DatabaseLogger* on the other hand is configured as fallback registration and will be injected in all other consumers.
 
-    public class Logger<T> : ILogger {
-        public void Log(string message) { }
-    }
+Simple Injector will process conditional registrations in the order in which they are made. This means that fallback registrations, such as for the previous *DatabaseLogger*, should be made last.    Simple Injector will always call all predicates to ensure no overlapping registrations are made. In case there multiple conditional registrations that can be applied, Simple Injector will throw an exception.
+
+.. container:: Note
+
+    **Note**: The predicates are only used during object graph compilation and the predicate's result is burned in the structure of returned object graph. This disallows changing the graph based on runtime conditions.
+    
+A very common scenario is to base the type of the injected dependency on the type of the consumer. Take for instance the following *ILogger* interface with a generic *Logger<T>* class that needs to be injected into several consumers. 
+
+.. code-block:: c#
+
+    public interface ILogger { }
+
+    public class Logger<T> : ILogger { }
 
     public class Consumer1 {
         public Consumer1(ILogger logger) { }
@@ -369,14 +383,14 @@ In this case we want to inject a *Logger<Consumer1>* into *Consumer1* and a *Log
     container.RegisterConditional(
         typeof(ILogger),
         c => typeof(Logger<>).MakeGenericType(c.Consumer.ImplementationType),
-        Lifestyle.Transient,
+        Lifestyle.Singleton,
         c => true);
 
-In the previous code snippet we supply the **RegisterConditional** method with a lambda presenting a *Func<TypeFactoryContext, Type>* delegate that allows building the exact implementation type based on contextual information. In this case we use the implementation type of the consuming component to build the correct closed *Logger<T>* type. We also supply the method with a predicate, but in this case we make the registration unconditional by returning true from the predicate.
+In the previous code snippet we supply the **RegisterConditional** method with a lambda presenting a *Func<TypeFactoryContext, Type>* delegate that allows building the exact implementation type based on contextual information. In this case we use the implementation type of the consuming component to build the correct closed *Logger<T>* type. We also supply the method with a predicate, but in this case we make the registration unconditional by returning *true* from the predicate, meaning that this is  the only registration for *ILogger*.
 
 .. container:: Note
 
-    **Note**: Although building a generic type using MakeGenericType is relatively slow, the call to the *Func<TypeFactoryContext, Type>* delegate itself has a one-time cost. The factory delegate will usually be called a finite number of times. After an object graph has been built, the delegate will not be called again when that same object graph is resolved.
+    **Note**: Although building a generic type using MakeGenericType is relatively slow, the call to the *Func<TypeFactoryContext, Type>* delegate itself has a one-time cost. The factory delegate will only be called a finite number of times. After an object graph has been built, the delegate will not be called again when that same object graph is resolved.
 
 .. container:: Note
 
@@ -666,7 +680,7 @@ When registering a decorator, Simple Injector will automatically decorate any co
     container.RegisterCollection<IEventHandler<CustomerMovedEvent>>(new[] {
         typeof(CustomerMovedEventHandler),
         typeof(NotifyStaffWhenCustomerMovedEventHandler)
-	});
+    });
         
     container.RegisterDecorator(
         typeof(IEventHandler<>),
@@ -771,7 +785,7 @@ Interception is the ability to intercept a call from a consumer to a service, an
 
 .. container:: Note
 
-    **Warning**: Simple Injector has :ref:`no out-of-the-box support for interception <No-interception>` because the use of interception is an indication of a sub optimal design and we are keen on pushing developers into best practices. Whenever possible, choose to improve your design to make decoration possible.	
+    **Warning**: Simple Injector has :ref:`no out-of-the-box support for interception <No-interception>` because the use of interception is an indication of a sub optimal design and we are keen on pushing developers into best practices. Whenever possible, choose to improve your design to make decoration possible.    
 
 Using the :doc:`Interception extensions <InterceptionExtensions>` code snippets, you can add the ability to do interception with Simple Injector. Using the given code, you can for instance define a *MonitoringInterceptor* that allows logging the execution time of the called service method:
 
