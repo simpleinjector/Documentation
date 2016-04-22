@@ -17,12 +17,12 @@ Many different platform and framework specific flavors are available for the *Sc
 * :ref:`Per WCF Operation <PerWcfOperation>`
 * :ref:`Per Lifetime Scope <PerLifetimeScope>`
 * :ref:`Per Execution Context Scope (async/await) <PerExecutionContextScope>`
-* :ref:`Per Graph <PerGraph>`
-* :ref:`Per Thread <PerThread>`
-* :ref:`Per HTTP Session <PerHttpSession>`
 
 Further reading:
 
+* :ref:`Per Graph <PerGraph>`
+* :ref:`Per Thread <PerThread>`
+* :ref:`Per HTTP Session <PerHttpSession>`
 * :ref:`Hybrid <Hybrid>`
 * :ref:`Developing a Custom Lifestyle <CustomLifestyles>`
 
