@@ -17,12 +17,12 @@ Many different platform and framework specific flavors are available for the *Sc
 * :ref:`Per WCF Operation <PerWcfOperation>`
 * :ref:`Per Lifetime Scope <PerLifetimeScope>`
 * :ref:`Per Execution Context Scope (async/await) <PerExecutionContextScope>`
-* :ref:`Per Graph <PerGraph>`
-* :ref:`Per Thread <PerThread>`
-* :ref:`Per HTTP Session <PerHttpSession>`
 
 Further reading:
 
+* :ref:`Per Graph <PerGraph>`
+* :ref:`Per Thread <PerThread>`
+* :ref:`Per HTTP Session <PerHttpSession>`
 * :ref:`Hybrid <Hybrid>`
 * :ref:`Developing a Custom Lifestyle <CustomLifestyles>`
 
@@ -110,7 +110,11 @@ Registration for concrete singletons is necessarily, because unregistered concre
 
 .. container:: Note
 
-    **Note**: Simple Injector will cache a *Singleton* instance for the lifetime of the **Container** instance and will dispose any auto-wired instance when *Container.Dispose()* is called. Instances that are not created by the container (and supplied to the container using *RegisterSingleton<TService>(TService)* will not be disposed by the container.
+    **Note**: Simple Injector will cache a *Singleton* instance for the lifetime of the **Container** instance and will dispose any auto-wired instance (that implements *IDisposable*) when *Container.Dispose()* is called. This includes registrations using *RegisterSingleton<TService, TImplementation>()* *RegisterSingleton<TConcrete>()* and *RegisterSingleton(Type, Type)*. Non-auto-wired instances that are created using factory delegates will be disposed as well. This includes *RegisterSingleton<TService>(Func<TService>)* and *RegisterSingleton(Type, Func<object>)*.
+	
+.. container:: Note
+	
+	**Warning**: Already existing instances that are supplied to the container using *RegisterSingleton<TService>(TService)* and *RegisterSingleton(Type, object)* will not be disposed by the container. They are considered to be 'externally owned'.
 
 .. _Scoped:
 
