@@ -6,24 +6,9 @@ Object Lifetime Management is the concept of controlling the number of instances
 
 Below is a list of the most common lifestyles with code examples of how to configure them using Simple Injector:
 
-+----------------+----------------------------------------------------------+-------------------------------------------------------------+
-|   Lifestyle    |                          Description                     |                           Disposal                          |
-+================+==========================================================+=============================================================+
-|:ref:`Transient | A new instance of the service type will be created for   | Transient instances are not tracked by the container. This  |
-|<Transient>`    | each request (both for calls to *GetInstance<T>* and     | means that Simple Injector will not dispose transient       |
-|                | instances as part of an object graph).                   | instances.                                                  |
-+----------------+----------------------------------------------------------+-------------------------------------------------------------+
-|:ref:`Scoped    | For every request within an implicitly or explicitly     | Instance will be disposed when the scope ends.              |
-|<Scoped>`       | defined scope, a single instance of the service will be  |                                                             |
-|                | returned.                                                |                                                             |
-+----------------+----------------------------------------------------------+-------------------------------------------------------------+
-|:ref:`Singleton | There will be only one instance of the registered        | In case instances are                                       |
-|<Singleton>`    | service type during the lifetime of that container       | considered to be owned by the container, they will be       |
-|                | instance. Clients will always receive that same          | disposed when the container is disposed. Instances that are |
-|                | instance.                                                | supplied directly by reference (using                       |
-|                |                                                          | *RegisterSingleton<T>(T)* and *RegisterSingleton(Type,      |
-|                |                                                          | object)*) are considered not to be owned by the container.  |
-+----------------+----------------------------------------------------------+-------------------------------------------------------------+
+* :ref:`Transient <Transient>`
+* :ref:`Scoped <Scoped>`
+* :ref:`Singleton <Singleton>`
 
 Many different platform and framework specific flavors are available for the *Scoped* lifestyle, namely:
 
