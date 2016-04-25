@@ -29,9 +29,9 @@ The following code snippet is an example of how to register Simple Injector cont
             container = new Container();
 
             // Register your types, for instance:
-            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Singleton);
+            container.RegisterSingle<IUserRepository, SqlUserRepository>();
             container.Register<IUserContext, WinFormsUserContext>();
-            container.Register<Form1>();    
+	    container.Register<Form1>();	
 
             // Optionally verify the container.
             container.Verify();

@@ -21,7 +21,6 @@ Many different platform and framework specific flavors are available for the *Sc
 Further reading:
 
 * :ref:`Per Graph <PerGraph>`
-* :ref:`Instance Per Dependency <InstancePerDependency>`
 * :ref:`Per Thread <PerThread>`
 * :ref:`Per HTTP Session <PerHttpSession>`
 * :ref:`Hybrid <Hybrid>`
@@ -406,19 +405,6 @@ Per Graph
     For each explicit call to **Container.GetInstance<T>** a new instance of the service type will be created, but the instance will be reused within the object graph that gets constructed.
 
 Compared to **Transient**, there will be just a single instance per explicit call to the container, while **Transient** services can have multiple new instances per explicit call to the container. This lifestyle is not supported by Simple Injector but can be simulated by using one of the :ref:`Scoped <Scoped>` lifestyles.
-
-.. _InstancePerDependency:
-
-Instance Per Dependency
-=======================
-
-.. container:: Note
-    
-    Each consumer will get a new instance of the given service type and that dependency is expected to get live as long as its consuming type.
-
-This lifestyle behaves the same as the built-in **Transient** lifestyle, but the intend is completely different. A **Transient** instance is expected to have a very short lifestyle and injecting it into a consumer with a longer lifestyle (such as **Singleton**) is an error. Simple Injector will prevent this from happening by checking for :doc:`lifestyle mismatches <LifestyleMismatches>`. With the *Instance Per Dependency* lifestyle on the other hand, the created component is expected to stay alive as long as the consuming component does. So when the *Instance Per Dependency* component is injected into a **Singleton** component, we intend it to be kept alive by its consumer.
-
-This lifestyle is deliberately left out of Simple Injector, because its usefulness is very limited compared to the **Transient** lifestyle. It ignores :doc:`lifestyle mismatch checks <LifestyleMismatches>` and this can easily lead to errors, and it ignores the fact that application components should be immutable. In case a component is immutable, it's very unlikely that each consumer requires its own instance of the injected dependency.
 
 .. _PerThread:
 

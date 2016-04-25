@@ -68,7 +68,6 @@
 <li class="toctree-l1"><a class="reference internal" href="using.html">Using Simple Injector</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="using.html#resolving-instances">Resolving instances</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#configuring-simple-injector">Configuring Simple Injector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using.html#collections">Collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#more-information">More information</a></li>
@@ -83,9 +82,8 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope-async-await">Per Execution Context Scope (async/await)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope">Per Execution Context Scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#instance-per-dependency">Instance Per Dependency</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-thread">Per Thread</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-http-session">Per HTTP Session</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#hybrid">Hybrid</a></li>
@@ -93,15 +91,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="aspnetintegration.html">ASP.NET Core (beta!)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">ASP.NET Web API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="owinintegration.html">OWIN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">Windows Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">WPF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
@@ -115,6 +111,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="">How To</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#register-factory-delegates">Register factory delegates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#resolve-instances-by-key">Resolve instances by key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#override-existing-registrations">Override existing registrations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
@@ -143,7 +140,6 @@
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#interception-of-resolved-object-graphs">Interception of Resolved Object Graphs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -182,9 +178,14 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -227,6 +228,7 @@
 <ul class="simple">
 <li>How to <a class="reference internal" href="#register-factory-delegates"><em>Register factory delegates</em></a></li>
 <li>How to <a class="reference internal" href="#resolve-instances-by-key"><em>Resolve instances by key</em></a></li>
+<li>How to <a class="reference internal" href="#resolve-arrays-and-lists"><em>Resolve arrays and lists</em></a></li>
 <li>How to <a class="reference internal" href="#register-multiple-interfaces-with-the-same-implementation"><em>Register multiple interfaces with the same implementation</em></a></li>
 <li>How to <a class="reference internal" href="#override-existing-registrations"><em>Override existing registrations</em></a></li>
 <li>How to <a class="reference internal" href="#verify-configuration"><em>Verify the container&#8217;s configuration</em></a></li>
@@ -238,7 +240,7 @@
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="n">SomeSubSystem</span><span class="p">.</span><span class="n">CreateMyService</span><span class="p">());</span>
 </pre></div>
 </div>
-<p>In situations where a service needs to create multiple instances of a certain component, or needs to explicitly control the lifetime of such component, abstract factories can be used. Instead of injecting an <em>IMyService</em>, you should inject an <em>IMyServiceFactory</em> that creates new instances of <em>IMyService</em>:</p>
+<p>In situations where a service needs to create multiple instances of a certain dependencies, or needs to explicitly control the lifetime of such dependency, abstract factories can be used. Instead of injecting an <em>IMyService</em>, you should inject an <em>IMyServiceFactory</em> that creates new instances of <em>IMyService</em>:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Definition</span>
 <span class="k">public</span> <span class="k">interface</span> <span class="n">IMyServiceFactory</span> <span class="p">{</span>
     <span class="n">IMyService</span> <span class="nf">CreateNew</span><span class="p">();</span>
@@ -252,7 +254,7 @@
 <span class="p">}</span>
 
 <span class="c1">// Registration</span>
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleton</span><span class="p">&lt;</span><span class="n">IMyServiceFactory</span><span class="p">&gt;(</span><span class="k">new</span> <span class="n">ServiceFactory</span><span class="p">());</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">IMyServiceFactory</span><span class="p">,</span> <span class="n">ServiceFactory</span><span class="p">&gt;();</span>
 
 <span class="c1">// Usage</span>
 <span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span> <span class="p">{</span>
@@ -276,7 +278,8 @@
 </div>
 <p>Instead of creating specific interfaces for your factories, you can also choose to inject <em>Func&lt;T&gt;</em> delegates into your services:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Registration</span>
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleton</span><span class="p">&lt;</span><span class="n">Func</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">MyServiceImpl</span><span class="p">());</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">Func</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;&gt;(</span>
+    <span class="p">()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">MyServiceImpl</span><span class="p">());</span>
 
 <span class="c1">// Usage</span>
 <span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span> <span class="p">{</span>
@@ -307,16 +310,31 @@
     <span class="nc">where</span> <span class="n">TImpl</span> <span class="p">:</span> <span class="n">class</span><span class="p">,</span> <span class="n">TService</span>
 <span class="p">{</span>
     <span class="n">lifestyle</span> <span class="p">=</span> <span class="n">lifestyle</span> <span class="p">??</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">;</span>
-    <span class="kt">var</span> <span class="n">producer</span> <span class="p">=</span> <span class="n">lifestyle</span><span class="p">.</span><span class="n">CreateProducer</span><span class="p">&lt;</span><span class="n">TService</span><span class="p">,</span> <span class="n">TImpl</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">);</span>
-    <span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleton</span><span class="p">&lt;</span><span class="n">Func</span><span class="p">&lt;</span><span class="n">TService</span><span class="p">&gt;&gt;(</span><span class="n">producer</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">);</span>
+
+    <span class="c1">// Register the Func&lt;T&gt; that resolves that instance.</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">Func</span><span class="p">&lt;</span><span class="n">TService</span><span class="p">&gt;&gt;(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">producer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">InstanceProducer</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">TService</span><span class="p">),</span>
+            <span class="n">lifestyle</span><span class="p">.</span><span class="n">CreateRegistration</span><span class="p">&lt;</span><span class="n">TService</span><span class="p">,</span> <span class="n">TImpl</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">));</span>
+
+        <span class="n">Func</span><span class="p">&lt;</span><span class="n">TService</span><span class="p">&gt;</span> <span class="n">instanceCreator</span> <span class="p">=</span>
+            <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="n">TService</span><span class="p">)</span><span class="n">producer</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">IsVerifying</span><span class="p">())</span> <span class="p">{</span>
+            <span class="n">instanceCreator</span><span class="p">.</span><span class="n">Invoke</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">instanceCreator</span><span class="p">;</span>
+    <span class="p">});</span>
 <span class="p">}</span>
 
 <span class="c1">// Registration</span>
 <span class="n">container</span><span class="p">.</span><span class="n">RegisterFuncFactory</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">,</span> <span class="n">RealService</span><span class="p">&gt;();</span>
 </pre></div>
 </div>
-<p>The extension method allows registration of a single factory.</p>
-<p>To take this one step further, the following extension method allows Simple Injector to resolve all types using a <em>Func&lt;T&gt;</em> delegate by default:</p>
+<p>The extension method allows registration of a single factory, but won&#8217;t be maintainable when you want all registrations to be resolvable using <em>Func&lt;T&gt;</em> delegates by default.</p>
+<div class="note container">
+<strong>Note</strong>: We personally think that allowing to register <em>Func&lt;T&gt;</em> delegates by default is a design smell. The use of <em>Func&lt;T&gt;</em> delegates makes your design harder to follow and your system harder to maintain and test. If you have many constructors in your system that depend on a <em>Func&lt;T&gt;</em>, please take a good look at your dependency strategy. If in doubt, please ask us here on the forum or on Stackoverflow.</div>
+<p>The following extension method allows Simple Injector to resolve all types using a <em>Func&lt;T&gt;</em> delegate by default:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using System;</span>
 <span class="c1">// using System.Linq;</span>
 <span class="c1">// using System.Linq.Expressions;</span>
@@ -348,12 +366,16 @@
 </pre></div>
 </div>
 <p>After calling this <em>AllowResolvingFuncFactories</em> extension method, the container allows resolving <em>Func&lt;T&gt;</em> delegates.</p>
-<div class="note container">
-<strong>Note</strong>: We personally think that allowing to register <em>Func&lt;T&gt;</em> delegates by default is a design smell. The use of <em>Func&lt;T&gt;</em> delegates makes your design harder to follow and your system harder to maintain and test. Your system should only have a few of those factories at most. If you have many constructors in your system that depend on a <em>Func&lt;T&gt;</em>, please take a good look at your dependency strategy. If in doubt, please ask us here on the forum or on Stackoverflow.</div>
-<p id="lazy">Just like <em>Func&lt;T&gt;</em> delegates can be injected, <em>Lazy&lt;T&gt;</em> instances can also be injected into services. <em>Lazy&lt;T&gt;</em> is useful in situations where the creation of a service is time consuming and not always required. <em>Lazy&lt;T&gt;</em> enables you to postpone the creation of a service until the moment it is actually required:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Registration</span>
-<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">Lazy</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;&gt;(</span>
-    <span class="p">()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">Lazy</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;));</span>
+<p id="lazy">Just like <em>Func&lt;T&gt;</em> delegates can be injected, <em>Lazy&lt;T&gt;</em> instances can also be injected into services. <em>Lazy&lt;T&gt;</em> is useful in situations where the creation of a service is time consuming and not always required. <em>Lazy&lt;T&gt;</em> enables you to postpone the creation of a service until the moment  it is actually requried:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Extension method</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterLazy</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="k">this</span> <span class="n">Container</span> <span class="n">container</span><span class="p">)</span> <span class="k">where</span> <span class="n">T</span> <span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+    <span class="n">Func</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">factory</span> <span class="p">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;();</span>
+
+    <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">Lazy</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">Lazy</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="n">factory</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="c1">// Registration</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterLazy</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;();</span>
 
 <span class="c1">// Usage</span>
 <span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span> <span class="p">{</span>
@@ -374,10 +396,10 @@
 <div class="note container">
 <strong>Note</strong>: instead of polluting the API of your application with <em>Lazy&lt;T&gt;</em> dependencies, it is usually cleaner to hide the <em>Lazy&lt;T&gt;</em> behind a proxy:</div>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Proxy definition</span>
-<span class="k">public</span> <span class="k">class</span> <span class="nc">LazyServiceProxy</span> <span class="p">:</span> <span class="n">IMyService</span> <span class="p">{</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">MyLazyServiceProxy</span> <span class="p">:</span> <span class="n">IMyService</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">Lazy</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;</span> <span class="n">wrapped</span><span class="p">;</span>
 
-    <span class="k">public</span> <span class="nf">LazyServiceProxy</span><span class="p">(</span><span class="n">Lazy</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;</span> <span class="n">wrapped</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="nf">MyLazyServiceProxy</span><span class="p">(</span><span class="n">Lazy</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;</span> <span class="n">wrapped</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">this</span><span class="p">.</span><span class="n">wrapped</span> <span class="p">=</span> <span class="n">wrapped</span><span class="p">;</span>
     <span class="p">}</span>
 
@@ -387,20 +409,20 @@
 <span class="p">}</span>
 
 <span class="c1">// Registration</span>
-<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">LazyServiceProxy</span><span class="p">(</span>
-    <span class="k">new</span> <span class="n">Lazy</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">RealService</span><span class="p">&gt;)));</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterLazy</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IMyService</span><span class="p">,</span> <span class="n">MyLazyServiceProxy</span><span class="p">&gt;();</span>
 </pre></div>
 </div>
 <p>This way the application can simply depend on <em>IMyService</em> instead of <em>Lazy&lt;IMyService&gt;</em>.</p>
 <div class="note container">
-<strong>Warning</strong>: The same warning applies to the use of <em>Lazy&lt;T&gt;</em> as it does for the use of <em>Func&lt;T&gt;</em> delegates. Further more, the constructors of your components should be simple, reliable and quick, and that would remove the need for lazy initialization. For more information about creating an application and container configuration that can be successfully verified, please read the <a class="reference internal" href="#verify-configuration"><em>How To Verify the container&#8217;s configuration</em></a>.</div>
+<strong>Warning</strong>: The same warning applies to the use of <em>Lazy&lt;T&gt;</em> as it does for the use of <em>Func&lt;T&gt;</em> delegates. For more information about creating an application and container configuration that can be successfully verified, please read the <a class="reference internal" href="#verify-configuration"><em>How To Verify the container&#8217;s configuration</em></a>.</div>
 </div>
 <div class="section" id="resolve-instances-by-key">
 <span id="id2"></span><h2>Resolve instances by key<a class="headerlink" href="#resolve-instances-by-key" title="Permalink to this headline">¶</a></h2>
 <p>Resolving instances by a key is a feature that is deliberately left out of Simple Injector, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the <em>Container</em> instance and this leads to the <a class="reference external" href="http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx">Service Locator anti-pattern</a>.</p>
 <p>This doesn&#8217;t mean that resolving instances by a key is never useful. Resolving instances by a key is normally a job for a specific factory rather than the <em>Container</em>. This approach makes the design much cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn&#8217;t consider.</p>
 <div class="note container">
-<strong>Note</strong>: The need for keyed registration can be an indication of ambiguity in the application design and a sign of a <a class="reference external" href="https://en.wikipedia.org/wiki/Liskov_substitution_principle">Liskov Substitution Principle</a> violation. Take a good look if each keyed registration shouldn&#8217;t have its own unique interface, or perhaps each registration should implement its own version of a generic interface.</div>
+<strong>Note</strong>: The need for keyed registration can be an indication of ambiguity in the application design. Take a good look if each keyed registration shouldn&#8217;t have its own unique interface, or perhaps each registration should implement its own version of a generic interface.</div>
 <p>Take a look at the following scenario, where we want to retrieve instances of type <em>IRequestHandler</em> by a string key. There are of course several ways to achieve this, but here is a simple but effective way, by defining an <em>IRequestHandlerFactory</em>:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Definition</span>
 <span class="k">public</span> <span class="k">interface</span> <span class="n">IRequestHandlerFactory</span>
@@ -447,7 +469,8 @@
     <span class="p">}</span>
 
     <span class="k">public</span> <span class="n">IRequestHandler</span> <span class="nf">CreateNew</span><span class="p">(</span><span class="kt">string</span> <span class="n">name</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span><span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">(</span><span class="k">this</span><span class="p">[</span><span class="n">name</span><span class="p">]);</span>
+        <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">(</span><span class="k">this</span><span class="p">[</span><span class="n">name</span><span class="p">]);</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span><span class="n">handler</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -464,7 +487,7 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Note</strong>: Please remember the previous note about ambiguity in the application design. In the given example the design would probably be better of by using a generic <em>IRequestHandler&lt;TRequest&gt;</em> interface. This would allow the implementations to be <a class="reference internal" href="advanced.html#batch-registration"><em>batch registered using a single line of code</em></a>, saves you from using keys, and results in a configuration the is <a class="reference internal" href="#verify-configuration"><em>verifiable by the container</em></a>.</div>
+<strong>Note</strong>: Please remember the previous note about ambiguity in the application design. In the given example the design would probably be better af by using a generic <em>IRequestHandler&lt;TRequest&gt;</em> interface. This would allow the implementations to be <a class="reference internal" href="advanced.html#batch-registration"><em>batch registered using a single line of code</em></a>, saves you from using keys, and results in a configuration the is <a class="reference internal" href="#verify-configuration"><em>verifiable by the container</em></a>.</div>
 <p>A final option for implementing keyed registrations is to manually create the registrations and store them in a dictionary. The following example shows the same <em>RequestHandlerFactory</em> using this approach:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">RequestHandlerFactory</span> <span class="p">:</span> <span class="n">IRequestHandlerFactory</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">Dictionary</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="n">InstanceProducer</span><span class="p">&gt;</span> <span class="n">producers</span> <span class="p">=</span>
@@ -478,15 +501,18 @@
     <span class="p">}</span>
 
     <span class="n">IRequestHandler</span> <span class="n">IRequestHandlerFactory</span><span class="p">.</span><span class="n">CreateNew</span><span class="p">(</span><span class="kt">string</span> <span class="n">name</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span><span class="k">this</span><span class="p">.</span><span class="n">producers</span><span class="p">[</span><span class="n">name</span><span class="p">].</span><span class="n">GetInstance</span><span class="p">();</span>
+        <span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">producers</span><span class="p">[</span><span class="n">name</span><span class="p">].</span><span class="n">GetInstance</span><span class="p">();</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span><span class="n">handler</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="k">public</span> <span class="k">void</span> <span class="n">Register</span><span class="p">&lt;</span><span class="n">TImplementation</span><span class="p">&gt;(</span><span class="kt">string</span> <span class="n">name</span><span class="p">,</span> <span class="n">Lifestyle</span> <span class="n">lifestyle</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span>
         <span class="k">where</span> <span class="n">TImplementation</span> <span class="p">:</span> <span class="n">class</span><span class="p">,</span> <span class="n">IRequestHandler</span> <span class="p">{</span>
         <span class="n">lifestyle</span> <span class="p">=</span> <span class="n">lifestyle</span> <span class="p">??</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">;</span>
 
-        <span class="kt">var</span> <span class="n">producer</span> <span class="p">=</span> <span class="n">lifestyle</span>
-            <span class="p">.</span><span class="n">CreateProducer</span><span class="p">&lt;</span><span class="n">IRequestHandler</span><span class="p">,</span> <span class="n">TImplementation</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">);</span>
+        <span class="kt">var</span> <span class="n">registration</span> <span class="p">=</span> <span class="n">lifestyle</span>
+            <span class="p">.</span><span class="n">CreateRegistration</span><span class="p">&lt;</span><span class="n">IRequestHandler</span><span class="p">,</span> <span class="n">TImplementation</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">);</span>
+
+        <span class="kt">var</span> <span class="n">producer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">InstanceProducer</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IRequestHandler</span><span class="p">),</span> <span class="n">registration</span><span class="p">);</span>
 
         <span class="k">this</span><span class="p">.</span><span class="n">producers</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">producer</span><span class="p">);</span>
     <span class="p">}</span>
@@ -507,8 +533,39 @@
 </div>
 <p>The advantage of this method is that it completely integrates with the <em>Container</em>. <a class="reference internal" href="advanced.html#decorators"><em>Decorators</em></a> can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a>.</p>
 </div>
+<div class="section" id="resolve-arrays-and-lists">
+<span id="id3"></span><h2>Resolve arrays and lists<a class="headerlink" href="#resolve-arrays-and-lists" title="Permalink to this headline">¶</a></h2>
+<p>Simple Injector allows the registration of collections of elements using the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm">RegisterAll</a> method overloads. Collections can be resolved by any of the <strong>GetAllInstances&lt;T&gt;()</strong> methods, by calling <em>GetInstance&lt;IEnumerable&lt;T&gt;&gt;()</em>, or by defining an <em>IEnumerable&lt;T&gt;</em> parameter in the constructor of a type that is created using automatic constructor injection.</p>
+<p>From Simple Injector 2.4 and up the other collection types that are automatically resolved are <a class="reference external" href="https://msdn.microsoft.com/en-us/library/hh881542.aspx">IReadOnlyCollection&lt;T&gt;</a> and <a class="reference external" href="https://msdn.microsoft.com/en-us/library/hh192385.aspx">IReadOnlyList&lt;T&gt;</a>.</p>
+<div class="note container">
+<strong>Note:</strong> <em>IReadOnlyCollection&lt;T&gt;</em> and <em>IReadOnlyList&lt;T&gt;</em> are new in .NET 4.5 and you need the .NET 4.5 build of Simple Injector. These interfaces are <em>not</em> supported by the PCL and .NET 4.0 versions of Simple Injector.</div>
+<p>Injection of other collection types, such as <em>arrays of T</em> or <em>IList&lt;T&gt;</em> into constructors is not supported out of the box. By hooking onto the unregistered type resolution event however, this functionality can be added. Look <a class="reference internal" href="CollectionRegistrationExtensions.html"><em>here</em></a> for an example extension method that allows this behavior for <em>T[]</em> types.</p>
+<p>Please take a look at your design if you think you need to work with a collection of items. Often you can succeed by creating a composite type that can be injected. Take the following interface for instance:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">ILogger</span> <span class="p">{</span>
+    <span class="k">void</span> <span class="nf">Log</span><span class="p">(</span><span class="kt">string</span> <span class="n">message</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Instead of injecting a collection of dependencies, the consumer might not really be interested in the collection, but simply wishes to operate on all elements. In that scenario you can configure your container to inject a composite of that particular type. That composite might look as follows:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">CompositeLogger</span> <span class="p">:</span> <span class="n">ILogger</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span><span class="p">[]</span> <span class="n">loggers</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nf">CompositeLogger</span><span class="p">(</span><span class="k">params</span> <span class="n">ILogger</span><span class="p">[]</span> <span class="n">loggers</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">loggers</span> <span class="p">=</span> <span class="n">loggers</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Log</span><span class="p">(</span><span class="kt">string</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">logger</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="n">loggers</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">logger</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A composite allows you to remove this boilerplate iteration logic from the application, which makes the application cleaner and when changes have to be made to the way the collection of loggers is processed, only the composite has to be changed.</p>
+</div>
 <div class="section" id="register-multiple-interfaces-with-the-same-implementation">
-<span id="id3"></span><h2>Register multiple interfaces with the same implementation<a class="headerlink" href="#register-multiple-interfaces-with-the-same-implementation" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>Register multiple interfaces with the same implementation<a class="headerlink" href="#register-multiple-interfaces-with-the-same-implementation" title="Permalink to this headline">¶</a></h2>
 <p>To adhere to the <a class="reference external" href="http://en.wikipedia.org/wiki/Interface_segregation_principle">Interface Segregation Principle</a>, it is important to keep interfaces narrow. Although in most situations implementations implement a single interface, it can sometimes be beneficial to have multiple interfaces on a single implementation. Here is an example of how to register this:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Impl implements IInterface1, IInterface2 and IInterface3.</span>
 <span class="kt">var</span> <span class="n">registration</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">.</span><span class="n">CreateRegistration</span><span class="p">&lt;</span><span class="n">Impl</span><span class="p">&gt;(</span><span class="n">container</span><span class="p">);</span>
@@ -526,12 +583,12 @@
 </div>
 <p>The first line creates a <strong>Registration</strong> instance for the <em>Impl</em>, in this case with a singleton lifestyle. The other lines add this registration to the container, once for each interface. This maps multiple service types to the exact same registration.</p>
 <div class="note container">
-<strong>Note:</strong> This is different from having three <strong>RegisterSingleton</strong> registrations, since that will results three separate singletons.</div>
+<strong>Note:</strong> This is different from having three <strong>RegisterSingle</strong> registrations, since that will results three separate singletons.</div>
 </div>
 <div class="section" id="override-existing-registrations">
-<span id="id4"></span><h2>Override existing registrations<a class="headerlink" href="#override-existing-registrations" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>Override existing registrations<a class="headerlink" href="#override-existing-registrations" title="Permalink to this headline">¶</a></h2>
 <p>The default behavior of Simple Injector is to fail when a service is registered for a second time. Most of the time the developer didn&#8217;t intend to override a previous registration and allowing this would lead to a configuration that would pass the container&#8217;s verification, but doesn&#8217;t behave as expected.</p>
-<p><a class="reference internal" href="decisions.html#separate-collections"><em>This design decision</em></a> differs from most other DI libraries, where adding new registrations results in appending the collection of registrations for that abstraction. Registering collections in Simple Injector is an explicit action done using one of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterCollection.htm">RegisterCollection</a> method overloads.</p>
+<p>This design decision differs from most other DI libraries, where adding new registrations results in appending the collection of registrations for that abstraction. Registering collections in Simple Injector is an explicit action done using one of the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterAll.htm">RegisterAll</a> method overloads.</p>
 <p>There are certain scenarios however where overriding is useful. An example of such is a bootstrapper project for a business layer that is reused in multiple applications (in both a web application, web service, and Windows service for instance). Not having a business layer specific bootstrapper project would mean the complete DI configuration would be duplicated in the startup path of each application, which would lead to code duplication. In that situation the applications would roughly have the same configuration, with a few adjustments.</p>
 <p>Best is to start of by configuring all possible dependencies in the BL bootstrapper and leave out the service registrations where the implementation differs for each application. In other words, the BL bootstrapper would result in an incomplete configuration. After that, each application can finish the configuration by registering the missing dependencies. This way you still don&#8217;t need to override the existing configuration.</p>
 <p>In certain scenarios it can be beneficial to allow an application override an existing configuration. The container can be configured to allow overriding as follows:</p>
@@ -563,30 +620,27 @@
 </div>
 <div class="section" id="verify-the-container-s-configuration">
 <span id="verify-configuration"></span><h2>Verify the container&#8217;s configuration<a class="headerlink" href="#verify-the-container-s-configuration" title="Permalink to this headline">¶</a></h2>
-<p>Dependency Injection promotes the concept of programming against abstractions. This makes your code much easier to test, easier to change and maintain. However, since the code itself isn&#8217;t responsible for maintaining the dependencies between implementations when using a DI library, the compiler will not be able to verify whether the dependency graph is correct.</p>
-<p>When starting to use a Dependency Injection container, many developers see their application fail when it is deployed in staging or sometimes even production, because of container misconfigurations. This makes developers often conclude that dependency injection is bad, since the dependency graph cannot be verified. This conclusion however, is incorrect. First of all, the use of Dependency Injection doesn&#8217;t require a DI library at all. The pattern is still valid, even without the use of tooling that will wire everything together for you. For some types of applications <a class="reference external" href="http://blog.ploeh.dk/2014/06/10/pure-di/">Pure DI</a> is even advisable. Second, although it is impossible for the compiler to verify the dependency graph when using a DI library, verifying the dependency graph is still possible and advisable.</p>
-<p>Simple Injector contains a <strong>Verify()</strong> method, that will iterate over all registrations and resolve an instance for each registration. Calling this method directly after configuring the container allows the application to fail during start-up if the configuration is invalid.</p>
+<p>Dependency Injection promotes the concept of programming against abstractions. This makes your code much easier to test, easier to change and more maintainable. However, since the code itself isn&#8217;t responsible for maintaining the dependencies between implementations, the compiler will not be able to verify whether the dependency graph is correct.</p>
+<p>When starting to use a Dependency Injection container, many developers see their application fail when it is deployed in staging or sometimes even production, because of container misconfigurations. This makes developers often conclude that dependency injection is bad, since the dependency graph cannot be verified. This conclusion however, is incorrect. Although it is impossible for the compiler to verify the dependency graph, verifying the dependency graph is still possible and advisable.</p>
+<p>Simple Injector contains a <strong>Verify()</strong> method, that will simply iterate over all registrations and resolve an instance for each registration. Calling this method directly after configuring the container, allows the application to fail during start-up, when the configuration is invalid.</p>
 <p>Calling the <strong>Verify()</strong> method however, is just part of the story. It is very easy to create a configuration that passes any verification, but still fails at runtime. Here are some tips to help building a verifiable configuration:</p>
 <ol class="arabic simple">
-<li>Stay away from <a class="reference internal" href="advanced.html#property-injection"><em>implicit property injection</em></a>, where the container is allowed to skip injecting the property if a corresponding or correctly registered dependency can&#8217;t be found. This will disallow your application to fail fast and will result in <em>NullReferenceException</em>&#8216;s later on. Only use implicit property injection when the property is truly optional, omitting the dependency still keeps the configuration valid, and the application still runs correctly without that dependency. Truly optional dependencies should be very rare though, since most of the time you should prefer injecting empty implementations (a.k.a. the <a class="reference external" href="https://en.wikipedia.org/wiki/Null_Object_pattern">Null Object pattern</a>) instead of allowing dependencies to be a null reference. <a class="reference internal" href="using.html#configuring-property-injection"><em>Explicit property injection</em></a> on the other hand is fine. With explicit property injection you force the container to inject a property and it will fail when it can&#8217;t succeed. However, you should prefer constructor injection whenever possible. Note that the need for property injection is often an indication of problems in the design. If you revert to property injection because you otherwise have too many constructor arguments, you&#8217;re probably violating the <cite>Single Responsibility Principle &lt;https://en.wikipedia.org/wiki/Single_responsibility_principle&gt;</cite>.</li>
-<li>Register all root objects explicitly. For instance, register all ASP.NET MVC Controller instances explicitly in the container (Controller instances are requested directly and are therefore called &#8216;root objects&#8217;). This way the container can check the complete dependency graph starting from the root object when you call <strong>Verify()</strong>. Prefer registering all root objects in an automated fashion, for instance by using reflection to find all root types. The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Web.Mvc">Simple Injector ASP.NET MVC Integration NuGet Package</a> for instance, contains a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_SimpleInjectorMvcExtensions_RegisterMvcControllers.htm">RegisterMvcControllers</a> extension method that will do this for you and the <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">WCF Integration NuGet Package</a> contains a similar <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary.v2/?topic=html/M_SimpleInjector_SimpleInjectorWcfExtensions_RegisterWcfServices.htm">RegisterWcfServices</a> extension method for this purpose.</li>
-<li>If any of your root types are generic you should explicitly register each required closed-generic version of the type instead of making a single open-generic registration per generic type. Simple Injector will not be able to guess the closed types that could be resolved (root types are not referenced by other types and there can be endless permutations of closed-generic types) and as such open generic registrations are skipped by Simple Injector&#8217;s verification system. Making an explicit registration for each closed-generic root type allows Simple Injector to verify and diagnose those registrations.</li>
+<li>Stay away from <a class="reference internal" href="advanced.html#property-injection"><em>implicit property injection</em></a>, where the container is allowed to skip injecting the property if a corresponding or correctly registered dependency can&#8217;t be found. This will disallow your application to fail fast and will result in <em>NullReferenceException</em>&#8216;s later on. Only use implicit property injection when the property is truly optional, omitting the dependency still keeps the configuration valid, and the application still runs correctly without that dependency. Truly optional dependencies should be very rare though, since most of the time you should prefer injecting empty implementations (a.k.a. the <a class="reference external" href="https://en.wikipedia.org/wiki/Null_Object_pattern">Null Object pattern</a>) instead of allowing dependencies to be a null reference. <a class="reference internal" href="using.html#configuring-property-injection"><em>Explicit property injection</em></a> on the other hand is fine. With explicit property injection you force the container to inject a property and it will fail when it can&#8217;t succeed. However, you should prefer constructor injection whenever possible. Note that the need for property injection is often an indication of problems in the design. If you revert to property injection because you otherwise have too many constructor arguments, you&#8217;re probably violating the <a class="reference external" href="https://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a>.</li>
+<li>Register all root objects explicitly if possible. For instance, register all ASP.NET MVC Controller instances explicitly in the container (Controller instances are requested directly and are therefore called &#8216;root objects&#8217;). This way the container can check the complete dependency graph starting from the root object when you call <strong>Verify()</strong>. Prefer registering all root objects in an automated fashion, for instance by using reflection to find all root types. The <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Web.Mvc">Simple Injector ASP.NET MVC Integration NuGet Package</a> for instance, contains a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_SimpleInjectorMvcExtensions_RegisterMvcControllers.htm">RegisterMvcControllers</a> extension method that will do this for you and the <a class="reference external" href="https://nuget.org/packages/SimpleInjector.Integration.Wcf">WCF Integration NuGet Package</a> contains a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary.v2/?topic=html/M_SimpleInjector_SimpleInjectorWcfExtensions_RegisterWcfServices.htm">RegisterWcfServices</a> extension method for this purpose.</li>
 <li>If registering root objects is not possible or feasible, test the creation of each root object manually during start-up. With ASP.NET Web Form Page classes for instance, you will probably call the container (directly or indirectly) from within their constructor (since Page classes must unfortunately have a default constructor). The key here again is finding them all in once using reflection. By finding all Page classes using reflection and instantiating them, you&#8217;ll find out (during app start-up or through automated testing) whether there is a problem with your DI configuration or not. The <a class="reference internal" href="webformsintegration.html"><em>Web Forms Integration</em></a> guide contains an example of how to verify page classes.</li>
 <li>There are scenarios where some dependencies cannot yet be created during application start-up. To ensure that the application can be started normally and the rest of the DI configuration can still be verified, abstract those dependencies behind a proxy or abstract factory. Try to keep those unverifiable dependencies to a minimum and keep good track of them, because you will probably have to test them manually or using an integration test.</li>
-<li>But even when all registrations can be resolved successfully by the container, that still doesn&#8217;t mean your configuration is correct. It is very easy to accidentally misconfigure the container in a way that only shows up late in the development process. Simple Injector contains <a class="reference internal" href="diagnostics.html"><em>Diagnostics Services</em></a> to help you spot common configuration mistakes. With Simple Injector 3, most of the diagnostic warnings are integrated into the verification mechanism. This means that a call to <strong>Verify()</strong> will also check for diagnostic warnings for you. It is advisable to analyze the container by calling <strong>Verify</strong> or by using the diagnostic services either during application startup or as part of an automated test that does this for you.</li>
+<li>But even when all registrations can be resolved succesfully by the container, that still doesn&#8217;t mean your configuration is correct. It is very easy to accidentally misconfigure the container in a way that only shows up late in the development process. Simple Injector contains <a class="reference internal" href="diagnostics.html"><em>Diagnostics Services</em></a> to help you spot common configuration mistakes. It is advicable to analyze the container using these services from time to time or write an automated test that does this for you.</li>
 </ol>
 </div>
 <div class="section" id="work-with-dependency-injection-in-multi-threaded-applications">
 <span id="multi-threaded-applications"></span><h2>Work with dependency injection in multi-threaded applications<a class="headerlink" href="#work-with-dependency-injection-in-multi-threaded-applications" title="Permalink to this headline">¶</a></h2>
 <div class="note container">
-<strong>Note:</strong> Simple Injector is designed for use in highly-concurrent applications and the container is thread-safe. Its lock-free design allows it to scale linearly with the number of threads and processors in your system.</div>
+<strong>Note:</strong> Simple Injector is designed for use in highly-concurrent applications and the container <a class="reference external" href="https://simpleinjector.codeplex.com/discussions/349908">is thread-safe</a>. Its lock-free design allows it to scale linearly with the number of threads and processors in your system.</div>
 <p>Many applications and application frameworks are inherently multi-threaded. Working in multi-threaded applications forces developers to take special care. It is easy for a less experienced developer to introduce a race condition in the code. Even although some frameworks such as ASP.NET make it easy to write thread-safe code, introducing a simple static field could break thread-safety.</p>
 <p>This same holds when working with DI containers in multi-threaded applications. The developer that configures the container should be aware of the risks of shared state. <strong>Not knowing which configured services are thread-safe is a sin.</strong> Registering a service that is not thread-safe as singleton, will eventually lead to concurrency bugs, that usually only appear in production. Those bugs are often hard to reproduce and hard to find, making them costly to fix. And even when you correctly configured a service with the correct lifestyle, when another component that depends on it accidentally as a longer lifetime, the service might be kept alive much longer and might even be accessible from other threads.</p>
 <p>Dependency injection however, can actually help in writing multi-threaded applications. Dependency injection forces you to wire all dependencies together in a single place in the application: the <a class="reference external" href="http://blog.ploeh.dk/2011/07/28/CompositionRoot/">Composition Root</a>. This means that there is a single place in the application that knows about how services behave, whether they are thread-safe, and how they should be wired. Without this centralization, this knowledge would be scattered throughout the code base, making it very hard to change the behavior of a service.</p>
 <div class="note container">
-<strong>Tip:</strong> Take a close look at the &#8216;Lifestyle Mismatches&#8217; warnings in the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a>. Lifestyle mismatches are a source of concurrency bugs.</div>
-<div class="note container">
-<strong>Note:</strong> By default, Simple Injector 3 will check for Lifestyle Mismatches for you when you resolve a service. In other words, Simple Injector will fail fast when there is a Lifestyle Mismatch in your configuration.</div>
+<strong>Tip:</strong> Take a close look at the &#8216;Potential Lifestyle Mismatches&#8217; warnings in the <a class="reference internal" href="diagnostics.html"><em>Diagnostic Services</em></a>. Lifestyle mismatches are a source of concurrency bugs.</div>
 <p>In a multi-threaded application, each thread should get its own object graph. This means that you should typically call <em>container.GetInstance&lt;T&gt;()</em> once at the beginning of the thread&#8217;s execution to get the root object for processing that thread (or request). The container will build an object graph with all root object&#8217;s dependencies. Some of those dependencies will be singletons; shared between all threads. Other dependencies might be transient; a new instance is created per dependency. Other dependencies might be thread-specific, request-specific, or with some other lifestyle. The application code itself is unaware of the way the dependencies are registered and that&#8217;s the way it is supposed to be.</p>
 <p>For web applications, you typically call <strong>GetInstance&lt;T&gt;()</strong> at the beginning of the web request. In an ASP.NET MVC application for instance, one Controller instance will be requested from the container (by the Controller Factory) per web request. When using one of the integration packages, such as the <a class="reference external" href="https://nuget.org/packages/SimpleInjector.MVC3">Simple Injector MVC Integration Quick Start NuGet package</a> for instance, you don&#8217;t have to call <strong>GetInstance&lt;T&gt;()</strong> yourself, the package will ensure this is done for you. Still, <strong>GetInstance&lt;T&gt;()</strong> is typically called once per request.</p>
 <p>The advice of building a new object graph (calling <strong>GetInstance&lt;T&gt;()</strong>) at the beginning of a thread, also holds when manually starting a new (background) thread. Although you can pass on data to other threads, you should not pass on container controlled dependencies to other threads. On each new thread, you should ask the container again for the dependencies. When you start passing dependencies from one thread to the other, those parts of the code have to know whether it is safe to pass those dependencies on. For instance, are those dependencies thread-safe? This might be trivial to analyze in some situations, but prevents you to change those dependencies with other implementations, since now you have to remember that there is a place in your code where this is happening and you need to know which dependencies are passed on. You are decentralizing this knowledge again, making it harder to reason about the correctness of your DI configuration and making it easier to misconfigure the container in a way that causes concurrency problems.</p>
@@ -642,55 +696,10 @@
 <p>In the Composition Root, instead of registering the <em>MailSender</em>, we register the <em>AsyncMailSenderProxy</em> as follows:</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">FileLogger</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IMailSender</span><span class="p">,</span> <span class="n">RealMailSender</span><span class="p">&gt;();</span>
-<span class="n">container</span><span class="p">.</span><span class="n">RegisterDecorator</span><span class="p">&lt;</span><span class="n">IMailSender</span><span class="p">,</span> <span class="n">AsyncMailSenderProxy</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleDecorator</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IMailSender</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="n">AsyncMailSenderProxy</span><span class="p">));</span>
 </pre></div>
 </div>
 <p>In this case the container will ensure that when an <em>IMailSender</em> is requested, a single <em>AsyncMailSenderProxy</em> is returned with a <em>Func&lt;IMailSender&gt;</em> delegate that will create a new <em>RealMailSender</em> when requested. The <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm">RegisterDecorator</a> and <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterSingleDecorator.htm">RegisterSingleDecorator</a> overloads natively understand how to handle <em>Func&lt;Decoratee&gt;</em> dependencies. The <a class="reference internal" href="advanced.html#decorators"><em>Decorators</em></a> section of the <a class="reference internal" href="advanced.html"><em>Advanced Scenarios</em></a> wiki page explains more about registering decorators.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-</div>
-<p id="resolve-arrays-and-lists"><strong>Resolve arrays and lists</strong>: The information in this section has been moved to <a class="reference internal" href="using.html#collections"><em>here</em></a>.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-</div>
 </div>
 </div>
 

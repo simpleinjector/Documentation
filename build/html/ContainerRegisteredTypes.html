@@ -69,7 +69,6 @@
 <li class="toctree-l1"><a class="reference internal" href="using.html">Using Simple Injector</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="using.html#resolving-instances">Resolving instances</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#configuring-simple-injector">Configuring Simple Injector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using.html#collections">Collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#more-information">More information</a></li>
@@ -84,9 +83,8 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope-async-await">Per Execution Context Scope (async/await)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope">Per Execution Context Scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#instance-per-dependency">Instance Per Dependency</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-thread">Per Thread</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-http-session">Per HTTP Session</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#hybrid">Hybrid</a></li>
@@ -94,15 +92,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="aspnetintegration.html">ASP.NET Core (beta!)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">ASP.NET Web API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="owinintegration.html">OWIN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">Windows Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">WPF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
@@ -116,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-factory-delegates">Register factory delegates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-instances-by-key">Resolve instances by key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
@@ -144,7 +141,6 @@
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#interception-of-resolved-object-graphs">Interception of Resolved Object Graphs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -183,9 +179,14 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -227,10 +228,6 @@
             
   <div class="section" id="diagnostic-warning-container-registered-types">
 <h1>Diagnostic Warning - Container-registered Types<a class="headerlink" href="#diagnostic-warning-container-registered-types" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="severity">
-<h2>Severity<a class="headerlink" href="#severity" title="Permalink to this headline">¶</a></h2>
-<p>Information</p>
-</div>
 <div class="section" id="cause">
 <h2>Cause<a class="headerlink" href="#cause" title="Permalink to this headline">¶</a></h2>
 <p>A concrete type that was not registered explicitly and was not resolved using unregistered type resolution, but was created by the container using the default lifestyle.</p>
@@ -238,7 +235,7 @@
 <div class="section" id="warning-description">
 <h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
 <p>The <em>Container-Registered Types</em> warning shows all concrete types that weren&#8217;t registered explicitly, but registered by the container as transient for you, because they were referenced by another component&#8217;s constructor or were resolved through a direct call to <em>container.GetIntance&lt;T&gt;()</em> (inside a <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm">RegisterInitializer</a> registered delegate for instance).</p>
-<p>This warning deserves your attention, since it might indicate that you program to implementations, instead of abstractions. Although the <a class="reference internal" href="LifestyleMismatches.html"><em>Lifestyle Mismatches</em></a> and <a class="reference internal" href="ShortCircuitedDependencies.html"><em>Short Circuited Dependencies</em></a> warnings are a very strong signal of a configuration problem, this <em>Container-Registered Types</em> warnings is just a point of attention.</p>
+<p>This warning deserves your attention, since it might indicate that you program to implementations, instead of abstractions. Although the <a class="reference internal" href="PotentialLifestyleMismatches.html"><em>Potential Lifestyle Mismatches</em></a> and <a class="reference internal" href="ShortCircuitedDependencies.html"><em>Short Circuited Dependencies</em></a> warnings are a very strong signal of a configuration problem, this <em>Container-Registered Types</em> warnings is just a point of attention.</p>
 </div>
 <div class="section" id="how-to-fix-violations">
 <h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
@@ -272,7 +269,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The given example registers a <em>HomeController</em> class that depends on an unregistered <em>SqlUserRepository</em> class. Injecting a concrete type can lead to problems, such as:</p>
+<p>The given example registers a <em>HomeController</em> class that depends on an unregistered <em>SqlUserRepository</em> class. Injecting a concrete type can lead to a lot of problems, such as:</p>
 <ul class="simple">
 <li>It makes the <em>HomeController</em> hard to test, since concrete types are often hard to fake (or when using a mocking framework that fixes this, would still result in unit tests that contain a lot of configuration for the mocking framework, instead of pure test logic) making the unit tests hard to read and hard to maintain.</li>
 <li>It makes it harder to reuse the class, since it expects a certain implementation of its dependency.</li>

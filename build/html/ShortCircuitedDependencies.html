@@ -31,7 +31,7 @@
     <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
         <link rel="up" title="Diagnostic Services" href="diagnostics.html"/>
         <link rel="next" title="Diagnostic Warning - Potential Single Responsibility Violations" href="PotentialSingleResponsibilityViolations.html"/>
-        <link rel="prev" title="Diagnostic Warning - Lifestyle Mismatches" href="LifestyleMismatches.html"/> 
+        <link rel="prev" title="Diagnostic Warning - Potential Lifestyle Mismatches" href="PotentialLifestyleMismatches.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -69,7 +69,6 @@
 <li class="toctree-l1"><a class="reference internal" href="using.html">Using Simple Injector</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="using.html#resolving-instances">Resolving instances</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#configuring-simple-injector">Configuring Simple Injector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using.html#collections">Collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#more-information">More information</a></li>
@@ -84,9 +83,8 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope-async-await">Per Execution Context Scope (async/await)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope">Per Execution Context Scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#instance-per-dependency">Instance Per Dependency</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-thread">Per Thread</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-http-session">Per HTTP Session</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#hybrid">Hybrid</a></li>
@@ -94,15 +92,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="aspnetintegration.html">ASP.NET Core (beta!)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">ASP.NET Web API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="owinintegration.html">OWIN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">Windows Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">WPF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
@@ -116,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-factory-delegates">Register factory delegates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-instances-by-key">Resolve instances by key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
@@ -144,7 +141,6 @@
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#interception-of-resolved-object-graphs">Interception of Resolved Object Graphs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -183,9 +179,14 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -227,10 +228,6 @@
             
   <div class="section" id="diagnostic-warning-short-circuited-dependencies">
 <h1>Diagnostic Warning - Short Circuited Dependencies<a class="headerlink" href="#diagnostic-warning-short-circuited-dependencies" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="severity">
-<h2>Severity<a class="headerlink" href="#severity" title="Permalink to this headline">¶</a></h2>
-<p>Warning</p>
-</div>
 <div class="section" id="cause">
 <h2>Cause<a class="headerlink" href="#cause" title="Permalink to this headline">¶</a></h2>
 <p>The component depends on an unregistered concrete type and this concrete type has a lifestyle that is different than the lifestyle of an explicitly registered type that uses this concrete type as its implementation.</p>
@@ -240,16 +237,18 @@
 <p>This warning signals the possible use of a short circuited dependency in a component. A short circuited dependency is:</p>
 <ul class="simple">
 <li>a concrete type</li>
-<li>that is not registered as itself (i.e. not registered as <strong>Register&lt;TConcrete&gt;</strong> or its non-generic equivalent)</li>
-<li>and is referenced by another component (most likely using a constructor argument)</li>
+<li>that is not registered by itself</li>
+<li>that is referenced by another component (most likely using a constructor argument)</li>
 <li>and exists as <em>TImplementation</em> in an explicitly made <strong>Register&lt;TService, TImplementation&gt;()</strong> registration (or its non-generic equivalent)</li>
-<li>and where the lifestyle of this explicit registration differs from the unregistered type (under normal circumstances this means that the explicit registration is not <strong>Transient</strong>)</li>
+<li>and where the lifestyle of this explicit registration differs from the unregistered type (in normal cases this means that the explicit registration is not <strong>Transient</strong>)</li>
 </ul>
 <p>When a component depends on a short circuited dependency, the application might be wired incorrectly because the flagged component gets a different instance of that concrete type than other components in the application will get. This can result in incorrect behavior.</p>
+<div class="note container">
+<strong>Note</strong>: This warning is a specialized version of the <a class="reference internal" href="ambiguouslifestyles.html#ambiguouslifestyles"><em>Ambiguous Lifestyles</em></a> warning.</div>
 </div>
 <div class="section" id="how-to-fix-violations">
 <h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
-<p>Let the component depend on the abstraction described in the warning message instead of depending directly on the concrete type. If the warning is a false positive and the component (and all other components that depend directly on this concrete type) should indeed get a transient instance of that concrete type, register the concrete type explicitly in the container using the transient lifestyle.</p>
+<p>Let the component depend on the abstraction described in the warning message instead of depending directly on the concrete type. If the warning is a false positive and the component (and all other components that depend directly on this concrete type) should indeed get a transient instance of that concrete type, register the concrete type explicitly in the contain using the transient lifestyle.</p>
 </div>
 <div class="section" id="when-to-ignore-warnings">
 <h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
@@ -257,7 +256,9 @@
 </div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">MyUnitOfWork</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Scoped</span><span class="p">);</span>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWebRequest</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">MyUnitOfWork</span><span class="p">&gt;();</span>
 <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">HomeController</span><span class="p">&gt;();</span>
 
 <span class="c1">// Definition of HomeController</span>
@@ -270,7 +271,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In this example <em>HomeController</em> depends on <em>MyUnitOfWork</em>. <em>MyUnitOfWork</em> however is not registered explicitly, but <em>IUnitOfWork</em> is. Furthermore <em>IUnitOfWork</em> is registered with a scoped lifestyle. However, since <em>MyUnitOfWork</em> is a concrete unregistered type, the container will create it on your behalf with the <strong>Transient</strong> lifestyle. This will typically be a problem, since during a request, the <em>HomeController</em> will get a different instance than other types that depend on <em>IUnitOfWork</em> while the intended use of <em>IUnitOfWork</em> is to have a single instance per web request.</p>
+<p>In this example <em>HomeController</em> depends on <em>MyUnitOfWork</em>. <em>MyUnitOfWork</em> however is not registered explicitly, but <em>IUnitOfWork</em> is. Furthermore <em>IUnitOfWork</em> is registered with the <em>WebRequestLifestyle</em>. However, since <em>MyUnitOfWork</em> is a concrete unregistered type, the container will create it on your behalf with the <strong>Transient</strong> lifestyle. This will typically be a problem, since during a request, the <em>HomeController</em> will get a different instance than other types that depend on <em>IUnitOfWork</em> while the intended use of <em>IUnitOfWork</em> is to have a single instance per web request.</p>
 <p>For Unit of Work implementations this is typically a problem, since the unit of work defines an atomic operation and creating multiple instances of such a unit of work in a single web request means that the work is split up in multiple (database) transactions (breaking consistency) or could result in part of the work not being committed at all.</p>
 <p>The <em>MyUnitOfWork</em> type is called &#8216;short circuited&#8217; because <em>HomeController</em> skips the <em>IUnitOfWork</em> dependency and directly depends on <em>MyUnitOfWork</em>. In other words, <em>HomeController</em> short circuits to <em>MyUnitOfWork</em>.</p>
 <p>Here is an example of a short circuited dependency in the watch window:</p>
@@ -308,7 +309,7 @@
         <a href="PotentialSingleResponsibilityViolations.html" class="btn btn-neutral float-right" title="Diagnostic Warning - Potential Single Responsibility Violations"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="LifestyleMismatches.html" class="btn btn-neutral" title="Diagnostic Warning - Lifestyle Mismatches"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="PotentialLifestyleMismatches.html" class="btn btn-neutral" title="Diagnostic Warning - Potential Lifestyle Mismatches"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

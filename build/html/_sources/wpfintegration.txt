@@ -36,7 +36,7 @@ Add a *Program.cs* file to your project to be the new entry point for the applic
         static void Main() {
             var container = Bootstrap();
 
-            // Any additional other configuration, e.g. of your desired MVVM toolkit.
+            // ANy additional other configuration, e.g. of your desired MVVM toolkit.
 
             RunApplication(container);
         }
@@ -46,7 +46,7 @@ Add a *Program.cs* file to your project to be the new entry point for the applic
             var container = new Container();
 
             // Register your types, for instance:
-            container.Register<IQueryProcessor, QueryProcessor>(Lifestyle.Singleton);
+            container.RegisterSingle<IQueryProcessor, QueryProcessor>();
             container.Register<IUserContext, WpfUserContext>();
 
             // Register your windows and view models:
@@ -80,7 +80,7 @@ Change the 'Startup object' in the properties of your project to be the newly cr
 Usage
 -----
 
-Constructor injection can now be used in any window (e.g. *MainWindow*) and view model:
+Constructor injection can now be used in any windows (e.g. *MainWindow*) and view models:
 
 .. code-block:: c#
 

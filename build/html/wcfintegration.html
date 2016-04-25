@@ -69,7 +69,6 @@
 <li class="toctree-l1"><a class="reference internal" href="using.html">Using Simple Injector</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="using.html#resolving-instances">Resolving instances</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#configuring-simple-injector">Configuring Simple Injector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using.html#collections">Collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#more-information">More information</a></li>
@@ -84,9 +83,8 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope-async-await">Per Execution Context Scope (async/await)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope">Per Execution Context Scope</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#instance-per-dependency">Instance Per Dependency</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-thread">Per Thread</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-http-session">Per HTTP Session</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#hybrid">Hybrid</a></li>
@@ -94,15 +92,13 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="integration.html">Integration Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="aspnetintegration.html">ASP.NET Core (beta!)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">ASP.NET Web API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="owinintegration.html">OWIN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">Windows Forms</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">WPF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">    WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
@@ -116,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-factory-delegates">Register factory delegates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-instances-by-key">Resolve instances by key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
@@ -144,7 +141,6 @@
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensibility.html#interception-of-resolved-object-graphs">Interception of Resolved Object Graphs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -183,9 +179,14 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -232,11 +233,10 @@
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Create the container as usual.</span>
     <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
-    <span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">DefaultScopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">WcfOperationLifestyle</span><span class="p">();</span>
 
     <span class="c1">// Register your types, for instance:</span>
     <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
-    <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">EfUnitOfWork</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Scoped</span><span class="p">);</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">RegisterPerWcfOperation</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">EfUnitOfWork</span><span class="p">&gt;();</span>
 
     <span class="c1">// Register the container to the SimpleInjectorServiceHostFactory.</span>
     <span class="n">SimpleInjectorServiceHostFactory</span><span class="p">.</span><span class="n">SetContainer</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
@@ -244,7 +244,7 @@
 </pre></div>
 </div>
 <div class="note container">
-<strong>Warning</strong>: Instead of what the name of the <strong>WcfOperationLifestyle</strong> class seems to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx">InstanceContextMode enumeration</a>. Components that are registered <em>PerWcfOperation</em> live as long as the WCF service class they are injected into.</div>
+<strong>Warning</strong>: Instead of what the name of the <strong>WcfOperationLifestyle</strong> class and the <strong>RegisterPerWcfOperation</strong> methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx">InstanceContextMode enumeration</a>. Components that are registered <em>PerWcfOperation</em> live as long as the WCF service class they are injected into.</div>
 <p>For each service class, you should supply a factory attribute in the .SVC file of each service class. For instance:</p>
 <div class="highlight-xml"><div class="highlight"><pre>&lt;%@ ServiceHost
     Service=&quot;UserService&quot;
@@ -258,17 +258,16 @@
 <strong>Note</strong>: Instead of having a WCF service layer consisting of many service classes and methods, consider a design that consists of just a single service class with a single method as explained in <a class="reference external" href="http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=95">this article</a>. A design where operations are communicated through messages allows the creation of highly maintainable WCF services. With such a design, this integration package will be redundant.</div>
 <div class="section" id="was-hosting-and-non-http-activation">
 <h2>WAS Hosting and Non-HTTP Activation<a class="headerlink" href="#was-hosting-and-non-http-activation" title="Permalink to this headline">¶</a></h2>
-<p>When hosting WCF Services in WAS (Windows Activation Service), you are not given an opportunity to build your container in the Application_Start event defined in your Global.asax because WAS doesn&#8217;t use the standard ASP.NET pipeline. A workaround for this is to move the container initialization to a static constructor:</p>
+<p>When hosting WCF Services in WAS (Windows Activation Service), you are not given an opportunity to build your container in the Application_Start event defined in your Global.asax because WAS doesn&#8217;t use the standard ASP.NET pipeline. A workaround for this is to move the container initialization to a static constructor</p>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Bootstrapper</span> <span class="p">{</span>
     <span class="k">public</span> <span class="k">static</span> <span class="k">readonly</span> <span class="n">Container</span> <span class="n">Container</span><span class="p">;</span>
 
     <span class="k">static</span> <span class="nf">Bootstrapper</span><span class="p">()</span> <span class="p">{</span>
         <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">DefaultScopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">WcfOperationLifestyle</span><span class="p">();</span>
 
         <span class="c1">// register all your components with the container here:</span>
         <span class="c1">// container.Register&lt;IService1, Service1&gt;()</span>
-        <span class="c1">// container.Register&lt;IDataContext, DataContext&gt;(Lifestyle.Scoped);</span>
+        <span class="c1">// container.RegisterLifetimeScope&lt;IDataContext,DataContext&gt;();</span>
 
         <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
 

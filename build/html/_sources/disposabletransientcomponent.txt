@@ -2,11 +2,6 @@
 Diagnostic Warning - Disposable Transient Components
 ====================================================
 
-Severity
-========
-
-Warning
-
 Cause
 =====
 
@@ -30,8 +25,7 @@ This warning can safely be ignored when:
 
 - *Dispose* is called by the application code
 - some manual registration ensures disposal
-- a framework (such as ASP.NET) guarantees disposal of the component
-- not disposing is not an issue.
+- not disposing is not a problem.
 
 The warning can be suppressed on a per-registration basis as follows:
 	
@@ -63,13 +57,13 @@ The issue can be fixed as follows:
 
 .. code-block:: c#
 
-    var container = new Container();
     // Select the scoped lifestyle that is appropriate for the application
     // you are building. For instance:
-    container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
+    ScopedLifestyle scopedLifestyle = new WebRequestLifestyle();
+    var container = new Container();
 
     // DisposableService implements IDisposable
-    container.Register<IService, DisposableService>(Lifestyle.Scoped);
+    container.Register<IService, DisposableService>(scopedLifestyle);
 
     container.Verify();
    

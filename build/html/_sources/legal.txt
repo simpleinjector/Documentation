@@ -5,7 +5,7 @@ Legal stuff
 Simple Injector License
 =======================
 
-Simple Injector is published under the MIT-license. Go `here <https://github.com/simpleinjector/SimpleInjector/blob/master/licence.txt>`_ to read our license. The MIT License is a free software license originating at the Massachusetts Institute of Technology (MIT). It is a permissive free software license, meaning that it permits reuse within proprietary software provided all copies of the licensed software include a copy of the MIT License terms. Such proprietary software retains its proprietary nature even though it incorporates software under the MIT License.
+Simple Injector is published under the MIT-license. Go `here <https://simpleinjector.codeplex.com/license>`_ to read our license. The MIT License is a free software license originating at the Massachusetts Institute of Technology (MIT). It is a permissive free software license, meaning that it permits reuse within proprietary software provided all copies of the licensed software include a copy of the MIT License terms. Such proprietary software retains its proprietary nature even though it incorporates software under the MIT License.
 
 Contributions
 =============
