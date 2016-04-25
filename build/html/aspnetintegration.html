@@ -1,0 +1,465 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ASP.NET Core Integration Guide (beta!) &mdash; Simple Injector 2 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
+        <link rel="up" title="Integration Guide" href="integration.html"/>
+        <link rel="next" title="ASP.NET MVC Integration Guide" href="mvcintegration.html"/>
+        <link rel="prev" title="Integration Guide" href="integration.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> Simple Injector</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#a-quick-example">A Quick Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#more-information">More information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using Simple Injector</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="using.html#resolving-instances">Resolving instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#configuring-simple-injector">Configuring Simple Injector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#collections">Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#more-information">More information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lifetimes.html">Object Lifetime Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#transient">Transient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#singleton">Singleton</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#scoped">Scoped</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-web-request">Per Web Request</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-web-api-request">Per Web API Request</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope-async-await">Per Execution Context Scope (async/await)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#instance-per-dependency">Instance Per Dependency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-thread">Per Thread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-http-session">Per HTTP Session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#hybrid">Hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#developing-a-custom-lifestyle">Developing a Custom Lifestyle</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="integration.html">Integration Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">ASP.NET Core (beta!)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="owinintegration.html">OWIN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#register-factory-delegates">Register factory delegates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-instances-by-key">Resolve instances by key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#work-with-dependency-injection-in-multi-threaded-applications">Work with dependency injection in multi-threaded applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Scenarios</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#generics">Generics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#batch-automatic-registration">Batch / Automatic registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#registration-of-open-generic-types">Registration of open generic types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#mixing-collections-of-open-generic-and-non-generic-components">Mixing collections of open-generic and non-generic components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#unregistered-type-resolution">Unregistered type resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#context-based-injection">Context based injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#decorators">Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#interception">Interception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#property-injection">Property injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#covariance-and-contravariance">Covariance and Contravariance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#registering-plugins-dynamically">Registering plugins dynamically</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility Points</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-constructor-resolution-behavior">Overriding Constructor Resolution Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-property-injection-behavior">Overriding Property Injection Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-parameter-injection-behavior">Overriding Parameter Injection Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#resolving-unregistered-types">Resolving Unregistered Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#interception-of-resolved-object-graphs">Interception of Resolved Object Graphs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#registration-pipeline">Registration Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#resolve-pipeline">Resolve Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="principles.html">Design Principles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#make-simple-use-cases-easy-make-complex-use-cases-possible">Make simple use cases easy, make complex use cases possible</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#push-developers-into-best-practices">Push developers into best practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#fast-by-default">Fast by default</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#don-t-force-vendor-lock-in">Don&#8217;t force vendor lock-in</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#never-fail-silently">Never fail silently</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#features-should-be-intuitive">Features should be intuitive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="principles.html#communicate-errors-clearly-and-describe-how-to-solve-them">Communicate errors clearly and describe how to solve them</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="decisions.html">Design Decisions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#the-container-is-locked-after-the-first-call-to-resolve">The container is locked after the first call to resolve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#the-api-clearly-differentiates-the-registration-of-collections">The API clearly differentiates the registration of collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-support-for-xml-based-configuration">No support for XML based configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#never-force-users-to-release-what-they-resolve">Never force users to release what they resolve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#don-t-allow-resolving-scoped-instances-outside-an-active-scope">Don&#8217;t allow resolving scoped instances outside an active scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-property-injection">No out-of-the-box support for property injection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-out-of-the-box-support-for-interception">No out-of-the-box support for interception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#limited-batch-registration-api">Limited batch-registration API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#no-per-thread-lifestyle">No per-thread lifestyle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decisions.html#allow-only-a-single-constructor">Allow only a single constructor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="legal.html">Legal stuff</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="legal.html#simple-injector-license">Simple Injector License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="legal.html#contributions">Contributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="legal.html#simple-injector-trademark-policy">Simple Injector Trademark Policy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Simple Injector</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="integration.html">Integration Guide</a> &raquo;</li>
+      
+    <li>ASP.NET Core Integration Guide (beta!)</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/aspnetintegration.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="asp-net-core-integration-guide-beta">
+<h1>ASP.NET Core Integration Guide (beta!)<a class="headerlink" href="#asp-net-core-integration-guide-beta" title="Permalink to this headline">¶</a></h1>
+<p>Simple Injector now offers the <a class="reference external" href="https://www.nuget.org/packages/SimpleInjector.Integration.AspNet">Simple Injector ASP.NET Core Integration NuGet package</a>.</p>
+<p>The following code snippet shows how to use the integration package to apply Simple Injector to your web application&#8217;s <cite>Startup</cite> class.</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// You&#39;ll need to include the following namespaces</span>
+<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Extensions.ExecutionContextScoping</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Integration.AspNet</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Startup</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nf">Startup</span><span class="p">(</span><span class="n">IHostingEnvironment</span> <span class="n">env</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ASP.NET default stuff here</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="n">Container</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+    <span class="c1">// This method gets called by the runtime.</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ASP.NET default stuff here</span>
+
+        <span class="n">services</span><span class="p">.</span><span class="n">AddInstance</span><span class="p">&lt;</span><span class="n">IControllerActivator</span><span class="p">&gt;(</span>
+            <span class="k">new</span> <span class="nf">SimpleInjectorControllerActivator</span><span class="p">(</span><span class="n">container</span><span class="p">));</span>
+        <span class="n">services</span><span class="p">.</span><span class="n">AddInstance</span><span class="p">&lt;</span><span class="n">IViewComponentInvokerFactory</span><span class="p">&gt;(</span>
+            <span class="k">new</span> <span class="nf">SimpleInjectorViewComponentInvokerFactory</span><span class="p">(</span><span class="n">container</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Configure is called after ConfigureServices is called.</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Configure</span><span class="p">(</span><span class="n">IApplicationBuilder</span> <span class="n">app</span><span class="p">,</span> <span class="n">IHostingEnvironment</span> <span class="n">env</span><span class="p">,</span> <span class="n">ILoggerFactory</span> <span class="n">fac</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">DefaultScopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">AspNetRequestLifestyle</span><span class="p">();</span>
+
+        <span class="n">app</span><span class="p">.</span><span class="n">UseSimpleInjectorAspNetRequestScoping</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+
+        <span class="n">InitializeContainer</span><span class="p">(</span><span class="n">app</span><span class="p">);</span>
+
+        <span class="n">container</span><span class="p">.</span><span class="n">RegisterAspNetControllers</span><span class="p">(</span><span class="n">app</span><span class="p">);</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">RegisterAspNetViewComponents</span><span class="p">(</span><span class="n">app</span><span class="p">);</span>
+
+        <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+        <span class="c1">// ASP.NET default stuff here</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">InitializeContainer</span><span class="p">(</span><span class="n">IApplicationBuilder</span> <span class="n">app</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Add application services. For instance:</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Scoped</span><span class="p">);</span>
+
+        <span class="c1">// Cross-wire ASP.NET services (if any). For instance:</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">CrossWire</span><span class="p">&lt;</span><span class="n">ILoggerFactory</span><span class="p">&gt;(</span><span class="n">app</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="working-with-the-default-visual-studio-2015-asp-net-core-template">
+<h2>Working with the default Visual Studio 2015 ASP.NET Core template<a class="headerlink" href="#working-with-the-default-visual-studio-2015-asp-net-core-template" title="Permalink to this headline">¶</a></h2>
+<p>The default Visual Studio 2015 template for ASP.NET Core injects a lot of code into your project: classes such as a <cite>HomeController</cite>, <cite>AccountController</cite> and empty <cite>AuthMessageSender</cite> and <cite>AuthMessageSender</cite> classes. You will have to make some adjustments to the default template to get it to work with Simple Injector.</p>
+<p><strong>Add application services.</strong></p>
+<p>The default template adds registrations for the <cite>IEmailSender</cite> and <cite>ISmsSender</cite> abstractions to the built-in ASP.NET configuration system but these abstractions are application services and no framework component depends on them (the application components <cite>AccountController</cite> and <cite>ManageController</cite> depend on them). These 2 registrations should be added to Simple Injector.</p>
+<p>Remove the two calls to <cite>AddTransient</cite> from the <cite>ConfigureServices</cite> method and replace them with the following registrations in the <cite>InitializeContainer</cite> method:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IEmailSender</span><span class="p">,</span> <span class="n">AuthMessageSender</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ISmsSender</span><span class="p">,</span> <span class="n">AuthMessageSender</span><span class="p">&gt;();</span>
+</pre></div>
+</div>
+<p><strong>Cross-wire required framework services.</strong></p>
+<p>To adhere to the Dependency Inversion Principle (DIP) you should minimize the dependencies your code has on framework supplied abstractions and classes. The Visual Studio template doesn&#8217;t follow the DIP and lets the generated classes depend on several framework and third party classes and abstractions. To be able to resolve the <cite>AccountController</cite> and <cite>ManageController</cite> from Simple Injector certain framework types need to be cross-wired into Simple Injector. Cross-wiring means that Simple Injector can forward the request for that type to the built-in ASP.NET configuration system. Add the following lines to the <cite>InitializeContainer</cite> method:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">CrossWire</span><span class="p">&lt;</span><span class="n">UserManager</span><span class="p">&lt;</span><span class="n">ApplicationUser</span><span class="p">&gt;&gt;(</span><span class="n">app</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">CrossWire</span><span class="p">&lt;</span><span class="n">SignInManager</span><span class="p">&lt;</span><span class="n">ApplicationUser</span><span class="p">&gt;&gt;(</span><span class="n">app</span><span class="p">);</span>
+<span class="n">container</span><span class="p">.</span><span class="n">CrossWire</span><span class="p">&lt;</span><span class="n">ILoggerFactory</span><span class="p">&gt;(</span><span class="n">app</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>Working around a bug in Identity Framework.</strong></p>
+<p>The previous registrations would normally be enough but due to a <a class="reference external" href="https://github.com/aspnet/Identity/issues/674">bug</a> in the beta&#8217;s of Identity Framework, Simple Injector&#8217;s verification will fail when checking the cross-wired <cite>SignInManager&lt;T&gt;</cite> because the <cite>SignInManager&lt;T&gt;</cite>&#8216;s constructor incorrectly throws an exception when there&#8217;s no <cite>HttpContext</cite> available (which is obviously the case when the <cite>SignInManger&lt;T&gt;</cite> is created during application start-up). This bug should be fixed in 3.0.0-rc2 of Identity framework, but in the meantime we need to register a custom <cite>IHttpContextAccessor</cite> to work around the issue:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">NeverNullHttpContextAccessor</span> <span class="p">:</span> <span class="n">IHttpContextAccessor</span>
+<span class="p">{</span>
+    <span class="n">AsyncLocal</span><span class="p">&lt;</span><span class="n">HttpContext</span><span class="p">&gt;</span> <span class="n">context</span> <span class="p">=</span> <span class="k">new</span> <span class="n">AsyncLocal</span><span class="p">&lt;</span><span class="n">HttpContext</span><span class="p">&gt;();</span>
+
+    <span class="k">public</span> <span class="n">HttpContext</span> <span class="n">HttpContext</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">Value</span> <span class="p">??</span> <span class="k">new</span> <span class="n">DefaultHttpContext</span><span class="p">();</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">Value</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This class can replace the framework&#8217;s original implementation by making the following registration in the <cite>ConfigureServices</cite> method:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// Work around for a Identity Framework bug inside the SignInManager&lt;T&gt; class.</span>
+<span class="n">services</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">ServiceDescriptor</span><span class="p">.</span><span class="n">Instance</span><span class="p">&lt;</span><span class="n">IHttpContextAccessor</span><span class="p">&gt;(</span>
+    <span class="k">new</span> <span class="nf">NeverNullHttpContextAccessor</span><span class="p">()));</span>
+</pre></div>
+</div>
+<p><strong>Everything together</strong></p>
+<p>When we put the given adjustments together, we get the following composition root:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// You&#39;ll need to include the following namespaces</span>
+<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Extensions.ExecutionContextScoping</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Integration.AspNet</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Startup</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nf">Startup</span><span class="p">(</span><span class="n">IHostingEnvironment</span> <span class="n">env</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ASP.NET default stuff here</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="n">Container</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+
+    <span class="c1">// This method gets called by the runtime.</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ASP.NET default stuff here</span>
+
+        <span class="n">services</span><span class="p">.</span><span class="n">AddInstance</span><span class="p">&lt;</span><span class="n">IControllerActivator</span><span class="p">&gt;(</span>
+            <span class="k">new</span> <span class="nf">SimpleInjectorControllerActivator</span><span class="p">(</span><span class="n">container</span><span class="p">));</span>
+        <span class="n">services</span><span class="p">.</span><span class="n">AddInstance</span><span class="p">&lt;</span><span class="n">IViewComponentInvokerFactory</span><span class="p">&gt;(</span>
+            <span class="k">new</span> <span class="nf">SimpleInjectorViewComponentInvokerFactory</span><span class="p">(</span><span class="n">container</span><span class="p">));</span>
+
+        <span class="c1">// Work around for a Identity Framework bug inside the SignInManager&lt;T&gt; class.</span>
+        <span class="n">services</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">ServiceDescriptor</span><span class="p">.</span><span class="n">Instance</span><span class="p">&lt;</span><span class="n">IHttpContextAccessor</span><span class="p">&gt;(</span>
+            <span class="k">new</span> <span class="nf">NeverNullHttpContextAccessor</span><span class="p">()));</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Configure is called after ConfigureServices is called.</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Configure</span><span class="p">(</span><span class="n">IApplicationBuilder</span> <span class="n">app</span><span class="p">,</span> <span class="n">IHostingEnvironment</span> <span class="n">env</span><span class="p">,</span> <span class="n">ILoggerFactory</span> <span class="n">fac</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">DefaultScopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">AspNetRequestLifestyle</span><span class="p">();</span>
+
+        <span class="n">app</span><span class="p">.</span><span class="n">UseSimpleInjectorAspNetRequestScoping</span><span class="p">(</span><span class="n">container</span><span class="p">);</span>
+
+        <span class="n">InitializeContainer</span><span class="p">(</span><span class="n">app</span><span class="p">);</span>
+
+        <span class="n">container</span><span class="p">.</span><span class="n">RegisterAspNetControllers</span><span class="p">(</span><span class="n">app</span><span class="p">);</span>
+                    <span class="n">container</span><span class="p">.</span><span class="n">RegisterAspNetViewComponents</span><span class="p">(</span><span class="n">app</span><span class="p">);</span>
+
+        <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+
+        <span class="c1">// ASP.NET default stuff here</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">InitializeContainer</span><span class="p">(</span><span class="n">IApplicationBuilder</span> <span class="n">app</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Add application services. For instance:</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IEmailSender</span><span class="p">,</span> <span class="n">AuthMessageSender</span><span class="p">&gt;();</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ISmsSender</span><span class="p">,</span> <span class="n">AuthMessageSender</span><span class="p">&gt;();</span>
+
+        <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Scoped</span><span class="p">);</span>
+
+        <span class="c1">// Cross-wire ASP.NET services (if any). For instance:</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">CrossWire</span><span class="p">&lt;</span><span class="n">UserManager</span><span class="p">&lt;</span><span class="n">ApplicationUser</span><span class="p">&gt;&gt;(</span><span class="n">app</span><span class="p">);</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">CrossWire</span><span class="p">&lt;</span><span class="n">SignInManager</span><span class="p">&lt;</span><span class="n">ApplicationUser</span><span class="p">&gt;&gt;(</span><span class="n">app</span><span class="p">);</span>
+        <span class="n">container</span><span class="p">.</span><span class="n">CrossWire</span><span class="p">&lt;</span><span class="n">ILoggerFactory</span><span class="p">&gt;(</span><span class="n">app</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">NeverNullHttpContextAccessor</span> <span class="p">:</span> <span class="n">IHttpContextAccessor</span>
+    <span class="p">{</span>
+        <span class="k">private</span> <span class="k">readonly</span> <span class="n">AsyncLocal</span><span class="p">&lt;</span><span class="n">HttpContext</span><span class="p">&gt;</span> <span class="n">context</span> <span class="p">=</span> <span class="k">new</span> <span class="n">AsyncLocal</span><span class="p">&lt;</span><span class="n">HttpContext</span><span class="p">&gt;();</span>
+
+        <span class="k">public</span> <span class="n">HttpContext</span> <span class="n">HttpContext</span>
+        <span class="p">{</span>
+            <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">Value</span> <span class="p">??</span> <span class="k">new</span> <span class="n">DefaultHttpContext</span><span class="p">();</span> <span class="p">}</span>
+            <span class="k">set</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">Value</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="mvcintegration.html" class="btn btn-neutral float-right" title="ASP.NET MVC Integration Guide"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="integration.html" class="btn btn-neutral" title="Integration Guide"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Simple Injector Contributors.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

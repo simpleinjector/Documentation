@@ -33,9 +33,12 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
             void IHttpModule.Init(HttpApplication context) {
                 context.PreRequestHandlerExecute += (sender, e) => {
                     var handler = context.Context.CurrentHandler;
-                    if (handler != null &&
-                        !handler.GetType().Assembly.FullName.StartsWith("System.Web")) {
-                        Global.InitializeHandler(handler);
+                    if (handler != null) {
+                        string name = handler.GetType().Assembly.FullName;
+                        if (!name.StartsWith("System.Web") &&
+                            !name.StartsWith("Microsoft")) {
+                            Global.InitializeHandler(handler);
+                        }
                     }
                 };
             }
@@ -67,15 +70,13 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                 container.Register<IUserRepository, SqlUserRepository>();
                 container.RegisterPerWebRequest<IUserContext, AspNetUserContext>();
 
-                // Register your Page classes.
+                // Register your Page classes to allow them to be verified and diagnosed.
                 RegisterWebPages(container);
 
                 // 3. Store the container for use by Page classes.
                 Global.container = container;
 
-                // 4. Optionally verify the container's configuration.
-                //    Did you know the container can diagnose your configuration? 
-                //    For more information, go to: https://simpleinjector.org/diagnostics.
+                // 3. Verify the container's configuration.
                 container.Verify();
             }
 
@@ -89,7 +90,13 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                     where !type.IsAbstract && !type.IsGenericType
                     select type;
 
-                pageTypes.ToList().ForEach(container.Register);
+                foreach (Type type in pageTypes) {
+                    var registration = Lifestyle.Transient.CreateRegistration(type, container);
+                    registration.SuppressDiagnosticWarning(
+                        DiagnosticType.DisposableTransientComponent,
+                        "ASP.NET creates and disposes page classes for us.");
+                    container.AddRegistration(type, registration);
+                }                
             }
 
             class ImportAttributePropertySelectionBehavior : IPropertySelectionBehavior {

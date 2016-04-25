@@ -68,6 +68,7 @@
 <li class="toctree-l1"><a class="reference internal" href="using.html">Using Simple Injector</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="using.html#resolving-instances">Resolving instances</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#configuring-simple-injector">Configuring Simple Injector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#collections">Collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#more-information">More information</a></li>
@@ -82,8 +83,9 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope">Per Execution Context Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope-async-await">Per Execution Context Scope (async/await)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#instance-per-dependency">Instance Per Dependency</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-thread">Per Thread</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-http-session">Per HTTP Session</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#hybrid">Hybrid</a></li>
@@ -91,13 +93,15 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspnetintegration.html">ASP.NET Core (beta!)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="owinintegration.html">OWIN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
@@ -111,7 +115,6 @@
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-factory-delegates">Register factory delegates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-instances-by-key">Resolve instances by key</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
@@ -140,6 +143,7 @@
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#interception-of-resolved-object-graphs">Interception of Resolved Object Graphs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -178,14 +182,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -238,13 +237,13 @@
 <li><em>Mono</em>.</li>
 </ul>
 <div class="note container">
-Simple Injector is carefully designed to run in <strong>partial / medium trust</strong>, and it is fast; <a class="reference external" href="https://simpleinjector.codeplex.com/discussions/326621">blazingly fast</a>.</div>
+Simple Injector is carefully designed to run in <strong>partial / medium trust</strong>, and it is fast; blazingly fast.</div>
 </div>
 <div class="section" id="getting-started">
 <h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
-<p>The easiest way to get started is by installing  <a class="reference external" href="https://nuget.org/packages?q=simpleinjector&amp;sortOrder=package-download-count">the available NuGet packages</a> and if you&#8217;re not a NuGet fan then follow these steps:</p>
+<p>The easiest way to get started is by installing  <a class="reference external" href="https://simpleinjector.org/nuget">the available NuGet packages</a> and if you&#8217;re not a NuGet fan then follow these steps:</p>
 <ol class="arabic simple">
-<li>Go to the <a class="reference external" href="https://simpleinjector.codeplex.com/releases/">Downloads</a> tab and download the latest <strong>runtime library</strong>;</li>
+<li>Download the latest <strong>runtime library</strong> from: <a class="reference external" href="https://simpleinjector.org/download">https://simpleinjector.org/download</a>;</li>
 <li>Unpack the downloaded <cite>.zip</cite> file;</li>
 <li>Add the <strong>SimpleInjector.dll</strong> to your start-up project by right-clicking on a project in the Visual Studio solution explorer and selecting &#8216;Add Reference...&#8217;.</li>
 <li>Add the <strong>using SimpleInjector;</strong> directive on the top of the code file where you wish to configure the application.</li>
@@ -256,13 +255,12 @@ Simple Injector is carefully designed to run in <strong>partial / medium trust</
 <h2>A Quick Example<a class="headerlink" href="#a-quick-example" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="dependency-injection">
 <h3>Dependency Injection<a class="headerlink" href="#dependency-injection" title="Permalink to this headline">¶</a></h3>
-<p>The general idea behind Simple Injector (or any DI framework for that matter) is that you design your application around loosely coupled components using the <a class="reference external" href="https://en.wikipedia.org/wiki/Dependency**injection">dependency injection pattern</a>. Take for instance the following <strong>UserController</strong> class in the context of an ASP.NET MVC application:</p>
+<p>The general idea behind Simple Injector (or any DI library for that matter) is that you design your application around loosely coupled components using the <a class="reference external" href="https://en.wikipedia.org/wiki/Dependency_injection">dependency injection pattern</a> while adhering to the <a class="reference external" href="https://en.wikipedia.org/wiki/Dependency_inversion_principle">Dependency Inversion Principle</a>. Take for instance the following <strong>UserController</strong> class in the context of an ASP.NET MVC application:</p>
 <div class="note container">
 <strong>Note:</strong> Simple Injector works for many different technologies and not just MVC. Please see the <a class="reference internal" href="integration.html"><em>Integration Guide</em></a> for help using Simple Injector with your technology of choice.</div>
 <div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">UserController</span> <span class="p">:</span> <span class="n">Controller</span> <span class="p">{</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">;</span>
     <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span> <span class="n">logger</span><span class="p">;</span>
-
 
     <span class="c1">// Use constructor injection for the dependencies</span>
     <span class="k">public</span> <span class="nf">UserController</span><span class="p">(</span><span class="n">IUserRepository</span> <span class="n">repository</span><span class="p">,</span> <span class="n">ILogger</span> <span class="n">logger</span><span class="p">)</span> <span class="p">{</span>
@@ -270,11 +268,24 @@ Simple Injector is carefully designed to run in <strong>partial / medium trust</
         <span class="k">this</span><span class="p">.</span><span class="n">logger</span> <span class="p">=</span> <span class="n">logger</span><span class="p">;</span>
     <span class="p">}</span>
 
-
     <span class="c1">// implement UserController methods here:</span>
     <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span> <span class="p">{</span>
         <span class="k">this</span><span class="p">.</span><span class="n">logger</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="s">&quot;Index called&quot;</span><span class="p">);</span>
         <span class="k">return</span> <span class="nf">View</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">repository</span><span class="p">.</span><span class="n">GetAll</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">SqlUserRepository</span> <span class="p">:</span> <span class="n">IUserRepository</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span> <span class="n">logger</span><span class="p">;</span>
+
+    <span class="c1">// Use constructor injection for the dependencies</span>
+    <span class="k">public</span> <span class="nf">SqlUserRepository</span><span class="p">(</span><span class="n">ILogger</span> <span class="n">logger</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">logger</span> <span class="p">=</span> <span class="n">logger</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">User</span> <span class="nf">GetById</span><span class="p">(</span><span class="n">Guid</span> <span class="n">id</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="n">logger</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="s">&quot;Getting User &quot;</span> <span class="p">+</span> <span class="n">id</span><span class="p">);</span>
+        <span class="c1">// retrieve from db.</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -283,18 +294,15 @@ Simple Injector is carefully designed to run in <strong>partial / medium trust</
 </div>
 <div class="section" id="introducing-simple-injector">
 <h3>Introducing Simple Injector<a class="headerlink" href="#introducing-simple-injector" title="Permalink to this headline">¶</a></h3>
-<p>Using Simple Injector, the configuration of the application using the <em>UserController</em> class shown above, would look something like this:</p>
+<p>Using Simple Injector, the configuration of the application using the <em>UserController</em> and <em>SqlUserRepository</em> classes shown above, might look something like this:</p>
 <div class="highlight-csharp"><div class="highlight"><pre><span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">(</span><span class="kt">object</span> <span class="n">sender</span><span class="p">,</span> <span class="n">EventArgs</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// 1. Create a new Simple Injector container</span>
     <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
 
     <span class="c1">// 2. Configure the container (register)</span>
-    <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;();</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">SqlUserRepository</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
 
-    <span class="n">container</span><span class="p">.</span><span class="n">RegisterSingle</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(()</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">CompositeLogger</span><span class="p">(</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">DatabaseLogger</span><span class="p">&gt;(),</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">MailLogger</span><span class="p">&gt;()</span>
-    <span class="p">));</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">MailLogger</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
 
     <span class="c1">// 3. Optionally verify the container&#39;s configuration.</span>
     <span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
@@ -306,11 +314,19 @@ Simple Injector is carefully designed to run in <strong>partial / medium trust</
 </div>
 <div class="note container">
 <strong>Tip</strong>: If you start with a MVC application, use the <a class="reference external" href="https://nuget.org/packages/SimpleInjector.MVC3">NuGet Simple Injector MVC Integration Quick Start package</a>.</div>
-<p>The given configuration registers implementations for the <em>IUserRepository</em> and <em>ILogger</em> interfaces. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as <em>SqlUserRepository</em>) to an interface or base type. In the given example, every time you ask the container for an <em>IUserRepository</em>, it will create a new <em>SqlUserRepository</em> on your behalf (in DI terminology: an object with a <strong>Transient</strong> lifestyle).</p>
-<p>The registration of the <em>ILogger</em> is a bit more complex though. It registers a delegate that knows how to create a new <em>ILogger</em> implementation, in this case <em>CompositeLogger</em> (which is an implementation of <em>ILogger</em>). The delegate itself calls back into the container and this allows the container to create the concrete <em>DatabaseLogger</em> and <em>MailLogger</em> and inject them into the <em>CompositeLogger</em>. While the type of registration that we&#8217;ve seen with the <em>IUserRepository</em> is much more common, the use of delegates allows many interesting scenarios.</p>
+<p>The given configuration registers implementations for the <em>IUserRepository</em> and <em>ILogger</em> interfaces. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as <em>SqlUserRepository</em>) to an interface or base type. In the given example, every time you ask the container for an <em>IUserRepository</em>, it will always create a new <em>SqlUserRepository</em> on your behalf (in DI terminology: an object with a <strong>Transient</strong> lifestyle).</p>
+<p>The seconds registration maps the <em>ILogger</em> interface to a <em>MailLogger</em> implementation. This <em>MailLogger</em> is registered with the <strong>Singleton</strong> lifestyle; only one instance of <em>MailLogger</em> will ever be created by the <strong>Container</strong>.</p>
 <div class="note container">
 <strong>Note</strong>: We did not register the <em>UserController</em>, because the <em>UserController</em> is a concrete type, Simple Injector can implicitly create it (as long as its dependencies can be resolved).</div>
-<p>And this is all it takes to start using Simple Injector. Design your classes around the dependency injection principle (which is actually the hard part) and configure them during application initialization. Some frameworks (such as ASP.NET MVC) will do the rest for you, other frameworks (like ASP.NET Web Forms) will need a little bit more work. See the <a class="reference internal" href="integration.html"><em>Integration Guide</em></a> for examples of many common frameworks.</p>
+<p>Using this configuration, when a <em>UserController</em> is requested, the following object graph is constructed:</p>
+<div class="highlight-csharp"><div class="highlight"><pre><span class="k">new</span> <span class="nf">UserController</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nf">SqlUserRepository</span><span class="p">(</span>
+        <span class="n">logger</span><span class="p">),</span>
+    <span class="n">logger</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note that object graphs can become very deep. What you can see is that not only <em>UserController</em> contains dependencies, so does <em>SqlUserRepository</em>. In this case <em>SqlUserRepository</em> itself contains an <em>ILogger</em> dependency itself. Simple Injector will not only resolve the dependencies of <em>UserController</em> but will instead build a whole tree structure of any level deep for you.</p>
+<p>And this is all it takes to start using Simple Injector. Design your classes around the SOLID principles and the dependency injection pattern (which is actually the hard part) and configure them during application initialization. Some frameworks (such as ASP.NET MVC) will do the rest for you, other frameworks (like ASP.NET Web Forms) will need a little bit more work. See the <a class="reference internal" href="integration.html"><em>Integration Guide</em></a> for examples of many common frameworks.</p>
 <div class="note container">
 Please go to the <a class="reference internal" href="using.html"><em>Using Simple Injector</em></a> section in the documentation to see more examples.</div>
 </div>
@@ -324,8 +340,8 @@ Please go to the <a class="reference internal" href="using.html"><em>Using Simpl
 <li>See the <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">Reference library</a> for the complete API documentation.</li>
 <li>See the <a class="reference internal" href="integration.html"><em>Integration Guide</em></a> for more information about how to integrate Simple Injector into your specific application framework.</li>
 <li>For more information about dependency injection in general, please visit <a class="reference external" href="https://stackoverflow.com/tags/dependency-injection/info">this page on Stackoverflow</a>.</li>
-<li>If you have any questions about how to use Simple Injector or about dependency injection in general, the experts at <a class="reference external" href="http://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23&amp;title=Simple%20Injector">Stackoverflow.com</a> are waiting for you.</li>
-<li>For all other Simple Injector related question and discussions, such as bug reports and feature requests, the <a class="reference external" href="https://simpleinjector.codeplex.com/discussions">Simple Injector discussion forum</a> will be the place to start.</li>
+<li>If you have any questions about how to use Simple Injector or about dependency injection in general, the experts at <a class="reference external" href="https://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23">Stackoverflow.com</a> are waiting for you.</li>
+<li>For all other Simple Injector related question and discussions, such as bug reports and feature requests, the <a class="reference external" href="https://simpleinjector.org/forum">Simple Injector discussion forum</a> will be the place to start.</li>
 </ul>
 <p><strong>Happy injecting!</strong></p>
 </div>

@@ -68,6 +68,7 @@
 <li class="toctree-l1"><a class="reference internal" href="using.html">Using Simple Injector</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="using.html#resolving-instances">Resolving instances</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#configuring-simple-injector">Configuring Simple Injector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using.html#collections">Collections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#verifying-the-container-s-configuration">Verifying the container&#8217;s configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#automatic-constructor-injection-auto-wiring">Automatic constructor injection / auto-wiring</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#more-information">More information</a></li>
@@ -82,8 +83,9 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#web-api-request-lifestyle-vs-web-request-lifestyle">Web API Request lifestyle vs. Web Request lifestyle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-wcf-operation">Per WCF Operation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-lifetime-scope">Per Lifetime Scope</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope">Per Execution Context Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-execution-context-scope-async-await">Per Execution Context Scope (async/await)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-graph">Per Graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lifetimes.html#instance-per-dependency">Instance Per Dependency</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-thread">Per Thread</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#per-http-session">Per HTTP Session</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#hybrid">Hybrid</a></li>
@@ -91,13 +93,15 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">    ASP.NET MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">    ASP.NET Web API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">    ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">    Windows Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">    WCF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">    WPF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">    Silverlight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspnetintegration.html">ASP.NET Core (beta!)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">ASP.NET MVC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">ASP.NET Web API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">ASP.NET Web Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="owinintegration.html">OWIN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">Windows Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">WCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">WPF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silverlightintegration.html">Silverlight</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
@@ -111,7 +115,6 @@
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-factory-delegates">Register factory delegates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-instances-by-key">Resolve instances by key</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howto.html#resolve-arrays-and-lists">Resolve arrays and lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#register-multiple-interfaces-with-the-same-implementation">Register multiple interfaces with the same implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#override-existing-registrations">Override existing registrations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#verify-the-container-s-configuration">Verify the container&#8217;s configuration</a></li>
@@ -140,6 +143,7 @@
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#overriding-lifestyle-selection-behavior">Overriding Lifestyle Selection Behavior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#intercepting-the-creation-of-types">Intercepting the Creation of Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensibility.html#building-up-external-instances">Building up External Instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html#interception-of-resolved-object-graphs">Interception of Resolved Object Graphs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Simple Injector Pipeline</a><ul>
@@ -178,14 +182,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="RuntimeDecorators.html">Runtime Decorators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CollectionRegistrationExtensions.html">Collection Registration Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ContextDependentExtensions.html">Context Dependent Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="injectproperties-is-deprecated.html">InjectProperties is Deprecated</a></li>
-<li class="toctree-l2"><a class="reference internal" href="registermvcattributefilterprovider-is-deprecated.html">RegisterMvcAttributeFilterProvider is Deprecated</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/">API Documentation</a></li>
@@ -247,10 +246,10 @@
 </ul>
 <p>In most situations it makes little sense to change the configuration once the application is running. This would make the application much more complex, whereas dependency injection as a pattern is meant to lower the total complexity of a system. By strictly separating the registration/startup phase from the phase where the application is in a running state, it is much easier to determine how the container will behave and it is much easier to verify the container&#8217;s configuration. The locking behavior of Simple Injector exists to protect the user from defining invalid and/or confusing combinations of registrations.</p>
 <p>Allowing the ability to alter the DI configuration while the application is running could easily cause strange, hard to debug, and hard to verify behavior. This may also mean the application has numerous hard references to the container and this is something we work hard to prevent. Attempting to alter the configuration when running a multi-threaded application would lead to very un-deterministic behavior, even if the container itself is thread-safe.</p>
-<p>Imagine the scenario where you want to replace some <em>FileLogger</em> component for a different implementation with the same <em>ILogger</em> interface. If there&#8217;s a different registration that directly or indirectly depends on this registration, replacing the <em>ILogger</em> might not work as you would expect. If the depending registration is registered as singleton, for example, the container should guarantee that only one instance will be created. When you are allowed to change the implementation of <em>ILogger</em> after a singleton instance already holds a reference to the &#8220;old&#8221; registered implementation the container has 2 choices - neither of which are correct:</p>
+<p>Imagine the scenario where you want to replace some <em>FileLogger</em> component for a different implementation with the same <em>ILogger</em> interface. If there&#8217;s a component that directly or indirectly depends on <em>ILogger</em>, replacing the <em>ILogger</em> implementation might not work as you would expect. If the consuming component is registered as singleton, for example, the container should guarantee that only one instance of this component will be created. When you are allowed to change the implementation of <em>ILogger</em> after a singleton instance already holds a reference to the &#8220;old&#8221; registered implementation the container has 2 choices - neither of which are correct:</p>
 <ol class="arabic simple">
-<li>Return the cached instance of the registration that has a reference to the &#8220;wrong&#8221; <em>ILogger</em>.</li>
-<li>Create and cache a new instance of that registration and, in doing so, break the promise of the type being registered as a singleton and the guarantee that the container will always return the same instance.</li>
+<li>Return the cached instance of the consuming component that has a reference to the &#8220;wrong&#8221; <em>ILogger</em> implementation.</li>
+<li>Create and cache a new instance of that component and, in doing so, break the promise of the type being registered as a singleton and the guarantee that the container will always return the same instance.</li>
 </ol>
 <p>The description above is a simple to grasp example of dealing with the runtime replacement of services. But adding new registrations can also cause things to go wrong in unexpected ways. A simple example would be where the container has previously supplied the object graph with a default implementation resolved through unregistered type resolution.</p>
 <p>Problems with thread-safety can easily emerge when the user changes a registration during a web request. If the container allowed such registration changes during a request, other requests could directly be impacted by those changes (since in general there should only be one <em>Container</em> instance per AppDomain). Depending on things such as the lifestyle of the registration; the use of factories and how the object graph is structured, it could be a real possibility that another request gets both the old and the new registration. Take for instance a transient registration that is replaced with a different one. If this is done while an object graph for a different thread is being resolved while the service is injected into multiple points within the graph - the graph would contain different instance of that abstraction with different lifetimes at the same time in the same request - and this is bad.</p>
@@ -261,28 +260,30 @@
 <li>Using <a class="reference internal" href="advanced.html#unregistered-type-resolution"><em>unregistered type resolution</em></a> the container will be able to at a later time resolve new types.</li>
 <li>The <a class="reference external" href="https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Lifestyle_CreateProducer.htm">Lifestyle.CreateProducer</a> overloads can be called at any point in time to create new <strong>InstanceProducer</strong> instances that allow building new registrations.</li>
 </ol>
+<p>All these options provide users with a safe way to add registrations at a later point in time, without the risks described above.</p>
 </div>
 <div class="section" id="the-api-clearly-differentiates-the-registration-of-collections">
 <span id="separate-collections"></span><h2>The API clearly differentiates the registration of collections<a class="headerlink" href="#the-api-clearly-differentiates-the-registration-of-collections" title="Permalink to this headline">¶</a></h2>
-<p>When designing Simple Injector, we made a very explicit design decision to define a separate <strong>RegisterAll</strong> method for registering a collection of services for an abstraction. This design adheres to the following principles:</p>
+<p>When designing Simple Injector, we made a very explicit design decision to define a separate <strong>RegisterCollection</strong> method for registering a collection of services for an abstraction. This design adheres to the following principles:</p>
 <ul class="simple">
 <li><a class="reference internal" href="principles.html#never-fail-silently"><em>Never fail silently</em></a></li>
 <li><a class="reference internal" href="principles.html#features-should-be-intuitive"><em>Features should be intuitive</em></a></li>
 </ul>
 <p>This design differentiates vastly from how other DI libraries work. Most libraries provide the same API for single registrations and collections. Registering a collection of some abstraction in that case means that you call the <strong>Register</strong> method multiple times with the same abstraction but with different implementations. There are some clear downsides to such an approach.</p>
 <ul class="simple">
-<li>There&#8217;s a big difference between having a collection of services and a single service. For many of the services you register you will have one implementation and it doesn&#8217;t make sense for there to be multiple implementations. For other services you will always expect a collection of them (even if you have one or no implementations). In the majority (if not all) of cases you wouldn&#8217;t expect to switch dynamically between one and multiple implementations and it doesn&#8217;t make much sense to create an API that makes it possible.</li>
-<li>An API that mixes these concepts will be unable to warn you if you accidentally add a second registration for the same service. Those APIs will &#8216;fail silently&#8217; and simply return one of the items you registered. Simple Injector will throw an exception when you call <strong>Register&lt;T&gt;</strong> for the same T and will describe that collections should be registered using <strong>RegisterAll</strong>.</li>
-<li>None of the APIs that mix these concepts make it clear which of the registered services is returned if you resolve one of them. Some libraries will return the first registered element, while others return the last. Although all of them describe this behavior in their documentation it&#8217;s not clear from the API itself i.e. it is not discoverable. An API design like this is unintuitive. A design that separates <strong>Register</strong> from <strong>RegisterAll</strong> makes the intention of the code very clear to anyone who reads it.</li>
+<li>There&#8217;s a big difference between having a collection of services and a single service. For many of the services you register, you will have one implementation and it doesn&#8217;t make sense for there to be multiple implementations. For other services you will always expect a collection of them (even if you have one or no implementations). In the majority (if not all) of cases you wouldn&#8217;t expect to switch dynamically between one and multiple implementations and it doesn&#8217;t make much sense to create an API that makes it possible.</li>
+<li>An API that mixes these concepts will be unable to warn you if you accidentally add a second registration for the same service. Those APIs will &#8216;fail silently&#8217; and simply return one of the items you registered. Simple Injector will throw an exception when you call <strong>Register&lt;T&gt;</strong> for the same T and will describe that collections should be registered using <strong>RegisterCollection</strong>.</li>
+<li>None of the APIs that mix these concepts make it clear which of the registered services is returned if you resolve one of them. Some libraries will return the first registered element, while others return the last. Although all of them describe this behavior in their documentation it&#8217;s not clear from the API itself i.e. it is not discoverable. An API design like this is unintuitive. A design that separates <strong>Register</strong> from <strong>RegisterCollection</strong> makes the intention of the code very clear to anyone who reads it.</li>
 </ul>
 <p>In general, your services should not depend on an <em>IEnumerable&lt;ISomeService&gt;</em>, especially when your application has multiple services that need to work with <em>ISomeService</em>. The problem with injecting <em>IEnumerable</em> into multiple consumers is that you will have to iterate that collection in multiple places. This forces the consumers to know about having multiple implementations and how to iterate and process that collection. As far as the consumer is concerned this should be an implementation detail. If you ever need to change the way a collection is processed you will have to go through the application, since this logic will have be duplicated throughout the system.</p>
-<p>Instead of injecting an <em>IEnumerable</em> a consumer should instead depend on a single abstraction and you can achieve this using a <a class="reference external" href="https://en.wikipedia.org/wiki/Composite_pattern">Composite</a> Implementation that wraps the actual collection and contains the logic of processing the collection. Registering composite implementation is so much easier with Simple Injector because of the clear separation between a single implementation and a collection of implementations. Take the following configuration for example, where we register a collection of <em>ILogger</em> implementations and a single composite implementation for use in the rest of our code:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterAll</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span>
+<p>Instead of injecting an <em>IEnumerable</em>, a consumer should instead depend on a single abstraction and you can achieve this using a <a class="reference external" href="https://en.wikipedia.org/wiki/Composite_pattern">Composite</a> Implementation that wraps the actual collection and contains the logic of processing the collection. Registering composite implementation is so much easier with Simple Injector because of the clear separation between a single implementation and a collection of implementations. Take the following configuration for example, where we register a collection of <em>ILogger</em> implementations and a single composite implementation for use in the rest of our code:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">container</span><span class="p">.</span><span class="n">RegisterCollection</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">&gt;(</span><span class="k">new</span><span class="p">[]</span> <span class="p">{</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">FileLogger</span><span class="p">),</span>
     <span class="k">typeof</span><span class="p">(</span><span class="n">SqlLogger</span><span class="p">),</span>
-    <span class="k">typeof</span><span class="p">(</span><span class="n">EventLogLogger</span><span class="p">));</span>
+    <span class="k">typeof</span><span class="p">(</span><span class="n">EventLogLogger</span><span class="p">)</span>
+<span class="p">});</span>
 
-    <span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">CompositeLogger</span><span class="p">&gt;();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">ILogger</span><span class="p">,</span> <span class="n">CompositeLogger</span><span class="p">&gt;();</span>
 </pre></div>
 </div>
 </div>
@@ -292,7 +293,7 @@
 <ul class="simple">
 <li><a class="reference internal" href="principles.html#push-developers-into-best-practices"><em>Push developers into best practices</em></a> and having a XML centered configuration is <em>not</em> best practice</li>
 </ul>
-<p>XML based configuration is brittle, error prone and always provides a subset of what you can achieve with code based configuration. General consensus is to use code based configuration as much as possible and only fall back to file based configuration for the parts of the configuration that really need to be customizable after deployment. These are normally just a few registrations since the majority of changes would still require developer interaction (write unit tests or recompiling for instance). Even for those few lines that do need to be configurable, it&#8217;s a bad idea to require the fully qualified type name in a configuration file. A configuration switch (true/false or simple enum) is more than enough. You can read the configured value in your code based configuration and this allows you to keep the type names in your code. This allows you to refactor easily and gives you compile-time support.</p>
+<p>XML based configuration is brittle, error prone and always provides a subset of what you can achieve with code based configuration. General consensus is to use code based configuration as much as possible and only fall back to file based configuration for the parts of the configuration that really need to be customizable after deployment. These are normally just a few registrations since the majority of changes would still require developer interaction (write unit tests or recompile for instance). Even for those few lines that do need to be configurable, it&#8217;s a bad idea to require the fully qualified type name in a configuration file. A configuration switch (true/false or simple enum) is more than enough. You can read the configured value in your code based configuration, this allows you to keep the type names in your code. This allows you to refactor easily, gives you compile-time support and is much more friendly to the person having to change this configuration file.</p>
 </div>
 <div class="section" id="never-force-users-to-release-what-they-resolve">
 <span id="never-force-release"></span><h2>Never force users to release what they resolve<a class="headerlink" href="#never-force-users-to-release-what-they-resolve" title="Permalink to this headline">¶</a></h2>
@@ -329,7 +330,7 @@ With implicit property injection, the container injects any public writable prop
 </div>
 <div class="section" id="no-out-of-the-box-support-for-interception">
 <span id="no-interception"></span><h2>No out-of-the-box support for interception<a class="headerlink" href="#no-out-of-the-box-support-for-interception" title="Permalink to this headline">¶</a></h2>
-<p>Simple Injector does support interception out-of-the box, because we want to:</p>
+<p>Simple Injector does not support interception out of the box, because we want to:</p>
 <ul class="simple">
 <li><a class="reference internal" href="principles.html#push-developers-into-best-practices"><em>Push developers into best practices</em></a></li>
 <li><a class="reference internal" href="principles.html#fast-by-default"><em>Fast by default</em></a></li>
@@ -337,7 +338,7 @@ With implicit property injection, the container injects any public writable prop
 </ul>
 <p>Simple Injector tries to push developers into good design, and the use of interception is often an indication of a suboptimal design. We prefer to promote the use of decorators. If you can&#8217;t apply a decorator around a group of related types, you are probably missing a common (generic) abstraction.</p>
 <p>Simple Injector is designed to be fast by default. Applying decorators in Simple Injector is just as fast as normal injection, while applying interceptors has a much higher cost, since it involves the use of reflection.</p>
-<p>To be able to intercept, you will need to take a dependency on your interception library, since this library defines an <em>IInterceptor</em> interface or something similar (such as Castle&#8217;s <em>IInterceptor</em> or Unity&#8217;s <em>ICallHandler</em>). Decorators on the other hand can be created without asking you to take a dependency on an external library. Since vendor lock-in should be avoided the Simple Injector library doesn&#8217;t define any interfaces or attributes to be used at the application level.</p>
+<p>To be able to intercept, you will need to take a dependency on your interception library, since this library defines an <em>IInterceptor</em> interface or something similar (such as Castle&#8217;s <em>IInterceptor</em> or Unity&#8217;s <em>ICallHandler</em>). Decorators on the other hand can be created without asking you to take a dependency on an external library. Since vendor lock-in should be avoided, Simple Injector doesn&#8217;t define any interfaces or attributes to be used at the application level.</p>
 </div>
 <div class="section" id="limited-batch-registration-api">
 <span id="limited-batch-registration"></span><h2>Limited batch-registration API<a class="headerlink" href="#limited-batch-registration-api" title="Permalink to this headline">¶</a></h2>
@@ -347,7 +348,7 @@ With implicit property injection, the container injects any public writable prop
 <li><a class="reference internal" href="principles.html#features-should-be-intuitive"><em>Features should be intuitive</em></a></li>
 </ul>
 <p>In most cases we found it much easier to write batch registrations using LINQ; a language that many developers are already familiar with. Specifying your registrations in LINQ reduces the need to learn yet another (domain specific) language (with all its quirks).</p>
-<p>When it comes to batch-registering generic-types things are different. Batch-registering generic types can be very complex without tool support. We have defined a clear API consisting of a single <strong>RegisterManyForOpenGeneric</strong> extension method that covers the majority of the cases.</p>
+<p>When it comes to batch-registering generic-types things are different. Batch-registering generic types can be very complex without tool support. We have defined a clear API consisting of a few <strong>Register</strong> and <strong>RegisterCollection</strong> overloads that covers the majority of the cases.</p>
 </div>
 <div class="section" id="no-per-thread-lifestyle">
 <span id="id1"></span><h2>No per-thread lifestyle<a class="headerlink" href="#no-per-thread-lifestyle" title="Permalink to this headline">¶</a></h2>

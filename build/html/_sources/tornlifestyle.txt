@@ -2,6 +2,11 @@
 Diagnostic Warning - Torn Lifestyle
 ===================================
 
+Severity
+========
+
+Warning
+
 Cause
 =====
 
@@ -21,7 +26,7 @@ Create a *Registration* instance for that component using *Lifestyle.CreateRegis
 When to Ignore Warnings
 =======================
 
-This warning can safely be ignored your intention is to have multiple instances of the flagged component (one for each registration) in the same scope.
+This warning can safely be ignored if your intention is to have multiple instances of the flagged component (one for each registration) in the same scope.
 
 The warning can be suppressed on a per-registration basis as follows:
 	

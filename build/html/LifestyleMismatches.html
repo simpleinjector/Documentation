@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Variance Extensions &mdash; Simple Injector 2 documentation</title>
+  <title>Diagnostic Warning - Lifestyle Mismatches &mdash; Simple Injector 2 documentation</title>
   
 
   
@@ -29,9 +29,9 @@
 
   
     <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
-        <link rel="up" title="Appendix" href="appendix.html"/>
-        <link rel="next" title="T4MVC Integration Guide" href="t4mvc.html"/>
-        <link rel="prev" title="Interception Extensions" href="InterceptionExtensions.html"/> 
+        <link rel="up" title="Diagnostic Services" href="diagnostics.html"/>
+        <link rel="next" title="Diagnostic Warning - Short Circuited Dependencies" href="ShortCircuitedDependencies.html"/>
+        <link rel="prev" title="Diagnostic Services" href="diagnostics.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -106,11 +106,11 @@
 <li class="toctree-l2"><a class="reference internal" href="integration.html#patterns">Patterns</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="diagnostics.html">Diagnostic Services</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#how-to-view-diagnostic-results">How to view diagnostic results</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#suppressing-warnings">Suppressing warnings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diagnostics.html#limitations">Limitations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="diagnostics.html#supported-warnings">Supported Warnings</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How To</a><ul>
@@ -182,9 +182,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="appendix.html">Appendix</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
 </ul>
 </li>
@@ -212,12 +212,12 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-          <li><a href="appendix.html">Appendix</a> &raquo;</li>
+          <li><a href="diagnostics.html">Diagnostic Services</a> &raquo;</li>
       
-    <li>Variance Extensions</li>
+    <li>Diagnostic Warning - Lifestyle Mismatches</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/varianceextensions.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/LifestyleMismatches.txt" rel="nofollow"> View page source</a>
         
       </li>
   </ul>
@@ -225,92 +225,94 @@
 </div>
           <div role="main">
             
-  <div class="section" id="variance-extensions">
-<h1>Variance Extensions<a class="headerlink" href="#variance-extensions" title="Permalink to this headline">¶</a></h1>
-<p><strong>Allowing Simple Injector to resolve a variant registration.</strong></p>
-<p>The following code snippet adds the ability to Simple Injector to resolve an assignable variant implementation, in case the exact requested type is not registered.</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
-<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
-<span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+  <div class="section" id="diagnostic-warning-lifestyle-mismatches">
+<h1>Diagnostic Warning - Lifestyle Mismatches<a class="headerlink" href="#diagnostic-warning-lifestyle-mismatches" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="severity">
+<h2>Severity<a class="headerlink" href="#severity" title="Permalink to this headline">¶</a></h2>
+<p>Warning</p>
+</div>
+<div class="section" id="cause">
+<h2>Cause<a class="headerlink" href="#cause" title="Permalink to this headline">¶</a></h2>
+<p>The component depends on a service with a lifestyle that is shorter than that of the component.</p>
+</div>
+<div class="section" id="warning-description">
+<h2>Warning Description<a class="headerlink" href="#warning-description" title="Permalink to this headline">¶</a></h2>
+<p>In general, components should only depend on other components that are configured to live at least as long. In other words, it is safe for a transient component to depend on a singleton, but not the other way around. Since components store a reference to their dependencies in (private) instance fields, those dependencies are kept alive for the lifetime of that component. This means that dependencies that are configured with a shorter lifetime than their consumer, accidentally live longer than intended. This can lead to all sorts of bugs, such as hard to debug multi-threading issues.</p>
+<p>The Diagnostic Services detect this kind of misconfiguration and report it. The container will be able to compare all built-in lifestyles (and sometimes even custom lifestyles). Here is an overview of the built-in lifestyles ordered by their length:</p>
+<ul class="simple">
+<li><a class="reference internal" href="lifetimes.html#transient"><em>Transient</em></a></li>
+<li><a class="reference internal" href="lifetimes.html#scoped"><em>Scoped</em></a></li>
+<li><a class="reference internal" href="lifetimes.html#singleton"><em>Singleton</em></a></li>
+</ul>
+<div class="note container">
+<strong>Note</strong>: This kind of error is also known as <a class="reference external" href="http://blog.ploeh.dk/2014/06/02/captive-dependency/">Captive Dependency</a>.</div>
+<div class="note container">
+<strong>Note</strong> Lifestyle mismatches are such a common source of bugs, that in Simple Injector 3, the container always checks for mismatches the first time a component is resolved, no matter whether you call <em>Verify()</em> or not. This behavior can be suppressed by setting the <strong>Container.Options.SuppressLifestyleMismatchVerification</strong> property, but you are advised to keep the default settings.</div>
+</div>
+<div class="section" id="how-to-fix-violations">
+<h2>How to Fix Violations<a class="headerlink" href="#how-to-fix-violations" title="Permalink to this headline">¶</a></h2>
+<p>There are multiple ways to fix this violation:</p>
+<ul class="simple">
+<li>Change the lifestyle of the component to a lifestyle that is as short or shorter than that of the dependency.</li>
+<li>Change the lifestyle of the dependency to a lifestyle as long or longer than that of the component.</li>
+<li>Instead of injecting the dependency, inject a factory for the creation of that dependency and call that factory every time an instance is required.</li>
+</ul>
+</div>
+<div class="section" id="when-to-ignore-warnings">
+<h2>When to Ignore Warnings<a class="headerlink" href="#when-to-ignore-warnings" title="Permalink to this headline">¶</a></h2>
+<p>Do not ignore these warnings. False positives for this warning are rare and even when they occur, the registration or the application design can always be changed in a way that the warning disappears.</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>The following example shows a configuration that will trigger the warning:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
 
-<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">VarianceExtensions</span>
-<span class="p">{</span>
-    <span class="c1">/// &lt;summary&gt;</span>
-    <span class="c1">/// When this method is called on a container, it allows the container to map an</span>
-    <span class="c1">/// unregistered requested (interface or delegate) type to an assignable and</span>
-    <span class="c1">/// (interface or delegate) type that has been registered in the container. When</span>
-    <span class="c1">/// there are multiple compatible types, an &lt;see cref=&quot;ActivationException&quot;/&gt; will</span>
-    <span class="c1">/// be thrown.</span>
-    <span class="c1">/// &lt;/summary&gt;</span>
-    <span class="c1">/// &lt;param name=&quot;ContainerOptions&quot;&gt;The options to make the registrations in.&lt;/param&gt;</span>
-    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">AllowToResolveVariantTypes</span><span class="p">(</span><span class="k">this</span> <span class="n">ContainerOptions</span> <span class="n">options</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="n">options</span><span class="p">.</span><span class="n">Container</span><span class="p">;</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">ResolveUnregisteredType</span> <span class="p">+=</span> <span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span>
-        <span class="p">{</span>
-            <span class="n">Type</span> <span class="n">serviceType</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">UnregisteredServiceType</span><span class="p">;</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUserRepository</span><span class="p">,</span> <span class="n">InMemoryUserRepository</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">);</span>
 
-            <span class="k">if</span> <span class="p">(!</span><span class="n">serviceType</span><span class="p">.</span><span class="n">IsGenericType</span> <span class="p">||</span> <span class="n">e</span><span class="p">.</span><span class="n">Handled</span><span class="p">)</span>
-            <span class="p">{</span>
-                <span class="k">return</span><span class="p">;</span>
-            <span class="p">}</span>
+<span class="c1">// RealUserService depends on IUserRepository</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleton</span><span class="p">&lt;</span><span class="n">RealUserService</span><span class="p">&gt;();</span>
 
-            <span class="kt">var</span> <span class="n">registrations</span> <span class="p">=</span> <span class="n">FindAssignableRegistrations</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">serviceType</span><span class="p">);</span>
+<span class="c1">// FakeUserService depends on IUserRepository</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleton</span><span class="p">&lt;</span><span class="n">FakeUserService</span><span class="p">&gt;();</span>
 
-            <span class="k">if</span> <span class="p">(!</span><span class="n">registrations</span><span class="p">.</span><span class="n">Any</span><span class="p">())</span>
-            <span class="p">{</span>
-                <span class="c1">// No registration found. We&#39;re done.</span>
-            <span class="p">}</span>
-            <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">registrations</span><span class="p">.</span><span class="n">Length</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span>
-            <span class="p">{</span>
-                <span class="c1">// Exactly one registration. Let&#39;s map the registration to the</span>
-                <span class="c1">// unregistered service type.</span>
-                <span class="n">e</span><span class="p">.</span><span class="n">Register</span><span class="p">(</span><span class="n">registrations</span><span class="p">[</span><span class="m">0</span><span class="p">].</span><span class="n">Registration</span><span class="p">);</span>
-            <span class="p">}</span>
-            <span class="k">else</span>
-            <span class="p">{</span>
-                <span class="kt">var</span> <span class="n">names</span> <span class="p">=</span> <span class="kt">string</span><span class="p">.</span><span class="n">Join</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="p">,</span>
-                    <span class="n">registrations</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">r</span> <span class="p">=&gt;</span> <span class="kt">string</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span><span class="s">&quot;{0}&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">)));</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Verify</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The <em>RealUserService</em> component is registered as <strong>Singleton</strong> but it depends on <em>IUserRepository</em> which is configured with the shorter <strong>Transient</strong> lifestyle. Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.</p>
+<img alt="Diagnostics debugger view watch window with lifestyle mismatches" src="_images/lifestylemismatch.png" />
+<p>The following example shows how to query the Diagnostic API for Lifetime Mismatches:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// using SimpleInjector.Diagnostics;</span>
 
-                <span class="k">throw</span> <span class="k">new</span> <span class="nf">ActivationException</span><span class="p">(</span><span class="kt">string</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span>
-                    <span class="s">&quot;There is an error in the container&#39;s configuration. It is impos&quot;</span> <span class="p">+</span>
-                    <span class="s">&quot;sible to resolve type {0}, because there are {1} registrations &quot;</span> <span class="p">+</span>
-                    <span class="s">&quot;that are applicable. Ambiguous registrations: {2}.&quot;</span><span class="p">,</span>
-                    <span class="n">serviceType</span><span class="p">,</span> <span class="n">registrations</span><span class="p">.</span><span class="n">Length</span><span class="p">,</span> <span class="n">names</span><span class="p">));</span>
-            <span class="p">}</span>
-        <span class="p">};</span>
-    <span class="p">}</span>
+<span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="cm">/* get verified container */</span><span class="p">;</span>
 
-    <span class="k">private</span> <span class="k">static</span> <span class="n">InstanceProducer</span><span class="p">[]</span> <span class="nf">FindAssignableRegistrations</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">,</span>
-        <span class="n">Type</span> <span class="n">serviceType</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">Type</span> <span class="n">serviceTypeDefinition</span> <span class="p">=</span> <span class="n">serviceType</span><span class="p">.</span><span class="n">GetGenericTypeDefinition</span><span class="p">();</span>
+<span class="kt">var</span> <span class="n">results</span> <span class="p">=</span> <span class="n">Analyzer</span><span class="p">.</span><span class="n">Analyze</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">OfType</span><span class="p">&lt;</span><span class="n">LifestyleMismatchDiagnosticResult</span><span class="p">&gt;();</span>
 
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="k">from</span> <span class="n">reg</span> <span class="k">in</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentRegistrations</span><span class="p">()</span>
-            <span class="k">where</span> <span class="n">reg</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">.</span><span class="n">IsGenericType</span>
-            <span class="k">where</span> <span class="n">reg</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">.</span><span class="n">GetGenericTypeDefinition</span><span class="p">()</span> <span class="p">==</span> <span class="n">serviceTypeDefinition</span>
-            <span class="k">where</span> <span class="n">serviceType</span><span class="p">.</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">)</span>
-            <span class="k">select</span> <span class="n">reg</span><span class="p">)</span>
-            <span class="p">.</span><span class="n">ToArray</span><span class="p">();</span>
-    <span class="p">}</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">result</span> <span class="k">in</span> <span class="n">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">Description</span><span class="p">);</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Lifestyle of service: &quot;</span> <span class="p">+</span>
+        <span class="n">result</span><span class="p">.</span><span class="n">Relationship</span><span class="p">.</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Name</span><span class="p">);</span>
+
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Lifestyle of service&#39;s dependency: &quot;</span> <span class="p">+</span>
+        <span class="n">result</span><span class="p">.</span><span class="n">Relationship</span><span class="p">.</span><span class="n">Dependency</span><span class="p">.</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Name</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>After copying the previous code snippet to your project, you can use the extension method as follows:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
-
-<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">AllowToResolveVariantTypes</span><span class="p">();</span>
-
-<span class="c1">// IEventHandler&lt;in TEvent&gt;</span>
-<span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedEvent</span><span class="p">&gt;,</span> <span class="n">CustomerMovedEventHandler</span><span class="p">&gt;();</span>
-
-<span class="c1">// MoveCustomerAbroadEvent inherits from MoveCustomerEvent</span>
-<span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedAbroadEvent</span><span class="p">&gt;&gt;();</span>
-
-<span class="c1">// Assert</span>
-<span class="n">Assert</span><span class="p">.</span><span class="n">IsInstanceOfType</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="k">typeof</span><span class="p">(</span><span class="n">CustomerMovedEventHandler</span><span class="p">));</span>
+</div>
+<div class="section" id="what-about-hybrid-lifestyles">
+<h2>What about Hybrid lifestyles?<a class="headerlink" href="#what-about-hybrid-lifestyles" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference internal" href="lifetimes.html#hybrid"><em>Hybrid lifestyle</em></a> is a mix between two or more other lifestyles. Here is an example of a custom lifestyle that mixes the <strong>Transient</strong> and <strong>Singleton</strong> lifestyles together:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">hybrid</span> <span class="p">=</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">CreateHybrid</span><span class="p">(</span>
+    <span class="n">lifestyleSelector</span><span class="p">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">someCondition</span><span class="p">,</span>
+    <span class="n">trueLifestyle</span><span class="p">:</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Transient</span><span class="p">,</span>
+    <span class="n">falseLifestyle</span><span class="p">:</span> <span class="n">Lifestyle</span><span class="p">.</span><span class="n">Singleton</span><span class="p">);</span>
 </pre></div>
+</div>
+<div class="note container">
+<strong>Note</strong> that this example is quite bizarre, since it is a very unlikely combination of lifestyles to mix together, but it serves us well for the purpose of this explanation.</div>
+<p>As explained, components should only depend on equal length or longer lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of <cite>someCondition</cite>. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).</p>
+<p>From the Diagnostic Services&#8217; perspective, a component can only safely depend on a hybrid lifestyled service if the consuming component&#8217;s lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid lifestyled component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the <strong>longest</strong> lifestyle is used in the comparison when the hybrid is part of the consuming component, and the <strong>shortest</strong> lifestyle is used when the hybrid is part of the dependency.</p>
+<p>This does imply that two components with the same hybrid lifestyle can&#8217;t safely depend on each other. This is true since in theory the supplied predicate could change results in each call. In practice however, those components would usually be able safely relate, since it is normally unlikely that the predicate changes lifestyles within a single object graph. This is an exception the Diagnostic Services can make pretty safely. From the Diagnostic Services&#8217; perspective, components can safely be related when both share the exact same lifestyle instance and no warning will be displayed in this case. This does mean however, that you should be very careful using predicates that change the lifestyle during the object graph.</p>
 </div>
 </div>
 
@@ -320,10 +322,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="t4mvc.html" class="btn btn-neutral float-right" title="T4MVC Integration Guide"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="ShortCircuitedDependencies.html" class="btn btn-neutral float-right" title="Diagnostic Warning - Short Circuited Dependencies"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="InterceptionExtensions.html" class="btn btn-neutral" title="Interception Extensions"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="diagnostics.html" class="btn btn-neutral" title="Diagnostic Services"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

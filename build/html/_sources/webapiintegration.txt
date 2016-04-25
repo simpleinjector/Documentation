@@ -2,7 +2,7 @@
 ASP.NET Web API Integration Guide
 =================================
 
-Simple Injector contains `Simple Injector ASP.NET Web API Integration Quick Start NuGet package for IIS-hosted applications <https://www.nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_. If you're not using NuGet, you must include both the **SimpleInjector.Integration.WebApi.dll** and **SimpleInjector.Extensions.ExecutionContextScoping.dll** in your Web API application, which is part of the standard CodePlex download.
+Simple Injector contains `Simple Injector ASP.NET Web API Integration Quick Start NuGet package for IIS-hosted applications <https://www.nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_. If you're not using NuGet, you must include both the **SimpleInjector.Integration.WebApi.dll** and **SimpleInjector.Extensions.ExecutionContextScoping.dll** in your Web API application, which is part of the standard download on Github.
 
 .. container:: Note
 
@@ -26,10 +26,10 @@ The following code snippet shows how to use the integration package (note that t
     protected void Application_Start() {
         // Create the container as usual.
         var container = new Container();
+        container.Options.DefaultScopedLifestyle = new WebApiRequestLifestyle();
 
-        // Register your types, for instance using the RegisterWebApiRequest
-        // extension from the integration package:
-        container.RegisterWebApiRequest<IUserRepository, SqlUserRepository>();
+        // Register your types, for instance using the scoped lifestyle:
+        container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
 
         // This is an extension method from the integration package.
         container.RegisterWebApiControllers(GlobalConfiguration.Configuration);
@@ -78,7 +78,7 @@ Given the configuration above, an actual controller could look like this:
 Extra features
 ==============
 
-The basic features of the Web API integration package are the **SimpleInjectorWebApiDependencyResolver** class and the **WebApiRequestLifestyle** with its **RegisterWebApiRequest** extension methods. Besides these basic features, the integration package contains extra features that can make your life easier.
+The basic features of the Web API integration package are the **SimpleInjectorWebApiDependencyResolver** class and the **WebApiRequestLifestyle** and **RegisterWebApiControllers** extension methods. Besides these basic features, the integration package contains extra features that can make your life easier.
 
 .. _Getting-the-current-requests-HttpRequestMessage:
 
@@ -103,17 +103,15 @@ This abstraction can be injected into your services, which can call the *Current
 
 .. code-block:: c#
 
-    // Register this class per Web API request
     private sealed class RequestMessageProvider : IRequestMessageProvider {
-        private readonly Lazy<HttpRequestMessage> message;
+        private readonly Container container;
         
         public RequestMessageProvider(Container container) {
-            this.message = new Lazy<HttpRequestMessage>(
-                () => container.GetCurrentHttpRequestMessage());
+            this.container = container;
         }
 
         public HttpRequestMessage CurrentMessage {
-            get { return this.message.Value; }
+            get { return this.container.GetCurrentHttpRequestMessage(); }
         }
     }
 
@@ -121,7 +119,7 @@ This implementation can be implemented as follows:
 
 .. code-block:: c#
 
-    container.RegisterWebApiRequest<IRequestMessageProvider, RequestMessageProvider>();
+    container.RegisterSingleton<IRequestMessageProvider>(new RequestMessageProvider(container));
 
 .. _Injecting-dependencies-into-Web-API-filter-attributes:
     
@@ -152,8 +150,8 @@ The following example visualizes this:
         public override Task OnActionExecutingAsync(HttpActionContext actionContext,
             CancellationToken cancellationToken)
         {
-            var checker = GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IMinimumAgeChecker))
-                as IMinimumAgeChecker;
+            var checker = GlobalConfiguration.Configuration.DependencyResolver
+                .GetService(typeof(IMinimumAgeChecker)) as IMinimumAgeChecker;
 
             checker.VerifyCurrentUserAge(this.MinimumAge);
 
@@ -200,7 +198,9 @@ The solution is to define a proxy class that sits in between. Since Web API lack
 
             var handler = this.container.GetInstance<THandler>();
 
-            handler.InnerHandler = this.InnerHandler;
+            if (!object.ReferenceEquals(handler.InnerHandler, this.InnerHandler)) {
+                handler.InnerHandler = this.InnerHandler;
+            }
 
             var invoker = new HttpMessageInvoker(handler);
         
@@ -208,11 +208,7 @@ The solution is to define a proxy class that sits in between. Since Web API lack
         }
     }
     
-This *DelegatingHandlerProxy<THandler>* can be added as singleton to the global *MessageHandlers* collection, and it will resolve the given *THandler* on each request, allowing it to be resolved according to its lifestyle. 
-
-.. container:: Note
-
-    **Warning**: Prevent registering any *THandler* with a lifestyle longer than the request, since message handlers are **not** thread-safe (just look at the assignment of *InnerHandler* in the *SendAsync* method and you'll understand why).
+This *DelegatingHandlerProxy<THandler>* can be added as singleton to the global *MessageHandlers* collection, and it will resolve the given *THandler* on each request, allowing it to be resolved according to its lifestyle.
 
 The *DelegatingHandlerProxy<THandler>* can be used as follows:
 

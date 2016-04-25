@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Variance Extensions &mdash; Simple Injector 2 documentation</title>
+  <title>OWIN Integration Guide &mdash; Simple Injector 2 documentation</title>
   
 
   
@@ -29,9 +29,9 @@
 
   
     <link rel="top" title="Simple Injector 2 documentation" href="index.html"/>
-        <link rel="up" title="Appendix" href="appendix.html"/>
-        <link rel="next" title="T4MVC Integration Guide" href="t4mvc.html"/>
-        <link rel="prev" title="Interception Extensions" href="InterceptionExtensions.html"/> 
+        <link rel="up" title="Integration Guide" href="integration.html"/>
+        <link rel="next" title="Windows Forms Integration Guide" href="windowsformsintegration.html"/>
+        <link rel="prev" title="ASP.NET Web Forms Integration Guide" href="webformsintegration.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -93,12 +93,12 @@
 <li class="toctree-l2"><a class="reference internal" href="lifetimes.html#developing-a-custom-lifestyle">Developing a Custom Lifestyle</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration Guide</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="integration.html">Integration Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="aspnetintegration.html">ASP.NET Core (beta!)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mvcintegration.html">ASP.NET MVC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="webapiintegration.html">ASP.NET Web API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="webformsintegration.html">ASP.NET Web Forms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="owinintegration.html">OWIN</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">OWIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="windowsformsintegration.html">Windows Forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wcfintegration.html">WCF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="wpfintegration.html">WPF</a></li>
@@ -182,9 +182,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html">How to Contribute</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="appendix.html">Appendix</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="InterceptionExtensions.html">Interception Extensions</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Variance Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varianceextensions.html">Variance Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="t4mvc.html">T4MVC</a></li>
 </ul>
 </li>
@@ -212,12 +212,12 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-          <li><a href="appendix.html">Appendix</a> &raquo;</li>
+          <li><a href="integration.html">Integration Guide</a> &raquo;</li>
       
-    <li>Variance Extensions</li>
+    <li>OWIN Integration Guide</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/varianceextensions.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/owinintegration.txt" rel="nofollow"> View page source</a>
         
       </li>
   </ul>
@@ -225,92 +225,61 @@
 </div>
           <div role="main">
             
-  <div class="section" id="variance-extensions">
-<h1>Variance Extensions<a class="headerlink" href="#variance-extensions" title="Permalink to this headline">¶</a></h1>
-<p><strong>Allowing Simple Injector to resolve a variant registration.</strong></p>
-<p>The following code snippet adds the ability to Simple Injector to resolve an assignable variant implementation, in case the exact requested type is not registered.</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
-<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
+  <div class="section" id="owin-integration-guide">
+<h1>OWIN Integration Guide<a class="headerlink" href="#owin-integration-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="basic-setup">
+<span id="owin-basic-setup"></span><h2>Basic setup<a class="headerlink" href="#basic-setup" title="Permalink to this headline">¶</a></h2>
+<p>To allow scoped instances to be resolved during an OWIN request, the following registration needs to be added to the <em>IAppBuilder</em> instance:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="c1">// You&#39;ll need to include the following namespaces</span>
+<span class="k">using</span> <span class="nn">Owin</span><span class="p">;</span>
 <span class="k">using</span> <span class="nn">SimpleInjector</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">SimpleInjector.Extensions.ExecutionContextScoping</span><span class="p">;</span>
 
-<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">VarianceExtensions</span>
-<span class="p">{</span>
-    <span class="c1">/// &lt;summary&gt;</span>
-    <span class="c1">/// When this method is called on a container, it allows the container to map an</span>
-    <span class="c1">/// unregistered requested (interface or delegate) type to an assignable and</span>
-    <span class="c1">/// (interface or delegate) type that has been registered in the container. When</span>
-    <span class="c1">/// there are multiple compatible types, an &lt;see cref=&quot;ActivationException&quot;/&gt; will</span>
-    <span class="c1">/// be thrown.</span>
-    <span class="c1">/// &lt;/summary&gt;</span>
-    <span class="c1">/// &lt;param name=&quot;ContainerOptions&quot;&gt;The options to make the registrations in.&lt;/param&gt;</span>
-    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">AllowToResolveVariantTypes</span><span class="p">(</span><span class="k">this</span> <span class="n">ContainerOptions</span> <span class="n">options</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="n">options</span><span class="p">.</span><span class="n">Container</span><span class="p">;</span>
-        <span class="n">container</span><span class="p">.</span><span class="n">ResolveUnregisteredType</span> <span class="p">+=</span> <span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">=&gt;</span>
-        <span class="p">{</span>
-            <span class="n">Type</span> <span class="n">serviceType</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">UnregisteredServiceType</span><span class="p">;</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">Configuration</span><span class="p">(</span><span class="n">IAppBuilder</span> <span class="n">app</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">Use</span><span class="p">(</span><span class="k">async</span> <span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">next</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">using</span> <span class="p">(</span><span class="n">container</span><span class="p">.</span><span class="n">BeginExecutionContextScope</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">await</span> <span class="nf">next</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Scoped instances need to be registered with the <cite>ExecutionContextScope</cite> lifestyle:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">DefaultScopedLifestyle</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ExecutionContextScopeLifestyle</span><span class="p">();</span>
 
-            <span class="k">if</span> <span class="p">(!</span><span class="n">serviceType</span><span class="p">.</span><span class="n">IsGenericType</span> <span class="p">||</span> <span class="n">e</span><span class="p">.</span><span class="n">Handled</span><span class="p">)</span>
-            <span class="p">{</span>
-                <span class="k">return</span><span class="p">;</span>
-            <span class="p">}</span>
+<span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IUnitOfWork</span><span class="p">,</span> <span class="n">MyUnitOfWork</span><span class="p">&gt;(</span><span class="n">Lifestyle</span><span class="p">.</span><span class="n">Scoped</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="extra-features">
+<span id="owin-extra-features"></span><h2>Extra features<a class="headerlink" href="#extra-features" title="Permalink to this headline">¶</a></h2>
+<p>Besides this basic integration, other tips and tricks can be applied to integrate Simple Injector with OWIN.</p>
+<div class="section" id="getting-the-current-request-s-iowincontext">
+<span id="getting-the-current-requests-iowincontext"></span><h3>Getting the current request&#8217;s IOwinContext<a class="headerlink" href="#getting-the-current-request-s-iowincontext" title="Permalink to this headline">¶</a></h3>
+<p>When working with OWIN you will occasionally find yourself wanting access to the current <em>IOwinContext</em>. Retrieving the current <em>IOwinContext</em> is easy as using the following code snippet:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">IOwinContextProvider</span> <span class="p">{</span>
+    <span class="n">IOwinContext</span> <span class="n">CurrentContext</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
 
-            <span class="kt">var</span> <span class="n">registrations</span> <span class="p">=</span> <span class="n">FindAssignableRegistrations</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">serviceType</span><span class="p">);</span>
-
-            <span class="k">if</span> <span class="p">(!</span><span class="n">registrations</span><span class="p">.</span><span class="n">Any</span><span class="p">())</span>
-            <span class="p">{</span>
-                <span class="c1">// No registration found. We&#39;re done.</span>
-            <span class="p">}</span>
-            <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">registrations</span><span class="p">.</span><span class="n">Length</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span>
-            <span class="p">{</span>
-                <span class="c1">// Exactly one registration. Let&#39;s map the registration to the</span>
-                <span class="c1">// unregistered service type.</span>
-                <span class="n">e</span><span class="p">.</span><span class="n">Register</span><span class="p">(</span><span class="n">registrations</span><span class="p">[</span><span class="m">0</span><span class="p">].</span><span class="n">Registration</span><span class="p">);</span>
-            <span class="p">}</span>
-            <span class="k">else</span>
-            <span class="p">{</span>
-                <span class="kt">var</span> <span class="n">names</span> <span class="p">=</span> <span class="kt">string</span><span class="p">.</span><span class="n">Join</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="p">,</span>
-                    <span class="n">registrations</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">r</span> <span class="p">=&gt;</span> <span class="kt">string</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span><span class="s">&quot;{0}&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">)));</span>
-
-                <span class="k">throw</span> <span class="k">new</span> <span class="nf">ActivationException</span><span class="p">(</span><span class="kt">string</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span>
-                    <span class="s">&quot;There is an error in the container&#39;s configuration. It is impos&quot;</span> <span class="p">+</span>
-                    <span class="s">&quot;sible to resolve type {0}, because there are {1} registrations &quot;</span> <span class="p">+</span>
-                    <span class="s">&quot;that are applicable. Ambiguous registrations: {2}.&quot;</span><span class="p">,</span>
-                    <span class="n">serviceType</span><span class="p">,</span> <span class="n">registrations</span><span class="p">.</span><span class="n">Length</span><span class="p">,</span> <span class="n">names</span><span class="p">));</span>
-            <span class="p">}</span>
-        <span class="p">};</span>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">static</span> <span class="n">InstanceProducer</span><span class="p">[]</span> <span class="nf">FindAssignableRegistrations</span><span class="p">(</span><span class="n">Container</span> <span class="n">container</span><span class="p">,</span>
-        <span class="n">Type</span> <span class="n">serviceType</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">Type</span> <span class="n">serviceTypeDefinition</span> <span class="p">=</span> <span class="n">serviceType</span><span class="p">.</span><span class="n">GetGenericTypeDefinition</span><span class="p">();</span>
-
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="k">from</span> <span class="n">reg</span> <span class="k">in</span> <span class="n">container</span><span class="p">.</span><span class="n">GetCurrentRegistrations</span><span class="p">()</span>
-            <span class="k">where</span> <span class="n">reg</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">.</span><span class="n">IsGenericType</span>
-            <span class="k">where</span> <span class="n">reg</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">.</span><span class="n">GetGenericTypeDefinition</span><span class="p">()</span> <span class="p">==</span> <span class="n">serviceTypeDefinition</span>
-            <span class="k">where</span> <span class="n">serviceType</span><span class="p">.</span><span class="n">IsAssignableFrom</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">ServiceType</span><span class="p">)</span>
-            <span class="k">select</span> <span class="n">reg</span><span class="p">)</span>
-            <span class="p">.</span><span class="n">ToArray</span><span class="p">();</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">CallContextOwinContextProvider</span> <span class="p">:</span> <span class="n">IOwinContextProvider</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="n">IOwinContext</span> <span class="n">CurrentContext</span> <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span><span class="n">IOwinContext</span><span class="p">)</span><span class="n">CallContext</span><span class="p">.</span><span class="n">LogicalGetData</span><span class="p">(</span><span class="s">&quot;IOwinContext&quot;</span><span class="p">);</span> <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>After copying the previous code snippet to your project, you can use the extension method as follows:</p>
-<div class="highlight-c#"><div class="highlight"><pre><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Container</span><span class="p">();</span>
+<p>The code snippet above defines an <em>IOwinContextProvider</em> and an implementation. Consumers can depend on the <em>IOwinContextProvider</em> and can call its <em>CurrentContext</em> property to get the request&#8217;s current <em>IOwinContext</em>.</p>
+<p>The following code snippet can be used to register this <em>IOwinContextProvider</em> and its implementation:</p>
+<div class="highlight-c#"><div class="highlight"><pre><span class="n">app</span><span class="p">.</span><span class="n">Use</span><span class="p">(</span><span class="k">async</span> <span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">next</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="n">CallContext</span><span class="p">.</span><span class="n">LogicalSetData</span><span class="p">(</span><span class="s">&quot;IOwinContext&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">);</span>
+    <span class="k">await</span> <span class="nf">next</span><span class="p">();</span>
+<span class="p">});</span>
 
-<span class="n">container</span><span class="p">.</span><span class="n">Options</span><span class="p">.</span><span class="n">AllowToResolveVariantTypes</span><span class="p">();</span>
-
-<span class="c1">// IEventHandler&lt;in TEvent&gt;</span>
-<span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">Register</span><span class="p">&lt;</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedEvent</span><span class="p">&gt;,</span> <span class="n">CustomerMovedEventHandler</span><span class="p">&gt;();</span>
-
-<span class="c1">// MoveCustomerAbroadEvent inherits from MoveCustomerEvent</span>
-<span class="kt">var</span> <span class="n">handler</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">container</span><span class="p">.</span><span class="n">GetInstance</span><span class="p">&lt;</span><span class="n">IEventHandler</span><span class="p">&lt;</span><span class="n">CustomerMovedAbroadEvent</span><span class="p">&gt;&gt;();</span>
-
-<span class="c1">// Assert</span>
-<span class="n">Assert</span><span class="p">.</span><span class="n">IsInstanceOfType</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="k">typeof</span><span class="p">(</span><span class="n">CustomerMovedEventHandler</span><span class="p">));</span>
+<span class="n">container</span><span class="p">.</span><span class="n">RegisterSingleton</span><span class="p">&lt;</span><span class="n">IOwinContextProvider</span><span class="p">&gt;(</span><span class="k">new</span> <span class="n">CallContextOwinContextProvider</span><span class="p">());</span>
 </pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -320,10 +289,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="t4mvc.html" class="btn btn-neutral float-right" title="T4MVC Integration Guide"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="windowsformsintegration.html" class="btn btn-neutral float-right" title="Windows Forms Integration Guide"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="InterceptionExtensions.html" class="btn btn-neutral" title="Interception Extensions"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="webformsintegration.html" class="btn btn-neutral" title="ASP.NET Web Forms Integration Guide"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
