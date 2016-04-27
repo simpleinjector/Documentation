@@ -34,7 +34,7 @@ Transient
 
 .. container:: Note
     
-    A new instance of the service type will be created for each request (both for calls to **GetInstance<T>** and instances as part of an object graph).
+    A new instance of the service type will be created each time the service is requested from the container. If multiple consumers depend on the service within the same graph, each consumer will get its own new instance of the given service.
 
 This example instantiates a new *IService* implementation for each call, while leveraging the power of :ref:`automatic constructor injection <Automatic-constructor-injection>`.
 
@@ -73,7 +73,7 @@ Singleton
 
 .. container:: Note
     
-    There will be only one instance of the registered service type during the lifetime of that container instance. Clients will always receive that same instance.
+    There will be at most one instance of the registered service type and the container will hold on to that instance until the container is disposed or goes out of scope. Clients will always receive that same instance from the container.
 
 There are multiple ways to register singletons. The most simple and common way to do this is by specifying both the service type and the implementation as generic type arguments. This allows the implementation type to be constructed using automatic constructor injection:
 
@@ -108,6 +108,10 @@ Alternatively, when needing to register a concrete type as singleton, you can us
     container.Register<RealService, RealService>(Lifestyle.Singleton);
 
 Registration for concrete singletons is necessarily, because unregistered concrete types will be treated as transient.
+
+.. container:: Note
+	
+	**Warning**: Simple Injector guarantees that there is at most one instance of the registered **Singleton** inside that **Container** instance, but if multiple **Container** instances are created, each **Container** instance will get its own instance of the registered **Singleton**.
 
 .. container:: Note
 
