@@ -2,7 +2,7 @@
 ASP.NET Core Integration Guide (beta!)
 ======================================
 
-Simple Injector now offers the `Simple Injector ASP.NET Core Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNet>`_.
+Simple Injector offers the `Simple Injector ASP.NET Core Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNet>`_.
 
 The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
 
@@ -27,10 +27,10 @@ The following code snippet shows how to use the integration package to apply Sim
         {
             // ASP.NET default stuff here
 
-            services.AddInstance<IControllerActivator>(
+            services.AddSingleton<IControllerActivator>(
                 new SimpleInjectorControllerActivator(container));
-            services.AddInstance<IViewComponentInvokerFactory>(
-                new SimpleInjectorViewComponentInvokerFactory(container));
+            services.AddSingleton<IViewComponentActivator>(
+                new SimpleInjectorViewComponentActivator(container));
         }
 
         // Configure is called after ConfigureServices is called.
@@ -42,9 +42,6 @@ The following code snippet shows how to use the integration package to apply Sim
             
             InitializeContainer(app);
 
-            container.RegisterAspNetControllers(app);
-            container.RegisterAspNetViewComponents(app);
-        
             container.Verify();
 
             // ASP.NET default stuff here
@@ -52,6 +49,10 @@ The following code snippet shows how to use the integration package to apply Sim
 
         private void InitializeContainer(IApplicationBuilder app) 
         {
+			// Add application presentation components:
+            container.RegisterAspNetControllers(app);
+            container.RegisterAspNetViewComponents(app);
+        
             // Add application services. For instance: 
             container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
             
@@ -85,106 +86,3 @@ To adhere to the Dependency Inversion Principle (DIP) you should minimize the de
     container.CrossWire<UserManager<ApplicationUser>>(app);
     container.CrossWire<SignInManager<ApplicationUser>>(app);
     container.CrossWire<ILoggerFactory>(app);
-    
-**Working around a bug in Identity Framework.**
-
-The previous registrations would normally be enough but due to a `bug <https://github.com/aspnet/Identity/issues/674>`_ in the beta's of Identity Framework, Simple Injector's verification will fail when checking the cross-wired `SignInManager<T>` because the `SignInManager<T>`'s constructor incorrectly throws an exception when there's no `HttpContext` available (which is obviously the case when the `SignInManger<T>` is created during application start-up). This bug should be fixed in 3.0.0-rc2 of Identity framework, but in the meantime we need to register a custom `IHttpContextAccessor` to work around the issue:
-
-.. code-block:: c#
-
-    public class NeverNullHttpContextAccessor : IHttpContextAccessor
-    {
-        AsyncLocal<HttpContext> context = new AsyncLocal<HttpContext>();
-
-        public HttpContext HttpContext
-        {
-            get { return this.context.Value ?? new DefaultHttpContext(); }
-            set { this.context.Value = value; }
-        }
-    }
-    
-This class can replace the framework's original implementation by making the following registration in the `ConfigureServices` method:
-
-.. code-block:: c#
-
-    // Work around for a Identity Framework bug inside the SignInManager<T> class.
-    services.Add(ServiceDescriptor.Instance<IHttpContextAccessor>(
-        new NeverNullHttpContextAccessor()));
-	    
-**Everything together**
-
-When we put the given adjustments together, we get the following composition root:
-	
-.. code-block:: c#
-
-    // You'll need to include the following namespaces
-    using SimpleInjector;
-    using SimpleInjector.Extensions.ExecutionContextScoping;
-    using SimpleInjector.Integration.AspNet;
-
-    public class Startup
-    {
-        public Startup(IHostingEnvironment env)
-        {
-            // ASP.NET default stuff here
-        }
-
-        private Container container = new Container();
-
-        // This method gets called by the runtime.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // ASP.NET default stuff here
-
-            services.AddInstance<IControllerActivator>(
-                new SimpleInjectorControllerActivator(container));
-            services.AddInstance<IViewComponentInvokerFactory>(
-                new SimpleInjectorViewComponentInvokerFactory(container));
-                
-            // Work around for a Identity Framework bug inside the SignInManager<T> class.
-            services.Add(ServiceDescriptor.Instance<IHttpContextAccessor>(
-                new NeverNullHttpContextAccessor()));
-        }
-
-        // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory fac)
-        {
-            container.Options.DefaultScopedLifestyle = new AspNetRequestLifestyle();
-
-            app.UseSimpleInjectorAspNetRequestScoping(container);
-
-            InitializeContainer(app);
-
-            container.RegisterAspNetControllers(app);
-			container.RegisterAspNetViewComponents(app);
-
-            container.Verify();
-
-            // ASP.NET default stuff here
-        }
-
-        private void InitializeContainer(IApplicationBuilder app)
-        {
-            // Add application services. For instance:
-            container.Register<IEmailSender, AuthMessageSender>();
-            container.Register<ISmsSender, AuthMessageSender>();
-            
-            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
-
-            // Cross-wire ASP.NET services (if any). For instance:
-            container.CrossWire<UserManager<ApplicationUser>>(app);
-            container.CrossWire<SignInManager<ApplicationUser>>(app);
-            container.CrossWire<ILoggerFactory>(app);
-        }
-        
-        private sealed class NeverNullHttpContextAccessor : IHttpContextAccessor
-        {
-            private readonly AsyncLocal<HttpContext> context = new AsyncLocal<HttpContext>();
-
-            public HttpContext HttpContext
-            {
-                get { return this.context.Value ?? new DefaultHttpContext(); }
-                set { this.context.Value = value; }
-            }
-        }
-    }
