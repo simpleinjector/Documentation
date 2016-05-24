@@ -1,5 +1,5 @@
 ==========================================
-ASP.NET Core mvc Integration Guide (beta!)
+ASP.NET Core MVC Integration Guide (beta!)
 ==========================================
 
 Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNet>`_.
@@ -9,8 +9,12 @@ The following code snippet shows how to use the integration package to apply Sim
 .. code-block:: c#
 
     // You'll need to include the following namespaces
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ViewComponents;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
     using SimpleInjector;
     using SimpleInjector.Integration.AspNet;
 	
@@ -38,7 +42,6 @@ The following code snippet shows how to use the integration package to apply Sim
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory fac) 
         {
             container.Options.DefaultScopedLifestyle = new AspNetRequestLifestyle();
-        
             app.UseSimpleInjectorAspNetRequestScoping(container);
             
             InitializeContainer(app);
@@ -51,8 +54,8 @@ The following code snippet shows how to use the integration package to apply Sim
         private void InitializeContainer(IApplicationBuilder app) 
         {
             // Add application presentation components:
-            // container.RegisterAspNetControllers(app);
-            container.RegisterAspNetViewComponents(app);
+            container.RegisterMvcControllers(app);
+            container.RegisterMvcViewComponents(app);
         
             // Add application services. For instance: 
             container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
