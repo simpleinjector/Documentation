@@ -1,18 +1,19 @@
-======================================
-ASP.NET Core Integration Guide (beta!)
-======================================
+==========================================
+ASP.NET Core mvc Integration Guide (beta!)
+==========================================
 
-Simple Injector offers the `Simple Injector ASP.NET Core Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNet>`_.
+Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNet>`_.
 
 The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
 
 .. code-block:: c#
 
     // You'll need to include the following namespaces
+    using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.ViewComponents;
     using SimpleInjector;
-    using SimpleInjector.Extensions.ExecutionContextScoping;
     using SimpleInjector.Integration.AspNet;
-
+	
     public class Startup
     {
         public Startup(IHostingEnvironment env) 
@@ -49,8 +50,8 @@ The following code snippet shows how to use the integration package to apply Sim
 
         private void InitializeContainer(IApplicationBuilder app) 
         {
-			// Add application presentation components:
-            container.RegisterAspNetControllers(app);
+            // Add application presentation components:
+            // container.RegisterAspNetControllers(app);
             container.RegisterAspNetViewComponents(app);
         
             // Add application services. For instance: 
