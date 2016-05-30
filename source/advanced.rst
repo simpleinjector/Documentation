@@ -764,6 +764,8 @@ The previous examples showed how to apply a decorator conditionally based on inf
 
 Although the **RegisterDecorator** methods don't have any built-in support for this, this behavior can be achieved by using the **RegisterConditional** methods. For instance:
 
+.. code-block:: c#
+
     container.RegisterConditional<IMailSender, AsyncMailSenderDecorator>(
         c => c.Consumer.ImplementationType == typeof(UserController));
     container.RegisterConditional<IMailSender, BufferedMailSenderDecorator>(
