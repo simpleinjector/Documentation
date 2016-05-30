@@ -754,6 +754,25 @@ The previous code snippet shows a decorator that applies a transaction behavior 
 If the attribute was applied to the command class instead of the command handler, this decorator would been able to gather this information without the use of the **DecoratorContext**. This would however leak implementation details into the command, since which type of transaction a handler should run is clearly an implementation detail and is of no concern to the consumer of that command. Placing that attribute on the handler instead of the command is therefore a much more reasonable thing to do.
 
 The decorator would also be able to get the attribute by using the injected decoratee, but this would only work when the decorator would directly wrap the handler. This would make the system quite fragile, since it would break once you start placing other decorator in between this decorator and the handler, which is a very likely thing to happen.
+
+.. _Applying-decorators-conditionally-based-on-consumer:
+
+Applying decorators conditionally based on consumer
+---------------------------------------------------
+
+The previous examples showed how to apply a decorator conditionally based on information about its dependencies, such as the decorators that it wraps and the wrapped real implementation. Another option is to make decisions based on the consuming components; the components the decorator is injected into.
+
+Although the **RegisterDecorator** methods don't have any built-in support for this, this behavior can be achieved by using the **RegisterConditional** methods. For instance:
+
+    container.RegisterConditional<IMailSender, AsyncMailSenderDecorator>(
+        c => c.Consumer.ImplementationType == typeof(UserController));
+    container.RegisterConditional<IMailSender, BufferedMailSenderDecorator>(
+        c => c.Consumer.ImplementationType == typeof(EmailBatchProcessor));
+
+    container.RegisterConditional<IMailSender, SmtpMailSender>(c => !c.Handled);
+
+Here we use **RegisterConditional** to register two decorators. Both decorator will wrap the *SmtpMailSender* that is registered last. The *AsyncCommandHandlerDecorator* is wrapped around the *SmtpMailSender* in case it is injected into the *UserController*, while the *BufferedMailSenderDecorator* is wrapped when injected into the *EmailBatchProcessor*. Note that the *SmtpMailSender* is registered as conditional as well, and is registered as fallback registration using **!c.Handled**, which basically means that in case no other registration applies, that registration is used.
+	
     
 .. _Decorator-registration-factories:
 
