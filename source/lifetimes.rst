@@ -140,7 +140,7 @@ Simple Injector contains five scoped lifestyles:
 
 *Per Web Request*, *Per Web API Request* and *Per WCF Operation* implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The *Container* does this for you. With the *Per Lifetime Scope* and *Per Execution Context Scope* lifestyles on the other hand, you explicitly define a scope (just like you would do with .NET's TransactionScope class).
 
-Most of the time, you will only use on particular scoped lifestyle per application. To simplify this, Simple Injector allows configuring the default scoped lifestyle in the container. After configuring the default scoped lifestyle, the rest of the configuration can access this lifestyle by calling **Lifestyle.Scoped**, as can be seen in the following example:
+Most of the time, you will only use one particular scoped lifestyle per application. To simplify this, Simple Injector allows configuring the default scoped lifestyle in the container. After configuring the default scoped lifestyle, the rest of the configuration can access this lifestyle by calling **Lifestyle.Scoped**, as can be seen in the following example:
     
 .. code-block:: c#
         
