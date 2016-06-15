@@ -1024,8 +1024,6 @@ Applications with a plugin architecture often allow special plugin assemblies to
         where file.Extension.ToLower() == ".dll"
         select Assembly.LoadFile(file.FullName);
 
-    var pluginTypes = container.GetTypesToRegister(typeof(IPlugin), pluginAssemblies);
-
-    container.RegisterCollection<IPlugin>(pluginTypes);
+    container.RegisterCollection<IPlugin>(pluginAssemblies);
 
 The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all publicly exposed concrete types that implement *IPlugin* will be registered using the **RegisterCollection** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.
