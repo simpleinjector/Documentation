@@ -39,7 +39,8 @@ The warning can be suppressed on a per-registration basis as follows:
 
     Registration registration = container.GetRegistration(typeof(IService)).Registration;
 
-    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent,
+        "Reason of suppression");
 
 
 Example
