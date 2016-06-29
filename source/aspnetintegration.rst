@@ -16,11 +16,11 @@ The following code snippet shows how to use the integration package to apply Sim
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-	
+    
     using SimpleInjector;
     using SimpleInjector.Integration.AspNetCore;
     using SimpleInjector.Integration.AspNetCore.Mvc;
-	
+    
     public class Startup
     {
         private Container container = new Container();
@@ -65,8 +65,8 @@ The following code snippet shows how to use the integration package to apply Sim
             container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
             
             // Cross-wire ASP.NET services (if any). For instance:
-			container.RegisterSingleton(app.ApplicationServices.GetService<ILoggerFactory>());
-			// NOTE: Prevent cross-wired instances as much as possible. 
-			// See: https://simpleinjector.org/blog/comingsoon
+            container.RegisterSingleton(app.ApplicationServices.GetService<ILoggerFactory>());
+            // NOTE: Prevent cross-wired instances as much as possible. 
+            // See: https://simpleinjector.org/blog/comingsoon
         }
     }
