@@ -67,6 +67,6 @@ The following code snippet shows how to use the integration package to apply Sim
             // Cross-wire ASP.NET services (if any). For instance:
             container.RegisterSingleton(app.ApplicationServices.GetService<ILoggerFactory>());
             // NOTE: Prevent cross-wired instances as much as possible. 
-            // See: https://simpleinjector.org/blog/comingsoon
+            // See: https://simpleinjector.org/blog/2016/07/
         }
     }
