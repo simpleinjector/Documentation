@@ -358,7 +358,7 @@ Simple Injector will process conditional registrations in the order in which the
 
 .. container:: Note
 
-    **Note**: The predicates are only used during object graph compilation and the predicate's result is burned in the structure of returned object graph. This disallows changing the graph based on runtime conditions.
+    **Note**: The predicates are only used during object graph compilation and the predicate’s result is burned in the structure of returned object graph. For a requested type, the exact same graph will be created on every subsequent call. This disallows changing the graph based on runtime conditions.
     
 A very common scenario is to base the type of the injected dependency on the type of the consumer. Take for instance the following *ILogger* interface with a generic *Logger<T>* class that needs to be injected into several consumers. 
 
