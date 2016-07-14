@@ -16,6 +16,7 @@ The following platforms are supported:
 * *Windows Phone 8*.
 * *Windows Store Apps*.
 * *Mono*.
+* *.NET Core*.
 
 .. container:: Note
 
