@@ -291,7 +291,7 @@ After copying the previous code snippet to your project, you can add interceptio
     // from being created and each call. When the intercepted service
     // and both the interceptor are both singletons, the returned 
     // (proxy) instance will be a singleton as well.
-    container.RegisterSingle<MonitoringInterceptor>();
+    container.RegisterSingleton<MonitoringInterceptor>();
 
     // Here is an example of an interceptor implementation.
     // NOTE: Interceptors must implement the IInterceptor interface:
@@ -311,6 +311,6 @@ After copying the previous code snippet to your project, you can add interceptio
             var decoratedType = invocation.InvocationTarget.GetType();
             
             this.logger.Log(string.Format("{0} executed in {1} ms.",
-                decoratedType.Name, watch.ElapsedMiliseconds));
+                decoratedType.Name, watch.ElapsedMilliseconds));
         }
     }
