@@ -337,7 +337,7 @@ The registration will then look as follows:
 
     container.RegisterSingle<IRequestHandlerFactory>(factory);
 
-The advantage of this method is that it completely integrates with the *Container*. :ref:`Decorators` can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
+The advantage of this method is that it completely integrates with the *Container*. :ref:`Decorators <decoration>` can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
 
 
 .. _Register-Multiple-Interfaces-With-The-Same-Implementation:
