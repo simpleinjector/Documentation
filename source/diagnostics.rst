@@ -106,7 +106,7 @@ Limitations
 The **Diagnostic Services** work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as  constructor arguments) can be analyzed. The *Container* uses the following information for analysis:
 
 * Constructor arguments of types that are created by the container (auto-wired types).
-* Dependencies added by :ref:`Decorators`.
+* Dependencies added by :ref:`Decorators <Decoration>`.
 * Dependencies that are not registered explicitly but are referenced as constructor argument (this included types that got created through unregistered type resolution).
 
 The Diagnostic Services **cannot** analyze the following:

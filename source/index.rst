@@ -35,6 +35,7 @@ Contents:
    diagnostics
    howto
    advanced
+   aop
    extensibility
    pipeline
    principles
