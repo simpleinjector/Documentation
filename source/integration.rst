@@ -37,3 +37,4 @@ Patterns
 
 * `Unit of Work pattern <https://stackoverflow.com/questions/10585478>`_
 * `Multi-tenant applications <https://simpleinjector.codeplex.com/discussions/434951>`_
+* `Auto-Mocking container <https://github.com/simpleinjector/SimpleInjector/issues/290#issuecomment-243244930>`_
