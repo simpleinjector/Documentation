@@ -16,7 +16,7 @@ This chapter discusses the following subjects:
 Decoration
 ==========
 
-The best way to add new functionality (such as `cross-cutting concerns <https://en.wikipedia.org/wiki/Cross-cutting_concern>`_) to classes is by the use of the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the :ref:`Registration of open generic types <Registration-Of-Open-Generic-Types>` section of this page or for instance the use of an generic *ICommandHandler<TCommand>* interface.
+The best way to add new functionality (such as `cross-cutting concerns <https://en.wikipedia.org/wiki/Cross-cutting_concern>`_) to classes is by the use of the `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_. The decorator pattern can be used to extend (decorate) the functionality of a certain object at run-time. Especially when using generic interfaces, the concept of decorators gets really powerful. Take for instance the examples given in the :ref:`Registration of open generic types <Registration-Of-Open-Generic-Types>` section or for instance the use of an generic *ICommandHandler<TCommand>* interface.
 
 .. container:: Note
 
@@ -28,12 +28,12 @@ Take the plausible scenario where we want to validate all commands that get exec
 
     public class ValidationCommandHandlerDecorator<TCommand> : ICommandHandler<TCommand> {
         private readonly IValidator validator;
-        private readonly ICommandHandler<TCommand> handler;
+        private readonly ICommandHandler<TCommand> decoratee;
 
         public ValidationCommandHandlerDecorator(IValidator validator, 
-            ICommandHandler<TCommand> handler) {
+            ICommandHandler<TCommand> decoratee) {
             this.validator = validator;
-            this.handler = handler;
+            this.decoratee = decoratee;
         }
 
         void ICommandHandler<TCommand>.Handle(TCommand command) {
@@ -41,7 +41,7 @@ Take the plausible scenario where we want to validate all commands that get exec
             this.validator.ValidateObject(command);
             
             // forward the (valid) command to the real command handler.
-            this.handler.Handle(command);
+            this.decoratee.Handle(command);
         }
     }
 
@@ -101,6 +101,11 @@ Multiple decorators can be wrapped by calling the **RegisterDecorator** method m
 
 The decorators are applied in the order in which they are registered, which means that the first decorator (*TransactionCommandHandlerDecorator<T>* in this case) wraps the real instance, the second decorator (*DeadlockRetryCommandHandlerDecorator<T>* in this case) wraps the first decorator, and so on.
 
+.. _Applying-decorators-conditionally:
+
+Applying Decorators conditionally
+---------------------------------
+
 There's an overload of the **RegisterDecorator** available that allows you to supply a predicate to determine whether that decorator should be applied to a specific service type. Using a given context you can determine whether the decorator should be applied. Here is an example:
 
 .. code-block:: c#
@@ -108,10 +113,63 @@ There's an overload of the **RegisterDecorator** available that allows you to su
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
         typeof(AccessValidationCommandHandlerDecorator<>),
-        context => !context.ImplementationType.Namespace.EndsWith("Admins"));
+        context => typeof(IAccessRestricted).IsAssignableFrom(
+            context.ServiceType.GetGenericArguments()[0]));
 
 The given context contains several properties that allows you to analyze whether a decorator should be applied to a given service type, such as the current closed generic service type (using the *ServiceType* property) and the concrete type that will be created (using the *ImplementationType* property). The predicate will (under normal circumstances) be called only once per closed generic type, so there is no performance penalty for using it.
 
+.. _Applying-decorators-conditionally-using-type-constraints:
+
+Applying Decorators conditionally using type constraints
+-----------------------------------------------------------
+
+The previous example shows the conditional registration of the *AccessValidationCommandHandlerDecorator<T>* decorator. It is applied in case the closed *TCommand* type (of *ICommandHandler<TCommand>*) implements the *IAccessRestricted* interface.
+
+Simple Injector will automatically apply decorators conditionally based on defined `generic type constraints <https://msdn.microsoft.com/en-us/library/d5x73970.aspx>`_. We can therefore define the *AccessValidationCommandHandlerDecorator<T>* with a generic type constraint, as follows:
+
+.. code-block:: c#
+
+    public class AccessValidationCommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
+        where TCommand : IAccessRestricted
+    {
+        private readonly ICommandHandler<TCommand> decoratee;
+
+        public AccessValidationCommandHandlerDecorator(ICommandHandler<TCommand> decoratee) {
+            this.decoratee = decoratee;
+        }
+
+        void ICommandHandler<TCommand>.Handle(TCommand command) {
+            // Do access validation
+            this.decoratee.Handle(command);
+        }
+    }
+    
+Since Simple Injector natively understands generic type constraints, we can reduce the previous registration to the following:
+    
+.. code-block:: c#
+
+    container.RegisterDecorator(
+        typeof(ICommandHandler<>),
+        typeof(AccessValidationCommandHandlerDecorator<>));
+
+The use of generic type constraints has many advantages:
+
+* It allows constraints to be specified exactly once, in the place it often makes most obvious, i.e. the decorator itself.
+* It allows constraints to be specified in the syntax you are used to the most, i.e. C#.
+* It allows constraints to be specified in a very succinct manner compared to the verbose, error prone and often hard to read syntax of the reflection API (the previous examples already shown this).
+* It allows decorator to be simplified, because of the added compile time support.
+
+Obviously there are cases where these conditions can't or shouldn't be defined using generic type constraints. The following code example shows a registration that can't be expressed using generic type constraints:
+
+.. code-block:: c#
+
+    container.RegisterDecorator(
+        typeof(ICommandHandler<>),
+        typeof(AccessValidationCommandHandlerDecorator<>),
+        c => c.ImplementationType.GetCustomAttributes(typeof(AccessAttribute)).Any());
+
+This registration applies the decorator conditionally based on an attribute on the (initially) decorated handler type. There is obviously no way to express this using generic type constraints, so we will have to fallback to the predicate syntax.
+        
 .. _Decorators-with-Func-factories:
 
 Decorators with Func<T> decoratee factories
@@ -386,7 +444,7 @@ Although the **RegisterDecorator** methods don't have any built-in support for t
     container.RegisterConditional<IMailSender, SmtpMailSender>(c => !c.Handled);
 
 Here we use **RegisterConditional** to register two decorators. Both decorator will wrap the *SmtpMailSender* that is registered last. The *AsyncCommandHandlerDecorator* is wrapped around the *SmtpMailSender* in case it is injected into the *UserController*, while the *BufferedMailSenderDecorator* is wrapped when injected into the *EmailBatchProcessor*. Note that the *SmtpMailSender* is registered as conditional as well, and is registered as fallback registration using **!c.Handled**, which basically means that in case no other registration applies, that registration is used.
-	
+    
     
 .. _Decorator-registration-factories:
 
