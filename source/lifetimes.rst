@@ -71,7 +71,7 @@ This construct is only required for registering types by a base type or an inter
     
 .. container:: Note
 
-    **Warning**: Transient instances are not tracked by the container. This means that Simple Injector will not dispose transient instances.
+    **Warning**: Transient instances are not tracked by the container. This means that Simple Injector will not dispose transient instances. Simple Injector will detect disposable instances that are registered as transient when calling *container.Verify()*. Please view  :doc:`Diagnostic Warning - Disposable Transient Components <disposabletransientcomponent>` for more information.
 
 .. _Singleton:
 
