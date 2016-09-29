@@ -2,23 +2,50 @@
 Diagnostic Services
 ===================
 
-The **Diagnostic Services** allow you to analyze the container's configuration to search for common configuration mistakes.
+The **Diagnostic Services** allow you to analyze the container's configuration to search for common configuration mistakes. Simple Injector knows about several common issues that might arise when composing the object graph, and can expose this information to the developer via its diagnostics API. Currently, Simple Injector classifies the issues in two severities: Warnings and Informational messages. 
+
+Information messages are are hints of things might want to look into, such as possible Single Responsibility Principle violations. Warnings on the other hand are strong indications that there is a problem with your configuration. See them as the Simple Injector equivalent of C# warnings: Your code will compile (as in: we will be able to resolve your objects), but you rather want to fix those warnings.
+
+Supported Warnings
+==================
+
+.. toctree::
+    :titlesonly:
+
+    Lifestyle Mismatches <LifestyleMismatches>
+    Short Circuited Dependencies <ShortCircuitedDependencies>
+    Torn Lifestyle <tornlifestyle>
+    Ambiguous Lifestyles <ambiguouslifestyles>
+    Disposable Transient Components <disposabletransientcomponent>
+	
+Supported Information messages
+==============================
+
+.. toctree::
+    :titlesonly:
+
+    Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
+    Container-Registered Types <ContainerRegisteredTypes>
 
 How to view diagnostic results
 ==============================
 
 .. container:: Note
 
-    **Note**: In Simple Injector 3, the container now by default checks for diagnostic errors when calling **Verify()**. In case of a diagnostic error, the container's **Verify()** method will throw a **DiagnosticVerificationException**.
+    **Note**: In Simple Injector 3, the container now by default checks for diagnostic errors when calling **Verify()**. In case of a diagnostic warning, the container's **Verify()** method will throw a **DiagnosticVerificationException**.
+
+.. container:: Note
+
+    **Tip**: Always call **Verify()** when you're done configuring the **Container**. This allows your application to fail-fast in case of configuration problems.
 
 There are two ways to view the diagnostic results - results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.
 
-Diagnostic results are available during debugging in Visual Studio after calling *Container.Verify()*. Set a breakpoint after the line that calls **Verify()** and when the breakpoint breaks, hover over the *Container* instance with the mouse. The debugger context menu will appear for the *Container* variable which you can unfold to view the diagnostic results. This might look like this:
+Diagnostic results are available during debugging in Visual Studio after calling **Container.Verify()**. Set a breakpoint after the line that calls **Verify()** and when the breakpoint hits, hover over the **Container** instance with the mouse. The debugger context menu will appear for the *container* variable which you can unfold to view the diagnostic results. This might look like this:
 
 .. image:: images/diagnosticsdebuggerview.png 
    :alt: Diagnostics debugger view context menu
 
-Another option is to add the **container** variable to the Visual Studio watch window by right clicking on the variable and selecting 'Add Watch' in the context menu:
+Another option is to add the *container* variable to the Visual Studio watch window by right clicking on the variable and selecting 'Add Watch' in the context menu:
 
 .. image:: images/diagnostics2.png 
    :alt: Diagnostics debugger view watch window
@@ -32,7 +59,7 @@ The debugger views also allow visualizing your application's dependency graphs. 
 
     **Note**: **Root Registrations** are registrations that are not depended upon by any other registration (or at least, not that Simple Injector can statically determine). They form the starting point of an object graph and are usually the types that are directly resolved from the container.
 
-This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the **SimpleInjector.Diagnostics** namespace. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings:
+This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the **SimpleInjector.Diagnostics** namespace. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings and informational messages:
 
 .. code-block:: c#
 
@@ -60,15 +87,15 @@ Instead of interacting with the Diagnostic API directly, you can force the conta
 
     container.Verify();
 
-A call to *Verify()* defaults to *Verify(VerificationOption.VerifyAndDiagnose)*. When called, the container will check for the warning types that are most likely to cause bugs in your application. By calling this overload during application startup, or inside an integration test, you'll keep the feedback cycle as short as possible, and you'll get notified about possible bugs that otherwise might have stayed undetected for much too long.
+A call to **Verify()** defaults to **Verify(VerificationOption.VerifyAndDiagnose)**. When called, the container will check for all the warning types, since they are most likely to cause bugs in your application. By calling this overload during application startup, or inside an integration test, you'll keep the feedback cycle as short as possible, and you'll get notified about possible bugs that otherwise might have stayed undetected for much too long.
 
 
 Suppressing warnings
 ====================
 
-There are rare cases that you want to ignore the warning system for specific registrations. There are scenarios where you are sure that the presented warning does not cause any harm in your case and changing the application's design is not feasible. In such situation you can suppress warnings on a case by case basis. This prevents a call to *Verify(VerificationOption.VerifyAndDiagnose)* from throwing an exception, it prevents the warning from popping up in the debugger, and it prevents the *Analyzer.Analyze()* method from returning that warning.
+There are rare cases that you want to ignore the warning system for specific registrations. There are scenarios where you are sure that the presented warning does not cause any harm in your case and changing the application's design is not feasible. In such situation you can suppress warnings on a case by case basis. This prevents a call to **Verify()** or **Verify(VerificationOption.VerifyAndDiagnose)** from throwing an exception, it prevents the warning from popping up in the debugger, and it prevents the *Analyzer.Analyze()* method from returning that warning.
 
-A warning can be suppressed by disabling a specific warning type on a *Registration* object. Example:
+A warning can be suppressed by disabling a specific warning type on a **Registration** object. Example:
 
 .. code-block:: c#
 
@@ -79,7 +106,7 @@ A warning can be suppressed by disabling a specific warning type on a *Registrat
 
     registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
 
-In the previous code sample, a *Registration* instance for the *HomeController* type is created and registered in the container. This *Registration* instance is explicitly marked to suppress the diagnostic warning type **Disposable Transient Component**.
+In the previous code sample, a **Registration** instance for the *HomeController* type is created and registered in the container. This **Registration** instance is explicitly marked to suppress the diagnostic warning type **Disposable Transient Component**.
 
 Suppressing this warning type for an MVC controller makes sense, because the MVC framework will ensure proper disposal of MVC controllers.
 
@@ -93,7 +120,7 @@ Alternatively, you can also request an already made registered and suppress a wa
 
 .. container:: Note
 
-    **Tip**: *RegisterMvcControllers* extension method of the **SimpleInjector.Integration.Web.Mvc.dll** will batch-register all MVC controllers and will automatically suppress the **Disposable Transient Component** warning on controller types.
+    **Tip**: The **RegisterMvcControllers** extension method of the **SimpleInjector.Integration.Web.Mvc.dll** will batch-register all MVC controllers and will automatically suppress the **Disposable Transient Component** warning on controller types.
 
 
 Limitations
@@ -103,7 +130,7 @@ Limitations
 
     **Warning**: Although the *Container* can spot several configuration mistakes, be aware that there will always be ways to make configuration errors that the Diagnostic Services cannot identify. Wiring your dependencies is a delicate matter and should be done with care. Always follow best practices.
 
-The **Diagnostic Services** work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as  constructor arguments) can be analyzed. The *Container* uses the following information for analysis:
+The **Diagnostic Services** work by analyzing all information that is known by the container. In general, only relationships between types that can be statically determined (such as constructor arguments) can be analyzed. The *Container* uses the following information for analysis:
 
 * Constructor arguments of types that are created by the container (auto-wired types).
 * Dependencies added by :ref:`Decorators <Decoration>`.
@@ -149,17 +176,3 @@ The Diagnostic Services **cannot** analyze the following:
 .. container:: Note
 
     **Tip**: Try to prevent depending on any features listed above because they all prevent you from having a :ref:`verifiable configuration <Verify-Configuration>` and trustworthy diagnostic results.
-
-Supported Warnings
-==================
-
-.. toctree::
-    :titlesonly:
-
-    Lifestyle Mismatches <LifestyleMismatches>
-    Short Circuited Dependencies <ShortCircuitedDependencies>
-    Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
-    Container-Registered Types <ContainerRegisteredTypes>
-    Torn Lifestyle <tornlifestyle>
-    Ambiguous Lifestyles <ambiguouslifestyles>
-    Disposable Transient Components <disposabletransientcomponent>
