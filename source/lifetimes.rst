@@ -6,17 +6,24 @@ Object Lifetime Management is the concept of controlling the number of instances
 
 Below is a list of the most common lifestyles with code examples of how to configure them using Simple Injector:
 
-* :ref:`Transient <Transient>`
-* :ref:`Scoped <Scoped>`
-* :ref:`Singleton <Singleton>`
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| Lifestyle                                     | Description                                                           | Disposal                   |
++===============================================+=======================================================================+============================+
+| :ref:`Transient <Transient>`                  | A new instance of the service type will be created each time the      | Never                      |
+|                                               | service is requested from the container. If multiple consumers depend |                            |
+|                                               | on the service within the same graph, each consumer will get its own  |                            |
+|                                               | new instance of the given service.                                    |                            |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Scoped <Scoped>`                        | For every request within an implicitly or explicitly defined scope.   | Instances will be disposed | 
+|                                               |                                                                       | when their scope ends.     |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Singleton <Singleton>`                  | There will be at most one instance of the registered service type and | Instances will be disposed |
+|                                               | the container will hold on to that instance until the container is    | when the container is      |
+|                                               | disposed or goes out of scope. Clients will always receive that same  | disposed.                  |
+|                                               | instance from the container.                                          |                            |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 
-Many different platform and framework specific flavors are available for the *Scoped* lifestyle, namely:
-
-* :ref:`Per Web Request <PerWebRequest>`
-* :ref:`Per Web API Request <PerWebAPIRequest>`
-* :ref:`Per WCF Operation <PerWcfOperation>`
-* :ref:`Per Lifetime Scope <PerLifetimeScope>`
-* :ref:`Per Execution Context Scope (async/await) <PerExecutionContextScope>`
+Many different platform and framework specific flavors are available for the *Scoped* lifestyle. Please see the :ref:`Scoped <Scoped>` section for more information.
 
 Further reading:
 
@@ -64,7 +71,7 @@ This construct is only required for registering types by a base type or an inter
     
 .. container:: Note
 
-    **Warning**: Transient instances are not tracked by the container. This means that Simple Injector will not dispose transient instances.
+    **Warning**: Transient instances are not tracked by the container. This means that Simple Injector will not dispose transient instances. Simple Injector will detect disposable instances that are registered as transient when calling *container.Verify()*. Please view  :doc:`Diagnostic Warning - Disposable Transient Components <disposabletransientcomponent>` for more information.
 
 .. _Singleton:
 
@@ -132,11 +139,28 @@ Scoped
 
 Simple Injector contains five scoped lifestyles:
 
-* :ref:`Per Web Request <PerWebRequest>`
-* :ref:`Per Web API Request <PerWebAPIRequest>`
-* :ref:`Per WCF Operation <PerWcfOperation>`
-* :ref:`Per Lifetime Scope <PerLifetimeScope>`
-* :ref:`Per Execution Context Scope <PerExecutionContextScope>`
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| Lifestyle                                     | Description                                                           | Disposal                   |
++===============================================+=======================================================================+============================+
+| :ref:`Per Web Request <PerWebRequest>`        | Only one instance will be created by the container per web request.   | Instances will be disposed | 
+|                                               |                                                                       | when the web request ends. |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Per Web API Request <PerWebAPIRequest>` | Only one instance will be created by the container per request in a   | Instances will be disposed |
+|                                               | ASP.NET Web API application and the instance will be disposed when    | the web request ends.      |
+|                                               | that request ends (unless specified otherwise).                       |                            |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Per WCF Operation <PerWcfOperation>`    | Only one instance will be created by the container during the lifetime| Instances will be disposed |
+|                                               | of the WCF service class.                                             | when the WCF service class |
+|                                               |                                                                       | is released.               |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Per Lifetime Scope <PerLifetimeScope>`  | Within a certain (explicitly defined) scope, there will be only one   | Instance will be disposed  |
+|                                               | instance of a given service type A created scope is specific to one   | when their scope gets      |
+|                                               | particular thread, and can't be moved across threads.                 | disposed.                  |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Per Execution Context Scope             | There will be only one instance of a given service type within a      | Instance will be disposed  |
+| (async/await) <PerExecutionContextScope>`     | certain (explicitly defined) scope. This scope will automatically     | when their scope gets      |
+|                                               | flow with the logical flow of control of asynchronous methods.        | disposed.                  |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 
 *Per Web Request*, *Per Web API Request* and *Per WCF Operation* implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The *Container* does this for you. With the *Per Lifetime Scope* and *Per Execution Context Scope* lifestyles on the other hand, you explicitly define a scope (just like you would do with .NET's TransactionScope class).
 
