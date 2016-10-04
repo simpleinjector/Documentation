@@ -2,7 +2,7 @@
 ASP.NET MVC Integration Guide
 =============================
 
-Simple Injector contains `Simple Injector MVC Integration Quick Start NuGet package <https://nuget.org/packages/SimpleInjector.MVC3>`_. If you're not using NuGet, you can include the **SimpleInjector.Integration.Web.Mvc.dll** in your MVC application, which is part of the standard download.
+Simple Injector contains `Simple Injector MVC Integration Quick Start NuGet package <https://nuget.org/packages/SimpleInjector.MVC3>`_.
 
 .. container:: Note
 
@@ -30,9 +30,6 @@ The following code snippet shows how to use the use the integration package (not
         // This is an extension method from the integration package.
         container.RegisterMvcControllers(Assembly.GetExecutingAssembly());
     	
-        // This is an extension method from the integration package as well.
-        container.RegisterMvcIntegratedFilterProvider();
-
         container.Verify();
     	
         DependencyResolver.SetResolver(new SimpleInjectorDependencyResolver(container));
