@@ -122,12 +122,16 @@ Registration for concrete singletons is necessarily, because unregistered concre
 
 .. container:: Note
 
-    **Note**: Simple Injector will cache a *Singleton* instance for the lifetime of the **Container** instance and will dispose any auto-wired instance (that implements *IDisposable*) when *Container.Dispose()* is called. This includes registrations using *RegisterSingleton<TService, TImplementation>()* *RegisterSingleton<TConcrete>()* and *RegisterSingleton(Type, Type)*. Non-auto-wired instances that are created using factory delegates will be disposed as well. This includes *RegisterSingleton<TService>(Func<TService>)* and *RegisterSingleton(Type, Func<object>)*.
-	
+    **Note**: Simple Injector will cache a **Singleton** instance for the lifetime of the **Container** instance and will dispose any auto-wired instance (that implements *IDisposable*) when **Container.Dispose()** is called. This includes registrations using **RegisterSingleton<TService, TImplementation>()** **RegisterSingleton<TConcrete>()** and **RegisterSingleton(Type, Type)**. Non-auto-wired instances that are created using factory delegates will be disposed as well. This includes **RegisterSingleton<TService>(Func<TService>)** and **RegisterSingleton(Type, Func<object>)**.
+
 .. container:: Note
 	
-	**Warning**: Already existing instances that are supplied to the container using *RegisterSingleton<TService>(TService)* and *RegisterSingleton(Type, object)* will not be disposed by the container. They are considered to be 'externally owned'.
+	**Warning**: Already existing instances that are supplied to the container using **RegisterSingleton<TService>(TService)* and **RegisterSingleton(Type, object)** will not be disposed by the container. They are considered to be 'externally owned'.
+	
+.. container:: Note
 
+    **Note**: Simple Injector guarantees that instances are disposed in opposite order of creation. When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B*  (assuming both implement *IDisposable*), since the guarantee of opposite order of creation. This allows *A* to use *B* while *A* is being disposed.
+	
 .. _Scoped:
 
 Scoped
@@ -212,6 +216,17 @@ This ensures that each time a *ServiceImpl* is created by the container, it is r
 
     **Note**: Be careful to not register any services for disposal that will outlive that scope (such as services registered as singleton), since a service cannot be used once it has been disposed. This would typically result in *ObjectDisposedExceptions* and this will cause your application to break.
 
+.. _Order-of-disposal:
+
+Order of disposal
+-----------------
+
+.. container:: Note
+
+    Simple Injector guarantees that instances are disposed in opposite order of creation.
+
+When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B* (assuming both implement *IDisposable*), since the guarantee of opposite order of creation. This allows *A* to use *B* while *A* is being disposed.
+	
 .. _PerWebRequest:
 
 Per Web Request
