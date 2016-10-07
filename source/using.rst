@@ -273,7 +273,7 @@ Simple Injector contains several methods for registering and resolving collectio
     // Configuration
     // Registering a list of instances that will be created by the container.
     // Supplying a collection of types is the preferred way of registering collections.
-    container.RegisterCollection<ILogger>(new[] { typeof(IMailLogger), typeof(SqlLogger) });
+    container.RegisterCollection<ILogger>(new[] { typeof(MailLogger), typeof(SqlLogger) });
 
     // Register a fixed list (these instances should be thread-safe).
     container.RegisterCollection<ILogger>(new[] { new MailLogger(), new SqlLogger() });
@@ -309,7 +309,7 @@ Just as with normal types, Simple Injector can inject collections of instances i
     }
 
     // Configuration
-    container.RegisterCollection<ILogger>(new[] { typeof(MailLogger)), typeof(SqlLogger) });
+    container.RegisterCollection<ILogger>(new[] { typeof(MailLogger), typeof(SqlLogger) });
     container.Register<IService, Service>(Lifestyle.Singleton);
 
     // Usage
