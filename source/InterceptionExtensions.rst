@@ -311,6 +311,6 @@ After copying the previous code snippet to your project, you can add interceptio
             var decoratedType = invocation.InvocationTarget.GetType();
             
             this.logger.Log(string.Format("{0} executed in {1} ms.",
-                decoratedType.Name, watch.ElapsedMiliseconds));
+                decoratedType.Name, watch.ElapsedMilliseconds));
         }
     }
