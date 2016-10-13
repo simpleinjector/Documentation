@@ -260,6 +260,26 @@ The *Action<T>* delegate that is registered by the **RegisterInitializer** metho
 
     **Tip**: Multiple initializers can be applied to a concrete type and the *Container* will call all initializers that apply. They are **guaranteed** to run in the same order that they are registered.
 
+.. _Automatic-Batch-registration:
+
+Automatic/Batch-registration
+----------------------------
+
+When an application starts to grow, so does the number of types to register in the container. This can cause a lot of maintenance on part of your application that holds your container registration. When working with a team, you'll start to experience many merge conflicts which increases the chance of errors.
+
+To minimize these problems, Simple Injector allows groups of types to be registered with a few lines of code. Especially when registering a family of types that are defined using the same (generic) interface. For instance, the previous example with the  *IHandler<T>* registrations can be reduced to the following code:
+
+.. code-block:: c#
+
+    // Configuration
+    Assembly[] assemblies = // determine list of assemblies to search in
+    container.Register(typeof(IHandler<>), assemblies);
+
+When supplying a list of assemblies to the **Register** method, Simple Injector will go through the assemblies and will register all types that implement the given interface. In this example, an open-generic type (*IHandler<T>*) is supplied. Simple Injector will automatically find all implementations of this interface.
+
+.. container:: Note
+
+    **Note**: For more information about batch registration, please see the :ref:`Batch-registration <batch-registration>` section.
 
 .. _Collections:
 
@@ -380,11 +400,50 @@ Besides *IEnumerable<ILogger>*, Simple Injector natively supports some other col
     **Note:** The *IReadOnlyCollection<T>* and *IReadOnlyList<T>* interfaces are new in .NET 4.5. Only the .NET 4.5 and .NET Core build of Simple Injector will be able to automatically inject these abstractions into your components. These interfaces are *not* supported by the PCL and .NET 4.0 versions of Simple Injector.
 
 Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>*, *ICollection<T>*, *IList<T>*, *IReadOnlyCollection<T>* and *IReadOnlyList<T>* instances. In reality you should not see the the injected *IEnumerable<T>* as a collection of instances; you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* or *ICollection<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component.
-	
+
 .. container:: Note
 
     **Warning**: In contrast to the collection abstractions, an array is registered as transient. An array is a mutable type; a consumer can change the contents of an array. Sharing the array (by making it singleton) might cause unrelated parts of your applications to fail because of changes to the array. Since an array is a concrete type, it can not function as a stream, causing the elements in the array to get the lifetime of the consuming component. This could cause :doc:`lifestyle mismatches <LifestyleMismatches>` when the array wasn't registered as transient.
-	
+
+.. _Batch-registering-collections:
+
+Batch-registering collections
+-----------------------------
+
+Just as with one-to-one mappings, Simple Injector allows collections of types to be batch-registered. There are overloads of the **RegisterCollection** method that accept a list of *Assembly* instances. Simple Injector will go through those assemblies to look for implementations of the supplied type:
+
+.. code-block:: c#
+
+    Assembly[] assemblies = // determine list of assemblies to search in
+    container.RegisterCollection(typeof(ILogger), assemblies);
+
+The previous code snippet will register all *ILogger* implementations that can be found in the supplied assemblies as part of the collection.
+
+.. container:: Note
+
+    **Note**: For more information about batch registration, please see the :ref:`Batch-registration <batch-registration>` section.
+
+
+.. _Appending-to-collections:
+
+Adding registrations to an existing collection
+----------------------------------------------
+
+In most cases you would register a collection with a single line of code. There are cases where you need to append registrations to an already registered collection. Common use cases for this are integration scenarios where you need to interact with some framework that made its own registrations on your behalf, or in cases where you want to add extra types based on configuration settings. In these cases it might be benifecial to append registrations to an existing collection.
+
+To be able to do this, Simple Injector contains the **AppendToCollection** extension method in the **SimpleInjector.Advanced** namespace.
+
+.. container:: Note
+
+    **Note**: This extension method will not show up using IntelliSense, unless you include the **SimpleInjector.Advanced** namespace to your code file. This extension method is deliberately hidden to prevent polluting the main API; appending to existing collections is not a common use case.
+
+.. code-block:: c#
+
+    Assembly[] assemblies = // determine list of assemblies to search in
+    container.RegisterCollection(typeof(ILogger), assemblies);
+
+    container.AppendToCollection(typeof(ILogger), typeof(ExtraLogger));
+
 
 .. _Verifying-Container:
 
