@@ -28,6 +28,8 @@ Avoid using *Assembly.LoadFile* and use *Assembly.Load* as shown in the followin
 	
 For an ASP.NET application use *BuildManager.GetReferencedAssemblies* as shown in the following example:
 
+.. code-block:: c#
+
     var assemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>();
 	              
 The *GetReferencedAssemblies* method will load all referenced assemblies located within the web application's /bin folder of the ASP.NET temp directory where the referenced assemblies are shadow copied by default.
