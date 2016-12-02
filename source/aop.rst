@@ -302,10 +302,12 @@ Since a typical application will not use the lifetime scope, but would prefer a 
 
 .. code-block:: c#
 
+    var defaultLifestyle = new LifetimeScopeLifestyle();
+	var fallbackLifestyle = new WebRequestLifestyle();
     ScopedLifestyle scopedLifestyle = Lifestyle.CreateHybrid(
-        lifestyleSelector: () => container.GetCurrentLifetimeScope() != null,
-        trueLifestyle: new LifetimeScopeLifestyle(),
-        falseLifestyle: new WebRequestLifestyle());
+        lifestyleSelector: () => defaultLifestyle.GetCurrentScope(container) != null,
+        trueLifestyle: defaultLifestyle,
+        falseLifestyle: fallbackLifestyle);
 
     container.Register<IUnitOfWork, DbUnitOfWork>(scopedLifestyle);
 
@@ -313,10 +315,14 @@ Obviously, if you run (part of) your commands on a background thread and also us
 
 .. code-block:: c#
 
-    container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
-        lifestyleSelector: () => container.GetCurrentLifetimeScope() != null,
-        trueLifestyle: new LifetimeScopeLifestyle(),
-        falseLifestyle: new WebRequestLifestyle());
+    var defaultLifestyle = new LifetimeScopeLifestyle();
+	var fallbackLifestyle = new WebRequestLifestyle();
+    ScopedLifestyle scopedLifestyle = Lifestyle.CreateHybrid(
+        lifestyleSelector: () => defaultLifestyle.GetCurrentScope(container) != null,
+        trueLifestyle: defaultLifestyle,
+        falseLifestyle: fallbackLifestyle);
+
+    container.Options.DefaultScopedLifestyle = scopedLifestyle;
 
     container.Register<IUnitOfWork, DbUnitOfWork>(Lifestyle.Scoped);
     container.Register<IRepository<User>, UserRepository>(Lifestyle.Scoped);

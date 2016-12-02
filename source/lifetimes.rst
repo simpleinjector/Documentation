@@ -499,9 +499,10 @@ Simple Injector has no built-in hybrid lifestyles, but has a simple mechanism fo
 .. code-block:: c#
 
     var container = new Container();
+	var trueLifestyle = new LifetimeScopeLifestyle();
     container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
-        lifestyleSelector: () => container.GetCurrentLifetimeScope() != null,
-        trueLifestyle: new LifetimeScopeLifestyle(),
+        lifestyleSelector: () => trueLifestyle.GetCurrentScope(container) != null,
+        trueLifestyle: trueLifestyle,
         falseLifestyle: new WebRequestLifestyle());
 
     container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
