@@ -110,7 +110,7 @@ Using Simple Injector, the configuration of the application using the *UserContr
 
 The given configuration registers implementations for the *IUserRepository* and *ILogger* interfaces. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as *SqlUserRepository*) to an interface or base type. In the given example, every time you ask the container for an *IUserRepository*, it will always create a new *SqlUserRepository* on your behalf (in DI terminology: an object with a **Transient** lifestyle).
 
-The seconds registration maps the *ILogger* interface to a *MailLogger* implementation. This *MailLogger* is registered with the **Singleton** lifestyle; only one instance of *MailLogger* will ever be created by the **Container**.
+The second registration maps the *ILogger* interface to a *MailLogger* implementation. This *MailLogger* is registered with the **Singleton** lifestyle; only one instance of *MailLogger* will ever be created by the **Container**.
 
 .. container:: Note
 
