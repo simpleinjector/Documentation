@@ -49,8 +49,16 @@ The following code snippet shows how to use the integration package to apply Sim
             container.Options.DefaultScopedLifestyle = new AspNetRequestLifestyle();
             
             InitializeContainer(app);
+			
+            container.Register<CustomMiddleware>();
 
             container.Verify();
+			
+            // Add custom middleware
+            app.Use(async (context, next) =>
+            {
+                await container.GetInstance<CustomMiddleware>().Invoke(context, next);
+            });
 
             // ASP.NET default stuff here
         }
@@ -70,3 +78,34 @@ The following code snippet shows how to use the integration package to apply Sim
             // See: https://simpleinjector.org/blog/2016/07/
         }
     }
+	
+Wiring custom middleware
+========================
+
+The previous `Startup` snippet already showed how a custom middleware class can be used in the ASP.NET Core pipeline. The following code snippet shows how such `CustomMiddleware` might look like:
+
+.. code-block:: c#
+	
+    // Example of some custom user-defined middleware component.
+    public sealed class CustomMiddleware
+    {
+        private readonly ILoggerFactory loggerFactory;
+        private readonly IUserService userService;
+
+        public CustomMiddleware(ILoggerFactory loggerFactory, IUserService userService)
+        {
+            this.loggerFactory = loggerFactory;
+            this.userService = userService;
+        }
+
+        public async Task Invoke(HttpContext context, Func<Task> next)
+        {
+            // Do something before
+            await next();
+            // Do something after
+        }
+    }
+
+Notice how the _CustomMiddleware_ class contains dependencies. Since the _CustomMiddleware_ class is resolved from Simple Injector for each request.
+
+In contrast to what the official ASP.NET Core documentation `advises <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware#writing-middleware>`_, the _RequestDelegate_ or _Func<Task> next_ delegate can best be passed in using Method Injection (through the _Invoke_ method), instead of by using Constructor Injection. Reason for this is that this delegate is runtime data and runtime data should `not be passed in through the constructor <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=99>`_. Moving it to the _Invoke_ method makes it possible to reliably verify the application's DI configuration and simplifies your configuration.
