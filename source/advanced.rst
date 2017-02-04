@@ -301,6 +301,10 @@ In most cases however, manually supplying the **RegisterCollection** with a list
     container.RegisterCollection(typeof(IValidator<>),
         new[] { typeof(IValidator<>).Assembly });
 
+.. container:: Note
+
+    **Warning**: This **RegisterCollection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart. In case strict ordering is required, use the **GetTypesToRegister** method (as explained below) and order types manually.		
+		
 Alternatively, we can make use of the Container's **GetTypesToRegister** to find the types for us:
 
 .. code-block:: c#
