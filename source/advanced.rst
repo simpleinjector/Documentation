@@ -303,24 +303,26 @@ In most cases however, manually supplying the **RegisterCollection** with a list
 
 .. container:: Note
 
-    **Warning**: This **RegisterCollection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart. In case strict ordering is required, use the **GetTypesToRegister** method (as explained below) and order types manually.		
-		
+    **Warning**: This **RegisterCollection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart. In case strict ordering is required, use the **GetTypesToRegister** method (as explained below) and order types manually.        
+        
 Alternatively, we can make use of the Container's **GetTypesToRegister** to find the types for us:
 
 .. code-block:: c#
 
-    List<Type> typesToRegister = new List<Type> {
-        typeof(DataAnnotationsValidator<>)
-    };
-    
-    var assemblies = new[] { typeof(IValidator<>).Assembly) };
-    typesToRegister.AddRange(container.GetTypesToRegister(typeof(IValidator<>), assemblies));
+    var typesToRegister = container.GetTypesToRegister(
+        typeof(IValidator<>),
+        new[] { typeof(IValidator<>).Assembly) }, 
+        new TypesToRegisterOptions 
+        { 
+            IncludeGenericTypeDefinitions = true,
+            IncludeComposites = false,
+        });
 
-    container.RegisterCollection(typeof(IValidator<>), typesToRegister);
-        
+    container.RegisterCollection(typeof(IValidator<>), typesToRegister);    
+    
 .. container:: Note
 
-    The **Register** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well.
+    The **Register** and **RegisterCollection** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well. Each however use their own **TypesToRegisterOptions** configuration.
 
 
 .. _Unregistered-Type-Resolution:
