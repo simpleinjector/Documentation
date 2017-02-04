@@ -291,7 +291,7 @@ But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible
 
     **Note**: This will work equally well when the open generic types contain type constraints. In that case those types will be applied conditionally to the collections based on their generic type constraints.
 
-In most cases however, manually supplying the **RegisterCollection** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the **RegisterCollection** overloads that accepts the `BatchRegistrationCallback <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Extensions_BatchRegistrationCallback.htm>`_ delegate and append the open generic type separately:
+In most cases however, manually supplying the **RegisterCollection** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the **RegisterCollection** overloads that accepts a list of assemblies and append the open generic type separately:
 
 .. code-block:: c#
 
@@ -301,22 +301,28 @@ In most cases however, manually supplying the **RegisterCollection** with a list
     container.RegisterCollection(typeof(IValidator<>),
         new[] { typeof(IValidator<>).Assembly });
 
+.. container:: Note
+
+    **Warning**: This **RegisterCollection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart. In case strict ordering is required, use the **GetTypesToRegister** method (as explained below) and order types manually.        
+        
 Alternatively, we can make use of the Container's **GetTypesToRegister** to find the types for us:
 
 .. code-block:: c#
 
-    List<Type> typesToRegister = new List<Type> {
-        typeof(DataAnnotationsValidator<>)
-    };
-    
-    var assemblies = new[] { typeof(IValidator<>).Assembly) };
-    typesToRegister.AddRange(container.GetTypesToRegister(typeof(IValidator<>), assemblies));
+    var typesToRegister = container.GetTypesToRegister(
+        typeof(IValidator<>),
+        new[] { typeof(IValidator<>).Assembly) }, 
+        new TypesToRegisterOptions 
+        { 
+            IncludeGenericTypeDefinitions = true,
+            IncludeComposites = false,
+        });
 
-    container.RegisterCollection(typeof(IValidator<>), typesToRegister);
-        
+    container.RegisterCollection(typeof(IValidator<>), typesToRegister);    
+    
 .. container:: Note
 
-    The **Register** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well.
+    The **Register** and **RegisterCollection** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well. Each however use their own **TypesToRegisterOptions** configuration.
 
 
 .. _Unregistered-Type-Resolution:
