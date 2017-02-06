@@ -8,6 +8,7 @@ How To
 * How to :ref:`Override existing registrations <Override-Existing-Registrations>`
 * How to :ref:`Verify the container's configuration <Verify-Configuration>`
 * How to :ref:`Work with dependency injection in multi-threaded applications <Multi-Threaded-Applications>`
+* How to :ref:`Package registrations <Package-registrations>`
 
 .. _Register-Factory-Delegates:
 
@@ -525,6 +526,82 @@ In the Composition Root, instead of registering the *MailSender*, we register th
     container.RegisterDecorator<IMailSender, AsyncMailSenderProxy>(Lifestyle.Singleton);
 
 In this case the container will ensure that when an *IMailSender* is requested, a single *AsyncMailSenderProxy* is returned with a *Func<IMailSender>* delegate that will create a new *RealMailSender* when requested. The `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ and `RegisterSingleDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterSingleDecorator.htm>`_ overloads natively understand how to handle *Func<Decoratee>* dependencies. The :ref:`Decorators <Decorators>` section of the :doc:`Advanced Scenarios <advanced>` wiki page explains more about registering decorators.
+
+.. _Package-registrations:
+
+Package registrations
+=====================
+
+Simple Injector has the notion of 'packages'. A package is a group of container registrations packed into a class that implements the **IPackage** interface. This feature is similar to what other containers call Installers, Modules or Registries.
+
+To use this feature, you need to install the `SimpleInjector.Packaging NuGet package <https://www.nuget.org/packages/SimpleInjector.Packaging/>`_.
+
+.. container:: Note
+
+    **SimpleInjector.Packaging** exists to accomodate applications that require plug-in like modularization, where parts of the application, packad with their own container registrations, can be independently compiled into a dll and 'dropped' into a folder, where the main application can pick them up, without the need for the main application to be recompiled and redeployed.
+
+To accomodate this, those independent application parts can create a package by defining a class that implements the **IPackage** interface:
+
+.. code-block:: c#
+
+    public class ModuleXPackage : IPackage
+    {
+        public void RegisterServices(Container container)
+        {
+            container.Register<IService1, Service1Impl>();
+            container.Register<IService2, Service2Impl>();
+        }
+    }
+	
+After doing so, the main application can dynamically load these application modules, and make sure their packages are ran:
+
+.. code-block:: c#
+    
+    var assemblies =
+        from file in new DirectoryInfo(pluginDirectory).GetFiles()
+        where file.Extension.ToLower() == ".dll"
+        select Assembly.LoadFile(file.FullName);
+
+    container.RegisterPackages(assemblies);
+	
+As explained above, **SimpleInjector.Packaging** is specifically designed for loading configurations from assemblies that are loaded dynamically. In other scenarios the use of Packaging is discouraged.
+
+For non-plug-in scenario's, all container registrations should be located as close as possible to the application’s entry point. This location is commonly referred to as the `Composition Root <http://blog.ploeh.dk/2011/07/28/CompositionRoot/>`_.
+
+Although even inside the Composition Root it might make sense to split the registration into multiple functions or even classes, as long as those registrations are available to the entry-point at compile time, it makes more sense to call them statically instead of by the use of reflection, as can be seen in the following example:
+
+.. code-block:: c#
+
+    public void App_Start()
+    {
+        var container = new Container();
+        container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
+        BusinessLayerBootstrapper.Bootstrap(container);
+        PresentationLayerBootstrapper.Bootstrap(container);
+    
+        // add missing registrations here.
+    
+        container.Verify();
+    }
+
+    class BusinessLayerBootstrapper {
+        public static void Bootstrap(Container container) { ... }
+    }
+    
+    class PresentationLayerBootstrapper {
+        public static void Bootstrap(Container container) { ... }
+    }
+
+The previous example gives the same amount of componentization, while everything is visibly referenced from within the start-up path. In other words, you can use your IDE's *go-to reference* feature to jump directly to that code, while still being able to group things together.
+
+On top of this, switching on or off groups of registrations based on configuration settings becomes simpler, as can be seen in the following example:
+
+.. code-block:: c#
+
+    if (ConfigurationManager.AppSettings["environment"] != "production")
+         MockedExternalServicesPackage.Bootstrap(container);
+    else
+         ProductionExternalServicesPackage.Bootstrap(container);
 
 |
 |
