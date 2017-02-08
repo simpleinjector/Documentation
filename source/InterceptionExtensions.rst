@@ -2,7 +2,7 @@
 Interception Extensions
 =======================
 
-**Adding interception abilities to the Simple Injector.**
+**Adding interception abilities to Simple Injector.**
 
 .. code-block:: c#
 

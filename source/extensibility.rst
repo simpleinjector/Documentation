@@ -229,7 +229,7 @@ Overriding Parameter Injection Behavior
 
 Simple Injector does not allow injecting primitive types (such as integers and string) into constructors. The **IDependencyInjectionBehavior** interface is defined by the library to change this default behavior.
 
-The following article contains more information about changing the library's default behavior: `Primitive Dependencies with the Simple Injector <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=94>`_.
+The following article contains more information about changing the library's default behavior: `Primitive Dependencies with Simple Injector <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=94>`_.
 
 .. _Resolving-Unregistered-Types:
 
