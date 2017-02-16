@@ -88,3 +88,39 @@ The following example shows how to query the Diagnostic API for Disposable Trans
     foreach (var result in results) {
         Console.WriteLine(result.Description);
     }
+
+Optionally you can let transient services dispose when a scope ends. Here's an example of an extension method that allows registering transient instances that are disposed when the specified scope ends:
+
+.. code-block:: c#
+    
+    public static void RegisterDisposableTransient<TService, TImplementation>(
+        this Container c)
+        where TImplementation: class, IDisposable, TService 
+        where TService : class
+    {
+        var scoped = Lifestyle.Scoped;
+        var r = Lifestyle.Transient.CreateRegistration<TService, TImplementation>(c);
+        r.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent, "ignore");
+        c.AddRegistration(typeof(TService), r);
+        c.RegisterInitializer<TImplementation>(o => scoped.RegisterForDisposal(c, o));
+    }
+    
+The following code snippet show the usage of this extension method:
+    
+.. code-block:: c#
+        
+    var container = new Container();
+    container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
+    
+    container.RegisterDisposableTransient<IService, ServiceImpl>();
+
+This ensures that each time a *ServiceImpl* is created by the container, it is registered for disposal when the scope - a web request in this case - ends. This can of course lead to the creation and disposal of multiple *ServiceImpl* instances during a single request.
+
+.. container:: Note
+
+    **Note**: To be able to dispose an instance, the **RegisterForDisposal** will store the reference to that instance in the scope. This means that the instance will be kept alive for the lifetime of that scope.
+
+.. container:: Note
+
+    **Warning**: Be careful to not register any services for disposal that will outlive that scope (such as services registered as singleton), since a service cannot be used once it has been disposed. This would typically result in *ObjectDisposedExceptions* and this will cause your application to break.
+	
