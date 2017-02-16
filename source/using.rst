@@ -4,13 +4,9 @@ Using Simple Injector
 
 This section will walk you through the basics of Simple Injector. After reading this section, you will have a good idea how to use Simple Injector.
 
-.. _Using-Simple-Injector:
-
 Good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library (if ever required). The technique for keeping this dependency to a minimum can be achieved by designing the types in your application around the constructor injection pattern: Define all dependencies of a class in the single public constructor of that type; do this for all service types that need to be resolved and resolve only the top most types in the application directly (i.e. let the container build up the complete graph of dependent objects for you).
 
-.. _The-Container:
-
-Simple Injector's main type is the `Container <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm>`_ class. An instance of *Container* is used to register mappings between each abstraction (service) and its corresponding implementation (component). Your application code should depend on abstractions and it is the role of the *Container* to supply the application with the right implementation. The easiest way to view the *Container* is as a big dictionary where the type of the abstraction is used as key, and each key's related value is the definition of how to create that particular implementation. Each time the application requests for a service, a look up is made within the dictionary and the correct implementation is returned.
+Simple Injector's main type is the `Container <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm>`_ class. An instance of *Container* is used to register mappings between each abstraction (service) and its corresponding implementation (component). Your application code should depend on abstractions and it is the role of the *Container* to supply the application with the right implementation. The easiest way to view the *Container* is as a big dictionary where the type of the abstraction is used as key, and each key's related value is the definition of how to create that particular implementation. Each time the application requests a service, a look up is made within the dictionary and the correct implementation is returned.
 
 .. container:: Note
 
@@ -24,7 +20,7 @@ Simple Injector's main type is the `Container <https://simpleinjector.org/Refere
 
     **Warning**: Do not create an infinite number of *Container* instances (such as one instance per request). Doing so will drain the performance of your application. The library is optimized for using a very limited number of *Container* instances. Creating and initializing *Container* instances has a large overhead, but resolving from the *Container* is extremely fast once initialized.
 
-Creating and configuring a *Container* is done by newing up an instance and calling the **RegisterXXX** overloads to register each of your services:
+Creating and configuring a *Container* is done by newing up an instance and calling the **Register** overloads to register each of your services:
 
 .. code-block:: c#
 
@@ -173,7 +169,7 @@ This example configures a single instance as a delegate. The *Container* will en
 .. code-block:: c#
 
     // Configuration
-    container.Register<IUserRepository>(() => UserRepFactory.Create("some constr"), 
+    container.Register<IUserRepository>(() => new SqlUserRepository("some constr"),
         Lifestyle.Singleton);
 
     // Usage
@@ -193,7 +189,8 @@ By supplying the service type and the created implementation as generic types, t
     container.Register<IHandler<MoveCustomerCommand>, MoveCustomerHandler>();
 
     // Alternatively you can supply the transient Lifestyle with the same effect.
-    container.Register<IHandler<MoveCustomerCommand>, MoveCustomerHandler>(Lifestyle.Transient);
+    container.Register<IHandler<MoveCustomerCommand>, MoveCustomerHandler>(
+        Lifestyle.Transient);
 
     // Usage
     var handler = container.GetInstance<IHandler<MoveCustomerCommand>>();
@@ -306,7 +303,12 @@ Simple Injector contains several methods for registering and resolving collectio
 
 .. container:: Note
 
-    **Note**:  When zero instances are registered using *RegisterCollection*, each call to *Container.GetAllInstances* will return an empty list.
+    **Note**:  When zero instances are registered using **RegisterCollection**, each call to **Container.GetAllInstances** will return an empty list.
+
+.. container:: Note
+
+    **Warning**:  Simple Injector requires a call to **RegsterCollection** to be made, even in the absence of any instances. Without a call to **RegisterCollection**, Simple Injector will throw an exception.
+
 
 Just as with normal types, Simple Injector can inject collections of instances into constructors:
 
@@ -386,6 +388,9 @@ When using this approach none of your services (except *CompositeLogger*) need a
 
 .. _Collection-types:
 
+Collection types
+----------------
+
 Besides *IEnumerable<ILogger>*, Simple Injector natively supports some other collection types as well. The following types are supported:
 
  - *IEnumerable<T>*
@@ -403,7 +408,7 @@ Simple Injector preserves the lifestyle of instances that are returned from an i
 
 .. container:: Note
 
-    **Warning**: In contrast to the collection abstractions, an array is registered as transient. An array is a mutable type; a consumer can change the contents of an array. Sharing the array (by making it singleton) might cause unrelated parts of your applications to fail because of changes to the array. Since an array is a concrete type, it can not function as a stream, causing the elements in the array to get the lifetime of the consuming component. This could cause :doc:`lifestyle mismatches <LifestyleMismatches>` when the array wasn't registered as transient.
+    **Warning**: In contrast to the collection abstractions, an **array** is registered as **transient**. An array is a mutable type; a consumer can change the contents of an array. Sharing the array (by making it singleton) might cause unrelated parts of your applications to fail because of changes to the array. Since an array is a concrete type, it can not function as a stream, causing the elements in the array to get the lifetime of the consuming component. This could cause :doc:`lifestyle mismatches <LifestyleMismatches>` when the array wasn't registered as transient.
 
 .. _Batch-registering-collections:
 
@@ -421,8 +426,11 @@ The previous code snippet will register all *ILogger* implementations that can b
 
 .. container:: Note
 
-    **Note**: For more information about batch registration, please see the :ref:`Batch-registration <batch-registration>` section.
+    **Warning**: This **RegisterCollection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart.
 
+.. container:: Note
+
+    **Note**: For more information about batch registration, please see the :ref:`Batch-registration <batch-registration>` section.
 
 .. _Appending-to-collections:
 
@@ -450,7 +458,12 @@ To be able to do this, Simple Injector contains the **AppendToCollection** exten
 Verifying the container's configuration
 =======================================
 
-You can optionally call the *Verify* method of the *Container*. The *Verify* method provides a fail-fast mechanism to prevent your application from starting when the *Container* has been accidentally misconfigured. The *Verify* method checks the entire configuration by creating an instance of each registered type.
+You can call the *Verify* method of the *Container*. The *Verify* method provides a fail-fast mechanism to prevent your application from starting when the *Container* has been accidentally misconfigured. The *Verify* method checks the entire configuration by creating an instance of each registered type.
+
+.. container:: Note
+
+    **Tip**: Calling **Verify** is not required, but is *highly encouraged*.
+
 
 For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container's configuration <Verify-Configuration>`.
 
@@ -459,11 +472,11 @@ For more information about creating an application and container configuration t
 Automatic constructor injection / auto-wiring
 =============================================
 
-Simple Injector uses the public constructor of a registered type and analyzes each constructor argument. The *Container* will resolve an instance for each argument type and then invoke the constructor using those instances. This mechanism is called *Automatic Constructor Injection* or *auto-wiring* and is one of the fundamental features that separates a DI Container from manual injection. 
+Simple Injector uses the public constructor of a registered type and analyzes each constructor argument. The *Container* will resolve an instance for each argument type and then invoke the constructor using those instances. This mechanism is called *Automatic Constructor Injection* or *auto-wiring* and is one of the fundamental features that separates a DI Container from applying DI by hand. 
 
 Simple Injector has the following prerequisites to be able to provide auto-wiring:
 
-#. Each type to be created must be concrete (not abstract, an interface or an open generic type). Types may be internal, although this can be limited if you're running in a sanbox (e.g. Silverlight or Windows Phone).
+#. Each type to be created must be concrete (not abstract, an interface or an open generic type). Types may be internal, although this can be limited if you're running in a sandbox (e.g. Silverlight or Windows Phone).
 #. The type *should* have one public constructor (this may be a default constructor).
 #. All the types of the arguments in that constructor must be resolvable by the *Container*; optional arguments are not supported.
 
@@ -494,7 +507,11 @@ The following code shows an example of the use of automatic constructor injectio
 
 .. container:: Note
 
-    **Note**: Because *UserService* is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can significantly simplify the *Container*'s configuration for more complex scenarios. Always keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
+    **Note**: Because *UserService* is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can simplify the *Container*'s configuration for some scenarios. Always keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
+
+.. container:: Note
+
+    **Warning**: Even though registration of concrete types is not required, it is adviced to register all root types explicitly. For instance, register all ASP.NET MVC Controller instances explicitly in the container (Controller instances are requested directly and are therefore called 'root objects'). This way the container can check the complete dependency graph starting from the root object when you call **Verify()**.
 
 .. _More-Information:
 

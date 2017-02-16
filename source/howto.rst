@@ -552,7 +552,7 @@ To accomodate this, those independent application parts can create a package by 
             container.Register<IService2, Service2Impl>();
         }
     }
-	
+
 After doing so, the main application can dynamically load these application modules, and make sure their packages are ran:
 
 .. code-block:: c#
@@ -563,7 +563,7 @@ After doing so, the main application can dynamically load these application modu
         select Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
 
     container.RegisterPackages(assemblies);
-	
+
 As explained above, **SimpleInjector.Packaging** is specifically designed for loading configurations from assemblies that are loaded dynamically. In other scenarios the use of Packaging is discouraged.
 
 For non-plug-in scenario's, all container registrations should be located as close as possible to the application’s entry point. This location is commonly referred to as the `Composition Root <http://blog.ploeh.dk/2011/07/28/CompositionRoot/>`_.
