@@ -147,5 +147,6 @@ For more information about Simple Injector please visit the following links:
 * For more information about dependency injection in general, please visit `this page on Stackoverflow <https://stackoverflow.com/tags/dependency-injection/info>`_.
 * If you have any questions about how to use Simple Injector or about dependency injection in general, the experts at `Stackoverflow.com <https://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23>`_ are waiting for you.
 * For all other Simple Injector related question and discussions, such as bug reports and feature requests, the `Simple Injector discussion forum <https://simpleinjector.org/forum>`_ will be the place to start.
+* The book `Dependency Injection in .NET <https://manning.com/seemann/>`_ presents core DI patterns in plain C# so you'll fully understand how DI works.
 
 **Happy injecting!**
