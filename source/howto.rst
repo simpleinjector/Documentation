@@ -560,7 +560,7 @@ After doing so, the main application can dynamically load these application modu
     var assemblies =
         from file in new DirectoryInfo(pluginDirectory).GetFiles()
         where file.Extension.ToLower() == ".dll"
-        select Assembly.LoadFile(file.FullName);
+        select Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
 
     container.RegisterPackages(assemblies);
 	

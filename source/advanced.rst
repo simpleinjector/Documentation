@@ -564,7 +564,7 @@ Applications with a plugin architecture often allow special plugin assemblies to
     var pluginAssemblies =
         from file in new DirectoryInfo(pluginDirectory).GetFiles()
         where file.Extension.ToLower() == ".dll"
-        select Assembly.LoadFile(file.FullName);
+        select Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
 
     container.RegisterCollection<IPlugin>(pluginAssemblies);
 
