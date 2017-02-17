@@ -53,8 +53,7 @@ The *ValidationCommandHandlerDecorator<TCommand>* depends on an *IValidator* int
 
     using System.ComponentModel.DataAnnotations;
 
-    public class DataAnnotationsValidator : IValidator {
-        
+    public class DataAnnotationsValidator : IValidator {       
         void IValidator.ValidateObject(object instance) {
             var context = new ValidationContext(instance, null, null);
 
@@ -121,7 +120,7 @@ The given context contains several properties that allows you to analyze whether
 .. _Applying-decorators-conditionally-using-type-constraints:
 
 Applying Decorators conditionally using type constraints
------------------------------------------------------------
+--------------------------------------------------------
 
 The previous example shows the conditional registration of the *AccessValidationCommandHandlerDecorator<T>* decorator. It is applied in case the closed *TCommand* type (of *ICommandHandler<TCommand>*) implements the *IAccessRestricted* interface.
 
@@ -129,12 +128,12 @@ Simple Injector will automatically apply decorators conditionally based on defin
 
 .. code-block:: c#
 
-    public class AccessValidationCommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
+    class AccessValidationCommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
         where TCommand : IAccessRestricted
     {
         private readonly ICommandHandler<TCommand> decoratee;
 
-        public AccessValidationCommandHandlerDecorator(ICommandHandler<TCommand> decoratee) {
+        public AccessValidationCommandHandlerDecorator(ICommandHandler<TCommand> decoratee){
             this.decoratee = decoratee;
         }
 
@@ -179,7 +178,7 @@ There are certain scenarios where it is necessary to postpone the building of pa
 
 You can easily delay the building of part of the graph by depending on a factory; the factory allows building that part of the object graph to be postponed until the moment the type is actually required. However, when working with decorators, injecting a factory to postpone the creation of the decorated instance will not work. This is best demonstrated with an example.
 
-Take for instance a *AsyncCommandHandlerDecorator<T>* that executes a command handler on a different thread. We could let the *AsyncCommandHandlerDecorator<T>* depend on a *CommandHandlerFactory<T>*, and let this factory call back into the container to retrieve a new *ICommandHandler<T>* but this would fail, since requesting an *ICommandHandler<T>* would again wrap the new instance with a *AsyncCommandHandlerDecorator<T>* and we'd end up recursively creating the same instance type again and again resulting in a stack overflow.
+Take for instance an *AsyncCommandHandlerDecorator<T>* that executes a command handler on a different thread. We could let the *AsyncCommandHandlerDecorator<T>* depend on a *CommandHandlerFactory<T>*, and let this factory call back into the container to retrieve a new *ICommandHandler<T>* but this would fail, since requesting an *ICommandHandler<T>* would again wrap the new instance with a *AsyncCommandHandlerDecorator<T>* and we'd end up recursively creating the same instance type again and again resulting in an endless loop.
 
 This particular scenario is really hard to solve without library support and as such Simple Injector allows injecting a *Func<T>* delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance and avoids the recursive decoration explained above.
 
@@ -259,6 +258,10 @@ This configuration has an interesting mix of decorator registrations.
 #. Prior to this point all commands are validated synchronously (to allow communicating validation errors to the caller)
 #. All handlers (sync and async) are executed in a transaction and the operation is retried when the database rolled back because of a deadlock
 
+.. container:: Note
+
+    **Warning**: Please note that the previous example is just meant for educational purposes. In practice, you don't want your commands to be processed this way, since it could lead to message loss. Instead you want to use a durable queue.
+
 Another useful application for *Func<T>* decoratee factories is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:
 
 .. code-block:: c#
@@ -303,20 +306,20 @@ Since a typical application will not use the lifetime scope, but would prefer a 
 .. code-block:: c#
 
     var defaultLifestyle = new LifetimeScopeLifestyle();
-	var fallbackLifestyle = new WebRequestLifestyle();
-    ScopedLifestyle scopedLifestyle = Lifestyle.CreateHybrid(
+    
+    container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
         lifestyleSelector: () => defaultLifestyle.GetCurrentScope(container) != null,
         trueLifestyle: defaultLifestyle,
-        falseLifestyle: fallbackLifestyle);
+        falseLifestyle: new WebRequestLifestyle());
 
-    container.Register<IUnitOfWork, DbUnitOfWork>(scopedLifestyle);
+    container.Register<IUnitOfWork, DbUnitOfWork>(Lifestyle.Scoped);
 
 Obviously, if you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use both the *LifetimeScopeCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
 
 .. code-block:: c#
 
     var defaultLifestyle = new LifetimeScopeLifestyle();
-	var fallbackLifestyle = new WebRequestLifestyle();
+    var fallbackLifestyle = new WebRequestLifestyle();
     ScopedLifestyle scopedLifestyle = Lifestyle.CreateHybrid(
         lifestyleSelector: () => defaultLifestyle.GetCurrentScope(container) != null,
         trueLifestyle: defaultLifestyle,
@@ -404,13 +407,13 @@ Sometimes however you might want to apply a decorator unconditionally, but let t
 .. code-block:: c#
 
     public class TransactionCommandHandlerDecorator<T> : ICommandHandler<T> {
-        private readonly ITransactionBuilder transactionBuilder;
+        private readonly ITransactionBuilder builder;
         private readonly ICommandHandler<T> decoratee;
         private readonly TransactionType transactionType;
 
         public TransactionCommandHandlerDecorator(DecoratorContext decoratorContext,
-            ITransactionBuilder transactionBuilder, ICommandHandler<T> decoratee) {
-            this.transactionBuilder = transactionBuilder;
+            ITransactionBuilder builder, ICommandHandler<T> decoratee) {
+            this.builder = builder;
             this.decoratee = decoratee;
             this.transactionType = decoratorContext.ImplementationType
                 .GetCustomAttribute<TransactionAttribute>()
@@ -418,14 +421,23 @@ Sometimes however you might want to apply a decorator unconditionally, but let t
         }
         
         public void Handle(T command) {
-            using (var ta = this.transactionBuilder.BeginTransaction(this.transactionType)) {
+            using (var ta = this.builder.BeginTransaction(this.transactionType)) {
                 this.decoratee.Handle(command);
                 ta.Complete();
             }
         }
     }
     
-The previous code snippet shows a decorator that applies a transaction behavior to command handlers. The decorator is injected with the **DecoratorContext** class which supplies the decorator with contextual information about the other decorators in the chain and the actual implementation type. In this example the decorator expects a *TransactionAttribute* to be applied to the wrapped command handler implementation and it starts the correct transaction type based on this information.
+The previous code snippet shows a decorator that applies a transaction behavior to command handlers. The decorator is injected with the **DecoratorContext** class which supplies the decorator with contextual information about the other decorators in the chain and the actual implementation type. In this example the decorator expects a *TransactionAttribute* to be applied to the wrapped command handler implementation and it starts the correct transaction type based on this information. The following code snippet shows a possible command handler implementation:
+
+.. code-block:: c#
+
+    [Transaction(TransactionType.ReadCommitted)]
+    public class ShipOrderHandler : ICommandHandler<ShipOrder> {
+        public void Handle(ShipOrder command) {
+            // Business logic here
+        }
+    }
 
 If the attribute was applied to the command class instead of the command handler, this decorator would been able to gather this information without the use of the **DecoratorContext**. This would however leak implementation details into the command, since which type of transaction a handler should run is clearly an implementation detail and is of no concern to the consumer of that command. Placing that attribute on the handler instead of the command is therefore a much more reasonable thing to do.
 
@@ -449,7 +461,7 @@ Although the **RegisterDecorator** methods don't have any built-in support for t
 
     container.RegisterConditional<IMailSender, SmtpMailSender>(c => !c.Handled);
 
-Here we use **RegisterConditional** to register two decorators. Both decorator will wrap the *SmtpMailSender* that is registered last. The *AsyncCommandHandlerDecorator* is wrapped around the *SmtpMailSender* in case it is injected into the *UserController*, while the *BufferedMailSenderDecorator* is wrapped when injected into the *EmailBatchProcessor*. Note that the *SmtpMailSender* is registered as conditional as well, and is registered as fallback registration using **!c.Handled**, which basically means that in case no other registration applies, that registration is used.
+Here we use **RegisterConditional** to register two decorators. Both decorator will wrap the *SmtpMailSender* that is registered last. The *AsyncMailSenderDecorator* is wrapped around the *SmtpMailSender* in case it is injected into the *UserController*, while the *BufferedMailSenderDecorator* is wrapped when injected into the *EmailBatchProcessor*. Note that the *SmtpMailSender* is registered as conditional as well, and is registered as fallback registration using **!c.Handled**, which basically means that in case no other registration applies, that registration is used.
     
     
 .. _Decorator-registration-factories:
@@ -471,7 +483,17 @@ Take the following registration for instance:
         Lifestyle.Transient,
         predicateContext => true);
 
-This example registers a decorator for the *IEventHandler<TEvent>* abstraction. The decorator to be used is the *LoggingEventHandlerDecorator<TEvent, TLogTarget>* type. The supplied factory delegate builds up a partially-closed open-generic type by filling in the *TLogTarget* argument with the actual wrapped event handler implementation type. Simple Injector will fill in the generic type argument *TEvent*. 
+This example registers the *LoggingEventHandlerDecorator<TEvent, TLogTarget>* decorator for the *IEventHandler<TEvent>* abstraction. The supplied factory delegate builds up a partially-closed generic type by filling in the *TLogTarget* argument, where the *TEvent* is left 'open'. This is done by requesting the first generic type argument (the *TEvent*) from the open-generic *LoggingEventHandler<,>* type itself and using the **ImplementationType** as second argument. This means that when this decorator is wrapped around a type called *CustomerMovedEventHandler*, the factory method will create the type *LoggingEventHandler<TEvent, CustomerMovedEventHandler>*. In other words, the second argument is a concrete type (and thus closed), while the first argument is still a blank.
+
+When a closed version of *IEventHandler<TEvent>* is requested later on, Simple Injector will know how to fill in the blank with the correct type for this *TEvent* argument.
+
+.. container:: Note
+
+    **Tip**: Simple Injector doesn't care in which order you define your generic type arguments, nor how you name them; it will be able to figure out the correct type to build any way.
+
+.. container:: Note
+
+    **Note**: The type factory delegate is typically called once per closed-type and the result is burned in the compiled object graph. You can't use this delegate to make runtime decisions.
 
 .. _Interception-using-Dynamic-Proxies:
 
