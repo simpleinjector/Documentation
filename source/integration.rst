@@ -18,6 +18,9 @@ Simple Injector can be used in a wide range of .NET technologies, both server si
     WPF <wpfintegration>
     Silverlight <silverlightintegration>
 
+Other Technologies
+==================
+
 Besides integration with standard .NET technologies, Simple Injector can be integrated with a wide range of other technologies. Here are a few links to help you get started quickly:
 
 * `RavenDB <https://stackoverflow.com/questions/10940988/how-to-configure-simple-injector-ioc-to-use-ravendb>`_

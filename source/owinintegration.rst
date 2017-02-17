@@ -49,19 +49,19 @@ When working with OWIN you will occasionally find yourself wanting access to the
 
 .. code-block:: c#
 
-    public interface IOwinContextProvider {
+    public interface IOwinContextAccessor {
         IOwinContext CurrentContext { get; }
     }
      
-    public class CallContextOwinContextProvider : IOwinContextProvider {
+    public class CallContextOwinContextAccessor : IOwinContextAccessor {
         public IOwinContext CurrentContext { 
             get { return (IOwinContext)CallContext.LogicalGetData("IOwinContext"); }
         }
     }
 
-The code snippet above defines an *IOwinContextProvider* and an implementation. Consumers can depend on the *IOwinContextProvider* and can call its *CurrentContext* property to get the request's current *IOwinContext*.
+The code snippet above defines an *IOwinContextAccessor* and an implementation. Consumers can depend on the *IOwinContextAccessor* and can call its *CurrentContext* property to get the request's current *IOwinContext*.
 
-The following code snippet can be used to register this *IOwinContextProvider* and its implementation:
+The following code snippet can be used to register this *IOwinContextAccessor* and its implementation:
     
 .. code-block:: c#
 
@@ -70,4 +70,4 @@ The following code snippet can be used to register this *IOwinContextProvider* a
         await next();
     });
     
-    container.RegisterSingleton<IOwinContextProvider>(new CallContextOwinContextProvider());
+    container.RegisterSingleton<IOwinContextAccessor>(new CallContextOwinContextAccessor());

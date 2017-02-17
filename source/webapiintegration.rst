@@ -42,7 +42,7 @@ The following code snippet shows how to use the integration package (note that t
         // Here your usual Web API configuration stuff.
     }
 
-With this configuration, ASP.NET Web API will create new *IHttpController* instances through the container. Because controllers are concrete classes, the container will be able to create them without any registration. However, to be able to :ref:`verify <Verify-Configuration>` and :doc:`diagnose <diagnostics>` the container's configuration, it is important to register all root types explicitly.
+With this configuration, ASP.NET Web API will create new *IHttpController* instances through the container. Because controllers are concrete classes, the container will be able to create them without any registration. However, to be able to :ref:`verify <Verify-Configuration>` and :doc:`diagnose <diagnostics>` the container's configuration, it is important to register all root types explicitly, which is done by calling **RegisterWebApiControllers**.
 
 .. container:: Note
 
@@ -95,7 +95,7 @@ There are several ways to get the current *HttpRequestMessage* in your services,
 
 .. code-block:: c#
 
-    public interface IRequestMessageProvider {
+    public interface IRequestMessageAccessor {
         HttpRequestMessage CurrentMessage { get; }
     }
 
@@ -103,10 +103,10 @@ This abstraction can be injected into your services, which can call the *Current
 
 .. code-block:: c#
 
-    private sealed class RequestMessageProvider : IRequestMessageProvider {
+    private sealed class RequestMessageAccessor : IRequestMessageAccessor {
         private readonly Container container;
         
-        public RequestMessageProvider(Container container) {
+        public RequestMessageAccessor(Container container) {
             this.container = container;
         }
 
@@ -119,7 +119,8 @@ This implementation can be implemented as follows:
 
 .. code-block:: c#
 
-    container.RegisterSingleton<IRequestMessageProvider>(new RequestMessageProvider(container));
+    container.RegisterSingleton<IRequestMessageAccessor>(
+        new RequestMessageAccessor(container));
 
 .. _Injecting-dependencies-into-Web-API-filter-attributes:
     

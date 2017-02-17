@@ -30,9 +30,9 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                 DynamicModuleUtility.RegisterModule(typeof(PageInitializerModule));
             }
 
-            void IHttpModule.Init(HttpApplication context) {
-                context.PreRequestHandlerExecute += (sender, e) => {
-                    var handler = context.Context.CurrentHandler;
+            void IHttpModule.Init(HttpApplication app) {
+                app.PreRequestHandlerExecute += (sender, e) => {
+                    var handler = app.Context.CurrentHandler;
                     if (handler != null) {
                         string name = handler.GetType().Assembly.FullName;
                         if (!name.StartsWith("System.Web") &&
@@ -91,11 +91,11 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                     select type;
 
                 foreach (Type type in pageTypes) {
-                    var registration = Lifestyle.Transient.CreateRegistration(type, container);
-                    registration.SuppressDiagnosticWarning(
+                    var reg = Lifestyle.Transient.CreateRegistration(type, container);
+                    reg.SuppressDiagnosticWarning(
                         DiagnosticType.DisposableTransientComponent,
                         "ASP.NET creates and disposes page classes for us.");
-                    container.AddRegistration(type, registration);
+                    container.AddRegistration(type, reg);
                 }                
             }
 
