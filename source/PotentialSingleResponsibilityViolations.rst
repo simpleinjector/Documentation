@@ -24,7 +24,7 @@ The general consensus is that a constructor with more than 4 or 5 dependencies i
 How to Fix Violations
 =====================
 
-The article `Dealing with constructor over-injection by Mark Seemann <https://deals.manningpublications.com/DependencyInjectioninNET.pdf>`_ goes into detail how to about fixing the root cause of constructor over-injection. Two solutions in particular come to mind.
+The article `Dealing with constructor over-injection <https://deals.manningpublications.com/DependencyInjectioninNET.pdf>`_, Mark Seemann goes into detail how to about fixing the root cause of constructor over-injection. Two solutions in particular come to mind.
 
 Note that moving dependencies out of the constructor and into properties might solve the constructor over-injection code smell, but does not solve a violation of the SRP, since the number of dependencies doesn't decrease.
 

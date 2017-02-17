@@ -22,7 +22,7 @@ This warning deserves your attention, since it might indicate that you program t
 How to Fix Violations
 =====================
 
-Let components depend on an interface that described the contract that this concrete type implements and register that concrete type in the container by that interface.
+Let components depend on an interface that describe the contract that this concrete type implements and register that concrete type in the container by that interface.
 
 When to Ignore Warnings
 =======================
