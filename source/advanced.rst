@@ -36,7 +36,7 @@ Generics
 Batch / Automatic registration
 ==============================
 
-Batch or automatic registration is a way of registering a set of (related) types in one go based on some convention. This features removes the need to constantly update the container's configuration each and every time a new type is added. The following example show a series of manually registered repositories: 
+Batch or automatic registration is a way of registering a set of (related) types in one go based on some convention. This feature removes the need to constantly update the container's configuration each and every time a new type is added. The following example show a series of manually registered repositories: 
 
 .. code-block:: c#
 
@@ -92,7 +92,7 @@ By default **Register** searches the supplied assemblies for all types that impl
 
 .. container:: Note
 
-    **Note**: There is a **Register** overload available that take a list of *System.Type* instances, instead a list of *Assembly* instances and there is a **GetTypesToRegister** method that allows retrieving a list of types based on a given service type for a set of given assemblies.
+    **Note**: There is a **Register** overload available that takes a list of *System.Type* instances, instead a list of *Assembly* instances and there is a **GetTypesToRegister** method that allows retrieving a list of types based on a given service type for a set of given assemblies.
 
 Above are a couple of examples of the things you can do with batch registration. A more advanced scenario could be the registration of multiple implementations of the same closed generic type to a common interface, i.e. a set of types that all implement the same interface.
 
@@ -103,7 +103,7 @@ As an example, imagine the scenario where you have a *CustomerValidator* type an
     var assemblies = new[] { typeof(IValidator<>).Assembly };
     container.RegisterCollection(typeof(IValidator<>), assemblies);
 
-The code snippet registers all types from the given assembly that implement *IValidator<T>*. As we now have multiple implementations the container cannot inject a single instance of *IValidator<T>* and because of this, we need to register collections. Because we register a collection, we can no longer call *container.GetInstance<IValidator<T>>()*. Instead instances can be retrieved by having an *IEnumerable<IValidator<T>>* constructor argument or by calling *container.GetAllInstances<IValidator<T>>()*.
+The code snippet registers all types from the given assembly that implement *IValidator<T>*. As we now have multiple implementations the container cannot inject a single instance of *IValidator<T>* and because of this, we need to register collections. Because we register a collection, we can no longer call **container.GetInstance<IValidator<T>>()**. Instead instances can be retrieved by having an *IEnumerable<IValidator<T>>* constructor argument or by calling **container.GetAllInstances<IValidator<T>>()**.
 
 It is not generally regarded as best practice to have an *IEnumerable<IValidator<T>>* dependency in multiple class constructors (or accessed from the  container directly). Depending on a set of types complicates your application design, can lead to code duplication. This can often be simplified with an alternate configuration. A better way is to have a single composite type that wraps *IEnumerable<IValidator<T>>* and presents it to the consumer as a single instance, in this case a *CompositeValidator<T>*:
 
@@ -198,7 +198,7 @@ This willl however not work, because this registration will try to map any close
     container.RegisterConditional(typeof(IValidate<>), typeof(NullValidator<>),
         c => !c.Handled);
 
-The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for *IValidate<Department>*, for example, will return a *NullValidator<Department>* instance each time. The **RegisterConditional** is supplied with a predicate. In this case the predicate checks whether there already is a different registration that handles the requested service type. In that case the predicate returns falls and the registration is not applied.
+The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for *IValidate<Department>*, for example, will return a *NullValidator<Department>* instance each time. The **RegisterConditional** is supplied with a predicate. In this case the predicate checks whether there already is a different registration that handles the requested service type. In that case the predicate returns *false* and the registration is not applied.
 
 This predicate can also be used to apply types conditionally based on a number of contextual arguments. Here's an example:
 
@@ -291,7 +291,7 @@ But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible
 
     **Note**: This will work equally well when the open generic types contain type constraints. In that case those types will be applied conditionally to the collections based on their generic type constraints.
 
-In most cases however, manually supplying the **RegisterCollection** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the **RegisterCollection** overloads that accepts the `BatchRegistrationCallback <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Extensions_BatchRegistrationCallback.htm>`_ delegate and append the open generic type separately:
+In most cases however, manually supplying the **RegisterCollection** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the **RegisterCollection** overloads that accepts a list of assemblies and append the open generic type separately:
 
 .. code-block:: c#
 
@@ -301,22 +301,27 @@ In most cases however, manually supplying the **RegisterCollection** with a list
     container.RegisterCollection(typeof(IValidator<>),
         new[] { typeof(IValidator<>).Assembly });
 
+.. container:: Note
+
+    **Warning**: This **RegisterCollection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart. In case strict ordering is required, use the **GetTypesToRegister** method (as explained below) and order types manually.
+        
 Alternatively, we can make use of the Container's **GetTypesToRegister** to find the types for us:
 
 .. code-block:: c#
 
-    List<Type> typesToRegister = new List<Type> {
-        typeof(DataAnnotationsValidator<>)
-    };
-    
-    var assemblies = new[] { typeof(IValidator<>).Assembly) };
-    typesToRegister.AddRange(container.GetTypesToRegister(typeof(IValidator<>), assemblies));
+    var typesToRegister = container.GetTypesToRegister(
+        typeof(IValidator<>),
+        new[] { typeof(IValidator<>).Assembly) }, 
+        new TypesToRegisterOptions { 
+            IncludeGenericTypeDefinitions = true,
+            IncludeComposites = false,
+        });
 
-    container.RegisterCollection(typeof(IValidator<>), typesToRegister);
-        
+    container.RegisterCollection(typeof(IValidator<>), typesToRegister);    
+    
 .. container:: Note
 
-    The **Register** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well.
+    The **Register** and **RegisterCollection** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well. Each however use their own **TypesToRegisterOptions** configuration.
 
 
 .. _Unregistered-Type-Resolution:
@@ -352,7 +357,7 @@ One of the simplest use cases for **RegisterConditional** is to select an implem
     
 Here we register three implementations, namely *NullLogger*, *FileLogger* and *DatabaseLogger*, all of which implement *ILogger*. The registrations are made using a predicate (lambda) describing for which condition they hold. The *NullLogger* will only be injected into the *HomeController* and the *FileLogger* will only be injected into the *UsersController*. The *DatabaseLogger* on the other hand is configured as fallback registration and will be injected in all other consumers.
 
-Simple Injector will process conditional registrations in the order in which they are made. This means that fallback registrations, such as for the previous *DatabaseLogger*, should be made last.    Simple Injector will always call all predicates to ensure no overlapping registrations are made. In case there multiple conditional registrations that can be applied, Simple Injector will throw an exception.
+Simple Injector will process conditional registrations in the order in which they are made. This means that fallback registrations, such as for the previous *DatabaseLogger*, should be made last. Simple Injector will always call all predicates to ensure no overlapping registrations are made. In case there are multiple conditional registrations that can be applied, Simple Injector will throw an exception.
 
 .. container:: Note
 
@@ -402,22 +407,25 @@ Property injection
 
 Simple Injector does not inject any properties into types that get resolved by the container. In general there are two ways of doing property injection, and both are not enabled by default for reasons explained below.
 
-**Implicit property injection**
+Implicit property injection
+---------------------------
 
 Some containers (such as Castle Windsor) implicitly inject public writable properties by default for any instance you resolve. They do this by mapping those properties to configured types. When no such registration exists, or when the property doesn't have a public setter, the property will be skipped. Simple Injector does not do implicit property injection, and for good reason. We think that **implicit property injection** is simply too uuhh... implicit :-). Silently skipping properties that can't be mapped can lead to a DI configuration that can't be easily verified and can therefore result in an application that fails at runtime instead of failing when the container is verified.
 
 
 .. _Explicit-Property-Injection:
 
-**Explicit property injection**
+Explicit property injection
+---------------------------
 
-We strongly feel that explicit property injection is a much better way to go. With explicit property injection the container is forced to inject a property and the process will fail immediately when a property can't be mapped or injected. Some containers (such as Unity and Ninject) allow explicit property injection by allowing properties to be decorated with attributes that are defined by the DI library. Problem with this is that this forces the application to take a dependency on the library, which is something that should be prevented.
+We strongly feel that explicit property injection is a much better way to go. With explicit property injection the container is forced to inject a property and the process will fail immediately when a property can't be mapped or injected. Some containers (such as Unity and Ninject) allow explicit property injection by allowing properties to be marked with attributes that are defined by the DI library. Problem with this is that this forces the application to take a dependency on the library, which is something that should be prevented.
 
 Because Simple Injector does not encourage its users to take a dependency on the container (except for the startup path of course), Simple Injector does not contain any attributes that allow explicit property injection and it can therefore not explicitly inject properties out-of-the-box.
 
 Besides this, the use of property injection should be very exceptional and in general constructor injection should be used in the majority of cases. If a constructor gets too many parameters (constructor over-injection anti-pattern), it is an indication of a violation of the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). SRP violations often lead to maintainability issues. So instead of patching constructor over-injection with property injection, the root cause should be analyzed and the type should be refactored, probably with `Facade Services <http://blog.ploeh.dk/2010/02/02/RefactoringtoAggregateServices/>`_. Another common reason to use properties is because those dependencies are optional. Instead of using optional property dependencies, best practice is to inject empty implementations (a.k.a. `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) into the constructor.
 
-**Enabling property injection**
+Enabling property injection
+---------------------------
 
 Simple Injector contains two ways to enable property injection. First of all the :ref:`RegisterInitializer\<T\> <Configuring-Property-Injection>` method can be used to inject properties (especially configuration values) on a per-type basis. Take for instance the following code snippet:
 
@@ -435,6 +443,10 @@ In the previous example an *Action<T>* delegate is registered that will be calle
 
 
 .. _ImportPropertySelectionBehavior:
+.. _IPropertySelectionBehavior:
+
+IPropertySelectionBehavior
+--------------------------
 
 The second way to inject properties is by implementing a custom **IPropertySelectionBehavior**. The *property selection behavior* is a general extension point provided by the container, to override the library's default behavior (which is to *not* inject properties). The following example enables explicit property injection using attributes, using the *ImportAttribute* from the *System.ComponentModel.Composition.dll*:
 
@@ -524,20 +536,20 @@ The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbr
     
 With the given classes, the code snippet above will give the following output:
 
-.. code-block
+.. code-block:: c#
 
     SendFlowersToMovedCustomer
     WarnShippingDepartmentAboutMove
     
-Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEvent>*, the container returned *IEventHandler<CustomerMovedEvent>* and *IEventHandler<CustomerMovedAbroadEvent>*. Simple Injector did this because the *IEventHandler<in TEvent>* interface was defined with the *in* keyword, which makes *SendFlowerToMovedCustomer* assignable to *IEventHandler<CustomerMovedAbroadEvent>* (since *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*, *SendFlowerToMovedCustomer* can also process *CustomerMovedAbroadEvent* events). 
+Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEvent>*, the container returned *IEventHandler<CustomerMovedEvent>* and *IEventHandler<CustomerMovedAbroadEvent>*. Simple Injector did this because the *IEventHandler<in TEvent>* interface was defined with the ***in*** keyword, which makes *IEventHandler<SendFlowerToMovedCustomer>* assignable to *IEventHandler<CustomerMovedAbroadEvent>* (since *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*, *SendFlowerToMovedCustomer* can also process *CustomerMovedAbroadEvent* events). 
 
 .. container:: Note
 
-    **Tip**: If you don't want Simple Injector to resolve variant registrations remove the *in* and *out* keywords from the interface definition. I.e. the *in* and *out* keywords are the trigger for Simple Injector to apply variance.
+    **Tip**: If you don't want Simple Injector to resolve variant registrations remove the **in** and **out** keywords from the interface definition. i.e. the **in** and **out** keywords are the trigger for Simple Injector to apply variance.
 
 .. container:: Note
 
-    **Tip**: Don't mark generic type arguments with *in* and *out* keywords by default, even if Resharper tells you to. Most of the generic abstractions you define will always have exactly one non-generic implementation but marking the interface with *in* and *out* keywords communicates that covariance and contravariance is expected and there could therefore be multiple applicable implementations. This will confuse the reader of your code. Only apply these keywords if variance is actually required. You should typically not use variance when defining *ICommandHandler<TCommand>* or *IQueryHandler<TQuery, TResult>*, but it might make sense for *IEventHandler<in TEvent>* and *IValidator<in T>*.
+    **Tip**: Don't mark generic type arguments with **in** and **out** keywords by default, even if Resharper tells you to. Most of the generic abstractions you define will always have exactly one non-generic implementation but marking the interface with **in** and **out** keywords communicates that covariance and contravariance is expected and there could therefore be multiple applicable implementations. This will confuse the reader of your code. Only apply these keywords if variance is actually required. You should typically not use variance when defining *ICommandHandler<TCommand>* or *IQueryHandler<TQuery, TResult>*, but it might make sense for *IEventHandler<in TEvent>* and *IValidator<in T>*.
     
 .. container:: Note
     
@@ -558,7 +570,7 @@ Applications with a plugin architecture often allow special plugin assemblies to
     var pluginAssemblies =
         from file in new DirectoryInfo(pluginDirectory).GetFiles()
         where file.Extension.ToLower() == ".dll"
-        select Assembly.LoadFile(file.FullName);
+        select Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
 
     container.RegisterCollection<IPlugin>(pluginAssemblies);
 

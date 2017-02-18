@@ -110,7 +110,7 @@ Using Simple Injector, the configuration of the application using the *UserContr
 
 The given configuration registers implementations for the *IUserRepository* and *ILogger* interfaces. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as *SqlUserRepository*) to an interface or base type. In the given example, every time you ask the container for an *IUserRepository*, it will always create a new *SqlUserRepository* on your behalf (in DI terminology: an object with a **Transient** lifestyle).
 
-The seconds registration maps the *ILogger* interface to a *MailLogger* implementation. This *MailLogger* is registered with the **Singleton** lifestyle; only one instance of *MailLogger* will ever be created by the **Container**.
+The second registration maps the *ILogger* interface to a *MailLogger* implementation. This *MailLogger* is registered with the **Singleton** lifestyle; only one instance of *MailLogger* will ever be created by the **Container**.
 
 .. container:: Note
 
@@ -147,5 +147,6 @@ For more information about Simple Injector please visit the following links:
 * For more information about dependency injection in general, please visit `this page on Stackoverflow <https://stackoverflow.com/tags/dependency-injection/info>`_.
 * If you have any questions about how to use Simple Injector or about dependency injection in general, the experts at `Stackoverflow.com <https://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23>`_ are waiting for you.
 * For all other Simple Injector related question and discussions, such as bug reports and feature requests, the `Simple Injector discussion forum <https://simpleinjector.org/forum>`_ will be the place to start.
+* The book `Dependency Injection in .NET <https://manning.com/seemann/>`_ presents core DI patterns in plain C# so you'll fully understand how DI works.
 
 **Happy injecting!**

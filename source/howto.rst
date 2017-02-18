@@ -8,6 +8,7 @@ How To
 * How to :ref:`Override existing registrations <Override-Existing-Registrations>`
 * How to :ref:`Verify the container's configuration <Verify-Configuration>`
 * How to :ref:`Work with dependency injection in multi-threaded applications <Multi-Threaded-Applications>`
+* How to :ref:`Package registrations <Package-registrations>`
 
 .. _Register-Factory-Delegates:
 
@@ -145,28 +146,30 @@ After calling this *AllowResolvingFuncFactories* extension method, the container
 
 .. container:: Note
 
-    **Note**: We personally think that allowing to register *Func<T>* delegates by default is a design smell. The use of *Func<T>* delegates makes your design harder to follow and your system harder to maintain and test. Your system should only have a few of those factories at most. If you have many constructors in your system that depend on a *Func<T>*, please take a good look at your dependency strategy. `The following article <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=100>`_ goes into details about why Abstract Factories (such as *Func<T>*) are a design smell.
-
+    **Warning**: We personally think that allowing to register *Func<T>* delegates by default is a design smell. The use of *Func<T>* delegates makes your design harder to follow and your system harder to maintain and test. Your system should only have a few of those factories at most. If you have many constructors in your system that depend on a *Func<T>*, please take a good look at your dependency strategy. `The following article <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=100>`_ goes into details about why Abstract Factories (such as *Func<T>*) are a design smell.
 
 .. _lazy:
 
-Just like *Func<T>* delegates can be injected, *Lazy<T>* instances can also be injected into services. *Lazy<T>* is useful in situations where the creation of a service is time consuming and not always required. *Lazy<T>* enables you to postpone the creation of a service until the moment it is actually required:
+Lazy
+----
+
+Just like *Func<T>* delegates can be injected, *Lazy<T>* instances can also be injected into components. *Lazy<T>* is useful in situations where the creation of a component is time consuming and not always required. *Lazy<T>* enables you to postpone the creation of such a component until the moment it is actually required:
 
 .. code-block:: c#
 
     // Registration    
     container.Register<Lazy<IMyService>>(
-        () => new Lazy<IMyService>(container.GetInstance<IMyService>));
+        () => new Lazy<IMyService>(container.GetInstance<RealService>));
 
     // Usage
-    public class MyService {
+    public class SomeController {
         private readonly Lazy<IMyService> myService;
         
-        public MyService(Lazy<IMyService> myService) {
+        public SomeController(Lazy<IMyService> myService) {
             this.myService = myService;
         }
         
-        public void SomeOperation() {
+        public void SomeOperation(bool someCondition) {
             if (someCondition) {
                 this.myService.Value.Operate();
             }
@@ -175,7 +178,7 @@ Just like *Func<T>* delegates can be injected, *Lazy<T>* instances can also be i
 
 .. container:: Note
 
-    **Note**: instead of polluting the API of your application with *Lazy<T>* dependencies, it is usually cleaner to hide the *Lazy<T>* behind a proxy:
+    **Tip**: instead of polluting the API of your application with *Lazy<T>* dependencies, it is usually cleaner to hide the *Lazy<T>* behind a proxy, as shown in the following example.
 
 .. code-block:: c#
 
@@ -196,11 +199,28 @@ Just like *Func<T>* delegates can be injected, *Lazy<T>* instances can also be i
     container.Register<IMyService>(() => new LazyServiceProxy(
         new Lazy<IMyService>(container.GetInstance<RealService>)));
     
-This way the application can simply depend on *IMyService* instead of *Lazy<IMyService>*.
+This way the application can simply depend on *IMyService* instead of *Lazy<IMyService>*:
+
+.. code-block:: c#
+
+    // Usage
+    public class SomeController {
+        private readonly IMyService myService;
+        
+        public SomeController(IMyService myService) {
+            this.myService = myService;
+        }
+        
+        public void SomeOperation(bool someCondition) {
+            if (someCondition) {
+                this.myService.Operate();
+            }
+        }
+    }
 
 .. container:: Note
 
-    **Warning**: The same warning applies to the use of *Lazy<T>* as it does for the use of *Func<T>* delegates. Further more, the constructors of your components should be simple, reliable and quick, and that would remove the need for lazy initialization. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container's configuration <Verify-Configuration>`.
+    **Warning**: The same warning applies to the use of *Lazy<T>* as it does for the use of *Func<T>* delegates. Further more, the constructors of your components should be simple, reliable and quick (as explained in `this blog post <http://blog.ploeh.dk/2011/03/03/InjectionConstructorsshouldbesimple/>`_ by Mark Seemann), and that would remove the need for lazy initialization. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container's configuration <Verify-Configuration>`.
 
 .. _Resolve-Instances-By-Key:
 
@@ -235,8 +255,7 @@ By inheriting from the BCL's *Dictionary<TKey, TValue>*, creating an *IRequestHa
 .. code-block:: c#
 
     public class RequestHandlerFactory : Dictionary<string, Func<IRequestHandler>>,
-        IRequestHandlerFactory 
-    {
+        IRequestHandlerFactory {
         public IRequestHandler CreateNew(string name) {
             return this[name]();
         }
@@ -248,23 +267,17 @@ With this class, we can register *Func<IRequestHandler>* factory methods by a ke
 
     var container = new Container();
      
-    container.RegisterSingle<IRequestHandlerFactory>(new RequestHandlerFactory
-    {
+    container.RegisterSingle<IRequestHandlerFactory>(new RequestHandlerFactory {
         { "default", () => container.GetInstance<DefaultRequestHandler>() },
         { "orders", () => container.GetInstance<OrdersRequestHandler>() },
         { "customers", () => container.GetInstance<CustomersRequestHandler>() },
     });
 
-.. container:: Note
-
-    **Note**: this design will work with almost all DI containers making the design easy to follow and also making it portable between DI libraries.
-
 If you don't like a design that uses *Func<T>* delegates this way, it can easily be changed to be a *Dictionary<string, Type>* instead. The *RequestHandlerFactory* can be implemented as follows:
 
 .. code-block:: c#
 
-    public class RequestHandlerFactory : Dictionary<string, Type>, IRequestHandlerFactory
-    {
+    public class RequestHandlerFactory : Dictionary<string, Type>, IRequestHandlerFactory {
         private readonly Container container;
         
         public RequestHandlerFactory(Container container) {
@@ -282,8 +295,7 @@ The registration will then look as follows:
 
     var container = new Container();
 
-    container.RegisterSingle<IRequestHandlerFactory>(new RequestHandlerFactory(container)
-    {
+    container.RegisterSingle<IRequestHandlerFactory>(new RequestHandlerFactory(container) {
         { "default", typeof(DefaultRequestHandler) },
         { "orders", typeof(OrdersRequestHandler) },
         { "customers", typeof(CustomersRequestHandler) },
@@ -291,32 +303,29 @@ The registration will then look as follows:
 
 .. container:: Note
 
-    **Note**: Please remember the previous note about ambiguity in the application design. In the given example the design would probably be better of by using a generic *IRequestHandler<TRequest>* interface. This would allow the implementations to be :ref:`batch registered using a single line of code <Batch-Registration>`, saves you from using keys, and results in a configuration the is :ref:`verifiable by the container <Verify-Configuration>`.
+    **Note**: Please remember the previous note about ambiguity in the application design. In the given example the design would probably be better of by using a generic *IRequestHandler<TRequest>* interface. This would allow the implementations to be :ref:`batch registered using a single line of code <Batch-Registration>`, saves you from using keys, and results in a configuration that is :ref:`verifiable by the container <Verify-Configuration>`.
 
 A final option for implementing keyed registrations is to manually create the registrations and store them in a dictionary. The following example shows the same *RequestHandlerFactory* using this approach:
 
 .. code-block:: c#
 
     public class RequestHandlerFactory : IRequestHandlerFactory {
-        private readonly Dictionary<string, InstanceProducer> producers =
-            new Dictionary<string, InstanceProducer>(
+        readonly Container container;
+        readonly Dictionary<string, InstanceProducer<IRequestHandler>> producers =
+            new Dictionary<string, InstanceProducer<IRequestHandler>>(
                 StringComparer.OrdinalIgnoreCase);
-
-        private readonly Container container;
 
         public RequestHandlerFactory(Container container) {
             this.container = container;
         }
 
         IRequestHandler IRequestHandlerFactory.CreateNew(string name) {
-            return (IRequestHandler)this.producers[name].GetInstance();
+            return this.producers[name].GetInstance();
         }
 
         public void Register<TImplementation>(string name, Lifestyle lifestyle = null)
             where TImplementation : class, IRequestHandler {
-            lifestyle = lifestyle ?? Lifestyle.Transient;
-
-            var producer = lifestyle
+            var producer = (lifestyle ?? container.Options.DefaultLifestyle)
                 .CreateProducer<IRequestHandler, TImplementation>(container);
 
             this.producers.Add(name, producer);
@@ -335,7 +344,7 @@ The registration will then look as follows:
     factory.Register<OrdersRequestHandler>("orders");
     factory.Register<CustomersRequestHandler>("customers");
 
-    container.RegisterSingle<IRequestHandlerFactory>(factory);
+    container.RegisterSingleton<IRequestHandlerFactory>(factory);
 
 The advantage of this method is that it completely integrates with the *Container*. :ref:`Decorators <decoration>` can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
 
@@ -358,9 +367,11 @@ To adhere to the `Interface Segregation Principle <http://en.wikipedia.org/wiki/
 
     var a = container.GetInstance<IInterface1>();
     var b = container.GetInstance<IInterface2>();
+    var c = container.GetInstance<IInterface3>();
 
-    // Since Impl is a singleton, both requests return the same instance.
+    // Since Impl is a singleton, all requests return the same instance.
     Assert.AreEqual(a, b);
+    Assert.AreEqual(b, c);
 
 The first line creates a **Registration** instance for the *Impl*, in this case with a singleton lifestyle. The other lines add this registration to the container, once for each interface. This maps multiple service types to the exact same registration.
 
@@ -375,7 +386,7 @@ Override existing registrations
 
 The default behavior of Simple Injector is to fail when a service is registered for a second time. Most of the time the developer didn't intend to override a previous registration and allowing this would lead to a configuration that would pass the container's verification, but doesn't behave as expected.
 
-:ref:`This design decision <Separate-collections>` differs from most other DI libraries, where adding new registrations results in appending the collection of registrations for that abstraction. Registering collections in Simple Injector is an explicit action done using one of the `RegisterCollection <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterCollection.htm>`_ method overloads.
+:ref:`This design decision <Separate-collections>` differs from most other DI libraries, where adding new registrations results in appending the collection of registrations for that abstraction. Registering collections in Simple Injector is an :ref:`explicit action <Separate-collections>` done using one of the `RegisterCollection <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Container_RegisterCollection.htm>`_ method overloads.
 
 There are certain scenarios however where overriding is useful. An example of such is a bootstrapper project for a business layer that is reused in multiple applications (in both a web application, web service, and Windows service for instance). Not having a business layer specific bootstrapper project would mean the complete DI configuration would be duplicated in the startup path of each application, which would lead to code duplication. In that situation the applications would roughly have the same configuration, with a few adjustments.
 
@@ -424,7 +435,7 @@ Simple Injector contains a **Verify()** method, that will iterate over all regis
 
 Calling the **Verify()** method however, is just part of the story. It is very easy to create a configuration that passes any verification, but still fails at runtime. Here are some tips to help building a verifiable configuration:
 
-#. Stay away from :ref:`implicit property injection <Property-Injection>`, where the container is allowed to skip injecting the property if a corresponding or correctly registered dependency can't be found. This will disallow your application to fail fast and will result in *NullReferenceException*'s later on. Only use implicit property injection when the property is truly optional, omitting the dependency still keeps the configuration valid, and the application still runs correctly without that dependency. Truly optional dependencies should be very rare though, since most of the time you should prefer injecting empty implementations (a.k.a. the `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) instead of allowing dependencies to be a null reference. :ref:`Explicit property injection <Configuring-Property-Injection>` on the other hand is fine. With explicit property injection you force the container to inject a property and it will fail when it can't succeed. However, you should prefer constructor injection whenever possible. Note that the need for property injection is often an indication of problems in the design. If you revert to property injection because you otherwise have too many constructor arguments, you're probably violating the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`.
+#. Stay away from :ref:`implicit property injection <Property-Injection>`, where the container is allowed to skip injecting the property if a corresponding or correctly registered dependency can't be found. This will disallow your application to fail fast and will result in *NullReferenceException*'s later on. Only use implicit property injection when the property is truly optional, omitting the dependency still keeps the configuration valid, and the application still runs correctly without that dependency. Truly optional dependencies should be very rare though, since most of the time you should prefer injecting empty implementations (a.k.a. the `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) instead of allowing dependencies to be a null reference. :ref:`Explicit property injection <Configuring-Property-Injection>` on the other hand is better. With explicit property injection you force the container to inject a property and it will fail when it can't succeed. However, you should prefer constructor injection whenever possible. Note that the need for property injection is often an indication of problems in the design. If you revert to property injection because you otherwise have too many constructor arguments, you're probably violating the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_.
 
 #. Register all root objects explicitly. For instance, register all ASP.NET MVC Controller instances explicitly in the container (Controller instances are requested directly and are therefore called 'root objects'). This way the container can check the complete dependency graph starting from the root object when you call **Verify()**. Prefer registering all root objects in an automated fashion, for instance by using reflection to find all root types. The `Simple Injector ASP.NET MVC Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Web.Mvc>`_ for instance, contains a `RegisterMvcControllers <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_SimpleInjectorMvcExtensions_RegisterMvcControllers.htm>`_ extension method that will do this for you and the `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ contains a similar `RegisterWcfServices <https://simpleinjector.org/ReferenceLibrary.v2/?topic=html/M_SimpleInjector_SimpleInjectorWcfExtensions_RegisterWcfServices.htm>`_ extension method for this purpose.
 
@@ -459,7 +470,7 @@ Dependency injection however, can actually help in writing multi-threaded applic
 
     **Note:** By default, Simple Injector 3 will check for Lifestyle Mismatches for you when you resolve a service. In other words, Simple Injector will fail fast when there is a Lifestyle Mismatch in your configuration.
 
-In a multi-threaded application, each thread should get its own object graph. This means that you should typically call *container.GetInstance<T>()* once at the beginning of the thread's execution to get the root object for processing that thread (or request). The container will build an object graph with all root object's dependencies. Some of those dependencies will be singletons; shared between all threads. Other dependencies might be transient; a new instance is created per dependency. Other dependencies might be thread-specific, request-specific, or with some other lifestyle. The application code itself is unaware of the way the dependencies are registered and that's the way it is supposed to be.
+In a multi-threaded application, each thread should get its own object graph. This means that you should typically call **GetInstance<T>()** once at the beginning of the thread's execution to get the root object for processing that thread (or request). The container will build an object graph with all root object's dependencies. Some of those dependencies might be singletons; shared between all threads. Other dependencies might be transient; a new instance is created per dependency. Other dependencies might be thread-specific, request-specific, or with some other lifestyle. The application code itself is unaware of the way the dependencies are registered and that's the way it is supposed to be.
 
 For web applications, you typically call **GetInstance<T>()** at the beginning of the web request. In an ASP.NET MVC application for instance, one Controller instance will be requested from the container (by the Controller Factory) per web request. When using one of the integration packages, such as the `Simple Injector MVC Integration Quick Start NuGet package <https://nuget.org/packages/SimpleInjector.MVC3>`_ for instance, you don't have to call **GetInstance<T>()** yourself, the package will ensure this is done for you. Still, **GetInstance<T>()** is typically called once per request.
 
@@ -524,7 +535,87 @@ In the Composition Root, instead of registering the *MailSender*, we register th
     container.Register<IMailSender, RealMailSender>();
     container.RegisterDecorator<IMailSender, AsyncMailSenderProxy>(Lifestyle.Singleton);
 
-In this case the container will ensure that when an *IMailSender* is requested, a single *AsyncMailSenderProxy* is returned with a *Func<IMailSender>* delegate that will create a new *RealMailSender* when requested. The `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ and `RegisterSingleDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterSingleDecorator.htm>`_ overloads natively understand how to handle *Func<Decoratee>* dependencies. The :ref:`Decorators <Decorators>` section of the :doc:`Advanced Scenarios <advanced>` wiki page explains more about registering decorators.
+In this case the container will ensure that when an *IMailSender* is requested, a single *AsyncMailSenderProxy* is returned with a *Func<IMailSender>* delegate that will create a new *RealMailSender* when requested. The `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ overloads natively understand how to handle *Func<Decoratee>* dependencies. The :ref:`Decorators <Decoration>` section explains more about registering decorators.
+
+.. container:: Note
+
+    **Warning:** Please note that the previous example is just meant for educational purposes. In practice, you want the sending of e-mails to go through a durable queue or outbox to prevent loss of e-mails. Loss can occur when the mail server is unavailable, which is something that is guaranteed to happen at some point in time, even when the mail server is running locally.
+
+.. _Package-registrations:
+
+Package registrations
+=====================
+
+Simple Injector has the notion of 'packages'. A package is a group of container registrations packed into a class that implements the **IPackage** interface. This feature is similar to what other containers call Installers, Modules or Registries.
+
+To use this feature, you need to install the `SimpleInjector.Packaging NuGet package <https://www.nuget.org/packages/SimpleInjector.Packaging/>`_.
+
+.. container:: Note
+
+    **SimpleInjector.Packaging** exists to accomodate applications that require plug-in like modularization, where parts of the application, packad with their own container registrations, can be independently compiled into a dll and 'dropped' into a folder, where the main application can pick them up, without the need for the main application to be recompiled and redeployed.
+
+To accomodate this, those independent application parts can create a package by defining a class that implements the **IPackage** interface:
+
+.. code-block:: c#
+
+    public class ModuleXPackage : IPackage
+    {
+        public void RegisterServices(Container container)
+        {
+            container.Register<IService1, Service1Impl>();
+            container.Register<IService2, Service2Impl>();
+        }
+    }
+
+After doing so, the main application can dynamically load these application modules, and make sure their packages are ran:
+
+.. code-block:: c#
+    
+    var assemblies =
+        from file in new DirectoryInfo(pluginDirectory).GetFiles()
+        where file.Extension.ToLower() == ".dll"
+        select Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
+
+    container.RegisterPackages(assemblies);
+
+As explained above, **SimpleInjector.Packaging** is specifically designed for loading configurations from assemblies that are loaded dynamically. In other scenarios the use of Packaging is discouraged.
+
+For non-plug-in scenario's, all container registrations should be located as close as possible to the application’s entry point. This location is commonly referred to as the `Composition Root <http://blog.ploeh.dk/2011/07/28/CompositionRoot/>`_.
+
+Although even inside the Composition Root it might make sense to split the registration into multiple functions or even classes, as long as those registrations are available to the entry-point at compile time, it makes more sense to call them statically instead of by the use of reflection, as can be seen in the following example:
+
+.. code-block:: c#
+
+    public void App_Start()
+    {
+        var container = new Container();
+        container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
+        BusinessLayerBootstrapper.Bootstrap(container);
+        PresentationLayerBootstrapper.Bootstrap(container);
+    
+        // add missing registrations here.
+    
+        container.Verify();
+    }
+
+    class BusinessLayerBootstrapper {
+        public static void Bootstrap(Container container) { ... }
+    }
+    
+    class PresentationLayerBootstrapper {
+        public static void Bootstrap(Container container) { ... }
+    }
+
+The previous example gives the same amount of componentization, while everything is visibly referenced from within the start-up path. In other words, you can use your IDE's *go-to reference* feature to jump directly to that code, while still being able to group things together.
+
+On top of this, switching on or off groups of registrations based on configuration settings becomes simpler, as can be seen in the following example:
+
+.. code-block:: c#
+
+    if (ConfigurationManager.AppSettings["environment"] != "production")
+         MockedExternalServicesPackage.Bootstrap(container);
+    else
+         ProductionExternalServicesPackage.Bootstrap(container);
 
 |
 |

@@ -2,7 +2,7 @@
 Interception Extensions
 =======================
 
-**Adding interception abilities to the Simple Injector.**
+**Adding interception abilities to Simple Injector.**
 
 .. code-block:: c#
 
@@ -144,13 +144,13 @@ Interception Extensions
             [DebuggerStepThrough]
             public void OnExpressionBuilt(object sender, ExpressionBuiltEventArgs e) {
                 if (this.Predicate(e.RegisteredServiceType)) {
-                    ThrowIfServiceTypeNotAnInterface(e);
+                    ThrowIfServiceTypeNotInterface(e);
                     e.Expression = this.BuildProxyExpression(e);
                 }
             }
 
             [DebuggerStepThrough]
-            private static void ThrowIfServiceTypeNotAnInterface(ExpressionBuiltEventArgs e) {
+            private static void ThrowIfServiceTypeNotInterface(ExpressionBuiltEventArgs e) {
                 // NOTE: We can only handle interfaces, because
                 // System.Runtime.Remoting.Proxies.RealProxy only supports interfaces.
                 if (!e.RegisteredServiceType.IsInterface) {
@@ -235,8 +235,10 @@ Interception Extensions
             }
 
             private IMessage InvokeMethodCall(IMethodCallMessage message) {
-                var invocation = 
-                    new Invocation { Proxy = this, Message = message, Arguments = message.Args };
+                var invocation = new Invocation {
+                    Proxy = this, 
+                    Message = message, 
+                    Arguments = message.Args };
 
                 invocation.Proceeding += () => {
                     invocation.ReturnValue = message.MethodBase.Invoke(

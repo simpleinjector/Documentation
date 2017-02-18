@@ -9,7 +9,7 @@ Below is a list of the most common lifestyles with code examples of how to confi
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 | Lifestyle                                     | Description                                                           | Disposal                   |
 +===============================================+=======================================================================+============================+
-| :ref:`Transient <Transient>`                  | A new instance of the service type will be created each time the      | Never                      |
+| :ref:`Transient <Transient>`                  | A new instance of the component will be created each time the         | Never                      |
 |                                               | service is requested from the container. If multiple consumers depend |                            |
 |                                               | on the service within the same graph, each consumer will get its own  |                            |
 |                                               | new instance of the given service.                                    |                            |
@@ -62,12 +62,6 @@ The next example instantiates a new *RealService* instance on each call by using
 .. container:: Note
     
     **Note**: It is normally recommended that registrations are made using **Register<TService, TImplementation>()**. It is easier, leads to less fragile configuration, and results in faster retrieval than registrations using a *Func<T>* delegate. Always try the former approach before resorting to using delegates.
-
-This construct is only required for registering types by a base type or an interface. For concrete transient types, no formal registration is required as concrete types will be automatically registered on request:
-
-.. code-block:: c#
-
-    container.GetInstance<RealService>(); 
     
 .. container:: Note
 
@@ -117,21 +111,21 @@ Alternatively, when needing to register a concrete type as singleton, you can us
 Registration for concrete singletons is necessarily, because unregistered concrete types will be treated as transient.
 
 .. container:: Note
-	
-	**Warning**: Simple Injector guarantees that there is at most one instance of the registered **Singleton** inside that **Container** instance, but if multiple **Container** instances are created, each **Container** instance will get its own instance of the registered **Singleton**.
+    
+    **Warning**: Simple Injector guarantees that there is at most one instance of the registered **Singleton** inside that **Container** instance, but if multiple **Container** instances are created, each **Container** instance will get its own instance of the registered **Singleton**.
 
 .. container:: Note
 
-    **Note**: Simple Injector will cache a **Singleton** instance for the lifetime of the **Container** instance and will dispose any auto-wired instance (that implements *IDisposable*) when **Container.Dispose()** is called. This includes registrations using **RegisterSingleton<TService, TImplementation>()** **RegisterSingleton<TConcrete>()** and **RegisterSingleton(Type, Type)**. Non-auto-wired instances that are created using factory delegates will be disposed as well. This includes **RegisterSingleton<TService>(Func<TService>)** and **RegisterSingleton(Type, Func<object>)**.
+    **Note**: Simple Injector will cache a **Singleton** instance for the lifetime of the **Container** instance and will dispose any auto-wired instance (that implements *IDisposable*) when **Container.Dispose()** is called. This includes registrations using **RegisterSingleton<TService, TImplementation>()**, **RegisterSingleton<TConcrete>()** and **RegisterSingleton(Type, Type)**. Non-auto-wired instances that are created using factory delegates will be disposed as well. This includes **RegisterSingleton<TService>(Func<TService>)** and **RegisterSingleton(Type, Func<object>)**.
 
 .. container:: Note
-	
-	**Warning**: Already existing instances that are supplied to the container using **RegisterSingleton<TService>(TService)* and **RegisterSingleton(Type, object)** will not be disposed by the container. They are considered to be 'externally owned'.
-	
+    
+    **Warning**: Already existing instances that are supplied to the container using **RegisterSingleton<TService>(TService)** and **RegisterSingleton(Type, object)** will not be disposed by the container. They are considered to be 'externally owned'.
+    
 .. container:: Note
 
-    **Note**: Simple Injector guarantees that instances are disposed in opposite order of creation. When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B*  (assuming both implement *IDisposable*), since the guarantee of opposite order of creation. This allows *A* to use *B* while *A* is being disposed.
-	
+    **Note**: Simple Injector guarantees that instances are disposed in opposite order of creation. See: :ref:`Order of disposal <Order-of-disposal>` for more information.
+    
 .. _Scoped:
 
 Scoped
@@ -147,7 +141,7 @@ Simple Injector contains five scoped lifestyles:
 | Lifestyle                                     | Description                                                           | Disposal                   |
 +===============================================+=======================================================================+============================+
 | :ref:`Per Web Request <PerWebRequest>`        | Only one instance will be created by the container per web request.   | Instances will be disposed | 
-|                                               |                                                                       | when the web request ends. |
+|                                               | Use this lifestyle for ASP.NET Web Forms and ASP.NET MVC applications.| when the web request ends. |
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 | :ref:`Per Web API Request <PerWebAPIRequest>` | Only one instance will be created by the container per request in a   | Instances will be disposed |
 |                                               | ASP.NET Web API application and the instance will be disposed when    | the web request ends.      |
@@ -178,43 +172,11 @@ Most of the time, you will only use one particular scoped lifestyle per applicat
     
     // Use the Lifestyle.Scoped everywhere in your configuration.
     container.Register<IUserContext, AspNetUserContext>(Lifestyle.Scoped);
-    container.Register<MyAppUnitOfWork>(() => new MyAppUnitOfWork("constr"), Lifestyle.Scoped);
+    container.Register<MyAppUnitOfWork>(() => new MyAppUnitOfWork("constr"),
+        Lifestyle.Scoped);
     
 Just like *Singleton* registrations, instances of scoped registrations that are created by the container will be disposed when the their scope ends. Scoped lifestyles are especially useful for implementing patterns such as the `Unit of Work <http://martinfowler.com/eaaCatalog/unitOfWork.html>`_.
 
-Optionally you can let transient services dispose when a scope ends. Here's an example of an extension method that allows registering transient instances that are disposed when the specified scope ends:
-
-.. code-block:: c#
-    
-    public static void RegisterDisposableTransient<TService, TImplementation>(this Container container)
-        where TImplementation: class, IDisposable, TService 
-        where TService : class
-    {
-        var scoped = Lifestyle.Scoped;
-        var reg = Lifestyle.Transient.CreateRegistration<TService, TImplementation>(container);
-        reg.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent, "suppressed.");
-        container.AddRegistration(typeof(TService), reg);
-        container.RegisterInitializer<TImplementation>(o => scoped.RegisterForDisposal(container, o));
-    }
-    
-The following code snippet show the usage of this extension method:
-    
-.. code-block:: c#
-        
-    var container = new Container();
-    container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
-    
-    container.RegisterDisposableTransient<IService, ServiceImpl>();
-
-This ensures that each time a *ServiceImpl* is created by the container, it is registered for disposal when the scope - a web request in this case - ends. This can of course lead to the creation and disposal of multiple *ServiceImpl* instances during a single request.
-
-.. container:: Note
-
-    **Note**: To be able to dispose an instance, the **RegisterForDisposal** will store the reference to that instance in the scope. This means that the instance will be kept alive for the lifetime of that scope.
-
-.. container:: Note
-
-    **Note**: Be careful to not register any services for disposal that will outlive that scope (such as services registered as singleton), since a service cannot be used once it has been disposed. This would typically result in *ObjectDisposedExceptions* and this will cause your application to break.
 
 .. _Order-of-disposal:
 
@@ -226,7 +188,7 @@ Order of disposal
     Simple Injector guarantees that instances are disposed in opposite order of creation.
 
 When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B* (assuming both implement *IDisposable*), since the guarantee of opposite order of creation. This allows *A* to use *B* while *A* is being disposed.
-	
+    
 .. _PerWebRequest:
 
 Per Web Request
@@ -236,7 +198,7 @@ Per Web Request
     
     Only one instance will be created by the container per web request and the instance will be disposed when the web request ends.
 
-The `ASP.NET Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Web>`_ is available (and available as **SimpleInjector.Integration.Web.dll** in the default download) contains *RegisterPerWebRequest* extension methods and a **WebRequestLifestyle** class that enable easy *Per Web Request* registrations:
+The `ASP.NET Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Web>`_ is available (and available as **SimpleInjector.Integration.Web.dll** in the default download) contains a **WebRequestLifestyle** class that enable easy *Per Web Request* registrations:
 
 .. code-block:: c#
 
@@ -259,7 +221,7 @@ Per Web API Request
     
     Only one instance will be created by the container per request in a ASP.NET Web API application and the instance will be disposed when that request ends (unless specified otherwise).
 
-The `ASP.NET Web API Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.WebApi>`_ is available (and available as **SimpleInjector.Integration.WebApi.dll** in the default download) contains *RegisterWebApiRequest* extension methods and a **WebApiRequestLifestyle** class that enable easy *Per Web API Request* registrations:
+The `ASP.NET Web API Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.WebApi>`_ is available (and available as **SimpleInjector.Integration.WebApi.dll** in the default download) contains a **WebApiRequestLifestyle** class that enable easy *Per Web API Request* registrations:
 
 .. code-block:: c#
 
@@ -278,11 +240,13 @@ The `ASP.NET Web API Integration NuGet Package <https://nuget.org/packages/Simpl
 Web API Request lifestyle vs. Web Request lifestyle
 ===================================================
 
-The lifestyles and scope implementations *Web Request* and *Web API Request* in SimpleInjector are based on different technologies. **WebApiRequestLifestyle** is derived from **ExecutionContextScopeLifestyle** which works well both inside and outside of IIS. i.e. It can function in a self-hosted Web API project where there is no *HttpContext.Current*. The scope used by **WebApiRequestLifestyle** is the **ExecutionContextScope**. As the name implies, an execution context scope registers itself in the logical call context and flows with *async* operations across threads (e.g. a continuation after *await* on a different thread still has access to the scope regardless of whether *ConfigureAwait()* was used with *true* or *false*).
+The lifestyles and scope implementations *Web Request* and *Web API Request* in Simple Injector are based on different technologies. **WebApiRequestLifestyle** is derived from **ExecutionContextScopeLifestyle** which works well both inside and outside of IIS. i.e. It can function in a self-hosted Web API project where there is no *HttpContext.Current*. As the name implies, an execution context scope registers itself in the logical call context and flows with *async* operations across threads (e.g. a continuation after *await* on a different thread still has access to the scope regardless of whether *ConfigureAwait()* was used with *true* or *false*).
 
 In contrast, the **Scope** of the **WebRequestLifestyle** is stored within the *HttpContext.Items* dictionary. The *HttpContext* can be used with Web API when it is hosted in IIS but care must be taken because it will not always flow with the execution context, because the current *HttpContext* is stored in the *IllogicalCallContext* (see `Understanding SynchronizationContext in ASP.NET <https://blogs.msdn.com/b/pfxteam/archive/2012/06/15/executioncontext-vs-synchronizationcontext.aspx>`_). If you use *await* with *ConfigureAwait(false)* the continuation may lose track of the original *HttpContext* whenever the async operation does not execute synchronously. A direct effect of this is that it would no longer be possible to resolve the instance of a previously created service with **WebRequestLifestyle** from the container (e.g. in a factory that has access to the container) - and an exception would be thrown because *HttpContext.Current* would be null.
 
-The recommendation is therefore to use **WebApiRequestLifestyle** for services that should be 'per Web API request', the most obvious example being services that are injected into Web API controllers. **WebApiRequestLifestyle** offers the following benefits:
+The recommendation is to use **WebApiRequestLifestyle** in for applications that solely consist of a Web API and use **WebRequestLifestyle** for applications that contain a mixture of Web API and MVC.
+
+**WebApiRequestLifestyle** offers the following benefits:
 
 * The Web API controller can be used outside of IIS (e.g. in a self-hosted project)
 * The Web API controller can execute *free-threaded* (or *multi-threaded*) *async* methods because it is not limited to the ASP.NET *SynchronizationContext*.
@@ -299,7 +263,7 @@ Per WCF Operation
     
     Only one instance will be created by the container during the lifetime of the WCF service class and the instance will be disposed when the WCF service class is released.
 
-The `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ is available (and available as **SimpleInjector.Integration.Wcf.dll** in the default download) contains **RegisterPerWcfOperation** extension methods and a **WcfOperationLifestyle** class that enable easy *Per WCF Operation* registrations:
+The `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ is available (and available as **SimpleInjector.Integration.Wcf.dll** in the default download) contains a **WcfOperationLifestyle** class that enable easy *Per WCF Operation* registrations:
 
 .. code-block:: c#
 
@@ -311,7 +275,7 @@ The `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.In
 
 .. container:: Note
 
-    **Warning**: Instead of what the name of the **WcfOperationLifestyle** class and the **RegisterPerWcfOperation** methods seem to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registered *PerWcfOperation* live as long as the WCF service class they are injected into.
+    **Warning**: Instead of what the name of the **WcfOperationLifestyle** class seems to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registered *PerWcfOperation* live as long as the WCF service class they are injected into.
 
 For more information about integrating Simple Injector with WCF, please see the :doc:`WCF integration guide <wcfintegration>`.
 
@@ -328,7 +292,7 @@ Per Lifetime Scope
 
     **Warning**: A lifetime scope can't be used for asynchronous operations (using the async/await keywords in C#).        
 
-Lifetime Scoping is supported as an extension package for Simple Injector. It is available as `Lifetime Scoping Extensions NuGet package <https://nuget.org/packages/SimpleInjector.Extensions.LifetimeScoping>`_ and is part of the default download as **SimpleInjector.Extensions.LifetimeScoping.dll**. The extension package adds multiple **RegisterLifetimeScope** extension method overloads and a **LifetimeScopeLifestyle** class, which allow to register services with the *Lifetime Scope* lifestyle:
+Lifetime Scoping is supported as an extension package for Simple Injector. It is available as `Lifetime Scoping Extensions NuGet package <https://nuget.org/packages/SimpleInjector.Extensions.LifetimeScoping>`_ and is part of the default download as **SimpleInjector.Extensions.LifetimeScoping.dll**. The extension package adds a **LifetimeScopeLifestyle** class, which allow to register services with the *Lifetime Scope* lifestyle:
 
 .. code-block:: c#
 
@@ -350,7 +314,7 @@ Within an explicitly defined scope, there will be only one instance of a service
 
 .. container:: Note
 
-    **Warning**: A scope is *thread-specific*. A single scope should **not** be used over multiple threads. Do not pass a scope between threads and do not wrap an ASP.NET HTTP request with a Lifetime Scope, since ASP.NET can finish a web request on different thread to the thread the request is started on. Use :ref:`Per Web Request <PerWebRequest>` scoping for ASP.NET web applications while running inside a web request. Lifetime scoping however, can still be used in web applications on background threads that are created by web requests or when processing commands in a Windows Service (where each commands gets its own scope). For developing multi-threaded applications, take :ref:`these guidelines <Multi-Threaded-Applications>` into consideration.
+    **Warning**: A lifetime scope is *thread-specific*. A single scope should **not** be used over multiple threads. Do not pass a scope between threads and do not wrap an ASP.NET HTTP request with a Lifetime Scope, since ASP.NET can finish a web request on different thread to the thread the request is started on. Use :ref:`Per Web Request <PerWebRequest>` scoping for ASP.NET web applications while running inside a web request. Lifetime scoping however, can still be used in web applications on background threads that are created by web requests or when processing commands in a Windows Service (where each command gets its own scope). For developing multi-threaded applications, take :ref:`these guidelines <Multi-Threaded-Applications>` into consideration.
 
 Outside the context of a lifetime scope, i.e. `using (container.BeginLifetimeScope())` no instances can be created. An exception is thrown when a lifetime scoped registration is requested outside of a scope instance.
 
@@ -499,7 +463,7 @@ Simple Injector has no built-in hybrid lifestyles, but has a simple mechanism fo
 .. code-block:: c#
 
     var container = new Container();
-	var trueLifestyle = new LifetimeScopeLifestyle();
+    var trueLifestyle = new LifetimeScopeLifestyle();
     container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
         lifestyleSelector: () => trueLifestyle.GetCurrentScope(container) != null,
         trueLifestyle: trueLifestyle,
@@ -510,7 +474,7 @@ Simple Injector has no built-in hybrid lifestyles, but has a simple mechanism fo
 
 In the example a hybrid lifestyle is defined wrapping the :ref:`Web Request <PerWebRequest>` lifestyle and the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle. The supplied *lifestyleSelector* predicate returns *true* when the container should use the *Lifetime Scope* lifestyle and *false* when the *Web Request* lifestyle should be selected.
 
-A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations need to be run in isolation (which their own instances of scoped registrations such as unit of works) or run outside the context of an *HttpContext* (in a background thread for instance).
+A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations need to be run in isolation (with their own instances of scoped registrations such as unit of works) or run outside the context of an *HttpContext* (in a background thread for instance).
 
 Please note though that when the lifestyle doesn't have to change throughout the lifetime of the application, a hybrid lifestyle is not needed. A normal lifestyle can be registered instead:
 
@@ -599,3 +563,7 @@ One of the closure variables is the *instance* and this will contain the cached 
 Since the constructed *Func<object>* delegate can be called from multiple threads, the code needs to do its own synchronization. Both the DateTime comparison and the DateTime assignment are not thread-safe and this code needs to handle this itself.
 
 Do note that even though locking is used to synchronize access, this custom lifestyle might not work as expected, because when the expiration time passes while an object graph is being resolved, it might result in an object graph that contains two instances of the registered component, which might not be what you want. This example therefore is only for demonstration purposes.
+
+.. container:: Note
+    
+    In case you wish to develop a custom lifestyle, we strongly advice posting a question on the Forum. We will be able to guide you through this process.

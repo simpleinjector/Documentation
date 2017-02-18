@@ -32,7 +32,7 @@ How to view diagnostic results
 
 .. container:: Note
 
-    **Note**: In Simple Injector 3, the container now by default checks for diagnostic errors when calling **Verify()**. In case of a diagnostic warning, the container's **Verify()** method will throw a **DiagnosticVerificationException**.
+    **Note**: In Simple Injector 3, the container now by default checks for problems when calling **Verify()**. In case of a diagnostic warning, the container's **Verify()** method will throw a **DiagnosticVerificationException**.
 
 .. container:: Note
 
@@ -64,7 +64,7 @@ This same information can be requested programmatically by using the Diagnostic 
 .. code-block:: c#
 
     [TestMethod]
-    public void Container_Always_ContainsNoDiagnosticWarnings() {
+    public void Container_Never_ContainsDiagnosticWarnings() {
         // Arrange
         var container = Bootstrapper.GetInitializedContainer();
 
@@ -175,4 +175,4 @@ The Diagnostic Services **cannot** analyze the following:
 
 .. container:: Note
 
-    **Tip**: Try to prevent depending on any features listed above because they all prevent you from having a :ref:`verifiable configuration <Verify-Configuration>` and trustworthy diagnostic results.
+    **Tip**: Try to prevent depending on any of the designs listed above because they all prevent you from having a :ref:`verifiable configuration <Verify-Configuration>` and trustworthy diagnostic results.

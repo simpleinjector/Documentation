@@ -7,6 +7,7 @@ Simple Injector can be used in a wide range of .NET technologies, both server si
 .. toctree::
     :maxdepth: 1
 
+    Console Applications <consoleintegration>
     ASP.NET Core MVC <aspnetintegration>
     ASP.NET MVC <mvcintegration>
     ASP.NET Web API <webapiintegration>
@@ -16,6 +17,9 @@ Simple Injector can be used in a wide range of .NET technologies, both server si
     WCF <wcfintegration>
     WPF <wpfintegration>
     Silverlight <silverlightintegration>
+
+Other Technologies
+==================
 
 Besides integration with standard .NET technologies, Simple Injector can be integrated with a wide range of other technologies. Here are a few links to help you get started quickly:
 

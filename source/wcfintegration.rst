@@ -89,7 +89,7 @@ Optionally, you can apply your custom service behaviors and contract behaviors t
                 Bootstrapper.Container, 
                 serviceType, 
                 baseAddresses);
-     
+            
             // This is all optional
             this.ApplyServiceBehaviors(host);
             this.ApplyContractBehaviors(host);
@@ -112,13 +112,12 @@ Optionally, you can apply your custom service behaviors and contract behaviors t
         }
     }
 
-For each service class, you should supply a factory attribute in the .SVC file of each service class. For instance:
+For each service class, you should supply a factory attribute in the .SVC file of each service class. Assuming the customly defined factory is defined in the *MyComp.MyWcfService.Common* namespace of the *MyComp.MyWcfService* assembly, the markup would be the following:
 
 .. code-block:: xml
 
     <%@ ServiceHost
         Service="UserService" 
         CodeBehind="UserService.svc.cs" 
-        Factory="SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory,
-            SimpleInjector.Integration.Wcf"
+        Factory="MyComp.MyWcfService.Common.WcfServiceFactory, MyComp.MyWcfService"
     %>
