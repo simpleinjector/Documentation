@@ -22,12 +22,11 @@ Our :doc:`design principles <principles>` have influenced the direction of the d
 The container is locked after the first call to resolve
 =======================================================
 
-When an application makes its first call to **GetInstance**, **GetAllIntances** or **Verify**, the container locks itself to prevent any future changes being made by explicit registrations. This strictly separates the configuration of the container from its use and forces the user to configure the container in one single place. This design decision is inspired by the following two design principles:
+When an application makes its first call to **GetInstance**, **GetAllIntances** or **Verify**, the container locks itself to prevent any future changes being made by explicit registrations. This strictly separates the configuration of the container from its use and forces the user to configure the container in one single place. This design decision is inspired by the following design principle:
 
 * :ref:`Push developers into best practices <Push-developers-into-best-practices>`
-* :ref:`Fast by default <Fast-by-default>`
 
-In most situations it makes little sense to change the configuration once the application is running. This would make the application much more complex, whereas dependency injection as a pattern is meant to lower the total complexity of a system. By strictly separating the registration/startup phase from the phase where the application is in a running state, it is much easier to determine how the container will behave and it is much easier to verify the container's configuration. The locking behavior of Simple Injector exists to protect the user from defining invalid and/or confusing combinations of registrations.
+In most situations it makes little sense to change the configuration once the application is running. This will make the application much more complex, whereas dependency injection as a pattern is meant to lower the total complexity of a system. By strictly separating the registration/startup phase from the phase where the application is in a running state, it is much easier to determine how the container will behave and it is much easier to verify the container's configuration. The locking behavior of Simple Injector exists to protect the user from defining invalid and/or confusing combinations of registrations.
 
 Allowing the ability to alter the DI configuration while the application is running could easily cause strange, hard to debug, and hard to verify behavior. This may also mean the application has numerous hard references to the container and this is something we work hard to prevent. Attempting to alter the configuration when running a multi-threaded application would lead to very un-deterministic behavior, even if the container itself is thread-safe.
 
@@ -62,13 +61,13 @@ When designing Simple Injector, we made a very explicit design decision to defin
 
 This design differentiates vastly from how other DI libraries work. Most libraries provide the same API for single registrations and collections. Registering a collection of some abstraction in that case means that you call the **Register** method multiple times with the same abstraction but with different implementations. There are some clear downsides to such an approach. 
 
-* There's a big difference between having a collection of services and a single service. For many of the services you register, you will have one implementation and it doesn't make sense for there to be multiple implementations. For other services you will always expect a collection of them (even if you have one or no implementations). In the majority (if not all) of cases you wouldn't expect to switch dynamically between one and multiple implementations and it doesn't make much sense to create an API that makes it possible.
+* There's a big difference between having a collection of services and a single service. For many of the services you register, you will have one implementation and it doesn't make sense for there to be multiple implementations. For other services you will always expect a collection of them (even if you have one or no implementations). In the majority -if not all- of cases you wouldn't expect to switch dynamically between one and multiple implementations.
 * An API that mixes these concepts will be unable to warn you if you accidentally add a second registration for the same service. Those APIs will 'fail silently' and simply return one of the items you registered. Simple Injector will throw an exception when you call **Register<T>** for the same T and will describe that collections should be registered using **RegisterCollection**.
-* None of the APIs that mix these concepts make it clear which of the registered services is returned if you resolve one of them. Some libraries will return the first registered element, while others return the last. Although all of them describe this behavior in their documentation it's not clear from the API itself i.e. it is not discoverable. An API design like this is unintuitive. A design that separates **Register** from **RegisterCollection** makes the intention of the code very clear to anyone who reads it.
+* None of the APIs that mix these concepts make it clear which of the registered services is returned if you resolve one of them. Some libraries will return the first registered element, while others return the last. Although all of them describe this behavior in their documentation it's not clear from the API itself i.e. it is not discoverable. An API design like this is unintuitive. A design that separates **Register** from **RegisterCollection** on the other hand, makes the intention of the code very clear to anyone who reads it.
 
-In general, your services should not depend on an *IEnumerable<ISomeService>*, especially when your application has multiple services that need to work with *ISomeService*. The problem with injecting *IEnumerable* into multiple consumers is that you will have to iterate that collection in multiple places. This forces the consumers to know about having multiple implementations and how to iterate and process that collection. As far as the consumer is concerned this should be an implementation detail. If you ever need to change the way a collection is processed you will have to go through the application, since this logic will have be duplicated throughout the system.
+In general, your services should not depend on an *IEnumerable<ISomeService>*, especially when your application has multiple services that need to work with *ISomeService*. The problem with injecting *IEnumerable<T>* into multiple consumers is that you will have to iterate that collection in multiple places. This forces the consumers to know about having multiple implementations and how to iterate and process that collection. As far as the consumer is concerned this should be an implementation detail. If you ever need to change the way a collection is processed you will have to go through the application, since this logic will have be duplicated throughout the system.
 
-Instead of injecting an *IEnumerable*, a consumer should instead depend on a single abstraction and you can achieve this using a `Composite <https://en.wikipedia.org/wiki/Composite_pattern>`_ Implementation that wraps the actual collection and contains the logic of processing the collection. Registering composite implementation is so much easier with Simple Injector because of the clear separation between a single implementation and a collection of implementations. Take the following configuration for example, where we register a collection of *ILogger* implementations and a single composite implementation for use in the rest of our code:
+Instead of injecting an *IEnumerable<T>*, a consumer should instead depend on a single abstraction and you can achieve this using a `Composite <https://en.wikipedia.org/wiki/Composite_pattern>`_ Implementation that wraps the actual collection and contains the logic of processing the collection. Registering composite implementation is so much easier with Simple Injector because of the clear separation between a single implementation and a collection of implementations. Take the following configuration for example, where we register a collection of *ILogger* implementations and a single composite implementation for use in the rest of our code:
 
 .. code-block:: c#
 
@@ -78,8 +77,26 @@ Instead of injecting an *IEnumerable*, a consumer should instead depend on a sin
         typeof(EventLogLogger)
     });
     
-    container.Register<ILogger, CompositeLogger>();
+    container.Register<ILogger, CompositeLogger>(Lifestyle.Singleton);
 
+In case the unusual scenario that you need both a default registration and list of registrations, this is still easy to configure in Simple Injector. Take a look at the following example:
+
+
+.. code-block:: c#
+
+    container.Register<ILogger, FileLogger>();
+    
+    container.RegisterCollection<ILogger>(new[] {
+        typeof(ILogger), 
+        typeof(SqlLogger),
+        typeof(EventLogLogger)
+    });
+
+The previous example registers both a *FileLogger* as one-to-one registration for *ILogger* and a collection of *ILogger* instances. The first registration in the collection itself is *ILogger* which means that it points back to the one-to-one mapping using *FileLogger*.
+
+This way you have full control over which registration is the default one (in this case the first), since ordering of the collection is guaranteed to be the order of registration.
+
+    
 .. _No-support-for-XML:
 
 No support for XML based configuration
@@ -87,9 +104,13 @@ No support for XML based configuration
 
 While designing Simple Injector, we decided to *not* provide an XML based configuration API, since we want to:
 
-* :ref:`Push developers into best practices <Push-developers-into-best-practices>` and having a XML centered configuration is *not* best practice
+* :ref:`Push developers into best practices <Push-developers-into-best-practices>`
 
-XML based configuration is brittle, error prone and always provides a subset of what you can achieve with code based configuration. General consensus is to use code based configuration as much as possible and only fall back to file based configuration for the parts of the configuration that really need to be customizable after deployment. These are normally just a few registrations since the majority of changes would still require developer interaction (write unit tests or recompile for instance). Even for those few lines that do need to be configurable, it's a bad idea to require the fully qualified type name in a configuration file. A configuration switch (true/false or simple enum) is more than enough. You can read the configured value in your code based configuration, this allows you to keep the type names in your code. This allows you to refactor easily, gives you compile-time support and is much more friendly to the person having to change this configuration file.
+Having a XML centered configuration however is *not* best practice.
+
+XML based configuration is brittle, error prone and always provides a subset of what you can achieve with code based configuration. General consensus is to use code based configuration as much as possible and only fall back to file based configuration for the parts of the configuration that really need to be customizable after deployment. These are normally just a few registrations since the majority of changes would still require developer interaction (write unit tests or recompile for instance). Even for those few lines that do need to be configurable, it's a bad idea to require the fully qualified type name in a configuration file. A configuration switch (true/false or simple enum) is in most cases a better option. You can read the configured value in your code based configuration, this allows you to keep the type names in your code. This allows you to refactor easily, gives you compile-time support and is much more friendly to the person having to change this configuration file.
+
+Putting fully qualified type names in your configuration files is only encouraged when a plugin architecture is required that allows special plugin assemblies to be dropped in a special folder and to be picked up by the application, without the need of a recompile. But even in that case the number of type names in the configuration should be reduced to the bare minimum, where most types are registered using batch-registration in code.
 
 .. _Never-force-release:
 
@@ -135,7 +156,9 @@ With implicit property injection, the container injects any public writable prop
 
 With explicit property injection, the container is forced to inject a property and the process will fail immediately when a property can't be mapped or injected. The common way containers allow you to specify whether a property should be injected or not is by the use of library-defined attributes. As previously discussed, this would force the application to take a dependency on the library, which causes a vendor lock-in.
 
-The use of property injection should be non-standard; constructor injection should be used in the majority of cases. If a constructor gets too many parameters (the constructor over-injection anti-pattern), it is an indication of a violation of the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). SRP violations often lead to maintainability issues. Instead of fixing constructor over-injection with property injection the root cause should be analyzed and the type should be refactored, probably with `Facade Services <http://blog.ploeh.dk/2010/02/02/RefactoringtoAggregateServices/>`_. Another common reason to use properties is because the dependencies are optional. But instead of using optional property dependencies, the best practice is to inject empty implementations (a.k.a. `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) into the constructor; Dependencies should rarely be optional.
+The use of property injection should be non-standard; constructor injection should be used in the majority -if not all- of cases. If a constructor gets too many parameters (the constructor over-injection anti-pattern), it is an indication of a violation of the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). SRP violations often lead to maintainability issues. Instead of fixing constructor over-injection with property injection the root cause should be analyzed and the type should be refactored, probably with `Facade Services <http://blog.ploeh.dk/2010/02/02/RefactoringtoAggregateServices/>`_.
+
+Another common reason developers start using properties is because they think their dependencies are optional. Instead of using optional property dependencies, best practice is to inject empty implementations (a.k.a. `Null Object pattern <https://en.wikipedia.org/wiki/Null_Object_pattern>`_) into the constructor; Dependencies should rarely be optional.
 
 This doesn't mean that you can't do property injection with Simple Injector, but with Simple Injector this will have to be :ref:`explicitly configured <Overriding-Property-Injection-Behavior>`.
 
@@ -176,21 +199,29 @@ When it comes to batch-registering generic-types things are different. Batch-reg
 No per-thread lifestyle
 =======================
 
+A per-thread lifestyle caches instances for as long as the thread lives and stores that instance in thread-static storage, in such way that any calls to **GetInstance** that are executed on that thread, will get that same instance.
+
+.. container:: Note
+
+    *Note**: This makes a per-thread lifestyle very different from the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle, as the lifetime of an instance is limited to a very clearly defined scope and usually a very short period of time, whereas a per-thread instance will live for the duration of the thread.
+
 While designing Simple Injector, we explicitly decided not to include a Per Thread lifestyle out-of-the-box, because we want to:
 
 * :ref:`Push developers into best practices <Push-developers-into-best-practices>`
 
 The Per Thread lifestyle is very dangerous and in general you should not use it in your application, especially web applications.
 
-This lifestyle should be considered dangerous, because it is very hard to predict what the actual lifespan of a thread is. When you create and start a thread using `new Thread().Start()`, you'll get a fresh block of thread-static memory, which means the container will create a new per-threaded instance for you. When starting threads from the thread pool using *ThreadPool.QueueUserWorkItem* however, you may get an existing thread from the pool. The same holds when running in ASP.NET (ASP.NET pools threads to increase performance).
+This lifestyle should be considered dangerous, because it is very hard to predict what the actual lifespan of a thread is. When you create and start a thread using `new Thread().Start()`, you'll get a fresh block of thread-static memory, which means the container will create a new per-threaded instance for you. When starting threads from the thread pool using *ThreadPool.QueueUserWorkItem* however, you may get an existing thread from the pool. The same holds when running in frameworks like ASP.NET. ASP.NET pools threads to increase performance.
 
-All this means that a thread will almost certainly outlive a web request. ASP.NET can run requests asynchronously meaning that a web request can be finished on a different thread to the thread the request started executing on. These are some of the problems you can encounter when working with a Per Thread lifestyle.
+All this means that a thread will almost certainly outlive a web request. ASP.NET and other frameworks can run requests asynchronously meaning that a web request can be finished on a different thread to the thread the request started executing on. These are some of the problems you can encounter when working with a Per Thread lifestyle.
 
 A web request will typically begin with a call to **GetInstance** which will load the complete object graph including any services registered with the Per Thread lifestyle. At some point during the operation the call is postponed (due to the asynchronous nature of the ASP.NET framework). At some future moment in time ASP.NET will resume processing this call on a different thread and at this point we have a problem - some of the objects in our object graph are tied up on another thread, possibly doing something else for another operation. What a mess!
 
 Since these instances are registered as Per Thread, they are probably not suited to be used in another thread. They are almost certainly not thread-safe (otherwise they would be registered as Singleton). Since the first thread that initially started the request is already free to pick up new requests, we can run into the situation where two threads access those Per Thread instances simultaneously. This will lead to race conditions and bugs that are hard to diagnose and find.
 
 So in general, using Per Thread is a bad idea and that's why Simple Injector does not support it. If you wish, you can always shoot yourself in the foot by implementing such a custom lifestyle, but don't blame us :-)
+
+For registrations with thread-affinity, we advise the use of the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle.
 
 .. _One-constructor:
 

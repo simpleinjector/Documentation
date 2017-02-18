@@ -8,7 +8,7 @@ Simple Injector contains `Simple Injector MVC Integration Quick Start NuGet pack
 
     **Warning**: If you are starting from an Empty MVC project template (File | New | Project | MVC 4 | Empty Project Template) you have to manually setup *System.Web.Mvc* binding redirects, or reference System.Web.Mvc from the GAC.
 
-The following code snippet shows how to use the use the integration package (note that the quick start package this code for you).
+The following code snippet shows how to use the use the integration package (note that the quick start package injects this code into your Visual Studio MVC project).
 
 .. code-block:: c#
 
@@ -34,7 +34,3 @@ The following code snippet shows how to use the use the integration package (not
         
         DependencyResolver.SetResolver(new SimpleInjectorDependencyResolver(container));
     }
-    
-.. container:: Note
-
-    For an example of how to apply decorators to MVC controllers, please take a look at `this Stackoverflow question <https://stackoverflow.com/questions/32118849>`_.

@@ -58,10 +58,10 @@ The following example shows a configuration that will trigger the warning:
     container.Register<IUserRepository, InMemoryUserRepository>(Lifestyle.Transient);
 
     // RealUserService depends on IUserRepository
-    container.RegisterSingleton<RealUserService>();
+    container.Register<RealUserService>(Lifestyle.Singleton);
 
     // FakeUserService depends on IUserRepository
-    container.RegisterSingleton<FakeUserService>();
+    container.Register<FakeUserService>(Lifestyle.Singleton);
 
     container.Verify();
 
