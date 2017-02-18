@@ -263,7 +263,17 @@ Here are some examples of registration calls that all register types as *transie
 
 Most of these methods have overloads that allow supplying a different lifestyle. This works great in situations where you register a single type (using one of the **Register** method overloads for instance), and when all registrations need the same lifestyle. This is less suitable for cases where you batch-register a set of types where each type needs a different lifestyle.
 
-In this case we need to override the way Simple Injector does lifestyle selection. This can be done by creating custom implementation of **ILifestyleSelectionBehavior**.
+In this case we need to override the way Simple Injector does lifestyle selection. There are two ways of overriding the lifestyle selection.
+
+Overriding the lifestyle selection can done globally by changing the **Container.Options.DefaultLifestyle** property, as shown in the following example:
+
+.. code-block:: c#
+
+    container.Options.DefaultLifestyle = Lifestyle.Singleton;
+
+Any registration that's not explicitly supplied with a lifestyle, will get this lifestyle. In this case all registrations will be made as **Singleton**.
+
+A more common need is to select the lifestyle based on some context. This can be done by creating custom implementation of **ILifestyleSelectionBehavior**.
 
 .. code-block:: c#
 
@@ -272,6 +282,8 @@ In this case we need to override the way Simple Injector does lifestyle selectio
     }
 
 When no lifestyle is explicitly supplied by the user, Simple Injector will call into the registered **ILifestyleSelectionBehavior** when the type is registered to allow the **ILifestyleSelectionBehavior** implementation to select the proper lifestyle. The default behavior can be replaced by setting the **Container.Options.LifestyleSelectionBehavior** property.
+
+Simple Injector's default **ILifestyleSelectionBehavior** implementation simply forwards the call to **Container.Options.DefaultLifestyle**.
 
 The following example changes the lifestyle selection behavior to always register those instances as singleton:
 
@@ -349,9 +361,9 @@ The following example changes the lifestyle selection behavior to pick the lifes
 Intercepting the Creation of Types
 ==================================
 
-Intercepting the creation of types allows registrations to be modified. This enables all sorts of advanced scenarios where the creation of a single type or whole object graphs gets altered. Simple Injector contains two events that allow altering the type's creation: `ExpressionBuilding <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm>`_ and `ExpressionBuilt <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm>`_. Both events are quite similar but are called in different stages of the :ref:`building process <Resolve-Pipeline>`. 
+Intercepting the creation of types allows registrations to be modified. This enables all sorts of advanced scenarios where the creation of a single type or whole object graphs gets altered. Simple Injector contains two events that allow altering the type's creation: `ExpressionBuilding <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm>`_ and `ExpressionBuilt <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ExpressionBuilding.htm>`_. Both events are quite similar but are called in different stages of the :ref:`building pipeline <Resolve-Pipeline>`. 
 
-The **ExpressionBuilding** event gets called just after the registrations expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for :ref:`Context based injection <Context-Based-Injection>`.
+The **ExpressionBuilding** event gets called just after the registration's expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for :ref:`Context based injection <Context-Based-Injection>`.
 
 The **ExpressionBuilt** event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time **ExpressionBuilding** was called, is gone. While **ExpressionBuilding** is especially suited for changing the relationship between the resolved type and its dependencies, **ExpressionBuilt** is especially useful for applying decorators or :ref:`applying interceptors <Interception>`.
 
@@ -429,4 +441,4 @@ When a user calls **Container.GetInstance** or **InstanceProducer.GetInstance**,
 
 The **InitializationContext** allows access to the **InstanceProducer** and **Registration** instances that describe the service's registration. These two types enable detailed analysis of the resolved service, if required.
 
-An **InstanceProducer** instance is responsible of caching the compiled factory delegate that allows the creation of new instances (according to their lifestyle) that is created. This factory delegate is a *Func<object>*. In case an *resolve interceptor* gets applied to an **InstanceProducer**, instead of calling that *Func<object>*, the **InstanceProducer** will call the resolve interceptor, while supplying that original *Func<object>* to the interceptor.
+An **InstanceProducer** instance is responsible of caching the compiled factory delegate that allows the creation of new instances (according to their lifestyle) that is created. This factory delegate is a *Func<object>*. In case a *resolve interceptor* gets applied to an **InstanceProducer**, instead of calling that *Func<object>*, the **InstanceProducer** will call the resolve interceptor, while supplying that original *Func<object>* to the interceptor.
