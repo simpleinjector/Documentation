@@ -88,11 +88,11 @@ Using Simple Injector, the configuration of the application using the *CancelOrd
 .. code-block:: csharp
 
     using SimpleInjector;
-
+    
     static class Program
     {
         static readonly Container container;
-
+        
         static Program() {
             // 1. Create a new Simple Injector container
             container = new Container();
@@ -101,7 +101,7 @@ Using Simple Injector, the configuration of the application using the *CancelOrd
             container.Register<IOrderRepository, SqlOrderRepository>();
             container.Register<ILogger, FileLogger>(Lifestyle.Singleton);
             container.Register<CancelOrderHandler>();
-
+            
             // 3. Verify your configuration
             container.Verify();
         }
