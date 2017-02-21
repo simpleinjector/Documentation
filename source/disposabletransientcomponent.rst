@@ -34,7 +34,7 @@ This warning can safely be ignored when:
 - not disposing is not an issue.
 
 The warning can be suppressed on a per-registration basis as follows:
-	
+    
 .. code-block:: c#
 
     Registration registration = container.GetRegistration(typeof(IService)).Registration;
@@ -67,7 +67,7 @@ The issue can be fixed as follows:
     var container = new Container();
     // Select the scoped lifestyle that is appropriate for the application
     // you are building. For instance:
-    container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
+    container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
     // DisposableService implements IDisposable
     container.Register<IService, DisposableService>(Lifestyle.Scoped);
@@ -110,7 +110,7 @@ The following code snippet show the usage of this extension method:
 .. code-block:: c#
         
     var container = new Container();
-    container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
+    container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
     
     container.RegisterDisposableTransient<IService, ServiceImpl>();
 
@@ -123,4 +123,4 @@ This ensures that each time a *ServiceImpl* is created by the container, it is r
 .. container:: Note
 
     **Warning**: Be careful to not register any services for disposal that will outlive that scope (such as services registered as singleton), since a service cannot be used once it has been disposed. This would typically result in *ObjectDisposedExceptions* and this will cause your application to break.
-	
+    

@@ -18,6 +18,7 @@ The following code snippet shows how to use the integration package to apply Sim
     using Microsoft.Extensions.Logging;
     
     using SimpleInjector;
+    using SimpleInjector.Lifestyles;
     using SimpleInjector.Integration.AspNetCore;
     using SimpleInjector.Integration.AspNetCore.Mvc;
     
@@ -43,7 +44,7 @@ The following code snippet shows how to use the integration package to apply Sim
             ILoggerFactory factory) {
             app.UseSimpleInjectorAspNetRequestScoping(container);
 
-            container.Options.DefaultScopedLifestyle = new AspNetRequestLifestyle();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
             
             InitializeContainer(app);
             

@@ -15,76 +15,27 @@ Multiple registrations with the same lifestyle map to the same component.
 Warning Description
 ===================
 
-When multiple registrations with the same lifestyle map to the same component, the component is said to have a torn lifestyle. The component is considered torn because each registration will get its own instance of the given component, which can potentially result in multiple instances of the component within a single :ref:`scope <Scoped>`. When the registrations are torn the application may be wired incorrectly which could lead to unexpected behavior.
+When multiple **Registration** instances with the same lifestyle map to the same component, the component is said to have a torn lifestyle. The component is considered torn because each **Registration** instance will have its own cache of the given component, which can potentially result in multiple instances of the component within a single :ref:`scope <Scoped>`. When the registrations are torn the application may be wired incorrectly which could lead to unexpected behavior.
+
+.. container:: Note
+
+    **Note**: With the introduction of Simple Injector 4, the container will prevent the creation of multiple **Registration** instances for the same concrete type in most cases. This warning type should therefore be extremely rare. Torn lifestyles will only happen when a custom lifestyle circumvents the caching behavior of the **Lifestyle.CreateRegistration** overloads.
 
 How to Fix Violations
 =====================
 
-Create a *Registration* instance for that component using *Lifestyle.CreateRegistration* and use that for both registrations. Alternatively, consider making both registrations *Transient*.
-
+Make sure the creation of **Registration** instances of your custom lifestyle goes through the **Lifestyle.CreateRegistration** method instead directly to **Lifestyle.CreateRegistrationCore**.
 
 When to Ignore Warnings
 =======================
 
-This warning can safely be ignored if your intention is to have multiple instances of the flagged component (one for each registration) in the same scope.
+This warning most likely signals a bug in a custom **Lifestyle** implementation, so warnings should typically not be ignored.
 
 The warning can be suppressed on a per-registration basis as follows:
-	
+    
 .. code-block:: c#
 
     var fooRegistration = container.GetRegistration(typeof(IFoo)).Registration;
     var barRegistration = container.GetRegistration(typeof(IBar)).Registration;
     fooRegistration.SuppressDiagnosticWarning(DiagnosticType.TornLifestyle);
     barRegistration.SuppressDiagnosticWarning(DiagnosticType.TornLifestyle);
-
-
-Example
-=======
-
-The following example shows a configuration that will trigger the warning:
-
-.. code-block:: c#
-
-    var container = new Container();
-
-    container.Register<IFoo, FooBar>(Lifestyle.Singleton);
-    container.Register<IBar, FooBar>(Lifestyle.Singleton);
-
-    container.Verify();
-
-The *FooBar* component is registered as **Singleton** twice; once for *IFoo* and once for *IBar*. Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.
-
-.. image:: images/tornlifestyle.png 
-   :alt: Diagnostics debugger view watch window with the torn lifestyle warnings
-
-The issue can be fixed as follows:
-
-.. code-block:: c#
-
-    var container = new Container();
-
-    var registration = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
-    
-    container.AddRegistration(typeof(IFoo), registration);
-    container.AddRegistration(typeof(IBar), registration);
-    
-    container.Verify();
-   
-The following example shows how to query the Diagnostic API for Torn Lifestyles:
-
-.. code-block:: c#
-
-    // using SimpleInjector.Diagnostics;
-
-    var container = /* get verified container */;
-
-    var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>();
-        
-    foreach (var result in results) {
-        Console.WriteLine(result.Description);
-        Console.WriteLine("Component name: " + result.ImplementationType.Name);
-        Console.WriteLine("Lifestyle of component: " + result.Lifestyle.Name);
-        Console.WriteLine("Affected registrations: " +
-            string.Join(", ", result.AffectedRegistrations.Select(r => r.ServiceType.Name)));
-    }
-

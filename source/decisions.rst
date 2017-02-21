@@ -119,7 +119,7 @@ Never force users to release what they resolve
 
 The `Register Resolve Release <http://blog.ploeh.dk/2010/09/29/TheRegisterResolveReleasepattern/>`_ (RRR) pattern is a common pattern that DI containers implement. In general terms the pattern describes that you should tell the container how to build each object  graph (Register) during application start-up, ask the container for an object graph (Resolve) at the beginning of a request, and tell the container when you're done with that object graph (Release) after the request.
 
-Although this pattern applies to Simple Injector, we never force users to have to explicitly release any service once they have finished with it. With Simple Injector your components are automatically released when the web request finishes, or when you dispose of your :ref:`Lifetime Scope <PerLifetimeScope>` or :ref:`Execution Context Scope <PerExecutionContextScope>`. By not forcing users to release what they resolve, we adhere to the following design principles:
+Although this pattern applies to Simple Injector, we never force users to have to explicitly release any service once they have finished with it. With Simple Injector your components are automatically released when the web request finishes, or when you dispose of your :ref:`Thread Scope <ThreadScoped>` or :ref:`Async Scope <AsyncScoped>`. By not forcing users to release what they resolve, we adhere to the following design principles:
 
 * :ref:`Never fail silently <Never-fail-silently>`
 * :ref:`Features should be intuitive <Features-should-be-intuitive>`
@@ -203,7 +203,7 @@ A per-thread lifestyle caches instances for as long as the thread lives and stor
 
 .. container:: Note
 
-    *Note**: This makes a per-thread lifestyle very different from the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle, as the lifetime of an instance is limited to a very clearly defined scope and usually a very short period of time, whereas a per-thread instance will live for the duration of the thread.
+    *Note**: This makes a per-thread lifestyle very different from the :ref:`Thred Scoped <ThreadScoped>` lifestyle, as the lifetime of an instance is limited to a very clearly defined scope and usually a very short period of time, whereas a per-thread instance will live for the duration of the thread.
 
 While designing Simple Injector, we explicitly decided not to include a Per Thread lifestyle out-of-the-box, because we want to:
 
@@ -221,7 +221,7 @@ Since these instances are registered as Per Thread, they are probably not suited
 
 So in general, using Per Thread is a bad idea and that's why Simple Injector does not support it. If you wish, you can always shoot yourself in the foot by implementing such a custom lifestyle, but don't blame us :-)
 
-For registrations with thread-affinity, we advise the use of the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle.
+For registrations with thread-affinity, we advise the use of the :ref:`Thread Scoped <ThreadScoped>` lifestyle.
 
 .. _One-constructor:
 

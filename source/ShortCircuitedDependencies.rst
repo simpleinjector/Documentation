@@ -10,7 +10,7 @@ Warning
 Cause
 =====
 
-The component depends on an unregistered concrete type and this concrete type has a lifestyle that is different than the lifestyle of an explicitly registered type that uses this concrete type as its implementation.
+The component depends on an unregistered concrete type where there exists a registration that uses this concrete type as its implementation.
 
 Warning Description
 ===================
@@ -21,7 +21,6 @@ This warning signals the possible use of a short circuited dependency in a compo
 * that is not registered as itself (i.e. not registered as **Register<TConcrete>** or its non-generic equivalent)
 * and is referenced by another component (most likely using a constructor argument)
 * and exists as *TImplementation* in an explicitly made **Register<TService, TImplementation>()** registration (or its non-generic equivalent)
-* and where the lifestyle of this explicit registration differs from the unregistered type (under normal circumstances this means that the explicit registration is not **Transient**)
 
 When a component depends on a short circuited dependency, the application might be wired incorrectly because the flagged component gets a different instance of that concrete type than other components in the application will get. This can result in incorrect behavior.
 
@@ -79,7 +78,7 @@ The following example shows how to query the Diagnostic API for Short Circuited 
         Console.WriteLine(
             "Lifestyle of service with the short circuited dependency: " + 
             result.Relationship.Lifestyle.Name);
-    	
+        
         Console.WriteLine("One of the following types was expected instead:");
         foreach (var expected in result.ExpectedDependencies) {
             Console.WriteLine("-" + expected.ServiceType.FullName);

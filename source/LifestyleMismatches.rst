@@ -29,7 +29,7 @@ The Diagnostic Services detect this kind of misconfiguration and report it. The 
     
 .. container:: Note
 
-    **Note** Lifestyle mismatches are such a common source of bugs, that in Simple Injector 3, the container always checks for mismatches the first time a component is resolved, no matter whether you call *Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
+    **Note**: Lifestyle mismatches are such a common source of bugs, that the container always checks for mismatches the first time a component is resolved, no matter whether you call *Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
 
 
 How to Fix Violations

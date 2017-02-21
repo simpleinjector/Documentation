@@ -2,7 +2,7 @@
 ASP.NET Web API Integration Guide
 =================================
 
-Simple Injector contains `Simple Injector ASP.NET Web API Integration Quick Start NuGet package for IIS-hosted applications <https://www.nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_. If you're not using NuGet, you must include both the **SimpleInjector.Integration.WebApi.dll** and **SimpleInjector.Extensions.ExecutionContextScoping.dll** in your Web API application, which is part of the standard download on Github.
+Simple Injector contains `Simple Injector ASP.NET Web API Integration Quick Start NuGet package for IIS-hosted applications <https://www.nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_. If you're not using NuGet, you must include the **SimpleInjector.Integration.WebApi.dll** in your Web API application, which is part of the standard download on Github.
 
 .. container:: Note
 
@@ -20,13 +20,14 @@ The following code snippet shows how to use the integration package (note that t
     // You'll need to include the following namespaces
     using System.Web.Http;
     using SimpleInjector;
+    using SimpleInjector.Lifestyles;
     using SimpleInjector.Integration.WebApi;
 
     // This is the Application_Start event from the Global.asax file.
     protected void Application_Start() {
         // Create the container as usual.
         var container = new Container();
-        container.Options.DefaultScopedLifestyle = new WebApiRequestLifestyle();
+        container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
         // Register your types, for instance using the scoped lifestyle:
         container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
@@ -46,7 +47,7 @@ With this configuration, ASP.NET Web API will create new *IHttpController* insta
 
 .. container:: Note
 
-    **Note**: For Web API applications the use of the **WebApiRequestLifestyle** is advised over the **WebRequestLifestyle**. Please take a look at the :ref:`Web API Request Object Lifestyle Management wiki page <WebAPIRequest-vs-WebRequest>` for more information.
+    **Note**: For Web API applications the use of the **AsyncScopedLifestyle** is advised over the **WebRequestLifestyle**. Please take a look at the :ref:`Web API Request Object Lifestyle Management wiki page <AsyncScoped-vs-WebRequest>` for more information.
 
 Given the configuration above, an actual controller could look like this:
 
@@ -78,7 +79,7 @@ Given the configuration above, an actual controller could look like this:
 Extra features
 ==============
 
-The basic features of the Web API integration package are the **SimpleInjectorWebApiDependencyResolver** class and the **WebApiRequestLifestyle** and **RegisterWebApiControllers** extension methods. Besides these basic features, the integration package contains extra features that can make your life easier.
+The basic features of the Web API integration package are the **SimpleInjectorWebApiDependencyResolver** class and the **RegisterWebApiControllers** extension method. Besides these basic features, the integration package contains extra features that can make your life easier.
 
 .. _Getting-the-current-requests-HttpRequestMessage:
 

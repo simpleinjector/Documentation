@@ -12,11 +12,11 @@ Many of the existing DI libraries have a big complicated legacy API or are new, 
 The following platforms are supported:
 
 * *.NET 4.0* and up.
-* *Silverlight 4* and up.
-* *Windows Phone 8*.
-* *Windows Store Apps*.
-* *Mono*.
-* *.NET Core*.
+* *.NET Standard* including:
+  * *Universal Windows Programs*.
+  * *Mono*.
+  * *.NET Core*.
+  * *Xamarin*.
 
 .. container:: Note
 
@@ -87,7 +87,7 @@ Using Simple Injector, the configuration of the application using the *CancelOrd
 
 .. code-block:: csharp
 
-using SimpleInjector;
+    using SimpleInjector;
 
     static class Program
     {
@@ -105,14 +105,14 @@ using SimpleInjector;
             // 3. Verify your configuration
             container.Verify();
         }
-
+        
         static void Main(string[] args)) {
             // 4. Use the container
             var handler = container.GetInstance<CancelOrderHandler>();            
             
             var orderId = Guid.Parse(args[0]);
             var command = new CancelOrder { OrderId = orderId };
-
+            
             handler.Handle(command);
         }
     }

@@ -38,14 +38,14 @@ When to Ignore Warnings
 This warning can safely be ignored when the type in question does not violate the SRP and the number of dependencies is stable (does not change often).
 
 The warning can be suppressed on a per-registration basis as follows:
-	
+    
 .. code-block:: c#
 
     Registration registration = container.GetRegistration(typeof(IFoo)).Registration;
 
     registration.SuppressDiagnosticWarning(DiagnosticType.SingleResponsibilityViolation);
 
-	
+    
 Example
 =======
 
@@ -83,5 +83,5 @@ The following example shows how to query the Diagnostic API for possible Single 
         
     foreach (var result in results) {
         Console.WriteLine(result.ImplementationType.Name + 
-    		" has " + result.Dependencies.Count + " dependencies.");
+            " has " + result.Dependencies.Count + " dependencies.");
     }

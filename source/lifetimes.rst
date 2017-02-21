@@ -140,27 +140,23 @@ Simple Injector contains five scoped lifestyles:
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 | Lifestyle                                     | Description                                                           | Disposal                   |
 +===============================================+=======================================================================+============================+
-| :ref:`Per Web Request <PerWebRequest>`        | Only one instance will be created by the container per web request.   | Instances will be disposed | 
-|                                               | Use this lifestyle for ASP.NET Web Forms and ASP.NET MVC applications.| when the web request ends. |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| :ref:`Per Web API Request <PerWebAPIRequest>` | Only one instance will be created by the container per request in a   | Instances will be disposed |
-|                                               | ASP.NET Web API application and the instance will be disposed when    | the web request ends.      |
-|                                               | that request ends (unless specified otherwise).                       |                            |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| :ref:`Per WCF Operation <PerWcfOperation>`    | Only one instance will be created by the container during the lifetime| Instances will be disposed |
-|                                               | of the WCF service class.                                             | when the WCF service class |
-|                                               |                                                                       | is released.               |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| :ref:`Per Lifetime Scope <PerLifetimeScope>`  | Within a certain (explicitly defined) scope, there will be only one   | Instance will be disposed  |
+| :ref:`Thread Scoped <ThreadScoped>`           | Within a certain (explicitly defined) scope, there will be only one   | Instance will be disposed  |
 |                                               | instance of a given service type A created scope is specific to one   | when their scope gets      |
 |                                               | particular thread, and can't be moved across threads.                 | disposed.                  |
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| :ref:`Per Execution Context Scope             | There will be only one instance of a given service type within a      | Instance will be disposed  |
-| (async/await) <PerExecutionContextScope>`     | certain (explicitly defined) scope. This scope will automatically     | when their scope gets      |
+| :ref:`Async Scoped <AsyncScoped>`             | There will be only one instance of a given service type within a      | Instance will be disposed  |
+|                                               | certain (explicitly defined) scope. This scope will automatically     | when their scope gets      |
 |                                               | flow with the logical flow of control of asynchronous methods.        | disposed.                  |
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Web Request <WebRequest>`               | Only one instance will be created by the container per web request.   | Instances will be disposed | 
+|                                               | Use this lifestyle in ASP.NET Web Forms and ASP.NET MVC applications. | when the web request ends. |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`WCF Operation <WcfOperation>`           | Only one instance will be created by the container during the lifetime| Instances will be disposed |
+|                                               | of the WCF service class.                                             | when the WCF service class |
+|                                               |                                                                       | is released.               |
++-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 
-*Per Web Request*, *Per Web API Request* and *Per WCF Operation* implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The *Container* does this for you. With the *Per Lifetime Scope* and *Per Execution Context Scope* lifestyles on the other hand, you explicitly define a scope (just like you would do with .NET's TransactionScope class).
+*Web Request* and *WCF Operation* implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The *Container* does this for you. With the *Thread Scoped* and *Async Scoped* lifestyles on the other hand, you explicitly define a scope (just like you would do with .NET's TransactionScope class).
 
 Most of the time, you will only use one particular scoped lifestyle per application. To simplify this, Simple Injector allows configuring the default scoped lifestyle in the container. After configuring the default scoped lifestyle, the rest of the configuration can access this lifestyle by calling **Lifestyle.Scoped**, as can be seen in the following example:
     
@@ -168,7 +164,7 @@ Most of the time, you will only use one particular scoped lifestyle per applicat
         
     var container = new Container();
     // Set the scoped lifestyle one directly after creating the container
-    container.Options.DefaultScopedLifestyle = new WebApiRequestLifestyle();
+    container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
     
     // Use the Lifestyle.Scoped everywhere in your configuration.
     container.Register<IUserContext, AspNetUserContext>(Lifestyle.Scoped);
@@ -188,11 +184,138 @@ Order of disposal
     Simple Injector guarantees that instances are disposed in opposite order of creation.
 
 When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B* (assuming both implement *IDisposable*), since the guarantee of opposite order of creation. This allows *A* to use *B* while *A* is being disposed.
-    
-.. _PerWebRequest:
 
-Per Web Request
-===============
+
+.. _PerLifetimeScope:
+.. _ThreadScoped:
+
+Thread Scoped
+=============
+
+.. container:: Note
+    
+    Within a certain (explicitly defined) scope, there will be only one instance of a given service type in that thread and the instance will be disposed when the scope ends. A created scope is specific to one particular thread, and can't be moved across threads.
+    
+.. container:: Note
+
+    **Warning**: A thread scoped lifestyle can't be used for asynchronous operations (using the async/await keywords in C#).
+
+**SimpleInjector.Lifestyles.ThreadScopedLifestyle** is part of the Simple Injector core library. The following examples shows its typical usage:
+
+.. code-block:: c#
+
+    var container = new Container();
+    container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
+
+    container.Register<IUnitOfWork, NorthwindContext>(Lifestyle.Scoped);
+
+Within an explicitly defined scope, there will be only one instance of a service that is defined with the *Thread Scoped* lifestyle:
+
+.. code-block:: c#
+
+    using (ThreadScopedLifestyle.BeginScope(container)) {
+        var uow1 = container.GetInstance<IUnitOfWork>();
+        var uow2 = container.GetInstance<IUnitOfWork>();
+
+        Assert.AreSame(uow1, uow2);
+    }
+
+.. container:: Note
+
+    **Warning**: The `ThreadScopedLifestyle` is *thread-specific*. A single scope should **not** be used over multiple threads. Do not pass a scope between threads and do not wrap an ASP.NET HTTP request with a `ThreadScopedLifestyle`, since ASP.NET can finish a web request on different thread to the thread the request is started on. Use :ref:`Web Request Lifestyle <WebRequest>` scoping for ASP.NET Web Forms and MVC web applications while running inside a web request. Use :ref:`Async Scoped Lifestyle <AsyncScoped>` when using ASP.NET Web API or ASP.NET Core. `ThreadScopedLifestyle` however, can still be used in web applications on background threads that are created by web requests or when processing commands in a Windows Service (where each command gets its own scope). For developing multi-threaded applications, take :ref:`these guidelines <Multi-Threaded-Applications>` into consideration.
+
+Outside the context of a thread scoped lifestyle, i.e. `using (ThreadScopedLifestyle.BeginScope(container))` no instances can be created. An exception is thrown when a thread scoped registration is requested outside of a scope instance.
+
+Scopes can be nested and each scope will get its own set of instances:
+
+.. code-block:: c#
+
+    using (ThreadScopedLifestyle.BeginScope(container)) {
+        var outer1 = container.GetInstance<IUnitOfWork>();
+        var outer2 = container.GetInstance<IUnitOfWork>();
+
+        Assert.AreSame(outer1, outer2);
+
+        using (ThreadScopedLifestyle.BeginScope(container)) {
+            var inner1 = container.GetInstance<IUnitOfWork>();
+            var inner2 = container.GetInstance<IUnitOfWork>();
+
+            Assert.AreSame(inner1, inner2);
+
+            Assert.AreNotSame(outer1, inner1);
+        }
+    }
+
+.. _PerExecutionContextScope:
+.. _PerWebAPIRequest:
+.. _AsyncScoped:
+
+Async Scoped (async/await)
+==========================
+
+.. container:: Note
+    
+    There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends. This scope will automatically flow with the logical flow of control of asynchronous methods.
+
+This lifestyle is meant for applications that work with the new asynchronous programming model.
+
+**SimpleInjector.Lifestyles.AsyncScopedLifestyle** is part of the Simple Injector core library. The following examples shows its typical usage:
+
+.. code-block:: c#
+
+    var container = new Container();
+    container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+    
+    container.Register<IUnitOfWork, NorthwindContext>(Lifestyle.Scoped);
+
+Within an explicitly defined scope, there will be only one instance of a service that is defined with the *Async Scoped* lifestyle:
+
+.. code-block:: c#
+
+    using (AsyncScopedLifestyle.BeginScope(container)) {
+        var uow1 = container.GetInstance<IUnitOfWork>();
+        await SomeAsyncOperation();
+        var uow2 = container.GetInstance<IUnitOfWork>();
+        await SomeOtherAsyncOperation();
+
+        Assert.AreSame(uow1, uow2);
+    }
+
+.. container:: Note
+
+    **Note**: A scope is specific to the asynchronous flow. A method call on a different (unrelated) thread, will get its own scope.
+
+Outside the context of an active async scope no instances can be created. An exception is thrown when this happens.
+
+Scopes can be nested and each scope will get its own set of instances:
+
+.. code-block:: c#
+
+    using (AsyncScopedLifestyle.BeginScope(container)) {
+        var outer1 = container.GetInstance<IUnitOfWork>();
+        await SomeAsyncOperation();
+        var outer2 = container.GetInstance<IUnitOfWork>();
+
+        Assert.AreSame(outer1, outer2);
+
+        using (AsyncScopedLifestyle.BeginScope(container)) {
+            var inner1 = container.GetInstance<IUnitOfWork>();
+            
+            await SomeOtherAsyncOperation();
+            
+            var inner2 = container.GetInstance<IUnitOfWork>();
+
+            Assert.AreSame(inner1, inner2);
+
+            Assert.AreNotSame(outer1, inner1);
+        }
+    }
+
+.. _PerWebRequest:
+.. _WebRequest:
+
+Web Request
+===========
 
 .. container:: Note
     
@@ -212,41 +335,19 @@ The `ASP.NET Integration NuGet Package <https://nuget.org/packages/SimpleInjecto
 
     **Tip**: For ASP.NET MVC, there's a `Simple Injector MVC Integration Quick Start <https://nuget.org/packages/SimpleInjector.MVC3>`_ NuGet Package available that helps you get started with Simple Injector in MVC applications quickly.
 
-.. _PerWebAPIRequest:
-
-Per Web API Request
-===================
-
-.. container:: Note
-    
-    Only one instance will be created by the container per request in a ASP.NET Web API application and the instance will be disposed when that request ends (unless specified otherwise).
-
-The `ASP.NET Web API Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.WebApi>`_ is available (and available as **SimpleInjector.Integration.WebApi.dll** in the default download) contains a **WebApiRequestLifestyle** class that enable easy *Per Web API Request* registrations:
-
-.. code-block:: c#
-
-    var container = new Container();
-    container.Options.DefaultScopedLifestyle = new WebApiRequestLifestyle();
-
-    container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
-    container.Register<IOrderRepository, SqlOrderRepository>(Lifestyle.Scoped);
-
-.. container:: Note
-
-    **Tip**: There's a `Simple Injector Web API Integration Quick Start <https://nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_ NuGet Package available that helps you get started with Simple Injector in Web API applications quickly.
-
 .. _WebAPIRequest-vs-WebRequest:
+.. _AsyncScoped-vs-WebRequest:
 
-Web API Request lifestyle vs. Web Request lifestyle
-===================================================
+Web Async Scoped lifestyle vs. Web Request lifestyle
+====================================================
 
-The lifestyles and scope implementations *Web Request* and *Web API Request* in Simple Injector are based on different technologies. **WebApiRequestLifestyle** is derived from **ExecutionContextScopeLifestyle** which works well both inside and outside of IIS. i.e. It can function in a self-hosted Web API project where there is no *HttpContext.Current*. As the name implies, an execution context scope registers itself in the logical call context and flows with *async* operations across threads (e.g. a continuation after *await* on a different thread still has access to the scope regardless of whether *ConfigureAwait()* was used with *true* or *false*).
+The lifestyles and scope implementations **Web Request** and **Async Scoped** in Simple Injector are based on different technologies. **AsyncScopedLifestyle** works well both inside and outside of IIS. i.e. It can function in a self-hosted Web API project where there is no *HttpContext.Current*. As the name implies, an async scope registers itself flows with *async* operations across threads (e.g. a continuation after *await* on a different thread still has access to the scope regardless of whether *ConfigureAwait()* was used with *true* or *false*).
 
-In contrast, the **Scope** of the **WebRequestLifestyle** is stored within the *HttpContext.Items* dictionary. The *HttpContext* can be used with Web API when it is hosted in IIS but care must be taken because it will not always flow with the execution context, because the current *HttpContext* is stored in the *IllogicalCallContext* (see `Understanding SynchronizationContext in ASP.NET <https://blogs.msdn.com/b/pfxteam/archive/2012/06/15/executioncontext-vs-synchronizationcontext.aspx>`_). If you use *await* with *ConfigureAwait(false)* the continuation may lose track of the original *HttpContext* whenever the async operation does not execute synchronously. A direct effect of this is that it would no longer be possible to resolve the instance of a previously created service with **WebRequestLifestyle** from the container (e.g. in a factory that has access to the container) - and an exception would be thrown because *HttpContext.Current* would be null.
+In contrast, the **Scope** of the **WebRequestLifestyle** is stored within the *HttpContext.Items* dictionary. The *HttpContext* can be used with Web API when it is hosted in IIS but care must be taken because it will not always flow with the async operation, because the current *HttpContext* is stored in the *IllogicalCallContext* (see `Understanding SynchronizationContext in ASP.NET <https://blogs.msdn.com/b/pfxteam/archive/2012/06/15/executioncontext-vs-synchronizationcontext.aspx>`_). If you use *await* with *ConfigureAwait(false)* the continuation may lose track of the original *HttpContext* whenever the async operation does not execute synchronously. A direct effect of this is that it would no longer be possible to resolve the instance of a previously created service with **WebRequestLifestyle** from the container (e.g. in a factory that has access to the container) - and an exception would be thrown because *HttpContext.Current* would be null.
 
-The recommendation is to use **WebApiRequestLifestyle** in for applications that solely consist of a Web API and use **WebRequestLifestyle** for applications that contain a mixture of Web API and MVC.
+The recommendation is to use **AsyncScopedLifestyle** in for applications that solely consist of a Web API (or other asynchronous technologies such as ASP.NET Core) and use **WebRequestLifestyle** for applications that contain a mixture of Web API and MVC.
 
-**WebApiRequestLifestyle** offers the following benefits:
+**AsyncScopedLifestyle** offers the following benefits when used in Web API:
 
 * The Web API controller can be used outside of IIS (e.g. in a self-hosted project)
 * The Web API controller can execute *free-threaded* (or *multi-threaded*) *async* methods because it is not limited to the ASP.NET *SynchronizationContext*.
@@ -255,9 +356,10 @@ For more information, check out the blog entry of Stephen Toub regarding the `di
 SynchronizationContext <https://vegetarianprogrammer.blogspot.de/2012/12/understanding-synchronizationcontext-in.html>`_.
 
 .. _PerWcfOperation:
+.. _WcfOperation:
 
-Per WCF Operation
-=================
+WCF Operation
+=============
 
 .. container:: Note
     
@@ -278,130 +380,6 @@ The `WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.In
     **Warning**: Instead of what the name of the **WcfOperationLifestyle** class seems to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registered *PerWcfOperation* live as long as the WCF service class they are injected into.
 
 For more information about integrating Simple Injector with WCF, please see the :doc:`WCF integration guide <wcfintegration>`.
-
-.. _PerLifetimeScope:
-
-Per Lifetime Scope
-==================
-
-.. container:: Note
-    
-    Within a certain (explicitly defined) scope, there will be only one instance of a given service type and the instance will be disposed when the scope ends. A created scope is specific to one particular thread, and can't be moved across threads.
-    
-.. container:: Note
-
-    **Warning**: A lifetime scope can't be used for asynchronous operations (using the async/await keywords in C#).        
-
-Lifetime Scoping is supported as an extension package for Simple Injector. It is available as `Lifetime Scoping Extensions NuGet package <https://nuget.org/packages/SimpleInjector.Extensions.LifetimeScoping>`_ and is part of the default download as **SimpleInjector.Extensions.LifetimeScoping.dll**. The extension package adds a **LifetimeScopeLifestyle** class, which allow to register services with the *Lifetime Scope* lifestyle:
-
-.. code-block:: c#
-
-    var container = new Container();
-    container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
-
-    container.Register<IUnitOfWork, NorthwindContext>(Lifestyle.Scoped);
-
-Within an explicitly defined scope, there will be only one instance of a service that is defined with the *Lifetime Scope* lifestyle:
-
-.. code-block:: c#
-
-    using (container.BeginLifetimeScope()) {
-        var uow1 = container.GetInstance<IUnitOfWork>();
-        var uow2 = container.GetInstance<IUnitOfWork>();
-
-        Assert.AreSame(uow1, uow2);
-    }
-
-.. container:: Note
-
-    **Warning**: A lifetime scope is *thread-specific*. A single scope should **not** be used over multiple threads. Do not pass a scope between threads and do not wrap an ASP.NET HTTP request with a Lifetime Scope, since ASP.NET can finish a web request on different thread to the thread the request is started on. Use :ref:`Per Web Request <PerWebRequest>` scoping for ASP.NET web applications while running inside a web request. Lifetime scoping however, can still be used in web applications on background threads that are created by web requests or when processing commands in a Windows Service (where each command gets its own scope). For developing multi-threaded applications, take :ref:`these guidelines <Multi-Threaded-Applications>` into consideration.
-
-Outside the context of a lifetime scope, i.e. `using (container.BeginLifetimeScope())` no instances can be created. An exception is thrown when a lifetime scoped registration is requested outside of a scope instance.
-
-Scopes can be nested and each scope will get its own set of instances:
-
-.. code-block:: c#
-
-    using (container.BeginLifetimeScope()) {
-        var outer1 = container.GetInstance<IUnitOfWork>();
-        var outer2 = container.GetInstance<IUnitOfWork>();
-
-        Assert.AreSame(outer1, outer2);
-
-        using (container.BeginLifetimeScope()) {
-            var inner1 = container.GetInstance<IUnitOfWork>();
-            var inner2 = container.GetInstance<IUnitOfWork>();
-
-            Assert.AreSame(inner1, inner2);
-
-            Assert.AreNotSame(outer1, inner1);
-        }
-    }
-
-.. _PerExecutionContextScope:
-
-Per Execution Context Scope (async/await)
-=========================================
-
-.. container:: Note
-    
-    There will be only one instance of a given service type within a certain (explicitly defined) scope and that instance will be disposed when the scope ends (unless specified otherwise). This scope will automatically flow with the logical flow of control of asynchronous methods.
-
-This lifestyle is especially suited for client applications that work with the new asynchronous programming model. For Web API there's a :ref:`Per Web API Request lifestyle <PerWebAPIRequest>` (which actually uses this Execution Context Scope lifestyle under the covers).
-
-Execution Context Scoping is an extension package for Simple Injector. It is available as `Execution Context Extensions NuGet package <https://nuget.org/packages/SimpleInjector.Extensions.ExecutionContextScoping>`_ and is part of the default download as **SimpleInjector.Extensions.ExecutionContextScoping.dll**.
-
-.. code-block:: c#
-
-    var container = new Container();
-    container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
-    
-    container.Register<IUnitOfWork, NorthwindContext>(Lifestyle.Scoped);
-
-Within an explicitly defined scope, there will be only one instance of a service that is defined with the *Execution Context Scope* lifestyle:
-
-.. code-block:: c#
-
-    // using SimpleInjector.Extensions.ExecutionContextScoping;
-
-    using (container.BeginExecutionContextScope()) {
-        var uow1 = container.GetInstance<IUnitOfWork>();
-        await SomeAsyncOperation();
-        var uow2 = container.GetInstance<IUnitOfWork>();
-        await SomeOtherAsyncOperation();
-
-        Assert.AreSame(uow1, uow2);
-    }
-
-.. container:: Note
-
-    **Note**: A scope is specific to the asynchronous flow. A method call on a different (unrelated) thread, will get its own scope.
-
-Outside the context of an active execution context scope no instances can be created. An exception is thrown when this happens.
-
-Scopes can be nested and each scope will get its own set of instances:
-
-.. code-block:: c#
-
-    using (container.BeginExecutionContextScope()) {
-        var outer1 = container.GetInstance<IUnitOfWork>();
-        await SomeAsyncOperation();
-        var outer2 = container.GetInstance<IUnitOfWork>();
-
-        Assert.AreSame(outer1, outer2);
-
-        using (container.BeginExecutionContextScope()) {
-            var inner1 = container.GetInstance<IUnitOfWork>();
-            
-            await SomeOtherAsyncOperation();
-            
-            var inner2 = container.GetInstance<IUnitOfWork>();
-
-            Assert.AreSame(inner1, inner2);
-
-            Assert.AreNotSame(outer1, inner1);
-        }
-    }
 
 .. _PerGraph:
 
@@ -436,7 +414,7 @@ Per Thread
     
     There will be one instance of the registered service type per thread.
 
-This lifestyle is deliberately left out of Simple Injector because `it is considered to be harmful <https://stackoverflow.com/a/14592419/264697>`_. Instead of using Per Thread lifestyle, you will usually be better of using one of the :ref:`Scoped lifestyles <Scoped>`.
+This lifestyle is deliberately left out of Simple Injector because :ref:`it is considered to be harmful <No-per-thread-lifestyle>`. Instead of using Per-Thread lifestyle, you will usually be better of using the :ref:`Thread Scoped Lifestyle <ThreadScoped>`.
 
 .. _PerHttpSession:
 
@@ -463,16 +441,15 @@ Simple Injector has no built-in hybrid lifestyles, but has a simple mechanism fo
 .. code-block:: c#
 
     var container = new Container();
-    var trueLifestyle = new LifetimeScopeLifestyle();
+    
     container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
-        lifestyleSelector: () => trueLifestyle.GetCurrentScope(container) != null,
-        trueLifestyle: trueLifestyle,
-        falseLifestyle: new WebRequestLifestyle());
+        defaultLifestyle: new ThreadScopedLifestyle(),
+        fallbackLifestyle: new WebRequestLifestyle());
 
     container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
     container.Register<ICustomerRepository, SqlCustomerRepository>(Lifestyle.Scoped);
 
-In the example a hybrid lifestyle is defined wrapping the :ref:`Web Request <PerWebRequest>` lifestyle and the :ref:`Per Lifetime Scope <PerLifetimeScope>` lifestyle. The supplied *lifestyleSelector* predicate returns *true* when the container should use the *Lifetime Scope* lifestyle and *false* when the *Web Request* lifestyle should be selected.
+In the example a hybrid lifestyle is defined wrapping the :ref:`Thread Scoped Lifestyle <ThreadScoped>` and the :ref:`Web Request Lifestyle <WebRequest>`. This hybrid lifestyle will use the `ThreadScopedLifestyle`, but will fall back to the `WebRequestLifestyle` in case there is no active thread scope.
 
 A hybrid lifestyle is useful for registrations that need to be able to dynamically switch lifestyles throughout the lifetime of the application. The shown hybrid example might be useful in a web application, where some operations need to be run in isolation (with their own instances of scoped registrations such as unit of works) or run outside the context of an *HttpContext* (in a background thread for instance).
 
@@ -484,7 +461,7 @@ Please note though that when the lifestyle doesn't have to change throughout the
 
     var container = new Container();
     container.Options.DefaultScopedLifestyle = 
-        runsOnWebServer ? new WebRequestLifestyle() : new LifetimeScopeLifestyle();
+        runsOnWebServer ? new WebRequestLifestyle() : new ThreadScopedLifestyle();
 
     container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
     container.Register<ICustomerRepository, SqlCustomerRepository>(Lifestyle.Scoped);
@@ -496,7 +473,7 @@ Developing a Custom Lifestyle
 
 The lifestyles supplied by Simple Injector should be sufficient for most scenarios, but in rare circumstances defining a custom lifestyle might be useful. This can be done by creating a class that inherits from `Lifestyle <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Lifestyle.htm>`_ and let it return `Custom Registration <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Registration.htm>`_ instances. This however is a lot of work, and a shortcut is available in the form of the `Lifestyle.CreateCustom <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Lifestyle_CreateCustom.htm>`_.
 
-A custom lifestyle can be created by calling the **Lifestyle.CreateCustom** factory method. This method takes two arguments: the name of the lifestyle to create (used mainly for display in the :doc:`Diagnostic Services <diagnostics>`) and a `CreateLifestyleApplier <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_CreateLifestyleApplier.htm>`_ delegate:
+A custom lifestyle can be created by calling the **Lifestyle.CreateCustom** factory method. This method takes two arguments: the name of the lifestyle to create (used mainly by the :doc:`Diagnostic Services <diagnostics>`) and a `CreateLifestyleApplier <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_CreateLifestyleApplier.htm>`_ delegate:
 
 .. code-block:: c#
 

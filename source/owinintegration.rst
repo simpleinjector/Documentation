@@ -14,22 +14,22 @@ To allow scoped instances to be resolved during an OWIN request, the following r
     // You'll need to include the following namespaces
     using Owin;
     using SimpleInjector;
-    using SimpleInjector.Extensions.ExecutionContextScoping;
+    using SimpleInjector.Lifestyles;
 
     public void Configuration(IAppBuilder app) {
         app.Use(async (context, next) => {
-            using (container.BeginExecutionContextScope()) {
+            using (AsyncScopedLifestyle.BeginScope(container)) {
                 await next();
             }
         });
     }
 
-Scoped instances need to be registered with the `ExecutionContextScope` lifestyle:
+Scoped instances need to be registered with the `AsyncScopedLifestyle` lifestyle:
 
 .. code-block:: c#
 
     var container = new Container();
-    container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
+    container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
     
     container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Scoped);
     
@@ -54,8 +54,9 @@ When working with OWIN you will occasionally find yourself wanting access to the
     }
      
     public class CallContextOwinContextAccessor : IOwinContextAccessor {
+        public static readonly AsyncLocal<IOwinContext> OwinContext = new AsyncLocal<IOwinContext>();
         public IOwinContext CurrentContext { 
-            get { return (IOwinContext)CallContext.LogicalGetData("IOwinContext"); }
+            get { return OwinContext.Value; }
         }
     }
 
@@ -66,7 +67,7 @@ The following code snippet can be used to register this *IOwinContextAccessor* a
 .. code-block:: c#
 
     app.Use(async (context, next) => {
-        CallContext.LogicalSetData("IOwinContext", context);
+        CallContextOwinContextAccessor.OwinContext = context;
         await next();
     });
     
