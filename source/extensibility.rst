@@ -38,13 +38,11 @@ The following example changes the constructor resolution behavior to always sele
 
     // Custom constructor resolution behavior
     public class GreediestConstructorBehavior : IConstructorResolutionBehavior {
-        public ConstructorInfo GetConstructor(Type implementationType) {
-            return (
-                from ctor in implementationType.GetConstructors()
-                orderby ctor.GetParameters().Length descending
-                select ctor)
-                .First();
-        }
+        public ConstructorInfo GetConstructor(Type implementationType) => (
+            from ctor in implementationType.GetConstructors()
+            orderby ctor.GetParameters().Length descending
+            select ctor)
+            .First();
     }
 
     // Usage
@@ -138,11 +136,9 @@ The Simple Injector API exposes the **IPropertySelectionBehavior** interface to 
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    class PropertySelectionBehavior<TAttribute> : IPropertySelectionBehavior
-        where TAttribute : Attribute {
-        public bool SelectProperty(PropertyInfo prop) {
-            return prop.GetCustomAttributes(typeof(TAttribute)).Any();
-        }
+    class PropertySelectionBehavior<T> : IPropertySelectionBehavior where T : Attribute {
+        public bool SelectProperty(PropertyInfo prop) =>
+            prop.GetCustomAttributes(typeof(T)).Any();
     }
 
     // Usage:
@@ -267,9 +263,7 @@ The following example changes the lifestyle selection behavior to always registe
 
     // Custom lifestyle selection behavior
     public class SingletonLifestyleSelectionBehavior : ILifestyleSelectionBehavior {
-        public Lifestyle SelectLifestyle(Type implementationType) {
-            return Lifestyle.Singleton;
-        }
+        public Lifestyle SelectLifestyle(Type implementationType) => Lifestyle.Singleton;
     }
 
     // Usage

@@ -491,9 +491,7 @@ When Simple Injector calls the **CreateLifestyleApplier**, it is your job to ret
         // instanceCreator is of type Func<object>
         lifestyleApplierFactory: instanceCreator => {
             // A Func<object> is returned that applies caching.
-            return () => {
-                return instanceCreator.Invoke();
-            };
+            return () => instanceCreator.Invoke();
         });
 
     var container = new Container();

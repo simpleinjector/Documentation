@@ -54,10 +54,8 @@ When working with OWIN you will occasionally find yourself wanting access to the
     }
      
     public class CallContextOwinContextAccessor : IOwinContextAccessor {
-        public static readonly AsyncLocal<IOwinContext> OwinContext = new AsyncLocal<IOwinContext>();
-        public IOwinContext CurrentContext { 
-            get { return OwinContext.Value; }
-        }
+        public static AsyncLocal<IOwinContext> OwinContext = new AsyncLocal<IOwinContext>();
+        public IOwinContext CurrentContext => OwinContext.Value;
     }
 
 The code snippet above defines an *IOwinContextAccessor* and an implementation. Consumers can depend on the *IOwinContextAccessor* and can call its *CurrentContext* property to get the request's current *IOwinContext*.

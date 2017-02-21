@@ -61,9 +61,7 @@ Given the configuration above, an actual controller could look like this:
             this.repository = repository;
         }
 
-        public IEnumerable<User> GetAllUsers() {
-            return this.repository.GetAll();
-        }
+        public IEnumerable<User> GetAllUsers() => this.repository.GetAll();
 
         public User GetUserById(int id) {
             try {
@@ -111,9 +109,8 @@ This abstraction can be injected into your services, which can call the *Current
             this.container = container;
         }
 
-        public HttpRequestMessage CurrentMessage {
-            get { return this.container.GetCurrentHttpRequestMessage(); }
-        }
+        public HttpRequestMessage CurrentMessage =>
+            this.container.GetCurrentHttpRequestMessage();
     }
 
 This implementation can be implemented as follows:

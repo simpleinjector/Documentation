@@ -46,12 +46,10 @@ The following example demonstrates a simple Console application that runs indefi
     using SimpleInjector;
     using SimpleInjector.Lifestyles;
    
-    static class Program
-    {
+    static class Program {
         static readonly Container container;
     
-        static Program()
-        {
+        static Program() {
             container = new Container();
             container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
             
@@ -61,12 +59,9 @@ The following example demonstrates a simple Console application that runs indefi
             container.Verify();
         }
     
-        static void Main() 
-        {
-            while (true)
-            {
-                using (ThreadScopedLifestyle.BeginScope(container))
-                {
+        static void Main()  {
+            while (true) {
+                using (ThreadScopedLifestyle.BeginScope(container)) {
                     var service = container.GetInstance<MyRootType>();
 
                     service.DoSomething();

@@ -190,9 +190,7 @@ Just like *Func<T>* delegates can be injected, *Lazy<T>* instances can also be i
             this.wrapped = wrapped;
         }
         
-        public void Operate() {
-            this.wrapped.Value.Operate();
-        }
+        public void Operate() => this.wrapped.Value.Operate();
     }
 
     // Registration
@@ -256,9 +254,7 @@ By inheriting from the BCL's *Dictionary<TKey, TValue>*, creating an *IRequestHa
 
     public class RequestHandlerFactory : Dictionary<string, Func<IRequestHandler>>,
         IRequestHandlerFactory {
-        public IRequestHandler CreateNew(string name) {
-            return this[name]();
-        }
+        public IRequestHandler CreateNew(string name) => this[name]();
     }
 
 With this class, we can register *Func<IRequestHandler>* factory methods by a key. With this in place the registration of keyed instances is a breeze:
@@ -284,9 +280,8 @@ If you don't like a design that uses *Func<T>* delegates this way, it can easily
             this.container = container;
         }
 
-        public IRequestHandler CreateNew(string name) {
-            return (IRequestHandler)this.container.GetInstance(this[name]);
-        }
+        public IRequestHandler CreateNew(string name) =>
+            (IRequestHandler)this.container.GetInstance(this[name]);
     }
 
 The registration will then look as follows:
@@ -319,9 +314,8 @@ A final option for implementing keyed registrations is to manually create the re
             this.container = container;
         }
 
-        IRequestHandler IRequestHandlerFactory.CreateNew(string name) {
-            return this.producers[name].GetInstance();
-        }
+        IRequestHandler IRequestHandlerFactory.CreateNew(string name) =>
+            this.producers[name].GetInstance();
 
         public void Register<TImplementation>(string name, Lifestyle lifestyle = null)
             where TImplementation : class, IRequestHandler {
@@ -611,49 +605,3 @@ On top of this, switching on or off groups of registrations based on configurati
          MockedExternalServicesPackage.Bootstrap(container);
     else
          ProductionExternalServicesPackage.Bootstrap(container);
-
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-
-.. _Resolve-Arrays-And-Lists:
-
-**Resolve arrays and lists**: The information in this section has been moved to :ref:`here <Collections>`.
-
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
