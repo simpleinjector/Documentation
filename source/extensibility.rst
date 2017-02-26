@@ -204,7 +204,7 @@ The following article contains more information about changing the library's def
 Resolving Unregistered Types
 ============================
 
-Unregistered type resolution is the ability to get notified by the container when a type is requested that is currently unregistered in the container. This gives you the change of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing enabling support for :ref:`decorators <Decorators>`.
+Unregistered type resolution is the ability to get notified by the container when a type is requested that is currently unregistered in the container. This gives you the change of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing enabling support for :ref:`decorators <Decoration>`.
 
 For more information about how to use this event, please look at the `ResolveUnregisteredType event documentation <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ in the `reference library <https://simpleinjector.org/ReferenceLibrary/>`_.
 
@@ -338,9 +338,9 @@ Intercepting the creation of types allows registrations to be modified. This ena
 
 The **ExpressionBuilding** event gets called just after the registration's expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for :ref:`Context based injection <Context-Based-Injection>`.
 
-The **ExpressionBuilt** event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time **ExpressionBuilding** was called, is gone. While **ExpressionBuilding** is especially suited for changing the relationship between the resolved type and its dependencies, **ExpressionBuilt** is especially useful for applying decorators or :ref:`applying interceptors <Interception>`.
+The **ExpressionBuilt** event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time **ExpressionBuilding** was called, is gone. While **ExpressionBuilding** is especially suited for changing the relationship between the resolved type and its dependencies, **ExpressionBuilt** is especially useful for applying decorators or :ref:`applying interceptors <interception-using-dynamic-proxies>`.
 
-Note that Simple Injector has built-in support for :ref:`applying decorators <Decorators>` using the `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ extension methods. These methods internally use the **ExpressionBuilt** event.
+Note that Simple Injector has built-in support for :ref:`applying decorators <Decoration>` using the `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ extension methods. These methods internally use the **ExpressionBuilt** event.
 
 .. _Building-Up-External-Instances:
 

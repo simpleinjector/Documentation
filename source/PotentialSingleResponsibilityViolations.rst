@@ -30,7 +30,7 @@ Note that moving dependencies out of the constructor and into properties might s
 
 Moving those properties to a base class also doesn't solve the SRP violation. Often derived types will still use the dependencies of the base class making them still violating the SRP and even if they don't, the base class itself will probably violate the SRP or have a high fan out.
 
-Those base classes will often just be helpers to implement all kinds of cross-cutting concerns. Instead of using base classes, a better way to implementing cross-cutting concerns is through :ref:`decorators <Decorators>`.
+Those base classes will often just be helpers to implement all kinds of cross-cutting concerns. Instead of using base classes, a better way to implementing cross-cutting concerns is through :ref:`decorators <Decoration>`.
 
 When to Ignore Warnings
 =======================

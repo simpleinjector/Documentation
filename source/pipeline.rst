@@ -68,7 +68,7 @@ Steps:
 
 * **Apply lifestyle**: Until this point in the pipeline, the expression that has been built describes the creation of a new instance (transient). This step applies caching to this instance. Lifestyles are applied by **Lifestyle** implementations. They use the expression that was built up using the previous steps and they are allowed to compile this expression to a delegate, before applying the caching. This means that the expressiveness about all the type's dependencies can be embedded in the compiled delegate and is unavailable for analysis and interception when the next step is applied.
 
-* **Intercept expression** (2): The container's **ExpressionBuilt** event gets triggered after the lifestyle has been applied to an expression. The container's :ref:`RegisterDecorator <Decorators>` extension methods internally make use of this event to decorate any type while preserving the lifestyle of that type. Multiple **ExpressionBuilt** events could handle the same type and they are all applied in the order in which they are registered.
+* **Intercept expression** (2): The container's **ExpressionBuilt** event gets triggered after the lifestyle has been applied to an expression. The container's :ref:`RegisterDecorator <Decoration>` extension methods internally make use of this event to decorate any type while preserving the lifestyle of that type. Multiple **ExpressionBuilt** events could handle the same type and they are all applied in the order in which they are registered.
 
 * **Compile expression**: In this step, the expression that is the result of the previous step is compiled to a *Func<object>* delegate. Several optimizations are applied. This step cannot be customized.
 
