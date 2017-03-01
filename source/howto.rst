@@ -348,7 +348,7 @@ The registration will then look as follows:
 
 The advantage of this method is that it completely integrates with the *Container*. :ref:`Decorators <decoration>` can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
 
-The previous examples showed how registrations could be requested based on a key. Another common use case is to have multiple consumers of a given abstraction, where each consumer requires a different implementation of that abstraction. While other DI libraries use keyed registrations to achieve this, in Simple Injector this is done through :ref:`Context based injection <Context-Based-Injection>`.
+The previous examples showed how registrations could be requested based on a key. Another common use case is to have multiple consumers of a given abstraction, where each consumer requires a different implementation of that abstraction. In Simple Injector this can be achieved through :ref:`Context based injection <Context-Based-Injection>`.
 
 .. _Register-Multiple-Interfaces-With-The-Same-Implementation:
 
