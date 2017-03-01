@@ -233,7 +233,7 @@ This doesn't mean that resolving instances by a key is never useful. Resolving i
 
 .. container:: Note
 
-    **Note**: The need for keyed registration can be an indication of ambiguity in the application design and a sign of a `Liskov Substitution Principle  <https://en.wikipedia.org/wiki/Liskov_substitution_principle>`_ violation. Take a good look if each keyed registration shouldn't have its own unique interface, or perhaps each registration should implement its own version of a generic interface.
+    **Note**: The need for keyed registration can be an indication of ambiguity in the application design and a sign of a `Liskov Substitution Principle <https://en.wikipedia.org/wiki/Liskov_substitution_principle>`_ violation. Take a good look if each keyed registration shouldn't have its own unique interface, or perhaps each registration should implement its own version of a generic interface.
 
 Take a look at the following scenario, where we want to retrieve instances of type *IRequestHandler* by a string key. There are of course several ways to achieve this, but here is a simple but effective way, by defining an *IRequestHandlerFactory*:
 
@@ -348,6 +348,7 @@ The registration will then look as follows:
 
 The advantage of this method is that it completely integrates with the *Container*. :ref:`Decorators <decoration>` can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
 
+The previous examples showed how registrations could be requested based on a key. Another common use case is to have multiple consumers of a given abstraction, where each consumer requires a different implementation of that abstraction. In Simple Injector this can be achieved through :ref:`Context based injection <Context-Based-Injection>`.
 
 .. _Register-Multiple-Interfaces-With-The-Same-Implementation:
 
