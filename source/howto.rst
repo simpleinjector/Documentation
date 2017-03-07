@@ -267,7 +267,7 @@ With this class, we can register *Func<IRequestHandler>* factory methods by a ke
 
     var container = new Container();
      
-    container.RegisterSingle<IRequestHandlerFactory>(new RequestHandlerFactory {
+    container.RegisterSingleton<IRequestHandlerFactory>(new RequestHandlerFactory {
         { "default", () => container.GetInstance<DefaultRequestHandler>() },
         { "orders", () => container.GetInstance<OrdersRequestHandler>() },
         { "customers", () => container.GetInstance<CustomersRequestHandler>() },
