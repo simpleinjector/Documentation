@@ -295,7 +295,7 @@ The registration will then look as follows:
 
     var container = new Container();
 
-    container.RegisterSingle<IRequestHandlerFactory>(new RequestHandlerFactory(container) {
+    container.RegisterSingleton<IRequestHandlerFactory>(new RequestHandlerFactory(container) {
         { "default", typeof(DefaultRequestHandler) },
         { "orders", typeof(OrdersRequestHandler) },
         { "customers", typeof(CustomersRequestHandler) },
