@@ -14,9 +14,13 @@ The following code snippet shows how to use the use the integration package (not
 
     // You'll need to include the following namespaces
     using System.Web.Mvc;
+    using System.Reflection;
     using SimpleInjector;
     using SimpleInjector.Integration.Web;
     using SimpleInjector.Integration.Web.Mvc;
+    
+    //Put this attribute outside of namespace
+    [assembly: WebActivator.PostApplicationStartMethod(typeof(YourProject.App_Start.YourClass), "Initialize")]
 
     // This is the Application_Start event from the Global.asax file.
     protected void Application_Start(object sender, EventArgs e) {
