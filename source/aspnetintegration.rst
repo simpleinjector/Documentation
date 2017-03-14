@@ -37,14 +37,13 @@ The following code snippet shows how to use the integration package to apply Sim
                 new SimpleInjectorControllerActivator(container));
             services.AddSingleton<IViewComponentActivator>(
                 new SimpleInjectorViewComponentActivator(container));
+                
+            services.UseSimpleInjectorAspNetRequestScoping(container);
         }
 
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,
             ILoggerFactory factory) {
-            app.UseSimpleInjectorAspNetRequestScoping(container);
-
-            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
             
             InitializeContainer(app);
             
@@ -61,6 +60,8 @@ The following code snippet shows how to use the integration package to apply Sim
         }
 
         private void InitializeContainer(IApplicationBuilder app) {
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+        
             // Add application presentation components:
             container.RegisterMvcControllers(app);
             container.RegisterMvcViewComponents(app);
@@ -70,7 +71,13 @@ The following code snippet shows how to use the integration package to apply Sim
             
             // Cross-wire ASP.NET services (if any). For instance:
             container.RegisterSingleton(app.ApplicationServices.GetService<ILoggerFactory>());
-            // NOTE: Prevent cross-wired instances as much as possible. 
+            
+            // The following registers a Func<T> delegate that can be injected as singleton,
+            // and on invocation resolves a MVC IViewBufferScope service for that request.
+            container.RegisterSingleton<Func<IViewBufferScope>>(
+                app.GetRequestService<IViewBufferScope>);
+                
+            // NOTE: Do prevent cross-wired instances as much as possible. 
             // See: https://simpleinjector.org/blog/2016/07/
         }
     }
@@ -99,9 +106,9 @@ The previous `Startup` snippet already showed how a custom middleware class can 
         }
     }
 
-Notice how the `CustomMiddleware` class contains dependencies. Since the `CustomMiddleware` class is resolved from Simple Injector for each request.
+Notice how the `CustomMiddleware` class contains dependencies. Because of this, the `CustomMiddleware` class is resolved from Simple Injector on each request.
 
-In contrast to what the official ASP.NET Core documentation `advises <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware#writing-middleware>`_, the `RequestDelegate` or `Func<Task> next` delegate can best be passed in using Method Injection (through the `Invoke` method), instead of by using Constructor Injection. Reason for this is that this delegate is runtime data and runtime data should `not be passed in through the constructor <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=99>`_. Moving it to the `Invoke` method makes it possible to reliably verify the application's DI configuration and it simplifies your configuration.
+In contrast to what the official ASP.NET Core documentation `advises <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware#writing-middleware>`_, the `RequestDelegate` or `Func<Task> next` delegate can best be passed in using **Method Injection** (through the `Invoke` method), instead of by using Constructor Injection. Reason for this is that this delegate is runtime data and runtime data should `not be passed in through the constructor <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=99>`_. Moving it to the `Invoke` method makes it possible to reliably verify the application's DI configuration and it simplifies your configuration.
 
 Working with `IOption<T>`
 =========================
