@@ -31,6 +31,7 @@ The following code snippet shows how to use the integration package to apply Sim
         // This method gets called by the runtime.
         public void ConfigureServices(IServiceCollection services) {
             // ASP.NET default stuff here
+            services.AddMvc();
 
             services.AddSingleton<IControllerActivator>(
                 new SimpleInjectorControllerActivator(container));
@@ -55,8 +56,14 @@ The following code snippet shows how to use the integration package to apply Sim
             app.Use(async (context, next) => {
                 await container.GetInstance<CustomMiddleware>().Invoke(context, next);
             });
-
+            
             // ASP.NET default stuff here
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
 
         private void InitializeContainer(IApplicationBuilder app) {
