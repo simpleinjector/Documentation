@@ -17,7 +17,7 @@ Supported Warnings
     Torn Lifestyle <tornlifestyle>
     Ambiguous Lifestyles <ambiguouslifestyles>
     Disposable Transient Components <disposabletransientcomponent>
-	
+    
 Supported Information messages
 ==============================
 

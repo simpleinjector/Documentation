@@ -37,23 +37,21 @@ Console applications can also be built to be long running, just like Windows ser
 
 The term 'request' is used loosely here. It could be an incoming request over the network, an action triggered by a message on an incoming queue, or an action triggered by timer or scheduler. Either way, a request is something that should typically run in a certain amount of isolation. It might for instance have its own set of state, specific to that request. An Entity Framework *DbContext* for instance, is typically an object that is particular to a single request.
 
-In the absence of any framework code, you are yourself responsible to tell Simple Injector that certain code must run in isolation. This can be done with Scoping. There are two types of scoped lifestyles that can be used. :ref:`LifetimeScopeLifestyle <PerLifetimeScope>` allows wrapping code that runs on a single thread in a scope, where :ref:`ExecutionContextScopeLifestyle <PerExecutionContextScope>` allows wrapping a block of code that flows asynchronously (using async await).
+In the absence of any framework code, you are yourself responsible to tell Simple Injector that certain code must run in isolation. This can be done with Scoping. There are two types of scoped lifestyles that can be used. :ref:`ThreadScopedLifestyle <ThreadScoped>` allows wrapping code that runs on a single thread in a scope, where :ref:`AsyncScopedLifestyle <AsyncScoped>` allows wrapping a block of code that flows asynchronously (using async await).
 
 The following example demonstrates a simple Console application that runs indefinitely, and executes a request every second. The request is wrapped in a scope:
     
 .. code-block:: c#
    
     using SimpleInjector;
-    using SimpleInjector.Extensions.LifetimeScoping;
+    using SimpleInjector.Lifestyles;
    
-    static class Program
-    {
+    static class Program {
         static readonly Container container;
     
-        static Program()
-        {
+        static Program() {
             container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
             
             container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
             container.Register<MyRootType>();
@@ -61,12 +59,9 @@ The following example demonstrates a simple Console application that runs indefi
             container.Verify();
         }
     
-        static void Main() 
-        {
-            while (true)
-            {
-                using (container.BeginLifetimeScope())
-                {
+        static void Main()  {
+            while (true) {
+                using (ThreadScopedLifestyle.BeginScope(container)) {
                     var service = container.GetInstance<MyRootType>();
 
                     service.DoSomething();

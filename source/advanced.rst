@@ -169,10 +169,8 @@ Sometimes you'll find that many implementations of the given generic interface a
 .. code-block:: c#
 
     // Implementation of the Null Object pattern.
-    sealed class NullValidator<T> : IValidate<T> {
-        public ValidationResults Validate(T instance) {
-            return ValidationResults.Valid;
-        }
+    public sealed class NullValidator<T> : IValidate<T> {
+        public ValidationResults Validate(T instance) => ValidationResults.Valid;
     }
 
 We could configure the container to use this *NullValidator<T>* for any entity that does not need validation:
@@ -459,9 +457,8 @@ The second way to inject properties is by implementing a custom **IPropertySelec
     using SimpleInjector.Advanced;
 
     class ImportPropertySelectionBehavior : IPropertySelectionBehavior {
-        public bool SelectProperty(Type type, PropertyInfo prop) {
-            return prop.GetCustomAttributes(typeof(ImportAttribute)).Any();
-        }
+        public bool SelectProperty(Type implementationType, PropertyInfo prop) =>
+            prop.GetCustomAttributes(typeof(ImportAttribute)).Any();
     }
 
 The previous class can be registered as follows:
@@ -575,80 +572,3 @@ Applications with a plugin architecture often allow special plugin assemblies to
     container.RegisterCollection<IPlugin>(pluginAssemblies);
 
 The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all publicly exposed concrete types that implement *IPlugin* will be registered using the **RegisterCollection** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.
-
-
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-
-.. _Decorators:
-
-**Decorators**: The information in this section has been moved to :doc:`here <aop>`.
-
-
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-
-.. _Interception:
-
-**Interception**: The information in this section has been moved to :doc:`here <aop>`.
-
-
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|

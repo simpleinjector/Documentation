@@ -70,7 +70,5 @@ Constructor injection can now be used in any pages (e.g. *MainPage*) and view mo
             this.userContext = userContext;
         }
 
-        public IEnumerable<IUser> Users {
-            get { return this.queryProcessor.Execute(new GetAllUsers()); }
-        }
+        public IEnumerable<IUser> Users => this.queryProcessor.Execute(new GetAllUsers());
     }

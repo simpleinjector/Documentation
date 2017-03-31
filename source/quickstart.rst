@@ -12,11 +12,11 @@ Many of the existing DI libraries have a big complicated legacy API or are new, 
 The following platforms are supported:
 
 * *.NET 4.0* and up.
-* *Silverlight 4* and up.
-* *Windows Phone 8*.
-* *Windows Store Apps*.
-* *Mono*.
-* *.NET Core*.
+* *.NET Standard* including:
+  * *Universal Windows Programs*.
+  * *Mono*.
+  * *.NET Core*.
+  * *Xamarin*.
 
 .. container:: Note
 
@@ -92,7 +92,7 @@ Using Simple Injector, the configuration of the application using the *CancelOrd
     static class Program
     {
         static readonly Container container;
-    
+        
         static Program() {
             // 1. Create a new Simple Injector container
             container = new Container();

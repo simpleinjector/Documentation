@@ -105,7 +105,5 @@ Constructor injection can now be used in any window (e.g. *MainWindow*) and view
             this.userContext = userContext;
         }
 
-        public IEnumerable<IUser> Users {
-            get { return this.queryProcessor.Execute(new GetAllUsers()); }
-        }
+        public IEnumerable<IUser> Users => this.queryProcessor.Execute(new GetAllUsers());
     }

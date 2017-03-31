@@ -27,7 +27,7 @@ In these rare cases we need to override the way Simple Injector does its constru
 .. code-block:: c#
 
     public interface IConstructorResolutionBehavior {
-        ConstructorInfo GetConstructor(Type serviceType, Type implementationType);
+        ConstructorInfo GetConstructor(Type implementationType);
     }
 
 Simple Injector will call into the registered **IConstructorResolutionBehavior** when the type is registered to allow the **IConstructorResolutionBehavior** implementation to verify the type. The implementation is called again when the registered type is resolved for the first time.
@@ -38,13 +38,11 @@ The following example changes the constructor resolution behavior to always sele
 
     // Custom constructor resolution behavior
     public class GreediestConstructorBehavior : IConstructorResolutionBehavior {
-        public ConstructorInfo GetConstructor(Type serviceType, Type implementationType) {
-            return (
-                from ctor in implementationType.GetConstructors()
-                orderby ctor.GetParameters().Length descending
-                select ctor)
-                .First();
-        }
+        public ConstructorInfo GetConstructor(Type implementationType) => (
+            from ctor in implementationType.GetConstructors()
+            orderby ctor.GetParameters().Length descending
+            select ctor)
+            .First();
     }
 
     // Usage
@@ -55,48 +53,53 @@ The following bit more advanced example changes the constructor resolution behav
 
 .. code-block:: c#
 
-    public class MostResolvableConstructorBehavior : IConstructorResolutionBehavior {
+    public class MostResolvableParametersConstructorResolutionBehavior 
+        : IConstructorResolutionBehavior {
         private readonly Container container;
 
-        public MostResolvableConstructorBehavior(Container container) {
+        public MostResolvableParametersConstructorResolutionBehavior(Container container) {
             this.container = container;
         }
 
-        private bool IsCalledDuringRegistrationPhase {
-            [DebuggerStepThrough]
-            get { return !this.container.IsLocked(); }
-        }
+        private bool IsCalledDuringRegistrationPhase => !this.container.IsLocked();
 
         [DebuggerStepThrough]
-        public ConstructorInfo GetConstructor(Type service, Type implementation) {
-            var constructors = implementation.GetConstructors();
-            return (
-                from ctor in constructors
-                let parameters = ctor.GetParameters()
-                where this.IsCalledDuringRegistrationPhase
-                    || constructors.Length == 1
-                    || parameters.All(p => this.CanBeResolved(p, service, implementation))
-                orderby parameters.Length descending
-                select ctor)
-                .First();
+        public ConstructorInfo GetConstructor(Type implementationType) {
+            var constructor = this.GetConstructors(implementationType).FirstOrDefault();
+            if (constructor != null) return constructor;
+            throw new ActivationException(BuildExceptionMessage(implementationType));
         }
 
-        [DebuggerStepThrough]
-        private bool CanBeResolved(ParameterInfo p, Type service, Type implementation) {
-            return this.container.GetRegistration(p.ParameterType) != null ||
-                this.CanBuildType(p, service, implementation);
-        }
+        private IEnumerable<ConstructorInfo> GetConstructors(Type implementation) =>
+            from ctor in implementation.GetConstructors()
+            let parameters = ctor.GetParameters()
+            where this.IsCalledDuringRegistrationPhase
+                || implementation.GetConstructors().Length == 1
+                || ctor.GetParameters().All(this.CanBeResolved)
+            orderby parameters.Length descending
+            select ctor;
 
-        [DebuggerStepThrough]
-        private bool CanBuildType(ParameterInfo p, Type service, Type implementation) {
-            try {
-                this.container.Options.DependencyInjectionBehavior.BuildExpression(
-                    new InjectionConsumerInfo(service, implementation, p));
-                return true;
-            } catch (ActivationException) {
-                return false;
-            }
-        }
+        private bool CanBeResolved(ParameterInfo parameter) =>
+            this.GetInstanceProducerFor(new InjectionConsumerInfo(parameter)) != null;
+
+        private InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo i) =>
+            this.container.Options.DependencyInjectionBehavior.GetInstanceProducer(i, false);
+
+        private static string BuildExceptionMessage(Type type) =>
+            !type.GetConstructors().Any()
+                ? TypeShouldHaveAtLeastOnePublicConstructor(type)
+                : TypeShouldHaveConstructorWithResolvableTypes(type);
+
+        private static string TypeShouldHaveAtLeastOnePublicConstructor(Type type) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to create {0}, it should contain at least " +
+                "one public constructor.", type.ToFriendlyName());
+
+        private static string TypeShouldHaveConstructorWithResolvableTypes(Type type) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to create {0}, it should contain a public " +
+                "constructor that only contains parameters that can be resolved.", 
+                type.ToFriendlyName());
     }
 
     // Usage
@@ -104,41 +107,7 @@ The following bit more advanced example changes the constructor resolution behav
     container.Options.ConstructorResolutionBehavior =
         new MostResolvableConstructorBehavior(container);
 
-The previous examples changed the constructor overload resolution for all registered types. This is usually not the best approach, since this promotes ambiguity in design of our classes. Since ambiguity is usually only a problem in code generation scenarios, it's best to only override the behavior for types that are affected by the code generator. Take for instance this example for earlier versions of T4MVC:
-
-.. code-block:: c#
-
-    public class T4MvcConstructorBehavior : IConstructorResolutionBehavior {
-        private IConstructorResolutionBehavior defaultBehavior;
-
-        public T4MvcConstructorBehavior(
-            IConstructorResolutionBehavior defaultBehavior) {
-            this.defaultBehavior = defaultBehavior;
-        }
-
-        public ConstructorInfo GetConstructor(Type serviceType, Type impType) {
-            if (typeof(IController).IsAssignableFrom(impType)) {
-                var nonDefaultConstructors =
-                    from constructor in impType.GetConstructors()
-                    where constructor.GetParameters().Length > 0
-                    select constructor;
-
-                if (nonDefaultConstructors.Count() == 1) {
-                    return nonDefaultConstructors.Single();
-                }
-            }
-
-            // fall back to the container's default behavior.
-            return this.defaultBehavior.GetConstructor(serviceType, impType);
-        }
-    }
-
-    // Usage
-    var container = new Container();
-    container.Options.ConstructorResolutionBehavior = 
-        new T4MvcConstructorBehavior(container.Options.ConstructorResolutionBehavior);
-
-The old T4MVC template generated an extra public constructor on MVC Controller types and overload resolution only had to be changed for types implementing *System.Web.Mvc.IController*, which is what the previous code snippet does. For all other types of registration in the container, the container's default behavior is used.
+The previous examples changed the constructor overload resolution for all registered types. This is usually not the best approach, since this promotes ambiguity in design of our classes. Since ambiguity is usually only a problem in code generation scenarios, it's best to only override the behavior for types that are affected by the code generator.
 
 .. _Overriding-Property-Injection-Behavior:
 
@@ -167,11 +136,9 @@ The Simple Injector API exposes the **IPropertySelectionBehavior** interface to 
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    class PropertySelectionBehavior<TAttribute> : IPropertySelectionBehavior
-        where TAttribute : Attribute {
-        public bool SelectProperty(Type type, PropertyInfo prop) {
-            return prop.GetCustomAttributes(typeof(TAttribute)).Any();
-        }
+    class PropertySelectionBehavior<T> : IPropertySelectionBehavior where T : Attribute {
+        public bool SelectProperty(PropertyInfo prop) =>
+            prop.GetCustomAttributes(typeof(T)).Any();
     }
 
     // Usage:
@@ -190,29 +157,30 @@ Implicit property injection can be enabled by creating an **IPropertySelectionBe
 .. code-block:: c#
 
     public class ImplicitPropertyInjectionBehavior : IPropertySelectionBehavior {
-        private readonly Container container;
+        private readonly IPropertySelectionBehavior original;
+        private readonly ContainerOptions options;
+
         internal ImplicitPropertyInjectionBehavior(Container container) {
-            this.container = container;
+            this.options = container.Options;
+            this.original = container.Options.PropertySelectionBehavior;
         }
 
-        public bool SelectProperty(Type type, PropertyInfo property) {
-            return this.IsImplicitInjectable(property);
-        }
+        public bool SelectProperty(Type t, PropertyInfo p) =>
+            this.IsImplicitInjectable(t, p) || this.original.SelectProperty(t, p);
 
-        private bool IsImplicitInjectable(PropertyInfo property) {
-            return IsInjectableProperty(property) && this.IsRegistered(property);
-        }
+        private bool IsImplicitInjectable(Type t, PropertyInfo p) =>
+            IsInjectableProperty(p) && this.CanBeResolved(t, p);
 
-        private static bool IsInjectableProperty(PropertyInfo prop) {
-            MethodInfo setMethod = prop.GetSetMethod(nonPublic: false);
-            return setMethod != null && !setMethod.IsStatic && prop.CanWrite;
-        }
+        private static bool IsInjectableProperty(PropertyInfo property) =>
+            property.CanWrite && property.GetSetMethod(nonPublic: false)?.IsStatic == false;
 
-        private bool IsRegistered(PropertyInfo property) {
-            return this.container.GetRegistration(property.PropertyType) != null;
-        }
+        private bool CanBeResolved(Type t, PropertyInfo property) =>
+            this.GetProducer(new InjectionConsumerInfo(t, property)) != null;
+
+        private InstanceProducer GetProducer(InjectionConsumerInfo info) =>
+            this.options.DependencyInjectionBehavior.GetInstanceProducer(info, false);
     }
-
+    
     // Usage:
     var container = new Container();
     container.Options.PropertySelectionBehavior = 
@@ -236,7 +204,7 @@ The following article contains more information about changing the library's def
 Resolving Unregistered Types
 ============================
 
-Unregistered type resolution is the ability to get notified by the container when a type is requested that is currently unregistered in the container. This gives you the change of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing enabling support for :ref:`decorators <Decorators>`.
+Unregistered type resolution is the ability to get notified by the container when a type is requested that is currently unregistered in the container. This gives you the change of registering that type. Simple Injector supports this scenario with the `ResolveUnregisteredType <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ event. Unregistered type resolution enables many advanced scenarios. The library itself uses this event for implementing enabling support for :ref:`decorators <Decoration>`.
 
 For more information about how to use this event, please look at the `ResolveUnregisteredType event documentation <https://simpleinjector.org/ReferenceLibrary/?topic=html/E_SimpleInjector_Container_ResolveUnregisteredType.htm>`_ in the `reference library <https://simpleinjector.org/ReferenceLibrary/>`_.
 
@@ -247,7 +215,7 @@ Overriding Lifestyle Selection Behavior
 
 By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the **Transient** lifestyle. This behavior can be overridden and this is especially useful in batch-registration scenarios.
 
-Here are some examples of registration calls that all register types as *transient*:
+Here are some examples of registration calls that all register types as *Transient*:
 
 .. code-block:: c#
 
@@ -278,7 +246,7 @@ A more common need is to select the lifestyle based on some context. This can be
 .. code-block:: c#
 
     public interface ILifestyleSelectionBehavior {
-        Lifestyle SelectLifestyle(Type serviceType, Type implementationType);
+        Lifestyle SelectLifestyle(Type implementationType);
     }
 
 When no lifestyle is explicitly supplied by the user, Simple Injector will call into the registered **ILifestyleSelectionBehavior** when the type is registered to allow the **ILifestyleSelectionBehavior** implementation to select the proper lifestyle. The default behavior can be replaced by setting the **Container.Options.LifestyleSelectionBehavior** property.
@@ -295,16 +263,22 @@ The following example changes the lifestyle selection behavior to always registe
 
     // Custom lifestyle selection behavior
     public class SingletonLifestyleSelectionBehavior : ILifestyleSelectionBehavior {
-        public Lifestyle SelectLifestyle(Type serviceType, Type implementationType) {
-            return Lifestyle.Singleton;
-        }
+        public Lifestyle SelectLifestyle(Type implementationType) => Lifestyle.Singleton;
     }
 
     // Usage
     var container = new Container();
     container.Options.LifestyleSelectionBehavior = new SingletonLifestyleSelectionBehavior();
 
-The following example changes the lifestyle selection behavior to pick the lifestyle based on an attribute:
+In case there is always a single default lifestyle, a much easier to set the **Container.Options.DefaultLifestyle** property:
+
+.. code-block:: c#
+
+    container.Options.DefaultLifestyle = Lifestyle.Singleton;
+
+The default **Container.Options.LifestyleSelectionBehavior** implementation simply returns the configured **Container.Options.DefaultLifestyle**.
+
+It gets more interesting when the lifestyle changes on the given type. The following example changes the lifestyle selection behavior to pick the lifestyle based on an attribute:
 
 .. code-block:: c#
 
@@ -315,30 +289,29 @@ The following example changes the lifestyle selection behavior to pick the lifes
     // Attribute for use by the application
     public enum CreationPolicy { Transient, Scoped, Singleton }
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, 
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface,
         Inherited = false, AllowMultiple = false)]
     public sealed class CreationPolicyAttribute : Attribute {
         public CreationPolicyAttribute(CreationPolicy policy) {
             this.Policy = policy;
         }
 
-        public CreationPolicy Policy { get; private set; }
+        public CreationPolicy Policy { get; }
     }
 
     // Custom lifestyle selection behavior
     public class AttributeBasedLifestyleSelectionBehavior : ILifestyleSelectionBehavior {
         private const CreationPolicy DefaultPolicy = CreationPolicy.Transient;
 
-        public Lifestyle SelectLifestyle(Type serviceType, Type implementationType) {
-            var attribute = implementationType.GetCustomAttribute<CreationPolicyAttribute>()
-                ?? serviceType.GetCustomAttribute<CreationPolicyAttribute>();
+        public Lifestyle SelectLifestyle(Type type) => ToLifestyle(GetPolicy(type));
 
-            switch (attribute != null ? attribute.Policy : DefaultPolicy) {
-                case CreationPolicy.Singleton: return Lifestyle.Singleton;
-                case CreationPolicy.Scoped: return Lifestyle.Scoped;
-                default: return Lifestyle.Transient;
-            }
-        }
+        private static Lifestyle ToLifestyle(CreationPolicy policy) =>
+            policy == CreationPolicy.Singleton ? Lifestyle.Singleton :
+            policy == CreationPolicy.Scoped ? Lifestyle.Scoped :
+            Lifestyle.Transient;
+
+        private static CreationPolicy GetPolicy(Type type) =>
+            type.GetCustomAttribute<CreationPolicyAttribute>()?.Policy ?? DefaultPolicy;
     }
 
     // Usage
@@ -365,9 +338,9 @@ Intercepting the creation of types allows registrations to be modified. This ena
 
 The **ExpressionBuilding** event gets called just after the registration's expression has been created that new up a new instance of that type, but before any lifestyle caching has been applied. This event can for instance be used for :ref:`Context based injection <Context-Based-Injection>`.
 
-The **ExpressionBuilt** event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time **ExpressionBuilding** was called, is gone. While **ExpressionBuilding** is especially suited for changing the relationship between the resolved type and its dependencies, **ExpressionBuilt** is especially useful for applying decorators or :ref:`applying interceptors <Interception>`.
+The **ExpressionBuilt** event gets called after the lifestyle caching has been applied. After lifestyle caching is applied much of the information that was available about the creation of that registration during the time **ExpressionBuilding** was called, is gone. While **ExpressionBuilding** is especially suited for changing the relationship between the resolved type and its dependencies, **ExpressionBuilt** is especially useful for applying decorators or :ref:`applying interceptors <interception-using-dynamic-proxies>`.
 
-Note that Simple Injector has built-in support for :ref:`applying decorators <Decorators>` using the `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ extension methods. These methods internally use the **ExpressionBuilt** event.
+Note that Simple Injector has built-in support for :ref:`applying decorators <Decoration>` using the `RegisterDecorator <https://simpleinjector.org/ReferenceLibrary/?topic=html/Overload_SimpleInjector_Extensions_DecoratorExtensions_RegisterDecorator.htm>`_ extension methods. These methods internally use the **ExpressionBuilt** event.
 
 .. _Building-Up-External-Instances:
 

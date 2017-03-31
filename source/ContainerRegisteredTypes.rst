@@ -30,7 +30,7 @@ When to Ignore Warnings
 If your intention is to resolve those types as transient and don't depend directly on their concrete types, this warning can in general be ignored safely.
 
 The warning can be suppressed on a per-registration basis as follows:
-	
+    
 .. code-block:: c#
 
     var registration = container.GetRegistration(typeof(HomeController)).Registration;
@@ -43,20 +43,20 @@ Example
 
 .. code-block:: c#
 
-	var container = new Container();
+    var container = new Container();
 
-	container.Register<HomeController>();
+    container.Register<HomeController>();
 
-	container.Verify();
+    container.Verify();
 
-	// Definition of HomeController
-	public class HomeController : Controller {
-	    private readonly SqlUserRepository repository;
+    // Definition of HomeController
+    public class HomeController : Controller {
+        private readonly SqlUserRepository repository;
 
-	    public HomeController(SqlUserRepository repository) {
-	        this.repository = repository;
-	    }
-	}
+        public HomeController(SqlUserRepository repository) {
+            this.repository = repository;
+        }
+    }
 
 The given example registers a *HomeController* class that depends on an unregistered *SqlUserRepository* class. Injecting a concrete type can lead to problems, such as:
 
@@ -68,22 +68,22 @@ Instead of depending directly on *SqlUserRepository*, *HomeController* can bette
 
 .. code-block:: c#
 
-	var container = new Container();
+    var container = new Container();
 
-	container.Register<IUserRepository, SqlUserRepository>();
-	container.Register<HomeController>();
+    container.Register<IUserRepository, SqlUserRepository>();
+    container.Register<HomeController>();
 
-	container.Verify();
+    container.Verify();
 
-	// Definition of HomeController
-	public class HomeController : Controller {
-	    private readonly IUserRepository repository;
+    // Definition of HomeController
+    public class HomeController : Controller {
+        private readonly IUserRepository repository;
 
-	    public HomeController(IUserRepository repository) {
-	        this.repository = repository;
-	    }
-	}
+        public HomeController(IUserRepository repository) {
+            this.repository = repository;
+        }
+    }
 
 .. container:: Note
 
-    **Tip**: It would probably be better to define a generic *IRepository<T>* abstraction. This makes easy to :ref:`batch registration <Batch-Registration>` implementations and allows cross-cutting concerns to be added using :ref:`decorators <Decorators>`.
+    **Tip**: It would probably be better to define a generic *IRepository<T>* abstraction. This makes easy to :ref:`batch registration <Batch-Registration>` implementations and allows cross-cutting concerns to be added using :ref:`decorators <Decoration>`.

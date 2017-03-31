@@ -25,7 +25,7 @@ For instance, having a single component that is registered both as Singleton and
 How to Fix Violations
 =====================
 
-Create a *Registration* instance for that component using *Lifestyle.CreateRegistration* and use that for both registrations.
+Make all registrations with the same lifestyle.
 
 In case you really intended to have this single component to be registered with two different lifestyles, this is a clear indication that the component should actually be split into multiple smaller components, each with their specific lifestyle.
 
@@ -50,7 +50,7 @@ The following example shows a configuration that will trigger the warning:
 
     container.Verify();
 
-The *FooBar* component is registered once as **Singleton** for *IFoo* and once as **Transient** for *IBar*. Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.
+The *FooBar* component is registered once as **Singleton** for *IFoo* and once as **Transient** for *IBar* (assuming that *FooBar* implements both *IFoo* and *IBar*). Below is an image that shows the output for this configuration in a watch window. The watch window shows two mismatches and one of the warnings is unfolded.
 
 .. image:: images/ambiguouslifestyles.png 
    :alt: Diagnostics debugger view watch window with the ambiguous lifestyle warnings
@@ -61,14 +61,25 @@ The issue can be fixed as follows:
 
     var container = new Container();
 
-    var registration = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
-    
-    container.AddRegistration(typeof(IFoo), registration);
-    container.AddRegistration(typeof(IBar), registration);
+    container.Register<IFoo, FooBar>(Lifestyle.Singleton);
+    container.Register<IBar, FooBar>(Lifestyle.Singleton);
     
     container.Verify();
     
-Another way to fix this issue is by splitting *FooBar* into multiple smaller components.
+Another way to fix this issue is by splitting *FooBar* into multiple smaller components:
+
+.. code-block:: c#
+
+    var container = new Container();
+
+    // New component with singleton lifestyle
+    container.Register<IFooBarCommon, FooBarCommon>(Lifestyle.Singleton);
+    
+    // Old component split into two, both depending on IFooBarCommon.
+    container.Register<IFoo, Foo>(Lifestyle.Transient);
+    container.Register<IBar, Bar>(Lifestyle.Singleton);
+    
+    container.Verify();
    
 The following example shows how to query the Diagnostic API for Torn Lifestyles:
 

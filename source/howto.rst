@@ -99,7 +99,7 @@ When you choose *Func<T>* delegates over specific factory interfaces you can def
         where TService : class
         where TImpl : class, TService
     {
-        lifestyle = lifestyle ?? Lifestyle.Transient;
+        lifestyle = lifestyle ?? container.Options.DefaultLifestyle;
         var producer = lifestyle.CreateProducer<TService, TImpl>(container);
         container.RegisterSingleton<Func<TService>>(producer.GetInstance);
     }
@@ -190,9 +190,7 @@ Just like *Func<T>* delegates can be injected, *Lazy<T>* instances can also be i
             this.wrapped = wrapped;
         }
         
-        public void Operate() {
-            this.wrapped.Value.Operate();
-        }
+        public void Operate() => this.wrapped.Value.Operate();
     }
 
     // Registration
@@ -256,9 +254,7 @@ By inheriting from the BCL's *Dictionary<TKey, TValue>*, creating an *IRequestHa
 
     public class RequestHandlerFactory : Dictionary<string, Func<IRequestHandler>>,
         IRequestHandlerFactory {
-        public IRequestHandler CreateNew(string name) {
-            return this[name]();
-        }
+        public IRequestHandler CreateNew(string name) => this[name]();
     }
 
 With this class, we can register *Func<IRequestHandler>* factory methods by a key. With this in place the registration of keyed instances is a breeze:
@@ -284,9 +280,8 @@ If you don't like a design that uses *Func<T>* delegates this way, it can easily
             this.container = container;
         }
 
-        public IRequestHandler CreateNew(string name) {
-            return (IRequestHandler)this.container.GetInstance(this[name]);
-        }
+        public IRequestHandler CreateNew(string name) =>
+            (IRequestHandler)this.container.GetInstance(this[name]);
     }
 
 The registration will then look as follows:
@@ -319,9 +314,8 @@ A final option for implementing keyed registrations is to manually create the re
             this.container = container;
         }
 
-        IRequestHandler IRequestHandlerFactory.CreateNew(string name) {
-            return this.producers[name].GetInstance();
-        }
+        IRequestHandler IRequestHandlerFactory.CreateNew(string name) =>
+            this.producers[name].GetInstance();
 
         public void Register<TImplementation>(string name, Lifestyle lifestyle = null)
             where TImplementation : class, IRequestHandler {
@@ -355,16 +349,14 @@ The previous examples showed how registrations could be requested based on a key
 Register multiple interfaces with the same implementation
 =========================================================
 
-To adhere to the `Interface Segregation Principle <http://en.wikipedia.org/wiki/Interface_segregation_principle>`_, it is important to keep interfaces narrow. Although in most situations implementations implement a single interface, it can sometimes be beneficial to have multiple interfaces on a single implementation. Here is an example of how to register this:
+To adhere to the `Interface Segregation Principle <https://en.wikipedia.org/wiki/Interface_segregation_principle>`_, it is important to keep interfaces narrow. Although in most situations implementations implement a single interface, it can sometimes be beneficial to have multiple interfaces on a single implementation. Here is an example of how to register this:
 
 .. code-block:: c#
 
     // Impl implements IInterface1, IInterface2 and IInterface3.
-    var registration = Lifestyle.Singleton.CreateRegistration<Impl>(container);
-
-    container.AddRegistration(typeof(IInterface1), registration);
-    container.AddRegistration(typeof(IInterface2), registration);
-    container.AddRegistration(typeof(IInterface3), registration);
+    container.Register<IInterface1, Impl>(Lifestyle.Singleton);
+    container.Register<IInterface2, Impl>(Lifestyle.Singleton);
+    container.Register<IInterface3, Impl>(Lifestyle.Singleton);
 
     var a = container.GetInstance<IInterface1>();
     var b = container.GetInstance<IInterface2>();
@@ -374,11 +366,8 @@ To adhere to the `Interface Segregation Principle <http://en.wikipedia.org/wiki/
     Assert.AreEqual(a, b);
     Assert.AreEqual(b, c);
 
-The first line creates a **Registration** instance for the *Impl*, in this case with a singleton lifestyle. The other lines add this registration to the container, once for each interface. This maps multiple service types to the exact same registration.
+At first glance the previous example would seem to cause three instances of *Impl*, but Simple Injector 4 will ensure that all three registrations will get the same instance.
 
-.. container:: Note
-
-    **Note:** This is different from having three **RegisterSingleton** registrations, since that will results three separate singletons.
 
 .. _Override-Existing-Registrations:
 
@@ -446,7 +435,7 @@ Calling the **Verify()** method however, is just part of the story. It is very e
 
 #. There are scenarios where some dependencies cannot yet be created during application start-up. To ensure that the application can be started normally and the rest of the DI configuration can still be verified, abstract those dependencies behind a proxy or abstract factory. Try to keep those unverifiable dependencies to a minimum and keep good track of them, because you will probably have to test them manually or using an integration test.
 
-#. But even when all registrations can be resolved successfully by the container, that still doesn't mean your configuration is correct. It is very easy to accidentally misconfigure the container in a way that only shows up late in the development process. Simple Injector contains :doc:`Diagnostics Services <diagnostics>` to help you spot common configuration mistakes. With Simple Injector 3, most of the diagnostic warnings are integrated into the verification mechanism. This means that a call to **Verify()** will also check for diagnostic warnings for you. It is advisable to analyze the container by calling **Verify** or by using the diagnostic services either during application startup or as part of an automated test that does this for you.
+#. But even when all registrations can be resolved successfully by the container, that still doesn't mean your configuration is correct. It is very easy to accidentally misconfigure the container in a way that only shows up late in the development process. Simple Injector contains :doc:`Diagnostics Services <diagnostics>` to help you spot common configuration mistakes. To help you, all the diagnostic warnings are integrated into the verification mechanism. This means that a call to **Verify()** will also check for diagnostic warnings for you. It is advisable to analyze the container by calling **Verify** or by using the diagnostic services either during application startup or as part of an automated test that does this for you.
 
 .. _Multi-Threaded-Applications:
 
@@ -469,7 +458,7 @@ Dependency injection however, can actually help in writing multi-threaded applic
 
 .. container:: Note
 
-    **Note:** By default, Simple Injector 3 will check for Lifestyle Mismatches for you when you resolve a service. In other words, Simple Injector will fail fast when there is a Lifestyle Mismatch in your configuration.
+    **Note:** By default, Simple Injector will check for Lifestyle Mismatches for you when you resolve a service. In other words, Simple Injector will fail fast when there is a Lifestyle Mismatch in your configuration.
 
 In a multi-threaded application, each thread should get its own object graph. This means that you should typically call **GetInstance<T>()** once at the beginning of the thread's execution to get the root object for processing that thread (or request). The container will build an object graph with all root object's dependencies. Some of those dependencies might be singletons; shared between all threads. Other dependencies might be transient; a new instance is created per dependency. Other dependencies might be thread-specific, request-specific, or with some other lifestyle. The application code itself is unaware of the way the dependencies are registered and that's the way it is supposed to be.
 
@@ -617,49 +606,3 @@ On top of this, switching on or off groups of registrations based on configurati
          MockedExternalServicesPackage.Bootstrap(container);
     else
          ProductionExternalServicesPackage.Bootstrap(container);
-
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-
-.. _Resolve-Arrays-And-Lists:
-
-**Resolve arrays and lists**: The information in this section has been moved to :ref:`here <Collections>`.
-
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|

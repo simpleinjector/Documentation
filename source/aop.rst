@@ -262,17 +262,17 @@ This configuration has an interesting mix of decorator registrations.
 
     **Warning**: Please note that the previous example is just meant for educational purposes. In practice, you don't want your commands to be processed this way, since it could lead to message loss. Instead you want to use a durable queue.
 
-Another useful application for *Func<T>* decoratee factories is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new lifetime scope, as follows:
+Another useful application for *Func<T>* decoratee factories is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new thread-specific scope, as follows:
 
 .. code-block:: c#
 
-    using SimpleInjector.Extensions.LifetimeScoping;
+    using SimpleInjector.Lifestyles;
 
-    public class LifetimeScopeCommandHandlerProxy<T> : ICommandHandler<T> {
+    public class ThreadScopedCommandHandlerProxy<T> : ICommandHandler<T> {
         private readonly Container container;
         private readonly Func<ICommandHandler<T>> decorateeFactory;
 
-        public LifetimeScopeCommandHandlerProxy(Container container,
+        public ThreadScopedCommandHandlerProxy(Container container,
             Func<ICommandHandler<T>> decorateeFactory) {
             this.container = container;
             this.decorateeFactory = decorateeFactory;
@@ -280,7 +280,7 @@ Another useful application for *Func<T>* decoratee factories is when a command n
 
         public void Handle(T command) {
             // Start a new scope.
-            using (container.BeginLifetimeScope()) {
+            using (ThreadScopedLifestyle.BeginScope(container)) {
                 // Create the decorateeFactory within the scope.
                 ICommandHandler<T> handler = this.decorateeFactory.Invoke();
                 handler.Handle(command);
@@ -288,42 +288,36 @@ Another useful application for *Func<T>* decoratee factories is when a command n
         }
     }
     
-This proxy class starts a new :ref:`lifetime scope lifestyle <PerLifetimeScope>` and resolves the decoratee within that new scope using the factory. The use of the factory ensures that the decoratee is resolved according to its lifestyle, independent of the lifestyle of our proxy class. The proxy can be registered as follows:
+This proxy class starts a new :ref:`thread scoped lifestyle <ThreadScoped>` and resolves the decoratee within that new scope using the factory. The use of the factory ensures that the decoratee is resolved according to its lifestyle, independent of the lifestyle of our proxy class. The proxy can be registered as follows:
 
 .. code-block:: c#
 
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
-        typeof(LifetimeScopeCommandHandlerProxy<>),
+        typeof(ThreadScopedCommandHandlerProxy<>),
         Lifestyle.Singleton);
 
 .. container:: Note
 
-    **Note**: Since the *LifetimeScopeCommandHandlerProxy<T>* only depends on singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it too can safely be registered as singleton.
+    **Note**: Since the *ThreadScopedCommandHandlerProxy<T>* only depends on singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it too can safely be registered as singleton.
         
-Since a typical application will not use the lifetime scope, but would prefer a scope specific to the application type (such as a :ref:`web request <PerWebRequest>`, :ref:`web api request <PerWebAPIRequest>` or :ref:`WCF operation <PerWcfOperation>` lifestyles), a special :ref:`hybrid lifestyle <Hybrid>` needs to be defined that allows object graphs to be resolved in this mixed-request scenario:
+Since a typical application will not use the thread scoped lifestyle, but would prefer a scope specific to the application type, a special :ref:`hybrid lifestyle <Hybrid>` needs to be defined that allows object graphs to be resolved in this mixed-request scenario:
 
 .. code-block:: c#
 
-    var defaultLifestyle = new LifetimeScopeLifestyle();
-    
     container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
-        lifestyleSelector: () => defaultLifestyle.GetCurrentScope(container) != null,
-        trueLifestyle: defaultLifestyle,
-        falseLifestyle: new WebRequestLifestyle());
+        defaultLifestyle = new ThreadScopedLifestyle(),
+        fallbackLifestyle: new WebRequestLifestyle());
 
     container.Register<IUnitOfWork, DbUnitOfWork>(Lifestyle.Scoped);
 
-Obviously, if you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use both the *LifetimeScopeCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
+Obviously, if you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use both the *ThreadScopedCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
 
 .. code-block:: c#
 
-    var defaultLifestyle = new LifetimeScopeLifestyle();
-    var fallbackLifestyle = new WebRequestLifestyle();
-    ScopedLifestyle scopedLifestyle = Lifestyle.CreateHybrid(
-        lifestyleSelector: () => defaultLifestyle.GetCurrentScope(container) != null,
-        trueLifestyle: defaultLifestyle,
-        falseLifestyle: fallbackLifestyle);
+    container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
+        defaultLifestyle = new ThreadScopedLifestyle(),
+        fallbackLifestyle: new WebRequestLifestyle());
 
     container.Options.DefaultScopedLifestyle = scopedLifestyle;
 
@@ -336,7 +330,7 @@ Obviously, if you run (part of) your commands on a background thread and also us
 
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
-        typeof(LifetimeScopeCommandHandlerProxy<>),
+        typeof(ThreadScopedCommandHandlerProxy<>),
         Lifestyle.Singleton);
         
     container.RegisterDecorator(

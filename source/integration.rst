@@ -27,7 +27,6 @@ Besides integration with standard .NET technologies, Simple Injector can be inte
 * `SignalR <https://stackoverflow.com/questions/10555791/using-simpleinjector-with-signalr>`_
 * `Fluent Validations <https://stackoverflow.com/questions/9984144/what-is-the-correct-way-to-register-fluentvalidation-with-simpleinjector>`_
 * `PetaPoco <https://simpleinjector.codeplex.com/discussions/283850>`_
-* :doc:`T4MVC <t4mvc>`
 * `Quartz.NET <https://stackoverflow.com/questions/14562176/constructor-injection-with-quartz-net-and-simple-injector>`_
 * `Membus <https://stackoverflow.com/questions/16123641/membus-and-ioc-simpleinjector-wiring-command-handlers-automatically-by-interfa>`_
 * `Web Forms MVP <https://stackoverflow.com/questions/15123515/pass-runtime-value-to-constructor-using-simpleinjector>`_
