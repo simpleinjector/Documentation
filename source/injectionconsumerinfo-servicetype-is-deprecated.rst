@@ -19,7 +19,7 @@ What's the problem?
 
 The **InjectionConsumerInfo** and **ExpressionBuildingEventArgs** classes are used at a point in the pipeline where only the given implementation type is known. Although in some cases the actual service type could be determined correctly, in other cases it just contained a wrong value (of a different registration).
 
-**InjectionConsumerInfo** and **ExpressionBuildingEventArgs** are used by **Registration** instances. A **Registration** instance is responsible for creating and caching a specific implementation, but it has no notion of the abstraction/service for which it is registered. This is deliberate, since a **Registration** can be reused by multiple **InstanceProducer** instances. **InstanceProducer**s are responsible of the mapping from an abstraction to the implementation provided by a **Registration**.
+**InjectionConsumerInfo** and **ExpressionBuildingEventArgs** are used by **Registration** instances. A **Registration** instance is responsible for creating and caching a specific implementation, but it has no notion of the abstraction/service for which it is registered. This is deliberate, since a **Registration** can be reused by multiple **InstanceProducer** instances. **InstanceProducer** instances are responsible of the mapping from an abstraction to the implementation provided by a **Registration**.
 
 The following example shows multiple registrations for the same implementation:
 
