@@ -30,7 +30,7 @@ The following example shows multiple registrations for the same implementation:
 
 These registrations result in two separate **InstanceProducer** instances (one for *IFoo* and one for *IBar*), but both use the same **Registration** instance for *FooBar*. This ensures that a single instance of *FooBar* will exist within that **Container** instance.
 
-The result of this is that *FooBar* is built, there are multiple possible abstractions. However, since a **Registration** is only built once, it could only be aware of the first service type it is built for. 
+The result of this is that when *FooBar* is built, there are multiple possible abstractions. However, since a **Registration** is only built once, it could only be aware of the first service type it is built for, which could be either *IFoo* or *IBar*. 
 
 Since the use of these properties was ambiguous and could lead to fragile configurations, they needed to be removed.
 
