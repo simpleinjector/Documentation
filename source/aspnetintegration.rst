@@ -82,7 +82,7 @@ The following code snippet shows how to use the integration package to apply Sim
             // The following registers a Func<T> delegate that can be injected as singleton,
             // and on invocation resolves a MVC IViewBufferScope service for that request.
             container.RegisterSingleton<Func<IViewBufferScope>>(
-                app.GetRequestService<IViewBufferScope>);
+                () => app.GetRequestService<IViewBufferScope>());
                 
             // NOTE: Do prevent cross-wired instances as much as possible. 
             // See: https://simpleinjector.org/blog/2016/07/
