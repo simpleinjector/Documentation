@@ -48,14 +48,14 @@ The following code snippet shows how to use the integration package to apply Sim
             
             InitializeContainer(app);
             
-            container.Register<CustomMiddleware>();
+            container.Register<CustomMiddleware1>();
+			container.Register<CustomMiddleware2>();
 
             container.Verify();
             
             // Add custom middleware
-            app.Use(async (context, next) => {
-                await container.GetInstance<CustomMiddleware>().Invoke(context, next);
-            });
+            app.Use((c, next) => container.GetInstance<CustomMiddleware1>().Invoke(c, next));
+			app.Use((c, next) => container.GetInstance<CustomMiddleware2>().Invoke(c, next));
             
             // ASP.NET default stuff here
             app.UseMvc(routes =>
