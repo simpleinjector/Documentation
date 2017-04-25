@@ -203,7 +203,7 @@ A per-thread lifestyle caches instances for as long as the thread lives and stor
 
 .. container:: Note
 
-    *Note**: This makes a per-thread lifestyle very different from the :ref:`Thred Scoped <ThreadScoped>` lifestyle, as the lifetime of an instance is limited to a very clearly defined scope and usually a very short period of time, whereas a per-thread instance will live for the duration of the thread.
+    **Note**: This makes a per-thread lifestyle very different from the :ref:`Thread Scoped <ThreadScoped>` lifestyle, as the lifetime of an instance is limited to a very clearly defined scope and usually a very short period of time, whereas a per-thread instance will live for the duration of the thread.
 
 While designing Simple Injector, we explicitly decided not to include a Per Thread lifestyle out-of-the-box, because we want to:
 
