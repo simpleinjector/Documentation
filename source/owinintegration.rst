@@ -65,7 +65,7 @@ The following code snippet can be used to register this *IOwinContextAccessor* a
 .. code-block:: c#
 
     app.Use(async (context, next) => {
-        CallContextOwinContextAccessor.OwinContext = context;
+        CallContextOwinContextAccessor.OwinContext.Value = context;
         await next();
     });
     
