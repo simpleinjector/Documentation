@@ -542,9 +542,9 @@ To use this feature, you need to install the `SimpleInjector.Packaging NuGet pac
 
 .. container:: Note
 
-    **SimpleInjector.Packaging** exists to accomodate applications that require plug-in like modularization, where parts of the application, packad with their own container registrations, can be independently compiled into a dll and 'dropped' into a folder, where the main application can pick them up, without the need for the main application to be recompiled and redeployed.
+    **SimpleInjector.Packaging** exists to accommodate applications that require plug-in like modularization, where parts of the application, packed with their own container registrations, can be independently compiled into a dll and 'dropped' into a folder, where the main application can pick them up, without the need for the main application to be recompiled and redeployed.
 
-To accomodate this, those independent application parts can create a package by defining a class that implements the **IPackage** interface:
+To accommodate this, those independent application parts can create a package by defining a class that implements the **IPackage** interface:
 
 .. code-block:: c#
 
