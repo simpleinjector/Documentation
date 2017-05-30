@@ -135,7 +135,7 @@ Scoped
     
     For every request within an implicitly or explicitly defined scope, a single instance of the service will be returned and that instance will be disposed when the scope ends.
 
-Simple Injector contains five scoped lifestyles:
+Simple Injector contains the following scoped lifestyles:
 
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 | Lifestyle                                     | Description                                                           | Disposal                   |
