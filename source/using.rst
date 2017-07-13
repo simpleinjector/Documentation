@@ -307,7 +307,7 @@ Simple Injector contains several methods for registering and resolving collectio
 
 .. container:: Note
 
-    **Warning**:  Simple Injector requires a call to **RegsterCollection** to be made, even in the absence of any instances. Without a call to **RegisterCollection**, Simple Injector will throw an exception.
+    **Warning**:  Simple Injector requires a call to **RegisterCollection** to be made, even in the absence of any instances. Without a call to **RegisterCollection**, Simple Injector will throw an exception.
 
 
 Just as with normal types, Simple Injector can inject collections of instances into constructors:
