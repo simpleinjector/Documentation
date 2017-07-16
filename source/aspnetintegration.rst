@@ -117,6 +117,116 @@ Notice how the `CustomMiddleware` class contains dependencies. Because of this, 
 
 In contrast to what the official ASP.NET Core documentation `advises <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware#writing-middleware>`_, the `RequestDelegate` or `Func<Task> next` delegate can best be passed in using **Method Injection** (through the `Invoke` method), instead of by using Constructor Injection. Reason for this is that this delegate is runtime data and runtime data should `not be passed in through the constructor <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=99>`_. Moving it to the `Invoke` method makes it possible to reliably verify the application's DI configuration and it simplifies your configuration.
 
+Cross-wiring ASP.NET and third party services
+=============================================
+
+When your application code (i.e. a **Controller**) needs a service which integrates with the ASP.NET Core configuration system it is sometimes necessary to cross-wire these dependencies. Cross-wiring is the process where a type is created and maintained by ASP.NET Core and is fed to Simple Injector so Simple Injector can use the created instance to supply it as a dependency to your application code. 
+
+To use these feature, Simple Injector contains the **CrossWire<TService>** extension method. This method ensures that the type is registered with the same lifestyle as configured in ASP.NET Core and makes sure there is an active **RequestScope** when such a service is used in a background thread instead of during a `WebRequest`. 
+
+To setup cross-wiring first you must make a call to **EnableSimpleInjectorCrossWiring** on **IServiceCollection** in the **ConfigureServices** method of your `Startup` class.
+
+.. code-block:: c#
+
+    services.EnableSimpleInjectorCrossWiring(container);
+
+When cross-wiring is enabled cross-wiring is as simple as:
+
+.. code-block:: c#
+
+    container.CrossWire<ILoggerFactory>(app);
+
+.. container:: Note
+
+    **NOTE**: Do prevent the use of cross-wiring as much as possible. In most cases cross-wiring is not the best solution and is a violation of the `Dependency Inversion Principle <https://en.wikipedia.org/wiki/Dependency_inversion_principle>`_. Don't depend directly upon Framework components and instead create application specific proxy and/or adapter implementations.
+
+
+Simple Injector also contains the `GetRequestService<TService>` and `GetRequiredRequestService<TService>` extension methods as shown in the `Startup` snippet. The methods both can be used to do setup cross-wiring yourself. These methods however don't work for services used outside the existence of an ASP.NET Core `RequestScope` and won't automatically suppress possible `Disposable Transient Components  <http://simpleinjector.readthedocs.io/en/latest/disposabletransientcomponent.html>`_ diagnostic warnings. Expect these methods to become obsolete in future versions of Simple Injector.
+
+Working with ASP.NET Core Identity
+==================================
+
+The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. To get the code from the template working only a few services from Identity need to be cross-wired.
+
+You can use this code snippet to get things working quickly
+
+.. code-block:: c#
+
+    public class Startup
+    {
+        private readonly Container container = new Container();
+        public IConfigurationRoot Configuration { get; }
+
+        public Startup(IHostingEnvironment env) { 
+            // ASP.NET default stuff here
+        }
+
+
+        // This method gets called by the runtime. 
+        public void ConfigureServices(IServiceCollection services) {
+            // Add framework services for Identity.
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddMvc();
+
+            // Enable Simple Injector Cross wiring
+            services.EnableSimpleInjectorCrossWiring(container);
+            
+            services.AddSingleton<IControllerActivator>(
+                new SimpleInjectorControllerActivator(container));
+            services.AddSingleton<IViewComponentActivator>(
+                new SimpleInjectorViewComponentActivator(container));
+            
+            services.UseSimpleInjectorAspNetRequestScoping(container);
+        }
+
+        // Configure is called after ConfigureServices is called.
+        public void Configure(IApplicationBuilder app, 
+                IHostingEnvironment env, ILoggerFactory loggerFactory) {
+            InitializeContainer(app);
+            
+            container.Verify();
+
+            // ASP.NET default stuff here
+            // Add Identity middleware
+            app.UseIdentity();
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
+        }
+
+        private void InitializeContainer(IApplicationBuilder app) {
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            // Add application presentation components:
+            container.RegisterMvcControllers(app);
+            container.RegisterMvcViewComponents(app);
+
+            // Add application services for AccountController
+            container.RegisterSingleton<IEmailSender, AuthMessageSender>();
+            container.RegisterSingleton<ISmsSender, AuthMessageSender>();
+
+            // Cross wire Identity services
+            container.CrossWire<UserManager<ApplicationUser>>(app);
+            container.CrossWire<SignInManager<ApplicationUser>>(app);
+            // Cross wire other AccountController dependencies
+            container.CrossWire<ILoggerFactory>(app);
+            container.CrossWire<IOptions<IdentityCookieOptions>>(app);
+
+            // NOTE: It is highly advisable to refactor the accountcontroller
+            // and NOT to depend on IOptions<IdentityCookieOptions> and ILoggerFactory
+            // See: http://simpleinjector.readthedocs.io/en/latest/aspnetintegration.html#working-with-ioption-t
+        }
+    }
+
 Working with `IOption<T>`
 =========================
 
