@@ -77,13 +77,8 @@ The following code snippet shows how to use the integration package to apply Sim
             container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
             
             // Cross-wire ASP.NET services (if any). For instance:
-            container.RegisterSingleton(app.ApplicationServices.GetService<ILoggerFactory>());
-            
-            // The following registers a Func<T> delegate that can be injected as singleton,
-            // and on invocation resolves a MVC IViewBufferScope service for that request.
-            container.RegisterSingleton<Func<IViewBufferScope>>(
-                () => app.GetRequestService<IViewBufferScope>());
-                
+            container.CrossWire<ILoggerFactory>(app);
+               
             // NOTE: Do prevent cross-wired instances as much as possible. 
             // See: https://simpleinjector.org/blog/2016/07/
         }
@@ -139,9 +134,6 @@ When cross-wiring is enabled cross-wiring is as simple as:
 .. container:: Note
 
     **NOTE**: Do prevent the use of cross-wiring as much as possible. In most cases cross-wiring is not the best solution and is a violation of the `Dependency Inversion Principle <https://en.wikipedia.org/wiki/Dependency_inversion_principle>`_. Don't depend directly upon Framework components and instead create application specific proxy and/or adapter implementations.
-
-
-Simple Injector also contains the `GetRequestService<TService>` and `GetRequiredRequestService<TService>` extension methods as shown in the `Startup` snippet. The methods both can be used to do setup cross-wiring yourself. These methods however don't work for services used outside the existence of an ASP.NET Core `RequestScope` and won't automatically suppress possible `Disposable Transient Components  <http://simpleinjector.readthedocs.io/en/latest/disposabletransientcomponent.html>`_ diagnostic warnings. Expect these methods to become obsolete in future versions of Simple Injector.
 
 Working with ASP.NET Core Identity
 ==================================
