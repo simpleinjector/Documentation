@@ -16,6 +16,7 @@ The following code snippet shows how to use the integration package to apply Sim
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using Microsoft.AspNetCore.Http; 
     
     using SimpleInjector;
     using SimpleInjector.Lifestyles;
@@ -34,12 +35,21 @@ The following code snippet shows how to use the integration package to apply Sim
             // ASP.NET default stuff here
             services.AddMvc();
 
+            IntegrateSimpleInjector(services);
+        }
+        
+        private void IntegrateSimpleInjector(IServiceCollection services) {
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+        
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        
             services.AddSingleton<IControllerActivator>(
                 new SimpleInjectorControllerActivator(container));
             services.AddSingleton<IViewComponentActivator>(
                 new SimpleInjectorViewComponentActivator(container));
                 
-            services.UseSimpleInjectorAspNetRequestScoping(container);
+            services.EnableSimpleInjectorCrossWiring(container);
+            services.UseSimpleInjectorAspNetRequestScoping(container);        
         }
 
         // Configure is called after ConfigureServices is called.
@@ -49,13 +59,13 @@ The following code snippet shows how to use the integration package to apply Sim
             InitializeContainer(app);
             
             container.Register<CustomMiddleware1>();
-			container.Register<CustomMiddleware2>();
+            container.Register<CustomMiddleware2>();
 
             container.Verify();
             
             // Add custom middleware
             app.Use((c, next) => container.GetInstance<CustomMiddleware1>().Invoke(c, next));
-			app.Use((c, next) => container.GetInstance<CustomMiddleware2>().Invoke(c, next));
+            app.Use((c, next) => container.GetInstance<CustomMiddleware2>().Invoke(c, next));
             
             // ASP.NET default stuff here
             app.UseMvc(routes =>
@@ -66,15 +76,13 @@ The following code snippet shows how to use the integration package to apply Sim
             });
         }
 
-        private void InitializeContainer(IApplicationBuilder app) {
-            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
-        
+        private void InitializeContainer(IApplicationBuilder app) {       
             // Add application presentation components:
             container.RegisterMvcControllers(app);
             container.RegisterMvcViewComponents(app);
         
             // Add application services. For instance: 
-            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
+            container.Register<IUserService, UserService>(Lifestyle.Scoped);
             
             // Cross-wire ASP.NET services (if any). For instance:
             container.CrossWire<ILoggerFactory>(app);
@@ -83,6 +91,8 @@ The following code snippet shows how to use the integration package to apply Sim
             // See: https://simpleinjector.org/blog/2016/07/
         }
     }
+    
+.. _wiring-custom-middleware:
     
 Wiring custom middleware
 ========================
@@ -112,14 +122,16 @@ Notice how the `CustomMiddleware` class contains dependencies. Because of this, 
 
 In contrast to what the official ASP.NET Core documentation `advises <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware#writing-middleware>`_, the `RequestDelegate` or `Func<Task> next` delegate can best be passed in using **Method Injection** (through the `Invoke` method), instead of by using Constructor Injection. Reason for this is that this delegate is runtime data and runtime data should `not be passed in through the constructor <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=99>`_. Moving it to the `Invoke` method makes it possible to reliably verify the application's DI configuration and it simplifies your configuration.
 
+.. _cross-wiring:
+
 Cross-wiring ASP.NET and third party services
 =============================================
 
-When your application code (i.e. a **Controller**) needs a service which integrates with the ASP.NET Core configuration system it is sometimes necessary to cross-wire these dependencies. Cross-wiring is the process where a type is created and maintained by ASP.NET Core and is fed to Simple Injector so Simple Injector can use the created instance to supply it as a dependency to your application code. 
+When your application code (i.e. a `Controller`) needs a service which integrates with the ASP.NET Core configuration system it is sometimes necessary to cross-wire these dependencies. Cross-wiring is the process where a type is created and maintained by the ASP.NET Core configuration system and is fed to Simple Injector so Simple Injector can use the created instance to supply it as a dependency to your application code.
 
-To use these feature, Simple Injector contains the **CrossWire<TService>** extension method. This method ensures that the type is registered with the same lifestyle as configured in ASP.NET Core and makes sure there is an active **RequestScope** when such a service is used in a background thread instead of during a `WebRequest`. 
+To use this feature, Simple Injector contains the **CrossWire<TService>** extension method. This method does the required blumbing such as making sure the type is registered with the same lifestyle as configured in ASP.NET Core.
 
-To setup cross-wiring first you must make a call to **EnableSimpleInjectorCrossWiring** on **IServiceCollection** in the **ConfigureServices** method of your `Startup` class.
+To setup cross-wiring first you must make a call to **EnableSimpleInjectorCrossWiring** on `IServiceCollection` in the `ConfigureServices` method of your `Startup` class.
 
 .. code-block:: c#
 
@@ -135,6 +147,8 @@ When cross-wiring is enabled cross-wiring is as simple as:
 
     **NOTE**: Do prevent the use of cross-wiring as much as possible. In most cases cross-wiring is not the best solution and is a violation of the `Dependency Inversion Principle <https://en.wikipedia.org/wiki/Dependency_inversion_principle>`_. Don't depend directly upon Framework components and instead create application specific proxy and/or adapter implementations.
 
+.. _identity:
+    
 Working with ASP.NET Core Identity
 ==================================
 
@@ -147,38 +161,44 @@ You can use this code snippet to get things working quickly
     public class Startup
     {
         private readonly Container container = new Container();
-        public IConfigurationRoot Configuration { get; }
 
         public Startup(IHostingEnvironment env) { 
             // ASP.NET default stuff here
         }
-
 
         // This method gets called by the runtime. 
         public void ConfigureServices(IServiceCollection services) {
             // Add framework services for Identity.
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
 
-            // Enable Simple Injector Cross wiring
-            services.EnableSimpleInjectorCrossWiring(container);
-            
+            IntegrateSimpleInjector(services);
+        }
+        
+        private void IntegrateSimpleInjector(IServiceCollection services) {
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+        
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        
             services.AddSingleton<IControllerActivator>(
                 new SimpleInjectorControllerActivator(container));
             services.AddSingleton<IViewComponentActivator>(
                 new SimpleInjectorViewComponentActivator(container));
-            
-            services.UseSimpleInjectorAspNetRequestScoping(container);
-        }
+                
+            services.EnableSimpleInjectorCrossWiring(container);
+            services.UseSimpleInjectorAspNetRequestScoping(container);        
+        }        
 
         // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, 
-                IHostingEnvironment env, ILoggerFactory loggerFactory) {
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
+            ILoggerFactory loggerFactory) {
+            
             InitializeContainer(app);
             
             container.Verify();
@@ -196,8 +216,6 @@ You can use this code snippet to get things working quickly
         }
 
         private void InitializeContainer(IApplicationBuilder app) {
-            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
-
             // Add application presentation components:
             container.RegisterMvcControllers(app);
             container.RegisterMvcViewComponents(app);
@@ -209,16 +227,19 @@ You can use this code snippet to get things working quickly
             // Cross wire Identity services
             container.CrossWire<UserManager<ApplicationUser>>(app);
             container.CrossWire<SignInManager<ApplicationUser>>(app);
+            
             // Cross wire other AccountController dependencies
             container.CrossWire<ILoggerFactory>(app);
             container.CrossWire<IOptions<IdentityCookieOptions>>(app);
 
-            // NOTE: It is highly advisable to refactor the accountcontroller
+            // NOTE: It is highly advisable to refactor the AccountController
             // and NOT to depend on IOptions<IdentityCookieOptions> and ILoggerFactory
-            // See: http://simpleinjector.readthedocs.io/en/latest/aspnetintegration.html#working-with-ioption-t
+            // See: https://simpleinjector.org/aspnetcore#working-with-ioption-t
         }
     }
 
+.. _ioption:
+    
 Working with `IOption<T>`
 =========================
 
@@ -241,4 +262,9 @@ Once you have a correctly read and verified configuration object, registration o
 
     // Verify mailSettings here (if required)
 
+    // Supply mailSettings as constructor argument to a type that requires it,
     container.Register<IMessageSender>(() => new MailMessageSender(mailSettings));
+
+    // or register MailSettings as singleton in the container.
+    container.RegisterSingleton<MyMailSettings>(mailSettings);
+    container.Register<IMessageSender, MailMessageSender>();
