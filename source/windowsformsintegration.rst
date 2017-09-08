@@ -38,7 +38,7 @@ The following code snippet is an example of how to register Simple Injector cont
         }
     }
 
-With this code in place, we can now write our *Form* and *UserControl* classes as follows:
+With this code in place, we can now write our *Form* classes as follows:
 
 .. code-block:: c#
 
@@ -59,3 +59,7 @@ With this code in place, we can now write our *Form* and *UserControl* classes a
             }
         }
     }
+
+.. container:: Note
+
+    **Note**: It is not possible to use *Constructor Injection* in *User Controls*. *User Controls* are required to have a default constructor. Instead, pass on dependencies to your *User Controls* using *Method Injection*.
