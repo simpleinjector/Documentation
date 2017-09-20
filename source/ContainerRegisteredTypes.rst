@@ -15,7 +15,7 @@ A concrete type that was not registered explicitly and was not resolved using un
 Warning Description
 ===================
 
-The *Container-Registered Types* warning shows all concrete types that weren't registered explicitly, but registered by the container as transient for you, because they were referenced by another component's constructor or were resolved through a direct call to *container.GetIntance<T>()* (inside a `RegisterInitializer <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm>`_ registered delegate for instance).
+The *Container-Registered Types* warning shows all concrete types that weren't registered explicitly, but registered by the container as transient for you, because they were referenced by another component's constructor or were resolved through a direct call to *container.GetInstance<T>()* (inside a `RegisterInitializer <https://simpleinjector.org/ReferenceLibrary/?topic=html/M_SimpleInjector_Container_RegisterInitializer__1.htm>`_ registered delegate for instance).
 
 This warning deserves your attention, since it might indicate that you program to implementations, instead of abstractions. Although the :doc:`Lifestyle Mismatches <LifestyleMismatches>` and :doc:`Short Circuited Dependencies <ShortCircuitedDependencies>` warnings are a very strong signal of a configuration problem, this *Container-Registered Types* warnings is just a point of attention. 
 
