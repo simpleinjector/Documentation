@@ -221,8 +221,8 @@ You can use this code snippet to get things working quickly
             container.RegisterMvcViewComponents(app);
 
             // Add application services for AccountController
-            container.RegisterSingleton<IEmailSender, AuthMessageSender>();
-            container.RegisterSingleton<ISmsSender, AuthMessageSender>();
+            container.Register<IEmailSender, AuthMessageSender>(Lifestyle.Singleton);
+            container.Register<ISmsSender, AuthMessageSender>(Lifestyle.Singleton);
 
             // Cross wire Identity services
             container.CrossWire<UserManager<ApplicationUser>>(app);
