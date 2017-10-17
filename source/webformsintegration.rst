@@ -100,10 +100,10 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
             }
 
             class ImportAttributePropertySelectionBehavior : IPropertySelectionBehavior {
-                public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo) {
+                public bool SelectProperty(Type implementationType, PropertyInfo property) {
                     // Makes use of the System.ComponentModel.Composition assembly
-                    return typeof(Page).IsAssignableFrom(serviceType) &&
-                        propertyInfo.GetCustomAttributes<ImportAttribute>().Any();
+                    return typeof(Page).IsAssignableFrom(implementationType) &&
+                        property.GetCustomAttributes<ImportAttribute>().Any();
                 }
             }
         }
