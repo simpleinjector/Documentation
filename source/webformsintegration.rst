@@ -9,15 +9,21 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
 .. code-block:: c#
 
     using System;
-    using System.ComponentModel.Composition;
     using System.Linq;
     using System.Reflection;
     using System.Web;
     using System.Web.Compilation;
     using System.Web.UI;
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+
+    // Use the SimpleInjector.Integration.Web Nuget package
     using SimpleInjector;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
+    using SimpleInjector.Integration.Web;
+    
+    // Makes use of the System.ComponentModel.Composition assembly
+    using System.ComponentModel.Composition;
 
     [assembly: PreApplicationStartMethod(
         typeof(MyWebApplication.PageInitializerModule),
@@ -61,6 +67,8 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
             private static void Bootstrap() {
                 // 1. Create a new Simple Injector container.
                 var container = new Container();
+				
+                container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
 
                 // Register a custom PropertySelectionBehavior to enable property injection.
                 container.Options.PropertySelectionBehavior =
@@ -68,7 +76,7 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
 
                 // 2. Configure the container (register)
                 container.Register<IUserRepository, SqlUserRepository>();
-                container.RegisterPerWebRequest<IUserContext, AspNetUserContext>();
+                container.Register<IUserContext, AspNetUserContext>(Lifestyle.Scoped);
 
                 // Register your Page classes to allow them to be verified and diagnosed.
                 RegisterWebPages(container);
@@ -103,7 +111,7 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                 public bool SelectProperty(Type implementationType, PropertyInfo property) {
                     // Makes use of the System.ComponentModel.Composition assembly
                     return typeof(Page).IsAssignableFrom(implementationType) &&
-                        property.GetCustomAttributes<ImportAttribute>().Any();
+                        property.GetCustomAttributes(typeof(ImportAttribute), true).Any();
                 }
             }
         }
@@ -113,7 +121,10 @@ With this code in place, we can now write our page classes as follows:
 
 .. code-block:: c#
 
-    public partial class Default : Page {
+    using System;
+    using System.ComponentModel.Composition;
+
+    public partial class Default : System.Web.UI.Page {
         [Import] public IUserRepository UserRepository { get; set; }
         [Import] public IUserContext UserContext { get; set; }
 
