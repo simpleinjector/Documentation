@@ -239,16 +239,17 @@ You can use this code snippet to get things working quickly
 
             // NOTE: It is highly advisable to refactor the AccountController
             // and NOT to depend on IOptions<IdentityCookieOptions> and ILoggerFactory
-            // See: https://simpleinjector.org/aspnetcore#working-with-ioption-t
+            // See: https://simpleinjector.org/aspnetcore#working-with-ioptions-t
         }
     }
 
 .. _ioption:
+.. _ioptions:
     
-Working with `IOption<T>`
+Working with `IOptions<T>`
 =========================
 
-ASP.NET Core contains a new configuration model based on an `IOption<T>` abstraction. We advise against injecting `IOption<T>` dependencies into your application components. Instead let components depend directly on configuration objects and register them as *Singleton*. This ensures that configuration values are read during application start up and it allows verifying them at that point in time, allowing the application to fail-fast.
+ASP.NET Core contains a new configuration model based on an `IOptions<T>` abstraction. We advise against injecting `IOptions<T>` dependencies into your application components. Instead let components depend directly on configuration objects and register them as *Singleton*. This ensures that configuration values are read during application start up and it allows verifying them at that point in time, allowing the application to fail-fast.
 
 Letting application components depend on `IOptions<T>` has some unfortunate downsides. First of all, it causes application code to take an unnecessary dependency on a framework abstraction. This is a violation of the Dependency Injection Principle that prescribes the use of application-tailored abstractions. Injecting an `IOptions<T>` into an application component only makes this component more difficult to test, while providing no benefits. Application components should instead depend directly on the configuration values they require.
 
@@ -256,7 +257,7 @@ Letting application components depend on `IOptions<T>` has some unfortunate down
 
 To make things worse, in case you forget to configure a particular section (by omitting a call to `services.Configure<T>`) or when you make a typo while retrieving the configuration section (by supplying the wrong name to `Configuration.GetSection(name)`), the configuration system will simply supply the application with a default and empty object instead of throwing an exception! This may make sense in some cases but it will easily lead to fragile applications.
 
-Since you want to verify the configuration at start-up, it makes no sense to delay reading it, and that makes injecting IOption<T> into your components plain wrong. Depending on `IOptions<T>` might still be useful when bootstrapping the application, but not as a dependency anywhere else.
+Since you want to verify the configuration at start-up, it makes no sense to delay reading it, and that makes injecting `IOptions<T>` into your components plain wrong. Depending on `IOptions<T>` might still be useful when bootstrapping the application, but not as a dependency anywhere else.
 
 Once you have a correctly read and verified configuration object, registration of the component that requires the configuration object is as simple as this:
 
