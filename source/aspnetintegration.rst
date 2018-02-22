@@ -134,7 +134,7 @@ Cross-wiring ASP.NET and third party services
 
 When your application code (i.e. a `Controller`) needs a service which integrates with the ASP.NET Core configuration system it is sometimes necessary to cross-wire these dependencies. Cross-wiring is the process where a type is created and maintained by the ASP.NET Core configuration system and is fed to Simple Injector so Simple Injector can use the created instance to supply it as a dependency to your application code.
 
-To use this feature, Simple Injector contains the **CrossWire<TService>** extension method. This method does the required blumbing such as making sure the type is registered with the same lifestyle as configured in ASP.NET Core.
+To use this feature, Simple Injector contains the **CrossWire<TService>** extension method. This method does the required plumbing such as making sure the type is registered with the same lifestyle as configured in ASP.NET Core.
 
 To setup cross-wiring first you must make a call to **EnableSimpleInjectorCrossWiring** on `IServiceCollection` in the `ConfigureServices` method of your `Startup` class.
 
