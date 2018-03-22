@@ -4,6 +4,10 @@ ASP.NET Core MVC Integration Guide
 
 Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_.
 
+.. container:: Note
+
+    **NOTE**: Please note that, starting with v4.1, Simple Injector's ASP.NET Core integration packages are available for ASP.NET Core v2.0 and up. For ASP.NET Core v1, please use the v4.0 integration packages.
+
 The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
 
 .. code-block:: c#
@@ -16,14 +20,15 @@ The following code snippet shows how to use the integration package to apply Sim
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Microsoft.AspNetCore.Http; 
-    
+    using Microsoft.AspNetCore.Http;
+
     using SimpleInjector;
     using SimpleInjector.Lifestyles;
-    using SimpleInjector.Integration.AspNetCore;
     using SimpleInjector.Integration.AspNetCore.Mvc;
-    
-    public class Startup {
+    using System.Threading.Tasks;
+
+    public class Startup
+    {
         private Container container = new Container();
         
         public Startup(IHostingEnvironment env) {
@@ -47,25 +52,21 @@ The following code snippet shows how to use the integration package to apply Sim
                 new SimpleInjectorControllerActivator(container));
             services.AddSingleton<IViewComponentActivator>(
                 new SimpleInjectorViewComponentActivator(container));
-                
+        
             services.EnableSimpleInjectorCrossWiring(container);
-            services.UseSimpleInjectorAspNetRequestScoping(container);        
+            services.UseSimpleInjectorAspNetRequestScoping(container);
         }
-
+        
         // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
-            ILoggerFactory factory) {
-            
+        public void Configure(
+            IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory factory) {
             InitializeContainer(app);
-            
-            container.Register<CustomMiddleware1>();
-            container.Register<CustomMiddleware2>();
-
-            container.Verify();
-            
+        
             // Add custom middleware
-            app.Use((c, next) => container.GetInstance<CustomMiddleware1>().Invoke(c, next));
-            app.Use((c, next) => container.GetInstance<CustomMiddleware2>().Invoke(c, next));
+            app.UseMiddleware<CustomMiddleware1>(container);
+            app.UseMiddleware<CustomMiddleware2>(container);
+            
+            container.Verify();
             
             // ASP.NET default stuff here
             app.UseMvc(routes =>
@@ -75,18 +76,18 @@ The following code snippet shows how to use the integration package to apply Sim
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
-
-        private void InitializeContainer(IApplicationBuilder app) {       
+        
+        private void InitializeContainer(IApplicationBuilder app) {
             // Add application presentation components:
             container.RegisterMvcControllers(app);
             container.RegisterMvcViewComponents(app);
-        
+            
             // Add application services. For instance: 
             container.Register<IUserService, UserService>(Lifestyle.Scoped);
             
             // Cross-wire ASP.NET services (if any). For instance:
             container.CrossWire<ILoggerFactory>(app);
-               
+            
             // NOTE: Do prevent cross-wired instances as much as possible. 
             // See: https://simpleinjector.org/blog/2016/07/
         }
@@ -102,12 +103,25 @@ The following code snippet shows how to use the integration package to apply Sim
 Wiring custom middleware
 ========================
 
-The previous `Startup` snippet already showed how a custom middleware class can be used in the ASP.NET Core pipeline. The following code snippet shows how such `CustomMiddleware` might look like:
+The previous `Startup` snippet already showed how a custom middleware class can be used in the ASP.NET Core pipeline. The Simple Injector ASP.NET Core integration packages v4.1 and up add a `UseMiddleware` extension method on top of `IApplicationBuilder` that allows adding custom middleware. The following listing shows how a `CustomMiddleware` class is added to the pipeline.
+
+.. code-block:: c#
+
+    app.UseMiddleware<CustomMiddleware>(container);
+	
+The type supplied to `UseMiddleware` should implement `Microsoft.AspNetCore.Http.IMiddleware`. A compile-error will be given in case the middleware does not implement that interface.
+	
+This `UseMiddleware` overload ensures two particular things:
+
+* Adds a middleware type to the application's request pipeline. The middleware will be resolved from the supplied the Simple Injector container.
+* The middleware type will be added to the container for :doc:`verification <diagnostics>`.
+	
+The following code snippet shows how such `CustomMiddleware` might look like:
 
 .. code-block:: c#
     
     // Example of some custom user-defined middleware component.
-    public sealed class CustomMiddleware {
+    public sealed class CustomMiddleware : Microsoft.AspNetCore.Http.IMiddleware {
         private readonly ILoggerFactory loggerFactory;
         private readonly IUserService userService;
 
@@ -116,16 +130,14 @@ The previous `Startup` snippet already showed how a custom middleware class can 
             this.userService = userService;
         }
 
-        public async Task Invoke(HttpContext context, Func<Task> next) {
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next) {
             // Do something before
-            await next();
+            await next(context);
             // Do something after
         }
     }
 
-Notice how the `CustomMiddleware` class contains dependencies. Because of this, the `CustomMiddleware` class is resolved from Simple Injector on each request.
-
-In contrast to what the official ASP.NET Core documentation `advises <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware#writing-middleware>`_, the `RequestDelegate` or `Func<Task> next` delegate can best be passed in using **Method Injection** (through the `Invoke` method), instead of by using Constructor Injection. Reason for this is that this delegate is runtime data and runtime data should `not be passed in through the constructor <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=99>`_. Moving it to the `Invoke` method makes it possible to reliably verify the application's DI configuration and it simplifies your configuration.
+Notice how the `CustomMiddleware` class contains dependencies. When the middleware is added to the pipeline using the previously shown `UseMiddleware` overload, it will be resolved from Simple Injector on each request, and its dependencies will be injected.
 
 .. _cross-wiring:
 
