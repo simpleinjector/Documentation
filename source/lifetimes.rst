@@ -186,6 +186,24 @@ Order of disposal
 When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B* (assuming both implement *IDisposable*), since the guarantee of opposite order of creation. This allows *A* to use *B* while *A* is being disposed.
 
 
+
+.. _Retrieving-disposables:
+
+Retrieving list of disposables from the Scope
+---------------------------------------------
+
+By calling **Scope.GetDisposables**, the scope's created, and cached, *Scoped* instances that implement `IDisposable` are returned. This list of instances will get disposed automatically, when the `Scope` instance is disposed.
+
+Retrieving the disposable instances, however, can be especially beneficial whenever you require asynchronous disposal. It is impossible for Simple Injector to apply asynchronous disposal, because that requires a framework-supplied abstraction that allows asynchronous disposal, e.g an `IAsyncDisposable`. Such abstraction however does not exist.
+
+To mitigate this, you can define your own abstraction that allows disposable objects to flush themselves asynchronously, in such way that their `Dispose()` will not cause any blocking operations. Using the **Scope.GetDisposables** method, the following code can be used before disposing the `Scope` instance:
+
+.. code-block:: c#
+        
+    foreach (var disposable = scope.GetDisposables().Reverse())
+        if (disposable is IAsyncFlushable flushable)
+            await flushable.FlushAsync();
+
 .. _PerLifetimeScope:
 .. _ThreadScoped:
 
