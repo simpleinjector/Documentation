@@ -58,8 +58,7 @@ The following code snippet shows how to use the integration package to apply Sim
         }
         
         // Configure is called after ConfigureServices is called.
-        public void Configure(
-            IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory factory) {
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
             InitializeContainer(app);
         
             // Add custom middleware
@@ -167,8 +166,7 @@ When cross-wiring is enabled, Simple Injector can be instructed to resolve missi
 
 .. code-block:: c#
 
-	public void Configure(
-		IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory factory) {
+	public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
 		...
 
 		container.AutoCrossWireAspNetComponents(app);
@@ -205,91 +203,11 @@ Like **AutoCrossWireAspNetComponents**, **CrossWire<TService>** does the require
 Working with ASP.NET Core Identity
 ==================================
 
-The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. To get the code from the template working only a few services from Identity need to be cross-wired.
+The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. The default template requires a fair amount of cross-wired dependencies. Using the new **AutoCrossWireAspNetComponents** method of version 4.1 of the Simple Injector ASP.NET Core Integration package, however, integration with ASP.NET Core Identity couldn't be more straightforward. When you followed the :ref:`cross-wire guidelineis <_cross-wiring>`, this is all you'll have to do to get Identity running.
 
-You can use this code snippet to get things working quickly
+.. container:: Note
 
-.. code-block:: c#
-
-    public class Startup
-    {
-        private readonly Container container = new Container();
-
-        public Startup(IHostingEnvironment env) { 
-            // ASP.NET default stuff here
-        }
-
-        // This method gets called by the runtime. 
-        public void ConfigureServices(IServiceCollection services) {
-            // Add framework services for Identity.
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
-
-            services.AddMvc();
-
-            IntegrateSimpleInjector(services);
-        }
-        
-        private void IntegrateSimpleInjector(IServiceCollection services) {
-            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
-        
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        
-            services.AddSingleton<IControllerActivator>(
-                new SimpleInjectorControllerActivator(container));
-            services.AddSingleton<IViewComponentActivator>(
-                new SimpleInjectorViewComponentActivator(container));
-                
-            services.EnableSimpleInjectorCrossWiring(container);
-            services.UseSimpleInjectorAspNetRequestScoping(container);        
-        }        
-
-        // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
-            ILoggerFactory loggerFactory) {
-            
-            InitializeContainer(app);
-            
-            container.Verify();
-
-            // ASP.NET default stuff here
-            // Add Identity middleware
-            app.UseIdentity();
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
-        }
-
-        private void InitializeContainer(IApplicationBuilder app) {
-            // Add application presentation components:
-            container.RegisterMvcControllers(app);
-            container.RegisterMvcViewComponents(app);
-
-            // Add application services for AccountController
-            container.Register<IEmailSender, AuthMessageSender>(Lifestyle.Singleton);
-            container.Register<ISmsSender, AuthMessageSender>(Lifestyle.Singleton);
-
-            // Cross wire Identity services
-            container.CrossWire<UserManager<ApplicationUser>>(app);
-            container.CrossWire<SignInManager<ApplicationUser>>(app);
-            
-            // Cross wire other AccountController dependencies
-            container.CrossWire<ILoggerFactory>(app);
-            container.CrossWire<IOptions<IdentityCookieOptions>>(app);
-
-            // NOTE: It is highly advisable to refactor the AccountController
-            // and NOT to depend on IOptions<IdentityCookieOptions> and ILoggerFactory
-            // See: https://simpleinjector.org/aspnetcore#working-with-ioptions-t
-        }
-    }
+    **NOTE**: It is highly advisable to refactor the `AccountController` to *not* to depend on `IOptions<IdentityCookieOptions>` and `ILoggerFactory`. See the next topic about `IOptions<T>` for more information.
 
 .. _ioption:
 .. _ioptions:
@@ -297,13 +215,13 @@ You can use this code snippet to get things working quickly
 Working with `IOptions<T>`
 =========================
 
-ASP.NET Core contains a new configuration model based on an `IOptions<T>` abstraction. We advise against injecting `IOptions<T>` dependencies into your application components. Instead let components depend directly on configuration objects and register them as *Singleton*. This ensures that configuration values are read during application start up and it allows verifying them at that point in time, allowing the application to fail-fast.
+ASP.NET Core contains a new configuration model based on an `IOptions<T>` abstraction. We advise against injecting `IOptions<T>` dependencies into your application components. Instead let components depend directly on configuration objects and register those objects as *Singleton*. This ensures that configuration values are read during application start up and it allows verifying them at that point in time, allowing the application to fail-fast.
 
-Letting application components depend on `IOptions<T>` has some unfortunate downsides. First of all, it causes application code to take an unnecessary dependency on a framework abstraction. This is a violation of the Dependency Injection Principle that prescribes the use of application-tailored abstractions. Injecting an `IOptions<T>` into an application component only makes this component more difficult to test, while providing no benefits. Application components should instead depend directly on the configuration values they require.
+Letting application components depend on `IOptions<T>` has some unfortunate downsides. First of all, it causes application code to take an unnecessary dependency on a framework abstraction. This is a violation of the Dependency Injection Principle, which prescribes the use of application-tailored abstractions. Injecting an `IOptions<T>` into an application component only makes this component more difficult to test, while providing no additional benefits. Application components should instead depend directly on the configuration values they require.
 
-`IOptions<T>` configuration values are read lazily. Although the configuration file might be read upon application start up, the required configuration object is only created when `IOptions<T>.Value` is called for the first time. When deserialization fails, because of application misconfiguration, such error will only be appear after the call to `IOptions<T>.Value`. This can cause misconfigurations to keep undetected for much longer than required. By reading -and verifying- configuration values at application start up, this problem can be prevented. Configuration values can be injected as singletons into the component that requires them.
+`IOptions<T>` configuration values are read lazily. Although the configuration file might be read upon application start up, the required configuration object is only created when `IOptions<T>.Value` is called for the first time. When deserialization fails, because of application misconfiguration, such error will only be appear after the call to `IOptions<T>.Value`. This can cause misconfigurations to keep undetected for much longer than required. By reading—and verifying—configuration values at application start up, this problem can be prevented. Configuration values can be injected as singletons into the component that requires them.
 
-To make things worse, in case you forget to configure a particular section (by omitting a call to `services.Configure<T>`) or when you make a typo while retrieving the configuration section (by supplying the wrong name to `Configuration.GetSection(name)`), the configuration system will simply supply the application with a default and empty object instead of throwing an exception! This may make sense in some cases but it will easily lead to fragile applications.
+To make things worse, in case you forget to configure a particular section (by omitting a call to `services.Configure<T>`) or when you make a typo while retrieving the configuration section (e.g. by supplying the wrong name to `Configuration.GetSection(name)`), the configuration system will simply supply the application with a default and empty object instead of throwing an exception! This may make sense in some cases but it will easily lead to fragile applications.
 
 Since you want to verify the configuration at start-up, it makes no sense to delay reading it, and that makes injecting `IOptions<T>` into your components plain wrong. Depending on `IOptions<T>` might still be useful when bootstrapping the application, but not as a dependency anywhere else.
 
