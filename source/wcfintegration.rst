@@ -4,6 +4,14 @@ WCF Integration Guide
 
 The `Simple Injector WCF Integration NuGet Package <https://nuget.org/packages/SimpleInjector.Integration.Wcf>`_ allows WCF services to be resolved by the container, which enables constructor injection.
 
+.. container:: Note
+
+    **NOTE**: With the introduction of version 4.1 of this integration package, asynchronous programming through async/await is supported. WCF service methods can now be specified using the `async` keyword.
+
+.. container:: Note
+
+    **Note**: To be able to run the WCF integration package, you need *.NET 4.5* or above.    
+
 After installing this NuGet package, it must be initialized in the start-up path of the application by calling the **SimpleInjectorServiceHostFactory.SetContainer** method:
 
 .. code-block:: c#
@@ -11,7 +19,10 @@ After installing this NuGet package, it must be initialized in the start-up path
     protected void Application_Start(object sender, EventArgs e) {
         // Create the container as usual.
         var container = new Container();
-        container.Options.DefaultScopedLifestyle = new WcfOperationLifestyle();
+        container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+        
+        // Register WCF services.
+        container.RegisterWcfServices(Assembly.GetExecutingAssembly());
         
         // Register your types, for instance:
         container.Register<IUserRepository, SqlUserRepository>();
@@ -23,8 +34,12 @@ After installing this NuGet package, it must be initialized in the start-up path
 
 .. container:: Note
 
-    **Warning**: Instead of what the name of the **WcfOperationLifestyle** class seems to imply, components that are registered with this lifestyle might actually outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registered *PerWcfOperation* live as long as the WCF service class they are injected into.
+    **Warning**: Components that are registered as *Lifestyle.Scoped* might outlive a single WCF operation. This behavior depends on how the WCF service class is configured. WCF is in control of the lifetime of the service class and contains three lifetime types as defined by the `InstanceContextMode enumeration <https://msdn.microsoft.com/en-us/library/system.servicemodel.instancecontextmode.aspx>`_. Components that are registered *Lifestyle.Scoped* live as long as the WCF service class they are injected into.
 
+.. container:: Note
+
+    **TIP**: Use `InstanceContextMode.PerCall` for all WCF services. This prevents any hard to detect problems caused by WCF services outliving a single request.
+    
 For each service class, you should supply a factory attribute in the .SVC file of each service class. For instance:
 
 .. code-block:: xml
@@ -35,7 +50,7 @@ For each service class, you should supply a factory attribute in the .SVC file o
         Factory="SimpleInjector.Integration.Wcf.SimpleInjectorServiceHostFactory,
             SimpleInjector.Integration.Wcf"
     %>
-
+    
 .. container:: Note
 
     **Note**: Instead of having a WCF service layer consisting of many service classes and methods, consider a design that consists of just a single service class with a single method as explained in `this article <http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=95>`_. A design where operations are communicated through messages allows the creation of highly maintainable WCF services. With such a design, this integration package will be redundant.
@@ -52,8 +67,11 @@ When hosting WCF Services in WAS (Windows Activation Service), you are not given
      
         static Bootstrapper() {
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new WcfOperationLifestyle();
-     
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+    
+            // Register WCF services.
+            container.RegisterWcfServices(Assembly.GetExecutingAssembly());
+    
             // register all your components with the container here:
             // container.Register<IService1, Service1>()
             // container.Register<IDataContext, DataContext>(Lifestyle.Scoped);
