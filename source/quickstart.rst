@@ -106,7 +106,7 @@ Using Simple Injector, the configuration of the application using the *CancelOrd
             container.Verify();
         }
         
-        static void Main(string[] args)) {
+        static void Main(string[] args) {
             // 4. Use the container
             var handler = container.GetInstance<CancelOrderHandler>();            
             
