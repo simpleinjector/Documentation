@@ -67,7 +67,7 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
             private static void Bootstrap() {
                 // 1. Create a new Simple Injector container.
                 var container = new Container();
-				
+                
                 container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
 
                 // Register a custom PropertySelectionBehavior to enable property injection.
