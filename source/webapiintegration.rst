@@ -117,7 +117,7 @@ This implementation can be implemented as follows:
 
 .. code-block:: c#
 
-    container.RegisterSingleton<IRequestMessageAccessor>(
+    container.RegisterInstance<IRequestMessageAccessor>(
         new RequestMessageAccessor(container));
 
 .. _Injecting-dependencies-into-Web-API-filter-attributes:

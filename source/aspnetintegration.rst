@@ -238,5 +238,5 @@ Once you have a correctly read and verified configuration object, registration o
     container.Register<IMessageSender>(() => new MailMessageSender(mailSettings));
 
     // or register MailSettings as singleton in the container.
-    container.RegisterSingleton<MyMailSettings>(mailSettings);
+    container.RegisterInstance<MyMailSettings>(mailSettings);
     container.Register<IMessageSender, MailMessageSender>();

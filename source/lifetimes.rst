@@ -82,14 +82,14 @@ There are multiple ways to register singletons. The most simple and common way t
 
     container.Register<IService, RealService>(Lifestyle.Singleton);
 
-You can also use the *RegisterSingleton<T>(T)* overload to assign a constructed instance manually:
+You can also use the **RegisterInstance<T>(T)** method to assign a constructed instance manually:
  
 .. code-block:: c#
 
     var service = new RealService(new SqlRepository());
-    container.RegisterSingleton<IService>(service);
+    container.RegisterInstance<IService>(service);
 
-There is also an overload that takes an *Func<T>* delegate. The container guarantees that this delegate is called only once:
+There is also a **RegisterSingleton<T>** overload that takes an *Func<T>* delegate. The container guarantees that this delegate is called only once:
 
 .. code-block:: c#
 
@@ -120,7 +120,7 @@ Registration for concrete singletons is necessarily, because unregistered concre
 
 .. container:: Note
     
-    **Warning**: Already existing instances that are supplied to the container using **RegisterSingleton<TService>(TService)** and **RegisterSingleton(Type, object)** will not be disposed by the container. They are considered to be 'externally owned'.
+    **Warning**: Already existing instances that are supplied to the container using **RegisterInstance<TService>(TService)** and **RegisterInstance(Type, object)** will not be disposed by the container. They are considered to be 'externally owned'.
     
 .. container:: Note
 

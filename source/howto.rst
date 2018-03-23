@@ -38,7 +38,7 @@ In situations where a service needs to create multiple instances of a certain co
     }
 
     // Registration
-    container.RegisterSingleton<IMyServiceFactory>(new ServiceFactory());
+    container.RegisterInstance<IMyServiceFactory>(new ServiceFactory());
 
     // Usage
     public class MyService {
@@ -64,7 +64,7 @@ Instead of creating specific interfaces for your factories, you can also choose 
 .. code-block:: c#
 
     // Registration
-    container.RegisterSingleton<Func<IMyService>>(() => new MyServiceImpl());
+    container.RegisterInstance<Func<IMyService>>(() => new MyServiceImpl());
 
     // Usage
     public class MyService {
@@ -101,7 +101,7 @@ When you choose *Func<T>* delegates over specific factory interfaces you can def
     {
         lifestyle = lifestyle ?? container.Options.DefaultLifestyle;
         var producer = lifestyle.CreateProducer<TService, TImpl>(container);
-        container.RegisterSingleton<Func<TService>>(producer.GetInstance);
+        container.RegisterInstance<Func<TService>>(producer.GetInstance);
     }
 
     // Registration
@@ -263,7 +263,7 @@ With this class, we can register *Func<IRequestHandler>* factory methods by a ke
 
     var container = new Container();
      
-    container.RegisterSingleton<IRequestHandlerFactory>(new RequestHandlerFactory {
+    container.RegisterInstance<IRequestHandlerFactory>(new RequestHandlerFactory {
         { "default", () => container.GetInstance<DefaultRequestHandler>() },
         { "orders", () => container.GetInstance<OrdersRequestHandler>() },
         { "customers", () => container.GetInstance<CustomersRequestHandler>() },
@@ -290,7 +290,7 @@ The registration will then look as follows:
 
     var container = new Container();
 
-    container.RegisterSingleton<IRequestHandlerFactory>(new RequestHandlerFactory(container) {
+    container.RegisterInstance<IRequestHandlerFactory>(new RequestHandlerFactory(container) {
         { "default", typeof(DefaultRequestHandler) },
         { "orders", typeof(OrdersRequestHandler) },
         { "customers", typeof(CustomersRequestHandler) },
@@ -338,7 +338,7 @@ The registration will then look as follows:
     factory.Register<OrdersRequestHandler>("orders");
     factory.Register<CustomersRequestHandler>("customers");
 
-    container.RegisterSingleton<IRequestHandlerFactory>(factory);
+    container.RegisterInstance<IRequestHandlerFactory>(factory);
 
 The advantage of this method is that it completely integrates with the *Container*. :ref:`Decorators <decoration>` can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
 

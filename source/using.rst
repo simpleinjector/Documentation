@@ -153,7 +153,7 @@ The following example configures a single instance of a manually created object 
 .. code-block:: c#
 
     // Configuration
-    container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+    container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
     // Usage
     IUserRepository repository = container.GetInstance<IUserRepository>();

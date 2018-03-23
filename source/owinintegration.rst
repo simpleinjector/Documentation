@@ -69,4 +69,4 @@ The following code snippet can be used to register this *IOwinContextAccessor* a
         await next();
     });
     
-    container.RegisterSingleton<IOwinContextAccessor>(new CallContextOwinContextAccessor());
+    container.RegisterInstance<IOwinContextAccessor>(new CallContextOwinContextAccessor());
