@@ -85,11 +85,8 @@ The following code snippet shows how to use the integration package to apply Sim
             // Add application services. For instance: 
             container.Register<IUserService, UserService>(Lifestyle.Scoped);
             
-            // Cross-wire ASP.NET services (if any). For instance:
-            container.CrossWire<ILoggerFactory>(app);
-            
-            // NOTE: Do prevent cross-wired instances as much as possible. 
-            // See: https://simpleinjector.org/blog/2016/07/
+            // Allow Simple Injector to resolve services from ASP.NET Core.
+            container.AutoCrossWireAspNetComponents(app);
         }
     }
     
@@ -103,15 +100,19 @@ The following code snippet shows how to use the integration package to apply Sim
 Wiring custom middleware
 ========================
 
-The previous `Startup` snippet already showed how a custom middleware class can be used in the ASP.NET Core pipeline. The Simple Injector ASP.NET Core integration packages v4.1 and up add a `UseMiddleware` extension method on top of `IApplicationBuilder` that allows adding custom middleware. The following listing shows how a `CustomMiddleware` class is added to the pipeline.
+The previous `Startup` snippet already showed how a custom middleware class can be used in the ASP.NET Core pipeline. The Simple Injector ASP.NET Core integration packages v4.1 and up add an **UseMiddleware** extension method on top of `IApplicationBuilder` that allows adding custom middleware. The following listing shows how a `CustomMiddleware` class is added to the pipeline.
 
 .. code-block:: c#
 
     app.UseMiddleware<CustomMiddleware>(container);
 	
-The type supplied to `UseMiddleware` should implement `Microsoft.AspNetCore.Http.IMiddleware`. A compile-error will be given in case the middleware does not implement that interface.
+The type supplied to **UseMiddleware** should implement `Microsoft.AspNetCore.Http.IMiddleware`. A compile-error will be given in case the middleware does not implement that interface.
+
+.. container:: Note
+
+    **NOTE**: The **UseMiddleware** extension method is new in v4.1.
 	
-This `UseMiddleware` overload ensures two particular things:
+This **UseMiddleware** overload ensures two particular things:
 
 * Adds a middleware type to the application's request pipeline. The middleware will be resolved from the supplied the Simple Injector container.
 * The middleware type will be added to the container for :doc:`verification <diagnostics>`.
@@ -137,32 +138,67 @@ The following code snippet shows how such `CustomMiddleware` might look like:
         }
     }
 
-Notice how the `CustomMiddleware` class contains dependencies. When the middleware is added to the pipeline using the previously shown `UseMiddleware` overload, it will be resolved from Simple Injector on each request, and its dependencies will be injected.
+Notice how the `CustomMiddleware` class contains dependencies. When the middleware is added to the pipeline using the previously shown **UseMiddleware** overload, it will be resolved from Simple Injector on each request, and its dependencies will be injected.
 
 .. _cross-wiring:
 
-Cross-wiring ASP.NET and third party services
+Cross-wiring ASP.NET and third-party services
 =============================================
 
-When your application code (i.e. a `Controller`) needs a service which integrates with the ASP.NET Core configuration system it is sometimes necessary to cross-wire these dependencies. Cross-wiring is the process where a type is created and maintained by the ASP.NET Core configuration system and is fed to Simple Injector so Simple Injector can use the created instance to supply it as a dependency to your application code.
+When your application code (e.g. a `Controller`) needs a service which is defined by ASP.NET Core or any third-party library, it is sometimes necessary to get such a dependency from ASP.NET Core's built-in configuration system. This is called _cross-wiring_. Cross-wiring is the process where a type is created and managed by the ASP.NET Core configuration system and is fed to Simple Injector so it can use the created instance to supply it as a dependency to your application code.
 
-To use this feature, Simple Injector contains the **CrossWire<TService>** extension method. This method does the required plumbing such as making sure the type is registered with the same lifestyle as configured in ASP.NET Core.
-
-To setup cross-wiring first you must make a call to **EnableSimpleInjectorCrossWiring** on `IServiceCollection` in the `ConfigureServices` method of your `Startup` class.
-
-.. code-block:: c#
-
-    services.EnableSimpleInjectorCrossWiring(container);
-
-When cross-wiring is enabled cross-wiring is as simple as:
-
-.. code-block:: c#
-
-    container.CrossWire<ILoggerFactory>(app);
+The easiest way to use cross-wiring is to use the **AutoCrossWireAspNetComponents** extension method, as shown in the listing at the start of this page.
 
 .. container:: Note
 
-    **NOTE**: Do prevent the use of cross-wiring as much as possible. In most cases cross-wiring is not the best solution and is a violation of the `Dependency Inversion Principle <https://en.wikipedia.org/wiki/Dependency_inversion_principle>`_. Don't depend directly upon Framework components and instead create application specific proxy and/or adapter implementations.
+    **NOTE**: The **AutoCrossWireAspNetComponents** extension method is new in Simple Injector v4.1. This requires .NET Core 2.0 or up.
+	
+To setup cross-wiring, first you must make a call to **EnableSimpleInjectorCrossWiring** on `IServiceCollection` in the `ConfigureServices` method of your `Startup` class.
+
+.. code-block:: c#
+
+	public void ConfigureServices(IServiceCollection services) {
+		... 
+
+		services.EnableSimpleInjectorCrossWiring(container);
+	}
+
+When cross-wiring is enabled, Simple Injector can be instructed to resolve missing dependencies from ASP.NET Core by calling **AutoCrossWireAspNetComponents** as part of the `Startup` class's `Configure` method:
+
+.. code-block:: c#
+
+	public void Configure(
+		IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory factory) {
+		...
+
+		container.AutoCrossWireAspNetComponents(app);
+	}
+
+This will accomplish the following:
+
+* Anytime Simple Injector needs to resolve a dependency that is not registered, it will query the `IServiceCollection` to see whether this dependency exists in the ASP.NET Core configuration system.
+* In case the dependency exists in `IServiceCollection`, Simple Injector will ensure that the dependency is resolved from ASP.NET Core anytime it is requested, by requesting it from `IApplicationBuilder`.
+* In doing so, Simple Injector will preserve the dependency's lifestyle. This allows application components that depend on external services to be :doc:`diagnosed <diagnostics>` for :doc:`Lifestyle Mismatches <LifestyleMismatched>`.
+* In case no suitable dependency exists in the `IServiceCollection`, Simple Injector will fall back to its default behavior. This most likely means that an expressive exception is thrown, since the object graph can't be fully composed.
+
+Simple Injector's auto cross-wiring has the following limitations:
+
+* Collections (i.e. `IEnumerable<T>`) will not be auto cross-wired because of unbridgeable differences between how Simple Injector and ASP.NET Core's configuration system handle collections. If a framework or third-party supplied collection should be injected into an application component that is constructed by Simple injector, such collection should be cross-wired manually. In that case, you must take explicit care to ensure no Lifestyle Mismatches occur—i.e. you should not make the cross-wired registration with the lifestyle equal to the shortest lifestyle of the elements of the collection.
+* Cross-wiring is a one-way process. By using **AutoCrossWireAspNetComponents**, ASP.NET's configuration system will not automatically resolve its missing dependencies from Simple Injector. When an application component, composed by Simple Injector, needs to be injected into a framework or third-party component, this has to be set up manually by adding a `ServiceDescriptor` to the `IServiceCollection` that requests the dependency from Simple Injector. This practice however should be quite rare.
+* Simple Injector will not be able to verify and diagnose object graphs built by the configuration system itself. Those components and their registrations are provided by Microsoft and third-party library makers—you should assume their correctness.
+
+The **AutoCrossWireAspNetComponents** method is new in v4.1 and supersedes the old **CrossWire<TService>** method, since the latter requires every missing dependency to be cross-wired explicitly. **CrossWire<TService>** is still available for backwards compatibility.
+
+Like **AutoCrossWireAspNetComponents**, **CrossWire<TService>** does the required plumbing such as making sure the type is registered with the same lifestyle as configured in ASP.NET Core, but with the difference of just cross-wiring that single supplied type. The following listing demonstrates its use:
+
+.. code-block:: c#
+
+	container.CrossWire<ILoggerFactory>(app);
+	container.CrossWire<IOptions<IdentityCookieOptions>>(app);
+
+.. container:: Note
+
+    **NOTE**: Even though **AutoCrossWireAspNetComponents** makes cross-wiring very easy, you should still prevent letting application components depend on types provided by ASP.NET as much as possible. In most cases it not the best solution and in violation of the `Dependency Inversion Principle <https://en.wikipedia.org/wiki/Dependency_inversion_principle>`_. Instead, application components should typically depend on _application-provided abstractions_. These abstractions can be implemented by proxy and/or adapter implementations that forward the call to the framework component. In that case cross-wiring can still be used to allow the framework component to be injected into the adapter, but this isn't required.
 
 .. _identity:
     
