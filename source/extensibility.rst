@@ -222,7 +222,7 @@ Here are some examples of registration calls that all register types as *Transie
     container.Register<IUserContext, AspNetUserContext>();
     container.Register<ITimeProvider>(() => new RealTimeProvider());
     container.RegisterCollection<ILogger>(new[] { typeof(SqlLogger), typeof(FileLogger) });
-    container.Register(typeof(IHandler<>), new[] { typeof(IHandler<>).Assembly });
+    container.Register(typeof(IHandler<>), typeof(IHandler<>).Assembly);
     container.RegisterDecorator(typeof(IHandler<>), typeof(LoggingHandlerDecorator<>));
     container.RegisterConditional(typeof(IValidator<>), typeof(NullVal<>), c => !c.Handled);
     container.RegisterMvcControllers();

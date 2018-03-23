@@ -86,7 +86,7 @@ By using the **Register** overload for batch registration, the same registration
 
 .. code-block:: c#
 
-    container.Register(typeof(IValidator<>), new[] { typeof(IValidator<>).Assembly });
+    container.Register(typeof(IValidator<>), typeof(IValidator<>).Assembly);
 
 By default **Register** searches the supplied assemblies for all types that implement the *IValidator<T>* interface and registers each type by their specific (closed generic) interface. It even works for types that implement multiple closed versions of the given interface.
 
@@ -162,7 +162,7 @@ As the previous section explained, this can be rewritten to the following one-li
 
 .. code-block:: c#
 
-    container.Register(typeof(IValidate<>), new[] { typeof(IValidate<>).Assembly });
+    container.Register(typeof(IValidate<>), typeof(IValidate<>).Assembly);
 
 Sometimes you'll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The *IValidate<T>* is a good example. It is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this we would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:
  

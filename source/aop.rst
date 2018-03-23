@@ -66,9 +66,7 @@ The implementations of the *ICommandHandler<T>* interface can be registered usin
 
 .. code-block:: c#
 
-    container.Register(
-        typeof(ICommandHandler<>), 
-        new[] { typeof(ICommandHandler<>).Assembly });
+    container.Register(typeof(ICommandHandler<>), typeof(ICommandHandler<>).Assembly);
 
 By using the following method, you can wrap the *ValidationCommandHandlerDecorator<TCommand>* around each and every *ICommandHandler<TCommand>* implementation:
 
@@ -82,9 +80,7 @@ Multiple decorators can be wrapped by calling the **RegisterDecorator** method m
 
 .. code-block:: c#
 
-    container.Register(
-        typeof(ICommandHandler<>), 
-        new[] { typeof(ICommandHandler<>).Assembly });
+    container.Register(typeof(ICommandHandler<>), typeof(ICommandHandler<>).Assembly);
         
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
@@ -230,9 +226,7 @@ When mixing this decorator with other (synchronous) decorators, you'll get an ex
 
 .. code-block:: c#
 
-    container.Register(
-        typeof(ICommandHandler<>), 
-        new[] { typeof(ICommandHandler<>).Assembly });
+    container.Register(typeof(ICommandHandler<>), typeof(ICommandHandler<>).Assembly);
         
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
@@ -324,9 +318,7 @@ Obviously, if you run (part of) your commands on a background thread and also us
     container.Register<IUnitOfWork, DbUnitOfWork>(Lifestyle.Scoped);
     container.Register<IRepository<User>, UserRepository>(Lifestyle.Scoped);
         
-    container.Register(
-        typeof(ICommandHandler<>), 
-        new[] { typeof(ICommandHandler<>).Assembly });
+    container.Register(typeof(ICommandHandler<>), typeof(ICommandHandler<>).Assembly);
 
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
