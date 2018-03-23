@@ -293,11 +293,9 @@ In most cases however, manually supplying the **RegisterCollection** with a list
 
 .. code-block:: c#
 
-    // Extension method from the SimpleInjector.Advanced namespace.
-    container.AppendToCollection(typeof(IValidator<>), typeof(DataAnnotationsValidator<>));
+    container.Collections.AppendTo(typeof(IValidator<>), typeof(DataAnnotationsValidator<>));
 
-    container.RegisterCollection(typeof(IValidator<>),
-        new[] { typeof(IValidator<>).Assembly });
+    container.RegisterCollection(typeof(IValidator<>), typeof(IValidator<>).Assembly);
 
 .. container:: Note
 

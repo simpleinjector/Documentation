@@ -437,20 +437,16 @@ The previous code snippet will register all *ILogger* implementations that can b
 Adding registrations to an existing collection
 ----------------------------------------------
 
-In most cases you would register a collection with a single line of code. There are cases where you need to append registrations to an already registered collection. Common use cases for this are integration scenarios where you need to interact with some framework that made its own registrations on your behalf, or in cases where you want to add extra types based on configuration settings. In these cases it might be benifecial to append registrations to an existing collection.
+In most cases you would register a collection with a single line of code. There are cases where you need to append registrations to an already registered collection. Common use cases for this are integration scenarios where you need to interact with some DI Containers that made its own registrations on your behalf, or in cases where you want to add extra types based on configuration settings. In these cases it might be benifecial to append registrations to an existing collection.
 
-To be able to do this, Simple Injector contains the **AppendToCollection** extension method in the **SimpleInjector.Advanced** namespace.
-
-.. container:: Note
-
-    **Note**: This extension method will not show up using IntelliSense, unless you include the **SimpleInjector.Advanced** namespace to your code file. This extension method is deliberately hidden to prevent polluting the main API; appending to existing collections is not a common use case.
+To be able to do this, Simple Injector contains the **Collections.AppendTo** method.
 
 .. code-block:: c#
 
     Assembly[] assemblies = // determine list of assemblies to search in
     container.RegisterCollection(typeof(ILogger), assemblies);
 
-    container.AppendToCollection(typeof(ILogger), typeof(ExtraLogger));
+    container.Collections.AppendTo(typeof(ILogger), typeof(ExtraLogger));
 
 
 .. _Verifying-Container:
