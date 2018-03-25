@@ -299,7 +299,7 @@ Simple Injector contains several methods for registering and resolving collectio
     container.RegisterCollection<ILogger>(Logger.Providers);
 
     // Usage
-    var loggers = container.GetAllInstances<ILogger>();
+    IEnumerable<ILogger> loggers = container.GetAllInstances<ILogger>();
 
 .. container:: Note
 
