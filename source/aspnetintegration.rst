@@ -203,7 +203,7 @@ Like **AutoCrossWireAspNetComponents**, **CrossWire<TService>** does the require
 Working with ASP.NET Core Identity
 ==================================
 
-The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. The default template requires a fair amount of cross-wired dependencies. Using the new **AutoCrossWireAspNetComponents** method of version 4.1 of the Simple Injector ASP.NET Core Integration package, however, integration with ASP.NET Core Identity couldn't be more straightforward. When you followed the :ref:`cross-wire guidelineis <_cross-wiring>`, this is all you'll have to do to get Identity running.
+The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. The default template requires a fair amount of cross-wired dependencies. Using the new **AutoCrossWireAspNetComponents** method of version 4.1 of the Simple Injector ASP.NET Core Integration package, however, integration with ASP.NET Core Identity couldn't be more straightforward. When you followed the :ref:`cross-wire guidelines <_cross-wiring>`, this is all you'll have to do to get Identity running.
 
 .. container:: Note
 
@@ -217,7 +217,7 @@ Working with `IOptions<T>`
 
 ASP.NET Core contains a new configuration model based on an `IOptions<T>` abstraction. We advise against injecting `IOptions<T>` dependencies into your application components. Instead let components depend directly on configuration objects and register those objects as *Singleton*. This ensures that configuration values are read during application start up and it allows verifying them at that point in time, allowing the application to fail-fast.
 
-Letting application components depend on `IOptions<T>` has some unfortunate downsides. First of all, it causes application code to take an unnecessary dependency on a framework abstraction. This is a violation of the Dependency Injection Principle, which prescribes the use of application-tailored abstractions. Injecting an `IOptions<T>` into an application component only makes this component more difficult to test, while providing no additional benefits. Application components should instead depend directly on the configuration values they require.
+Letting application components depend on `IOptions<T>` has some unfortunate downsides. First of all, it causes application code to take an unnecessary dependency on a framework abstraction. This is a violation of the Dependency Inversion Principle, which prescribes the use of application-tailored abstractions. Injecting an `IOptions<T>` into an application component only makes this component more difficult to test, while providing no additional benefits. Application components should instead depend directly on the configuration values they require.
 
 `IOptions<T>` configuration values are read lazily. Although the configuration file might be read upon application start up, the required configuration object is only created when `IOptions<T>.Value` is called for the first time. When deserialization fails, because of application misconfiguration, such error will only be appear after the call to `IOptions<T>.Value`. This can cause misconfigurations to keep undetected for much longer than required. By reading—and verifying—configuration values at application start up, this problem can be prevented. Configuration values can be injected as singletons into the component that requires them.
 
