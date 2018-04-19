@@ -23,6 +23,7 @@ Other Technologies
 
 Besides integration with standard .NET technologies, Simple Injector can be integrated with a wide range of other technologies. Here are a few links to help you get started quickly:
 
+* `Azure Functions <https://github.com/simpleinjector/SimpleInjector/issues/536>`_
 * `RavenDB <https://stackoverflow.com/questions/10940988/how-to-configure-simple-injector-ioc-to-use-ravendb>`_
 * `SignalR <https://stackoverflow.com/questions/10555791/using-simpleinjector-with-signalr>`_
 * `Fluent Validations <https://stackoverflow.com/questions/9984144/what-is-the-correct-way-to-register-fluentvalidation-with-simpleinjector>`_
