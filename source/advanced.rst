@@ -293,7 +293,7 @@ In most cases however, manually supplying the **RegisterCollection** with a list
 
 .. code-block:: c#
 
-    container.Collections.AppendTo(typeof(IValidator<>), typeof(DataAnnotationsValidator<>));
+    container.Collection.AppendTo(typeof(IValidator<>), typeof(DataAnnotationsValidator<>));
 
     container.RegisterCollection(typeof(IValidator<>), typeof(IValidator<>).Assembly);
 
