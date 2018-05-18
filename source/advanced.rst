@@ -101,7 +101,7 @@ As an example, imagine the scenario where you have a *CustomerValidator* type an
 .. code-block:: c#
 
     var assemblies = new[] { typeof(IValidator<>).Assembly };
-    container.RegisterCollection(typeof(IValidator<>), assemblies);
+    container.Register.Collection(typeof(IValidator<>), assemblies);
 
 The code snippet registers all types from the given assembly that implement *IValidator<T>*. As we now have multiple implementations the container cannot inject a single instance of *IValidator<T>* and because of this, we need to register collections. Because we register a collection, we can no longer call **container.GetInstance<IValidator<T>>()**. Instead instances can be retrieved by having an *IEnumerable<IValidator<T>>* constructor argument or by calling **container.GetAllInstances<IValidator<T>>()**.
 
@@ -248,11 +248,11 @@ Mixing collections of open-generic and non-generic components
 
 The **Register** overload that take in a list of assemblies only select non-generic implementations of the given open-generic type. Open-generic implementations are skipped, because they often need special attention.
 
-To register collections that contain both non-generic and open-generic components a **RegisterCollection** overload is available that accept a list of Type instances. For instance:
+To register collections that contain both non-generic and open-generic components a **Register.Collection** overload is available that accept a list of Type instances. For instance:
 
 .. code-block:: c#
 
-    container.RegisterCollection(typeof(IValidator<>), new[] {
+    container.Register.Collection(typeof(IValidator<>), new[] {
         typeof(DataAnnotationsValidator<>), // open generic
         typeof(CustomerValidator), // implements IValidator<Customer>
         typeof(GoldCustomerValidator), // implements IValidator<Customer>
@@ -260,20 +260,20 @@ To register collections that contain both non-generic and open-generic component
         typeof(OrderValidator) // implements IValidator<Order>
     });
 
-In the previous example a set of *IValidator<T>* implementations is supplied to the **RegisterCollection** overload. This list contains one generic implementation, namely *DataAnnotationsValidator<T>*. This leads to a registration that is equivalent to the following manual registration:
+In the previous example a set of *IValidator<T>* implementations is supplied to the **Register.Collection** overload. This list contains one generic implementation, namely *DataAnnotationsValidator<T>*. This leads to a registration that is equivalent to the following manual registration:
 
 .. code-block:: c#
 
-    container.RegisterCollection<IValidator<Customer>>(
+    container.Register.Collection<IValidator<Customer>>(
         typeof(DataAnnotationsValidator<Customer>),
         typeof(CustomerValidator),
         typeof(GoldCustomerValidator));
         
-    container.RegisterCollection<IValidator<Employee>>(
+    container.Register.Collection<IValidator<Employee>>(
         typeof(DataAnnotationsValidator<Employee>),
         typeof(EmployeeValidator));
         
-    container.RegisterCollection<IValidator<Order>>(
+    container.Register.Collection<IValidator<Order>>(
         typeof(DataAnnotationsValidator<Order>),
         typeof(OrderValidator));
 
@@ -281,7 +281,7 @@ In other words, the supplied non-generic types are grouped by their closed *IVal
 
 .. container:: Note
 
-    **Note**: **RegisterCollection** is guaranteed to preserve the order of the types that you supply.
+    **Note**: **Register.Collection** is guaranteed to preserve the order of the types that you supply.
         
 But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible fourth registration is made. This is a registration that hooks onto the **unregistered type resolution** event and this will ensure that any time an *IEnumerable<IValidator<T>>* for a *T* that is anything other than *Customer*, *Employee* and *Order*, an *IEnumerable<IValidator<T>>* is returned that contains the closed-generic versions of the supplied open-generic types; *DataAnnotationsValidator<T>* in the given example.
 
@@ -289,17 +289,17 @@ But besides these three *IEnumerable<IValidator<T>>* registrations, an invisible
 
     **Note**: This will work equally well when the open generic types contain type constraints. In that case those types will be applied conditionally to the collections based on their generic type constraints.
 
-In most cases however, manually supplying the **RegisterCollection** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the **RegisterCollection** overloads that accepts a list of assemblies and append the open generic type separately:
+In most cases however, manually supplying the **Register.Collection** with a list of types leads to hard to maintain configurations, since the registration needs to be changed for each new validator we add to the system. Instead we can make use of one of the **Register.Collection** overloads that accepts a list of assemblies and append the open generic type separately:
 
 .. code-block:: c#
 
-    container.Collection.AppendTo(typeof(IValidator<>), typeof(DataAnnotationsValidator<>));
+    container.Collection.Append(typeof(IValidator<>), typeof(DataAnnotationsValidator<>));
 
-    container.RegisterCollection(typeof(IValidator<>), typeof(IValidator<>).Assembly);
+    container.Collection.Register(typeof(IValidator<>), typeof(IValidator<>).Assembly);
 
 .. container:: Note
 
-    **Warning**: This **RegisterCollection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart. In case strict ordering is required, use the **GetTypesToRegister** method (as explained below) and order types manually.
+    **Warning**: This **Register.Collection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart. In case strict ordering is required, use the **GetTypesToRegister** method (as explained below) and order types manually.
         
 Alternatively, we can make use of the Container's **GetTypesToRegister** to find the types for us:
 
@@ -313,11 +313,11 @@ Alternatively, we can make use of the Container's **GetTypesToRegister** to find
             IncludeComposites = false,
         });
 
-    container.RegisterCollection(typeof(IValidator<>), typesToRegister);    
+    container.Register.Collection(typeof(IValidator<>), typesToRegister);    
     
 .. container:: Note
 
-    The **Register** and **RegisterCollection** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well. Each however use their own **TypesToRegisterOptions** configuration.
+    The **Register** and **Register.Collection** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well. Each however use their own **TypesToRegisterOptions** configuration.
 
 
 .. _Unregistered-Type-Resolution:
@@ -519,8 +519,8 @@ The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbr
 .. code-block:: c#
 
     // Configuration
-    container.RegisterCollection(typeof(IEventHandler<>),
-        new[] { typeof(IEventHandler<>).Assembly });
+    container.Register.Collection(typeof(IEventHandler<>),
+        typeof(IEventHandler<>).Assembly);
 
     // Usage
     var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
@@ -548,7 +548,7 @@ Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEv
     
 .. container:: Note
     
-    **Note**: Simple Injector only resolves variant implementations for collections that are registered using the *RegisterCollection* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered, because this could easily lead to ambiguity; Simple Injector will not know which implementation to select.
+    **Note**: Simple Injector only resolves variant implementations for collections that are registered using the *Register.Collection* overloads. In the screnario you are resolving a single instance using *GetInstance<T>* then Simple Injector will not return an assignable type, even if the exact type is not registered, because this could easily lead to ambiguity; Simple Injector will not know which implementation to select.
 
 .. _Plugins:
 
@@ -567,6 +567,6 @@ Applications with a plugin architecture often allow special plugin assemblies to
         where file.Extension.ToLower() == ".dll"
         select Assembly.Load(AssemblyName.GetAssemblyName(file.FullName));
 
-    container.RegisterCollection<IPlugin>(pluginAssemblies);
+    container.Register.Collection<IPlugin>(pluginAssemblies);
 
-The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all publicly exposed concrete types that implement *IPlugin* will be registered using the **RegisterCollection** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.
+The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all publicly exposed concrete types that implement *IPlugin* will be registered using the **Register.Collection** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.

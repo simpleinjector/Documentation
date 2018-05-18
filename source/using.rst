@@ -290,24 +290,24 @@ Simple Injector contains several methods for registering and resolving collectio
     // Configuration
     // Registering a list of instances that will be created by the container.
     // Supplying a collection of types is the preferred way of registering collections.
-    container.RegisterCollection<ILogger>(new[] { typeof(MailLogger), typeof(SqlLogger) });
+    container.Collection.Register<ILogger>(typeof(MailLogger), typeof(SqlLogger));
 
     // Register a fixed list (these instances should be thread-safe).
-    container.RegisterCollection<ILogger>(new[] { new MailLogger(), new SqlLogger() });
+    container.Collection.Register<ILogger>(new MailLogger(), new SqlLogger());
 
     // Using a collection from another subsystem
-    container.RegisterCollection<ILogger>(Logger.Providers);
+    container.Collection.Register<ILogger>(Logger.Providers);
 
     // Usage
     IEnumerable<ILogger> loggers = container.GetAllInstances<ILogger>();
 
 .. container:: Note
 
-    **Note**:  When zero instances are registered using **RegisterCollection**, each call to **Container.GetAllInstances** will return an empty list.
+    **Note**:  When zero instances are registered using **Collection.Register**, each call to **Container.GetAllInstances** will return an empty list.
 
 .. container:: Note
 
-    **Warning**:  Simple Injector requires a call to **RegisterCollection** to be made, even in the absence of any instances. Without a call to **RegisterCollection**, Simple Injector will throw an exception.
+    **Warning**:  Simple Injector requires a call to **Collection.Register** to be made, even in the absence of any instances. Without a call to **Collection.Register**, Simple Injector will throw an exception.
 
 
 Just as with normal types, Simple Injector can inject collections of instances into constructors:
@@ -331,14 +331,14 @@ Just as with normal types, Simple Injector can inject collections of instances i
     }
 
     // Configuration
-    container.RegisterCollection<ILogger>(new[] { typeof(MailLogger), typeof(SqlLogger) });
+    container.Collection.Register<ILogger>(typeof(MailLogger), typeof(SqlLogger));
     container.Register<IService, Service>(Lifestyle.Singleton);
 
     // Usage
     var service = container.GetInstance<IService>();
     service.DoStuff();
 
-The **RegisterCollection** overloads that take a collection of *Type* instances rely on the *Container* to create an instance of each type just as it would for individual registrations. This means that the same rules we have seen above apply to each item in the collection. Take a look at the following configuration:
+The **Collection.Register** overloads that take a collection of *Type* instances rely on the *Container* to create an instance of each type just as it would for individual registrations. This means that the same rules we have seen above apply to each item in the collection. Take a look at the following configuration:
 
 .. code-block:: c#
 
@@ -346,15 +346,26 @@ The **RegisterCollection** overloads that take a collection of *Type* instances 
     container.Register<MailLogger>(Lifestyle.Singleton);
     container.Register<ILogger, FileLogger>();
 
-    container.RegisterCollection<ILogger>(new[] {
+    container.Register.Collection<ILogger>(
         typeof(MailLogger), 
         typeof(SqlLogger), 
-        typeof(ILogger)
-    });
+        typeof(ILogger));
 
 When the registered collection of *ILogger* instances are resolved, the *Container* will resolve each of them applying the specific rules of their configuration. When no registration exists, the type is created with the default **Transient** lifestyle (*transient* means that a new instance is created every time the returned collection is iterated). In the example, the *MailLogger* type is registered as **Singleton**, and so each resolved *ILogger* collection will always have the same instance of *MailLogger* in their collection.
 
-Since the creation is forwarded, abstract types can also be registered using **RegisterCollection**. In the above example the *ILogger* type itself is registered using **RegisterCollection**. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of *ILogger* instances as well. A more usual scenario however is the use of a composite as shown next.
+Since the creation is forwarded, abstract types can also be registered using **Collection.Register**. In the above example the *ILogger* type itself is registered using **Collection.Register**. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of *ILogger* instances as well. A more usual scenario however is the use of a composite as shown below.
+
+Alternatively, if the components of the collections are supplied explicity, as the previous example shows, opposed to supplying an assembly instance, the **Collection.Append* method can be used to achieve the same:
+
+.. code-block:: c#
+
+    container.Register<ILogger, FileLogger>();
+
+    container.Register.Append<ILogger, MailLogger>(Lifestyle.Singleton);
+    container.Register.Append<ILogger, SqlLogger>();
+    container.Register.Append<ILogger, FileLogger>();
+	
+This set of registrations is _identical_ to the previous construct using **Register.Collection**.
 
 While resolving collections is useful and also works with :ref:`automatic constructor injection <Automatic-constructor-injection>`, the registration of *Composites* is preferred over the use of collections as constructor arguments in application code. Register a composite whenever possible, as shown in the example below:
 
@@ -378,7 +389,7 @@ While resolving collections is useful and also works with :ref:`automatic constr
     // Configuration
     container.Register<IService, Service>(Lifestyle.Singleton);
     container.Register<ILogger, CompositeLogger>(Lifestyle.Singleton);
-    container.RegisterCollection<ILogger>(new[] { typeof(MailLogger), typeof(SqlLogger) });
+    container.Register.Collection<ILogger>(typeof(MailLogger), typeof(SqlLogger));
 
     // Usage
     var service = container.GetInstance<IService>();
@@ -415,18 +426,18 @@ Simple Injector preserves the lifestyle of instances that are returned from an i
 Batch-registering collections
 -----------------------------
 
-Just as with one-to-one mappings, Simple Injector allows collections of types to be batch-registered. There are overloads of the **RegisterCollection** method that accept a list of *Assembly* instances. Simple Injector will go through those assemblies to look for implementations of the supplied type:
+Just as with one-to-one mappings, Simple Injector allows collections of types to be batch-registered. There are overloads of the **Register.Collection** method that accept a list of *Assembly* instances. Simple Injector will go through those assemblies to look for implementations of the supplied type:
 
 .. code-block:: c#
 
     Assembly[] assemblies = // determine list of assemblies to search in
-    container.RegisterCollection(typeof(ILogger), assemblies);
+    container.Register.Collection<ILogger>(assemblies);
 
 The previous code snippet will register all *ILogger* implementations that can be found in the supplied assemblies as part of the collection.
 
 .. container:: Note
 
-    **Warning**: This **RegisterCollection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart.
+    **Warning**: This **Register.Collection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart.
 
 .. container:: Note
 
@@ -439,14 +450,14 @@ Adding registrations to an existing collection
 
 In most cases you would register a collection with a single line of code. There are cases where you need to append registrations to an already registered collection. Common use cases for this are integration scenarios where you need to interact with some DI Containers that made its own registrations on your behalf, or in cases where you want to add extra types based on configuration settings. In these cases it might be benifecial to append registrations to an existing collection.
 
-To be able to do this, Simple Injector contains the **Collection.AppendTo** method.
+To be able to do this, Simple Injector contains the **Collection.Append** method.
 
 .. code-block:: c#
 
     Assembly[] assemblies = // determine list of assemblies to search in
-    container.RegisterCollection(typeof(ILogger), assemblies);
+    container.Collection.Register<ILogger>(assemblies);
 
-    container.Collection.AppendTo(typeof(ILogger), typeof(ExtraLogger));
+    container.Collection.Append<ILogger, ExtraLogger>();
 
 
 .. _Verifying-Container:
