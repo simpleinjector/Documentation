@@ -117,7 +117,7 @@ Using Simple Injector, the configuration of the application using the *CancelOrd
         }
     }
 
-The given configuration registers implementations for the *ICancelOrderHandler*, *IOrderRepository* and *ILogger* interfaces. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as *SqlOrderRepository*) to an interface or base type (such as *IOrderRepository*). In the given example, every time you ask the container for an *IOrderRepository*, it will always create a new *SqlOrderRepository* on your behalf (in DI terminology: an object with a **Transient** lifestyle).
+The given configuration registers implementations for the *IOrderRepository* and *ILogger* interfaces, as well as registering the concrete class *CancelOrderHandler*. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as *SqlOrderRepository*) to an interface or base type (such as *IOrderRepository*). In the given example, every time you ask the container for an *IOrderRepository*, it will always create a new *SqlOrderRepository* on your behalf (in DI terminology: an object with a **Transient** lifestyle).
 
 The second registration maps the *ILogger* interface to a *FileLogger* implementation. This *FileLogger* is registered with the **Singleton** lifestyle; only one instance of *FileLogger* will ever be created by the **Container**.
 
