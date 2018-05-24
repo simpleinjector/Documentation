@@ -54,7 +54,7 @@ All these options provide users with a safe way to add registrations at a later 
 The API clearly differentiates the registration of collections
 ==============================================================
 
-When designing Simple Injector, we made a very explicit design decision to define a separate **RegisterCollection** method for registering a collection of services for an abstraction. This design adheres to the following principles:
+When designing Simple Injector, we made a very explicit design decision to define a separate **Collection.Register** method for registering a collection of services for an abstraction. This design adheres to the following principles:
 
 * :ref:`Never fail silently <Never-fail-silently>`
 * :ref:`Features should be intuitive <Features-should-be-intuitive>`
@@ -62,8 +62,8 @@ When designing Simple Injector, we made a very explicit design decision to defin
 This design differentiates vastly from how other DI libraries work. Most libraries provide the same API for single registrations and collections. Registering a collection of some abstraction in that case means that you call the **Register** method multiple times with the same abstraction but with different implementations. There are some clear downsides to such an approach. 
 
 * There's a big difference between having a collection of services and a single service. For many of the services you register, you will have one implementation and it doesn't make sense for there to be multiple implementations. For other services you will always expect a collection of them (even if you have one or no implementations). In the majority -if not all- of cases you wouldn't expect to switch dynamically between one and multiple implementations.
-* An API that mixes these concepts will be unable to warn you if you accidentally add a second registration for the same service. Those APIs will 'fail silently' and simply return one of the items you registered. Simple Injector will throw an exception when you call **Register<T>** for the same T and will describe that collections should be registered using **RegisterCollection**.
-* None of the APIs that mix these concepts make it clear which of the registered services is returned if you resolve one of them. Some libraries will return the first registered element, while others return the last. Although all of them describe this behavior in their documentation it's not clear from the API itself i.e. it is not discoverable. An API design like this is unintuitive. A design that separates **Register** from **RegisterCollection** on the other hand, makes the intention of the code very clear to anyone who reads it.
+* An API that mixes these concepts will be unable to warn you if you accidentally add a second registration for the same service. Those APIs will 'fail silently' and simply return one of the items you registered. Simple Injector will throw an exception when you call **Register<T>** for the same T and will describe that collections should be registered using **Collection.Register**.
+* None of the APIs that mix these concepts make it clear which of the registered services is returned if you resolve one of them. Some libraries will return the first registered element, while others return the last. Although all of them describe this behavior in their documentation it's not clear from the API itself i.e. it is not discoverable. An API design like this is unintuitive. A design that separates **Register** from **Collection.Register** on the other hand, makes the intention of the code very clear to anyone who reads it.
 
 In general, your services should not depend on an *IEnumerable<ISomeService>*, especially when your application has multiple services that need to work with *ISomeService*. The problem with injecting *IEnumerable<T>* into multiple consumers is that you will have to iterate that collection in multiple places. This forces the consumers to know about having multiple implementations and how to iterate and process that collection. As far as the consumer is concerned this should be an implementation detail. If you ever need to change the way a collection is processed you will have to go through the application, since this logic will have be duplicated throughout the system.
 
@@ -71,11 +71,10 @@ Instead of injecting an *IEnumerable<T>*, a consumer should instead depend on a 
 
 .. code-block:: c#
 
-    container.RegisterCollection<ILogger>(new[] {
+    container.Collection.Register<ILogger>(
         typeof(FileLogger), 
         typeof(SqlLogger),
-        typeof(EventLogLogger)
-    });
+        typeof(EventLogLogger));
     
     container.Register<ILogger, CompositeLogger>(Lifestyle.Singleton);
 
@@ -86,11 +85,10 @@ In case the unusual scenario that you need both a default registration and list 
 
     container.Register<ILogger, FileLogger>();
     
-    container.RegisterCollection<ILogger>(new[] {
+    container.Collection.Register<ILogger>(
         typeof(ILogger), 
         typeof(SqlLogger),
-        typeof(EventLogLogger)
-    });
+        typeof(EventLogLogger));
 
 The previous example registers both a *FileLogger* as one-to-one registration for *ILogger* and a collection of *ILogger* instances. The first registration in the collection itself is *ILogger* which means that it points back to the one-to-one mapping using *FileLogger*.
 
@@ -192,7 +190,7 @@ Instead of creating our own API that would fall into the same trap as all the ot
 
 In most cases we found it much easier to write batch registrations using LINQ; a language that many developers are already familiar with. Specifying your registrations in LINQ reduces the need to learn yet another (domain specific) language (with all its quirks).
 
-When it comes to batch-registering generic-types things are different. Batch-registering generic types can be very complex without tool support. We have defined a clear API consisting of a few **Register** and **RegisterCollection** overloads that covers the majority of the cases. 
+When it comes to batch-registering generic-types things are different. Batch-registering generic types can be very complex without tool support. We have defined a clear API consisting of a few **Register** and **Collection.Register** overloads that covers the majority of the cases. 
 
 .. _No-per-thread-lifestyle:
 
