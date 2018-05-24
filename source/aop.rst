@@ -342,10 +342,9 @@ When registering a decorator, Simple Injector will automatically decorate any co
 
 .. code-block:: c#
 
-    container.RegisterCollection<IEventHandler<CustomerMovedEvent>>(new[] {
+    container.Collection.Register<IEventHandler<CustomerMovedEvent>>(
         typeof(CustomerMovedEventHandler),
-        typeof(NotifyStaffWhenCustomerMovedEventHandler)
-    });
+        typeof(NotifyStaffWhenCustomerMovedEventHandler));
         
     container.RegisterDecorator(
         typeof(IEventHandler<>),
@@ -366,13 +365,13 @@ When a collection is uncontrolled, it means that the lifetime of its elements ar
             new NotifyStaffWhenCustomerMovedEventHandler(),
         };
 
-    container.RegisterCollection<IEventHandler<CustomerMovedEvent>>(handlers);
+    container.Collection.Register<IEventHandler<CustomerMovedEvent>>(handlers);
 
 Although this registration contains a list of singletons, the container has no way of knowing this. The collection could easily have been a dynamic (an ever changing) collection. In this case, the container calls the registered predicate once (and supplies the predicate with the *IEventHandler<CusotmerMovedEvent>* type) and if the predicate returns true, each element in the collection is decorated with a decorator instance.
 
 .. container:: Note
 
-    **Warning**: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can't help you in doing :doc:`diagnostics <diagnostics>`. Since the lifetime of those items is unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the **RegisterCollection** overloads that take a collection of *System.Type* instances.
+    **Warning**: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can't help you in doing :doc:`diagnostics <diagnostics>`. Since the lifetime of those items is unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the **Collection.Register** overloads that take a collection of *System.Type* instances.
 
 .. _Using-contextual-information-inside-decorators:
 
