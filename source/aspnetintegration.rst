@@ -1,4 +1,4 @@
-==================================
+﻿==================================
 ASP.NET Core MVC Integration Guide
 ==================================
 
@@ -144,7 +144,7 @@ Notice how the `CustomMiddleware` class contains dependencies. When the middlewa
 Cross-wiring ASP.NET and third-party services
 =============================================
 
-When your application code (e.g. a `Controller`) needs a service which is defined by ASP.NET Core or any third-party library, it is sometimes necessary to get such a dependency from ASP.NET Core's built-in configuration system. This is called _cross-wiring_. Cross-wiring is the process where a type is created and managed by the ASP.NET Core configuration system and is fed to Simple Injector so it can use the created instance to supply it as a dependency to your application code.
+When your application code (e.g. a `Controller`) needs a service which is defined by ASP.NET Core or any third-party library, it is sometimes necessary to get such a dependency from ASP.NET Core's built-in configuration system. This is called *cross-wiring*. Cross-wiring is the process where a type is created and managed by the ASP.NET Core configuration system and is fed to Simple Injector so it can use the created instance to supply it as a dependency to your application code.
 
 The easiest way to use cross-wiring is to use the **AutoCrossWireAspNetComponents** extension method, as shown in the listing at the start of this page.
 
