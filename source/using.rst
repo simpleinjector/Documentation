@@ -346,7 +346,7 @@ The **Collection.Register** overloads that take a collection of *Type* instances
     container.Register<MailLogger>(Lifestyle.Singleton);
     container.Register<ILogger, FileLogger>();
 
-    container.Register.Collection<ILogger>(
+    container.Collection.Register<ILogger>(
         typeof(MailLogger), 
         typeof(SqlLogger), 
         typeof(ILogger));
@@ -365,7 +365,7 @@ Alternatively, if the components of the collections are supplied explicity, as t
     container.Register.Append<ILogger, SqlLogger>();
     container.Register.Append<ILogger, FileLogger>();
 	
-This set of registrations is _identical_ to the previous construct using **Register.Collection**.
+This set of registrations is _identical_ to the previous construct using **Collection.Register**.
 
 While resolving collections is useful and also works with :ref:`automatic constructor injection <Automatic-constructor-injection>`, the registration of *Composites* is preferred over the use of collections as constructor arguments in application code. Register a composite whenever possible, as shown in the example below:
 
@@ -389,7 +389,7 @@ While resolving collections is useful and also works with :ref:`automatic constr
     // Configuration
     container.Register<IService, Service>(Lifestyle.Singleton);
     container.Register<ILogger, CompositeLogger>(Lifestyle.Singleton);
-    container.Register.Collection<ILogger>(typeof(MailLogger), typeof(SqlLogger));
+    container.Collection.Register<ILogger>(typeof(MailLogger), typeof(SqlLogger));
 
     // Usage
     var service = container.GetInstance<IService>();
@@ -426,18 +426,18 @@ Simple Injector preserves the lifestyle of instances that are returned from an i
 Batch-registering collections
 -----------------------------
 
-Just as with one-to-one mappings, Simple Injector allows collections of types to be batch-registered. There are overloads of the **Register.Collection** method that accept a list of *Assembly* instances. Simple Injector will go through those assemblies to look for implementations of the supplied type:
+Just as with one-to-one mappings, Simple Injector allows collections of types to be batch-registered. There are overloads of the **Collection.Register** method that accept a list of *Assembly* instances. Simple Injector will go through those assemblies to look for implementations of the supplied type:
 
 .. code-block:: c#
 
     Assembly[] assemblies = // determine list of assemblies to search in
-    container.Register.Collection<ILogger>(assemblies);
+    container.Collection.Register<ILogger>(assemblies);
 
 The previous code snippet will register all *ILogger* implementations that can be found in the supplied assemblies as part of the collection.
 
 .. container:: Note
 
-    **Warning**: This **Register.Collection** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart.
+    **Warning**: This **Collection.Register** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart.
 
 .. container:: Note
 
