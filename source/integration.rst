@@ -27,18 +27,18 @@ Besides integration with standard .NET technologies, Simple Injector can be inte
 * `RavenDB <https://stackoverflow.com/questions/10940988/how-to-configure-simple-injector-ioc-to-use-ravendb>`_
 * `SignalR <https://stackoverflow.com/questions/10555791/using-simpleinjector-with-signalr>`_
 * `Fluent Validations <https://stackoverflow.com/questions/9984144/what-is-the-correct-way-to-register-fluentvalidation-with-simpleinjector>`_
-* `PetaPoco <https://simpleinjector.codeplex.com/discussions/283850>`_
+* `PetaPoco <https://github.com/simpleinjector/SimpleInjector/issues/598>`_
 * `Quartz.NET <https://stackoverflow.com/questions/14562176/constructor-injection-with-quartz-net-and-simple-injector>`_
 * `Membus <https://stackoverflow.com/questions/16123641/membus-and-ioc-simpleinjector-wiring-command-handlers-automatically-by-interfa>`_
 * `Web Forms MVP <https://stackoverflow.com/questions/15123515/pass-runtime-value-to-constructor-using-simpleinjector>`_
 * `Nancy <https://github.com/NancyFx/Nancy/issues/1227#issuecomment-163279040>`_
 * `Castle DynamicProxy Interception <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_
-* `ASP.NET Identity Framework <https://simpleinjector.codeplex.com/discussions/564822>`_
+* `ASP.NET Identity Framework <https://github.com/simpleinjector/SimpleInjector/issues/597>`_
 * `Drum <https://stackoverflow.com/questions/26661621/how-to-register-drum-urimaker-using-simple-injector>`_
 
 Patterns
 ========
 
 * `Unit of Work pattern <https://stackoverflow.com/questions/10585478>`_
-* `Multi-tenant applications <https://simpleinjector.codeplex.com/discussions/434951>`_
+* `Multi-tenant applications <https://github.com/simpleinjector/SimpleInjector/issues/599>`_
 * `Auto-Mocking container <https://github.com/simpleinjector/SimpleInjector/issues/290#issuecomment-243244930>`_
