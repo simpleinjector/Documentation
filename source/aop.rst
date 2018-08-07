@@ -481,11 +481,12 @@ When a closed version of *IEventHandler<TEvent>* is requested later on, Simple I
     **Note**: The type factory delegate is typically called once per closed-type and the result is burned in the compiled object graph. You can't use this delegate to make runtime decisions.
 
 .. _Interception-using-Dynamic-Proxies:
+.. _Interception:
 
 Interception using Dynamic Proxies
 ==================================
 
-Interception is the ability to intercept a call from a consumer to a service, and add or change behavior. The `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_ describes a form of interception, but when it comes to applying cross-cutting concerns, you might end up writing decorators for many service interfaces, but with the exact same code. If this is happening, it's time to take a close look at your design. If for what ever reason, it's impossible for you to make the required improvements to your design, your second best bet is to explore the possibilities of interception through dynamic proxies.
+Interception is the ability to intercept a call from a consumer to a service, and add or change behavior. The `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_ describes a form of interception, but when it comes to applying cross-cutting concerns, you might end up writing decorators for many service interfaces, but with the exact same code. If this is happening, it's time to take a close look at your design. If, for what ever reason, it's impossible for you to make the required improvements to your design, your second best bet is to explore the possibilities of _dynamic_ interception through dynamic proxies.
 
 .. container:: Note
 
