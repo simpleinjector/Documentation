@@ -185,7 +185,7 @@ Simple Injector's auto cross-wiring has the following limitations:
 * Cross-wiring is a one-way process. By using **AutoCrossWireAspNetComponents**, ASP.NET's configuration system will not automatically resolve its missing dependencies from Simple Injector. When an application component, composed by Simple Injector, needs to be injected into a framework or third-party component, this has to be set up manually by adding a `ServiceDescriptor` to the `IServiceCollection` that requests the dependency from Simple Injector. This practice however should be quite rare.
 * Simple Injector will not be able to verify and diagnose object graphs built by the configuration system itself. Those components and their registrations are provided by Microsoft and third-party library makers—you should assume their correctness.
 
-The **AutoCrossWireAspNetComponents** method is new in v4.1 and supersedes the old **CrossWire<TService>** method, since the latter requires every missing dependency to be cross-wired explicitly. **CrossWire<TService>** is still available for backwards compatibility.
+The **AutoCrossWireAspNetComponents** method is new in v4.1 and supersedes the old **CrossWire<TService>** method, since the latter requires every missing dependency to be cross-wired explicitly. **CrossWire<TService>** is still available for backwards compatibility and to handle corner-case scenarios.
 
 Like **AutoCrossWireAspNetComponents**, **CrossWire<TService>** does the required plumbing such as making sure the type is registered with the same lifestyle as configured in ASP.NET Core, but with the difference of just cross-wiring that single supplied type. The following listing demonstrates its use:
 
@@ -196,7 +196,7 @@ Like **AutoCrossWireAspNetComponents**, **CrossWire<TService>** does the require
 
 .. container:: Note
 
-    **NOTE**: Even though **AutoCrossWireAspNetComponents** makes cross-wiring very easy, you should still prevent letting application components depend on types provided by ASP.NET as much as possible. In most cases it not the best solution and in violation of the `Dependency Inversion Principle <https://en.wikipedia.org/wiki/Dependency_inversion_principle>`_. Instead, application components should typically depend on _application-provided abstractions_. These abstractions can be implemented by proxy and/or adapter implementations that forward the call to the framework component. In that case cross-wiring can still be used to allow the framework component to be injected into the adapter, but this isn't required.
+    **NOTE**: Even though **AutoCrossWireAspNetComponents** makes cross-wiring very easy, you should still prevent letting application components depend on types provided by ASP.NET as much as possible. In most cases it not the best solution and in violation of the `Dependency Inversion Principle <https://en.wikipedia.org/wiki/Dependency_inversion_principle>`_. Instead, application components should typically depend on *application-provided abstractions*. These abstractions can be implemented by proxy and/or adapter implementations that forward the call to the framework component. In that case cross-wiring can still be used to allow the framework component to be injected into the adapter, but this isn't required.
 
 .. _identity:
     
