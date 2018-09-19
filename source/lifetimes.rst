@@ -356,8 +356,8 @@ The `ASP.NET Integration NuGet Package <https://nuget.org/packages/SimpleInjecto
 .. _WebAPIRequest-vs-WebRequest:
 .. _AsyncScoped-vs-WebRequest:
 
-Web Async Scoped lifestyle vs. Web Request lifestyle
-====================================================
+Async Scoped lifestyle vs. Web Request lifestyle
+================================================
 
 The lifestyles and scope implementations **Web Request** and **Async Scoped** in Simple Injector are based on different technologies. **AsyncScopedLifestyle** works well both inside and outside of IIS. i.e. It can function in a self-hosted Web API project where there is no *HttpContext.Current*. As the name implies, an async scope registers itself and flows with *async* operations across threads (e.g. a continuation after *await* on a different thread still has access to the scope regardless of whether *ConfigureAwait()* was used with *true* or *false*).
 
