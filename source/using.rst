@@ -355,7 +355,7 @@ When the registered collection of *ILogger* instances are resolved, the *Contain
 
 Since the creation is forwarded, abstract types can also be registered using **Collection.Register**. In the above example the *ILogger* type itself is registered using **Collection.Register**. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of *ILogger* instances as well. A more usual scenario however is the use of a composite as shown below.
 
-Alternatively, if the components of the collections are supplied explicity, as the previous example shows, opposed to supplying an assembly instance, the **Collection.Append* method can be used to achieve the same:
+Alternatively, if the components of the collections are supplied explicity, as the previous example shows, opposed to supplying an assembly instance, the **Collection.Append** method can be used to achieve the same:
 
 .. code-block:: c#
 
