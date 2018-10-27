@@ -246,12 +246,9 @@ Using [FromServices] in ASP.NET Core Controllers
 
 Besides injecting dependencies into a controller's constructor, ASP.NET Core allows injecting dependencies `directly into action methods <https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/dependency-injection?view=aspnetcore-2.1#action-injection-with-fromservices>`_ using method injection. This is done by marking a corresponding action method argument with the `[FromServices]` attribute. While the use of `[FromServices]` works for services registered in ASP.NET Core's built-in configuration system (i.e. `IServiceCollection`), the Simple Injector integration package, however, does not integrate with `[FromServices]` out of the box. This is by design and adheres to our :doc:`design guidelines <principles>`, as explained below.
 
-
-We will explain why this is below.
-
 .. container:: Note
 
-    **WARNING**: Simple Injector's ASP.NET Core integration packages do not allow any Simple Injector registered dependencies to be injected into ASP.NET Core controller action methods using the `[FromServices]` attribute.
+    **IMPORTANT**: Simple Injector's ASP.NET Core integration packages do not allow any Simple Injector registered dependencies to be injected into ASP.NET Core controller action methods using the `[FromServices]` attribute.
 
 The use of method injection, as the `[FromServices]` attribute allows, has a few considerate downsides that should be prevented.
 
