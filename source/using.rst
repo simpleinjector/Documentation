@@ -407,19 +407,21 @@ Besides *IEnumerable<ILogger>*, Simple Injector natively supports some other col
  - *IEnumerable<T>*
  - *ICollection<T>*
  - *IList<T>*
- - *IReadOnlyCollection<T>*
- - *IReadOnlyList<T>*
+ - *IReadOnlyCollection<T>* (.NET v4.5 and .NET Standard only)
+ - *IReadOnlyList<T>* (.NET v4.5 and .NET Standard only)
+ - *Collection<T>* (Simple Injector >= v4.4)
  - *T[]* (array)
+ - *List<T>* (Simple Injector >= v4.4)
 
 .. container:: Note
 
     **Note:** The *IReadOnlyCollection<T>* and *IReadOnlyList<T>* interfaces are new in .NET 4.5. Only the .NET 4.5 and .NET Standard (including .NET Core and Xamarin) builds of Simple Injector will be able to automatically inject these abstractions into your components. These interfaces are *not* supported by the .NET 4.0 version of Simple Injector.
 
-Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>*, *ICollection<T>*, *IList<T>*, *IReadOnlyCollection<T>* and *IReadOnlyList<T>* instance. In reality you should not see the the injected *IEnumerable<T>* as a collection of instances; you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* or *ICollection<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component.
+Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>*, *ICollection<T>*, *Collection<T>*, *IList<T>*, *IReadOnlyCollection<T>* and *IReadOnlyList<T>* instance. In reality you should not see the injected *IEnumerable<T>* as a collection of instances; you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* or *ICollection<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component.
 
 .. container:: Note
 
-    **Warning**: In contrast to the collection abstractions, an **array** is registered as **transient**. An array is a mutable type; a consumer can change the contents of an array. Sharing the array (by making it singleton) might cause unrelated parts of your applications to fail because of changes to the array. Since an array is a concrete type, it can not function as a stream, causing the elements in the array to get the lifetime of the consuming component. This could cause :doc:`lifestyle mismatches <LifestyleMismatches>` when the array wasn't registered as transient.
+    **Warning**: In contrast to the collection abstractions, **array** and **List<T>** are registered as **Transient**. Array and List<T> are a mutable types; a consumer can change the contents of such collection. Sharing it (by making it singleton) might cause unrelated parts of your applications to fail when changes are made to it. Because an array and List<T> are concrete types, they can not function as a stream, causing the elements in the array to get the lifetime of the consuming component. This could cause :doc:`lifestyle mismatches <LifestyleMismatches>` when the array wasn't registered as transient.
 
 .. _Batch-registering-collections:
 
