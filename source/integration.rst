@@ -25,6 +25,7 @@ Besides integration with standard .NET technologies, Simple Injector can be inte
 
 * `Azure Functions <https://github.com/simpleinjector/SimpleInjector/issues/536>`_
 * `RavenDB <https://stackoverflow.com/questions/10940988/how-to-configure-simple-injector-ioc-to-use-ravendb>`_
+* `SignalR Core <https://github.com/simpleinjector/SimpleInjector/issues/631>`_
 * `SignalR <https://stackoverflow.com/questions/10555791/using-simpleinjector-with-signalr>`_
 * `Fluent Validations <https://stackoverflow.com/questions/9984144/what-is-the-correct-way-to-register-fluentvalidation-with-simpleinjector>`_
 * `PetaPoco <https://github.com/simpleinjector/SimpleInjector/issues/598>`_
