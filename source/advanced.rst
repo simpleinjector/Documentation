@@ -11,7 +11,7 @@ This chapter discusses the following subjects:
 * :ref:`Registration of open generic types <Registration-Of-Open-Generic-Types>`
 * :ref:`Mixing collections of open-generic and non-generic components <Mixing-collections-of-open-generic-and-non-generic-components>`
 * :ref:`Unregistered type resolution <Unregistered-Type-Resolution>`
-* :ref:`Context based injection / Contextual binding <Context-Based-Injection>`
+* :ref:`Context-based injection / Contextual binding <Context-Based-Injection>`
 * :ref:`Property injection <Property-Injection>`
 * :ref:`Covariance and Contravariance <Covariance-Contravariance>`
 * :ref:`Registering plugins dynamically <Plugins>`
@@ -332,14 +332,14 @@ For more information about how to use this event, please take a look at the `Res
 
 .. _Context-Based-Injection:
 
-Context based injection
+Context-based injection
 =======================
 
-Context based injection is the ability to inject a particular dependency based on the context it lives in (or change the implementation based on the type it is injected into). Simple Injector contains the **RegisterConditional** method overloads that enable context based injection.
+Context-based injection is the ability to inject a particular dependency based on the context it lives in (or change the implementation based on the type it is injected into). Simple Injector contains the **RegisterConditional** method overloads that enable context-based injection.
 
 .. container:: Note
 
-    **Note**: In many cases context based injection is not the best solution, and the design should be reevaluated. In some narrow cases however it can make sense.
+    **Note**: In many cases context-based injection is not the best solution, and the design should be reevaluated. In some narrow cases however it can make sense.
 
 One of the simplest use cases for **RegisterConditional** is to select an implementation depending on the consumer a dependency is injected into. Take a look at the following registrations for instance:
 
