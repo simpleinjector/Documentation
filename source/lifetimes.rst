@@ -36,8 +36,8 @@ Further reading:
 
 .. _Transient:
 
-Transient
-=========
+Transient Lifestyle
+===================
 
 .. container:: Note
     
@@ -69,8 +69,8 @@ The next example instantiates a new *RealService* instance on each call by using
 
 .. _Singleton:
 
-Singleton
-=========
+Singleton Lifestyle
+===================
 
 .. container:: Note
     
@@ -128,13 +128,21 @@ Registration for concrete singletons is necessarily, because unregistered concre
     
 .. _Scoped:
 
-Scoped
-======
+Scoped Lifestyle
+================
 
 .. container:: Note
     
     For every request within an implicitly or explicitly defined scope, a single instance of the service will be returned and that instance will be disposed when the scope ends.
 
+The Scoped lifestyle behaves much like the Singleton lifestyle within a single, well-defined scope or request. A Scoped instance, however, isn't shared across scopes. Each scope has its own cache of associated dependencies.
+
+The Scoped lifestyle is useful for applications where you run a single operation in an isolated manner. Web applications are a great example, as you want to run a request in isolation from other requests. The same can hold for desktop applications. A press of a button can be seen as a form of a request, and you might wish to isolate such request. This can be done with the use of the Scoped lifestyle.
+
+In frameworks where Simple Injector supplies out-of-the-box integration for (see the :doc:`integration guide <integration>`), the integration package will typically wrap a scope around a request on your behalf. This is what we call an *implicitly defined scope*, as you are not responsible for defining the scope–the integration package is.
+
+In other situations, where there is no integration package available or, alternatively, you wish to start an operation outside the facilities that the integration package provides, you should start your own scope. This can happen when you wish to run an operation on a background thread of a web application, or when you want start a new operation when running inside a Windows service. When you manage the scope yourself, we call this an *explicitly defined scope*, as you are directly responsible for the creation and disposing of that scope.
+ 	
 Simple Injector contains the following scoped lifestyles:
 
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
@@ -194,21 +202,22 @@ Retrieving list of disposables from the Scope
 
 By calling **Scope.GetDisposables**, the scope's created, and cached, *Scoped* instances that implement `IDisposable` are returned. This list of instances will get disposed automatically, when the `Scope` instance is disposed.
 
-Retrieving the disposable instances, however, can be especially beneficial whenever you require asynchronous disposal. It is impossible for Simple Injector to apply asynchronous disposal, because that requires a framework-supplied abstraction that allows asynchronous disposal, e.g an `IAsyncDisposable`. Such abstraction however does not exist.
+Retrieving the disposable instances, however, can be especially beneficial whenever you require asynchronous disposal. It is impossible for Simple Injector to apply asynchronous disposal, because that requires a framework-supplied abstraction that allows asynchronous disposal, e.g an `IAsyncDisposable`. Such abstraction however does not exist (yet).
 
 To mitigate this, you can define your own abstraction that allows disposable objects to flush themselves asynchronously, in such way that their `Dispose()` will not cause any blocking operations. Using the **Scope.GetDisposables** method, the following code can be used before disposing the `Scope` instance:
 
 .. code-block:: c#
         
-    foreach (var disposable = scope.GetDisposables().Reverse())
-        if (disposable is IAsyncFlushable flushable)
-            await flushable.FlushAsync();
+    foreach (var flushable = scope.GetDisposables().OfType<IAsyncFlushable>().Reverse())
+    {
+        await flushable.FlushAsync();
+    }
 
 .. _PerLifetimeScope:
 .. _ThreadScoped:
 
-Thread Scoped
-=============
+Thread Scoped Lifestyle
+=======================
 
 .. container:: Note
     
@@ -268,8 +277,8 @@ Scopes can be nested and each scope will get its own set of instances:
 .. _PerWebAPIRequest:
 .. _AsyncScoped:
 
-Async Scoped (async/await)
-==========================
+Async Scoped Lifestyle (async/await)
+====================================
 
 .. container:: Note
     
@@ -332,8 +341,8 @@ Scopes can be nested and each scope will get its own set of instances:
 .. _PerWebRequest:
 .. _WebRequest:
 
-Web Request
-===========
+Web Request Lifestyle
+=====================
 
 .. container:: Note
     
@@ -376,8 +385,8 @@ SynchronizationContext <https://vegetarianprogrammer.blogspot.de/2012/12/underst
 .. _PerWcfOperation:
 .. _WcfOperation:
 
-WCF Operation
-=============
+WCF Operation Lifestyle
+=======================
 
 .. container:: Note
     
@@ -401,8 +410,8 @@ For more information about integrating Simple Injector with WCF, please see the 
 
 .. _PerGraph:
 
-Per Graph
-=========
+Per Graph Lifestyle
+===================
 
 .. container:: Note
     
@@ -412,8 +421,8 @@ Compared to **Transient**, there will be just a single instance per explicit cal
 
 .. _InstancePerDependency:
 
-Instance Per Dependency
-=======================
+Instance Per Dependency Lifestyle
+=================================
 
 .. container:: Note
     
@@ -425,8 +434,8 @@ This lifestyle is deliberately left out of Simple Injector, because its usefulne
 
 .. _PerThread:
 
-Per Thread
-==========
+Per Thread Lifestyle
+====================
 
 .. container:: Note
     
@@ -436,8 +445,8 @@ This lifestyle is deliberately left out of Simple Injector because :ref:`it is c
 
 .. _PerHttpSession:
 
-Per HTTP Session
-================
+Per HTTP Session Lifestyle
+==========================
 
 .. container:: Note
     
@@ -447,8 +456,8 @@ This lifestyle is deliberately left out of Simple Injector because `it is be use
 
 .. _Hybrid:
 
-Hybrid
-======
+Hybrid Lifestyle
+================
 
 .. container:: Note
     
