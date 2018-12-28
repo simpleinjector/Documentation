@@ -36,6 +36,7 @@ Besides integration with standard .NET technologies, Simple Injector can be inte
 * `Castle DynamicProxy Interception <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_
 * `ASP.NET Identity Framework <https://github.com/simpleinjector/SimpleInjector/issues/597>`_
 * `Drum <https://stackoverflow.com/questions/26661621/how-to-register-drum-urimaker-using-simple-injector>`_
+* `FluentScheduler <https://stackoverflow.com/a/53956064/264697>`_
 
 Patterns
 ========
