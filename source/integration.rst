@@ -16,7 +16,6 @@ Simple Injector can be used in a wide range of .NET technologies, both server si
     Windows Forms <windowsformsintegration>
     WCF <wcfintegration>
     WPF <wpfintegration>
-    Silverlight <silverlightintegration>
 
 Other Technologies
 ==================
