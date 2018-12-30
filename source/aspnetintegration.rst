@@ -40,7 +40,7 @@ The following code snippet shows how to use the integration package to apply Sim
             // ASP.NET default stuff here
             services.AddMvc();
 
-            // Add custom IHosteServiceAdapter
+            // Add custom IHostedServiceAdapter
             services.AddSingleton<IHostedService>(new SimpleInjectorJobProcessorHostedService(container));
 
             IntegrateSimpleInjector(services);
