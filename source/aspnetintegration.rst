@@ -40,6 +40,9 @@ The following code snippet shows how to use the integration package to apply Sim
             // ASP.NET default stuff here
             services.AddMvc();
 
+            // Add custom IHosteServiceAdapter
+            services.AddSingleton<IHostedService>(new SimpleInjectorJobProcessorHostedService(container));
+
             IntegrateSimpleInjector(services);
         }
         
@@ -91,7 +94,7 @@ The following code snippet shows how to use the integration package to apply Sim
     
 .. container:: Note
 
-    **NOTE**: Please note that when integrating Simple Injector in ASP.NET Core, you do **not** replace ASP.NET's built-in container, as advised by `the Microsoft documentation <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection#replacing-the-default-services-container>`_. The practice with Simple Injector is to use Simple Injector to build up object graphs of your *application components* and let the built-in container build framework and third-party components, as shown in the previous code snippet. To understand the rational around this, please read `this article <https://simpleinjector.org/blog/2016/06/whats-wrong-with-the-asp-net-core-di-abstraction/>`_.
+    **NOTE**: Please note that when integrating Simple Injector in ASP.NET Core, you do **not** replace ASP.NET's built-in container, as advised by `the Microsoft documentation <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection#replacing-the-default-services-container>`_. The practice with Simple Injector is to use Simple Injector to build up object graphs of your *application components* and let the built-in container build framework and third-party components, as shown in the previous code snippet. To understand the rationale around this, please read `this article <https://simpleinjector.org/blog/2016/06/whats-wrong-with-the-asp-net-core-di-abstraction/>`_.
 
     
 .. _wiring-custom-middleware:
@@ -263,3 +266,210 @@ A typical solution to this problem is to split up the class into multiple smalle
 Simple Injector :ref:`promotes <Push-developers-into-best-practices>` best practices, and because of downsides described above, we consider the use of the `[FromServices]` attribute *not* to be a best practice. This is why we choose not to provide out-of-the-box support for injecting Simple Injector registered dependencies into controller actions. 
 
 In case you still feel method injection is the best option for you, you can plug in a custom `IModelBinderProvider` implementation returning a custom `IModelBinder` that resolves instances from Simple Injector.
+
+.. _using-simpleinjector-with-aspnetcore-ihostedservices:
+
+Using Simple Injector with ASP.NET Core 2.0 IHostedServices
+===========================================================
+
+There are multiple ways to integrate Simple Injector with IHostedServices.  The easiest approach is to cross-wire the hosted service with the ASP.NET core configuration system so that it resolves the hosted service implementation from Simple Injector.  That would look something like this:
+
+.. code-block:: c#
+
+    public class MyHostedService : IHostedService, IDisposable
+    {
+        private readonly ISettingsObject _settingsObj;
+        private readonly ILogger _logger;
+        private Timer _timer;
+
+        //The Simple Injector container will resolve this instance so it can have application-specific dependencies
+        public MyHostedService(ISettingsObject settings, ILogger logger)
+        {
+            _settingsObj = settings;
+            _logger = logger;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            _timer = new Timer(this.DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(_settingsObj.TimerInterval));
+            return Task.CompletedTask;
+        }
+
+        private void DoWork(object state)
+        {
+            //Do some work here...
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _timer?.Change(Timeout.Infinite, 0);
+            return Task.CompletedTask;
+        }
+
+        public void Dispose() => _timer?.Dispose();
+    }
+
+    public class Startup
+    {
+        private Container container = new Container();
+
+        //...Other startup initialization code here...
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            //...ASP.NET default stuff here...
+
+            // Cross-wire TimedService with the ASP.NET Core configuration system
+            //The delegate will be called after the container has been configured.
+            services.AddSingleton<IHostedService>(
+                c => container.GetInstance<MyHostedService>());
+
+            IntegrateSimpleInjector(services);
+        }
+
+        //...Other configuration code...
+
+        private void InitializeContainer(IApplicationBuilder app)
+        {
+            // Add application presentation components:
+            container.RegisterMvcControllers(app);
+            container.RegisterMvcViewComponents(app);
+
+            // Add application services.
+            //Register dependent services for the MyHostedService.  They will have to be singletons
+            //since hosted services are singletons in the ASP.NET Core configuration system.
+            container.Register<ISettingsObject, MySettingsObject>(Lifestyle.Singleton);
+            container.Register<ILogger, MyLogger>(Lifestyle.Singleton);
+
+            // Register MyHostedService in Simple Injector as Singleton
+            container.RegisterSingleton<MyHostedService>();
+
+            // Allow Simple Injector to resolve services from ASP.NET Core.
+            container.AutoCrossWireAspNetComponents(app);
+        }
+    }
+
+
+.. container:: Note
+
+    **NOTE**: The `documentation for hosted services <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services/>`_ says to register these services with the services.AddHostedService<T> extension method but that extension method doesn't give a way to provide either an instance or a factory.  Internally, the AddHostedService<T> extension method just calls the AddTransient<IHostedService, THostedService>() method. Later on, all of the IHostedService implementations are added as a dependency to HostedServiceExecuter which itself is added as a singleton. So, adding the hosted service implementations as singletons to the ASP.NET Core configuration system is an equivalent (and much clearer) way to add hosted services to the ASP.NET Core configuration system.
+
+The approach that will be laid out next is the preferred approach and it involves creating an adapter implementation that gets registered with the ASP.NET Core configuration system and forwards the calls to Simple Injector with the application-specific abstraction.
+
+The main idea with this approach is to have an application specific abstraction or abstractions which define the functionality to be performed in the IHostedService.  As an example, let's call this application-specific abstraction "IMyJob".  The implementation of IHostedService then becomes a simple adapter which can be used by ASP.NET Core to run application-specific dependencies in a hosted service similar to the way that the IControllerActivator abstraction implemented by SimpleInjectorControllerActivator provides an adapter for ASP.NET Core to be able to create Controllers with dependencies resolved by the Container.
+
+Given that, the IHostedService adapter might look like this:
+
+.. code-block:: c#
+
+    public class SimpleInjectorJobProcessorHostedService : IHostedService, IDisposable
+    {
+        private readonly Container _container;
+        private Timer _timer;
+
+        //Depending on how this adapter gets registered with the ASP.NET Core configuration system, this
+        //constructor may be called before all of the registrations have been added to the container.
+        public SimpleInjectorJobProcessorHostedService(Container container) => _container = container;
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            /*
+             * Now the adapter can resolve things from the container.
+             * For example, we could get a settings object from the container:
+             * ISettingsObj settings = _containter.GetInstance<ISettingsObj>();
+             * _timer = new Timer(this.DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(settings.TimerInterval));
+             */
+            _timer = new Timer(this.DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+            return Task.CompletedTask;
+        }
+
+        private void DoWork(object state)
+        {
+            // Run operation in a scope
+            using (AsyncScopedLifestyle.BeginScope(_container))
+            {
+                // Resolve the collection of IMyJob application-specific implementations and run them all
+                foreach (var service in _container.GetAllInstances<IMyJob>())
+                {
+                    service.DoWork();
+                }
+            }
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _timer?.Change(Timeout.Infinite, 0);
+            return Task.CompletedTask;
+        }
+
+        public void Dispose() => _timer?.Dispose();
+    }
+
+Then the IHostedService adapter would get registered in the Startup class in the following way (for the rest of the Simple Injector-specific code see the Startup snippet above):
+
+.. code-block:: c#
+
+    public class Startup
+    {
+        private Container container = new Container();
+
+        //...Other startup initialization code here...
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // ASP.NET default stuff here
+
+            services.AddSingleton<IHostedService>(new SimpleInjectorJobProcessorHostedService(container));
+
+            IntegrateSimpleInjector(services);
+        }
+
+        //...Configuration code here...
+    }
+
+This approach allows the application-specific code to remain oblivious of ASP.NET's implementation details, such as IHostedService.  For example, an IMyJob implementation might look like this:
+
+.. code-block:: c#
+
+    public class DoSomethingJob : IMyJob
+    {
+        private readonly IJobRepository _repo;
+        private readonly ILogger _logger;
+
+        //No knowledge of ASP.NET Core dependencies is needed.
+        public DoSomethingJob(IJobRepository repo, ILogger logger)
+        {
+            _repo = repo;
+            _logger = logger;
+        }
+
+        public void DoWork() => ...do something here...
+    }
+
+The IMyJob implementations can be registered with SimpleInjector as usual:
+
+.. code-block:: c#
+
+    public class Startup
+    {
+        private Container container = new Container();
+
+        //...Other startup initialization and configuration code here...
+
+        private void InitializeContainer(IApplicationBuilder app)
+        {
+            // Add application presentation components:
+            container.RegisterMvcControllers(app);
+            container.RegisterMvcViewComponents(app);
+            
+            // Add application services. For instance: 
+            container.Register<IUserService, UserService>(Lifestyle.Scoped);
+            container.Register<ISettingsObj, MySettingsObj>();
+
+            // NOTE: Simple Injector v4.3 API
+            container.Collection.Register<IMyJob>(typeof(IMyJob).Assembly);
+            
+            // Allow Simple Injector to resolve services from ASP.NET Core.
+            container.AutoCrossWireAspNetComponents(app);
+        }
+    }
