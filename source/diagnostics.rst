@@ -79,6 +79,23 @@ This same information can be requested programmatically by using the Diagnostic 
                 select result.Description));
     }
 
+Object graphs can be visualized programmatically as well, by calling the **VisualizeObjectGraph** method on an **InstanceProducer**:
+
+.. code-block:: c#
+
+    InstanceProducer producer = container.GetRegistration(typeof(UserListController));
+    
+    string graph = producer.VisualizeObjectGraph();
+
+The value returned by **VisualizeObjectGraph** is identical as what would be shown in the **DependencyGraph** property in the debugger:
+	
+.. code-block:: text
+
+    UserListController(
+        SqlRepository<User>(
+            SqlConnectionFactory()),
+        FileLogger())	
+
 Instead of interacting with the Diagnostic API directly, you can force the container to fail fast during verification in case one of the more severe warnings is detected:
 
 .. code-block:: c#
