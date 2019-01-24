@@ -15,7 +15,7 @@ The component depends on too many services.
 Warning Description
 ===================
 
-Psychological studies show that the human mind has difficulty dealing with more than seven things at once. This is related to the concept of `High Fan In - Low Fan Out <http://it.toolbox.com/blogs/enterprise-solutions/design-principles-fanin-vs-fanout-16088>`_. Lowering the number of dependencies (fan out) that a class has can therefore reduce complexity and increase maintainability of such class.
+Psychological studies show that the human mind has difficulty dealing with more than seven things at once. This is related to the concept of `High Fan In - Low Fan Out <https://it.toolbox.com/blogs/enterprise-solutions/design-principles-fanin-vs-fanout-16088>`_. Lowering the number of dependencies (fan out) that a class has can therefore reduce complexity and increase maintainability of such class.
 
 So in general, components should only depend on a few other components. When a component depends on many other components (usually caused by constructor over-injection), it might indicate that the component has too many responsibilities. In other words it might be a sign that the component violates the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ (SRP). Violations of the SRP will often lead to maintainability issues later on in the application lifecycle.
 

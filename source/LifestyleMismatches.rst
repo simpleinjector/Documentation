@@ -25,7 +25,7 @@ The Diagnostic Services detect this kind of misconfiguration and report it. The 
 
 .. container:: Note
 
-    **Note**: This kind of error is also known as `Captive Dependency <http://blog.ploeh.dk/2014/06/02/captive-dependency/>`_.
+    **Note**: This kind of error is also known as `Captive Dependency <https://blog.ploeh.dk/2014/06/02/captive-dependency/>`_.
     
 .. container:: Note
 

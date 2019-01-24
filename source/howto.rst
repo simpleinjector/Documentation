@@ -218,14 +218,14 @@ This way the application can simply depend on *IMyService* instead of *Lazy<IMyS
 
 .. container:: Note
 
-    **Warning**: The same warning applies to the use of *Lazy<T>* as it does for the use of *Func<T>* delegates. Further more, the constructors of your components should be simple, reliable and quick (as explained in `this blog post <http://blog.ploeh.dk/2011/03/03/InjectionConstructorsshouldbesimple/>`_ by Mark Seemann), and that would remove the need for lazy initialization. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container's configuration <Verify-Configuration>`.
+    **Warning**: The same warning applies to the use of *Lazy<T>* as it does for the use of *Func<T>* delegates. Further more, the constructors of your components should be simple, reliable and quick (as explained in `this blog post <https://blog.ploeh.dk/2011/03/03/InjectionConstructorsshouldbesimple/>`_ by Mark Seemann), and that would remove the need for lazy initialization. For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container's configuration <Verify-Configuration>`.
 
 .. _Resolve-Instances-By-Key:
 
 Resolve instances by key
 ========================
 
-Resolving instances by a key is a feature that is deliberately left out of Simple Injector, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the *Container* instance and this leads to the `Service Locator anti-pattern <http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx>`_.
+Resolving instances by a key is a feature that is deliberately left out of Simple Injector, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the *Container* instance and this leads to the `Service Locator anti-pattern <https://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx>`_.
 
 This doesn't mean that resolving instances by a key is never useful. Resolving instances by a key is normally a job for a specific factory rather than the *Container*. This approach makes the design much cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn't consider.
 
@@ -419,7 +419,7 @@ Verify the container's configuration
 
 Dependency Injection promotes the concept of programming against abstractions. This makes your code much easier to test, easier to change and maintain. However, since the code itself isn't responsible for maintaining the dependencies between implementations when using a DI library, the compiler will not be able to verify whether the dependency graph is correct.
 
-When starting to use a Dependency Injection container, many developers see their application fail when it is deployed in staging or sometimes even production, because of container misconfigurations. This makes developers often conclude that dependency injection is bad, since the dependency graph cannot be verified. This conclusion however, is incorrect. First of all, the use of Dependency Injection doesn't require a DI library at all. The pattern is still valid, even without the use of tooling that will wire everything together for you. For some types of applications `Pure DI <http://blog.ploeh.dk/2014/06/10/pure-di/>`_ is even advisable. Second, although it is impossible for the compiler to verify the dependency graph when using a DI library, verifying the dependency graph is still possible and advisable.
+When starting to use a Dependency Injection container, many developers see their application fail when it is deployed in staging or sometimes even production, because of container misconfigurations. This makes developers often conclude that dependency injection is bad, since the dependency graph cannot be verified. This conclusion however, is incorrect. First of all, the use of Dependency Injection doesn't require a DI library at all. The pattern is still valid, even without the use of tooling that will wire everything together for you. For some types of applications `Pure DI <https://blog.ploeh.dk/2014/06/10/pure-di/>`_ is even advisable. Second, although it is impossible for the compiler to verify the dependency graph when using a DI library, verifying the dependency graph is still possible and advisable.
 
 Simple Injector contains a **Verify()** method, that will iterate over all registrations and resolve an instance for each registration. Calling this method directly after configuring the container allows the application to fail during start-up if the configuration is invalid.
 
@@ -450,7 +450,7 @@ Many applications and application frameworks are inherently multi-threaded. Work
 
 This same holds when working with DI containers in multi-threaded applications. The developer that configures the container should be aware of the risks of shared state. **Not knowing which configured services are thread-safe is a sin.** Registering a service that is not thread-safe as singleton, will eventually lead to concurrency bugs, that usually only appear in production. Those bugs are often hard to reproduce and hard to find, making them costly to fix. And even when you correctly configured a service with the correct lifestyle, when another component that depends on it accidentally as a longer lifetime, the service might be kept alive much longer and might even be accessible from other threads.
 
-Dependency injection however, can actually help in writing multi-threaded applications. Dependency injection forces you to wire all dependencies together in a single place in the application: the `Composition Root <http://blog.ploeh.dk/2011/07/28/CompositionRoot/>`_. This means that there is a single place in the application that knows about how services behave, whether they are thread-safe, and how they should be wired. Without this centralization, this knowledge would be scattered throughout the code base, making it very hard to change the behavior of a service.
+Dependency injection however, can actually help in writing multi-threaded applications. Dependency injection forces you to wire all dependencies together in a single place in the application: the `Composition Root <https://blog.ploeh.dk/2011/07/28/CompositionRoot/>`_. This means that there is a single place in the application that knows about how services behave, whether they are thread-safe, and how they should be wired. Without this centralization, this knowledge would be scattered throughout the code base, making it very hard to change the behavior of a service.
 
 .. container:: Note
 
@@ -570,7 +570,7 @@ After doing so, the main application can dynamically load these application modu
 
 As explained above, **SimpleInjector.Packaging** is specifically designed for loading configurations from assemblies that are loaded dynamically. In other scenarios the use of Packaging is discouraged.
 
-For non-plug-in scenario's, all container registrations should be located as close as possible to the application’s entry point. This location is commonly referred to as the `Composition Root <http://blog.ploeh.dk/2011/07/28/CompositionRoot/>`_.
+For non-plug-in scenario's, all container registrations should be located as close as possible to the application’s entry point. This location is commonly referred to as the `Composition Root <https://blog.ploeh.dk/2011/07/28/CompositionRoot/>`_.
 
 Although even inside the Composition Root it might make sense to split the registration into multiple functions or even classes, as long as those registrations are available to the entry-point at compile time, it makes more sense to call them statically instead of by the use of reflection, as can be seen in the following example:
 

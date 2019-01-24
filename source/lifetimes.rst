@@ -179,7 +179,7 @@ Most of the time, you will only use one particular scoped lifestyle per applicat
     container.Register<MyAppUnitOfWork>(() => new MyAppUnitOfWork("constr"),
         Lifestyle.Scoped);
     
-Just like *Singleton* registrations, instances of scoped registrations that are created by the container will be disposed when the their scope ends. Scoped lifestyles are especially useful for implementing patterns such as the `Unit of Work <http://martinfowler.com/eaaCatalog/unitOfWork.html>`_.
+Just like *Singleton* registrations, instances of scoped registrations that are created by the container will be disposed when the their scope ends. Scoped lifestyles are especially useful for implementing patterns such as the `Unit of Work <https://martinfowler.com/eaaCatalog/unitOfWork.html>`_.
 
 
 .. _Order-of-disposal:
