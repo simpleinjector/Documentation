@@ -125,14 +125,14 @@ This implementation can be implemented as follows:
 Injecting dependencies into Web API filter attributes
 -----------------------------------------------------
 
-Web API caches filter attribute instances indefinitely per action, effectively making them singletons. This makes them unsuited for dependency injection, since the attribute's dependencies will be accidentally promoted to singleton as well, which can cause all sorts of concurrency issues.
+Web API caches filter attribute instances indefinitely per action, effectively making them singletons. This makes them unsuited for dependency injection, since the attribute's dependencies will be accidentally promoted to singleton as well, which can cause all sorts of concurrency issues. This problem is commonly referred to as `Captive Dependencies <https://blog.ploeh.dk/2014/06/02/captive-dependency/>`_ and although Simple Injector tries to detect ref:`find those issues <LifestyleMismatches>`, it will be unable to do so in this this case.
 
-Since dependency injection is not an option here, an other mechanism is advised. There are basically two options here. Which one is best depends on the amount of filter attributes your application needs. If the number of attributes is limited (to a few), the simplest solution is to revert to the Service Locator pattern within your attributes. If the number of attributes is larger, it might be better to make attributes passive.
+Since dependency injection is not an option here, an other mechanism is advised. There are basically two options here. Which one is best depends on the amount of filter attributes your application needs. If the number of attributes is limited (to a few), the simplest solution is to revert to the Service Locator (anti-)pattern within your attributes. If the number of attributes is larger, it might be better to make attributes passive.
 
-Reverting to the Service Locator pattern means that you need to do the following:
+Reverting to Service Locator means that you need to do the following:
 
 * Extract all the attribute's logic -with its dependencies- into a new service class.
-* Resolve this service from within the filter attribute's `OnActionExecXXX` methods, but don't store the resolved service in a private field.
+* Resolve this service from within the filter attribute's `OnActionExecXXX` methods (but prevent storing the resolved service in a private field as that could lead to undetectable Captive Dependencies).
 * Call the service's method.
 
 The following example visualizes this:
@@ -160,7 +160,7 @@ The following example visualizes this:
 
 By moving all the logic and dependencies out of the attribute, the attribute becomes a small infrastructural piece of code; a humble object that simply forwards the call to the real service.
     
-If the number of required filter attributes grows, a different model might be in place. In that case you might want to make your attributes `passive <http://blog.ploeh.dk/2014/06/13/passive-attributes/>`_ as explained `here <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=98>`_.
+If the number of required filter attributes grows, a different model might be in place. In that case you might want to make your attributes `passive <https://blog.ploeh.dk/2014/06/13/passive-attributes/>`_ as explained `here <https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=98>`_.
 
 .. _Injecting-dependencies-into-Web-API-message-handlers:
 

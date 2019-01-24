@@ -10,7 +10,7 @@ Once you have completed your changes:
 
 #. Follow `10 tips for better Pull Requests <https://blog.ploeh.dk/2015/01/15/10-tips-for-better-pull-requests/>`_.
 #. Make sure all existing and new unit tests pass.
-#. Unit tests must conform to `Roy Osherove's Naming Standards for Unit Tests <http://osherove.com/blog/2005/4/3/naming-standards-for-unit-tests.html>`_ and the  `AAA pattern <http://c2.com/cgi/wiki?ArrangeActAssert>`_ must be documented explicitly in each test.
+#. Unit tests must conform to `Roy Osherove's Naming Standards for Unit Tests <http://osherove.com/blog/2005/4/3/naming-standards-for-unit-tests.html>`_ and the  `AAA pattern <https://c2.com/cgi/wiki?ArrangeActAssert>`_ must be documented explicitly in each test.
 #. Make sure it compiles in both Debug and Release mode (xml comments are only checked in the release build). 
 #. Make sure there are no `StyleCop <https://visualstudiogallery.msdn.microsoft.com/cac2a05b-6eb6-4fa2-95b9-1f8d011e6cae>`_ warnings {Ctrl + Shift + Y} 
 #. Make sure the project can be built using the **build.bat**.

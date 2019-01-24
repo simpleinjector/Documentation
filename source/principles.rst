@@ -21,7 +21,7 @@ The design principles:
 Make simple use cases easy, make complex use cases possible
 ===========================================================
 
-This guideline comes directly from the `Framework Design Guidelines <http://www.amazon.com/Framework-Design-Guidelines-Conventions-Libraries/dp/0321545613>`_ and is an important guidance for us. Commonly used features should be easy to implement, even for a new user, but the library must be flexible and extensible enough to support complex scenarios.
+This guideline comes directly from the `Framework Design Guidelines <https://www.amazon.com/Framework-Design-Guidelines-Conventions-Libraries/dp/0321545613>`_ and is an important guidance for us. Commonly used features should be easy to implement, even for a new user, but the library must be flexible and extensible enough to support complex scenarios.
 
 .. _Push-developers-into-best-practices:
 
