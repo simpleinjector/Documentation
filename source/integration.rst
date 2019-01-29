@@ -36,6 +36,7 @@ Besides integration with standard .NET technologies, Simple Injector can be inte
 * `SignalR <https://stackoverflow.com/questions/10555791/using-simpleinjector-with-signalr>`_
 * `SignalR Core <https://github.com/simpleinjector/SimpleInjector/issues/631>`_
 * `Web Forms MVP <https://stackoverflow.com/questions/15123515/pass-runtime-value-to-constructor-using-simpleinjector>`_
+* `HttpClientFactory <https://github.com/simpleinjector/SimpleInjector/issues/654>`_
 
 Patterns
 ========
