@@ -67,7 +67,7 @@ This design differentiates vastly from how other DI libraries work. Most librari
 
 In general, your services should not depend on an *IEnumerable<ISomeService>*, especially when your application has multiple services that need to work with *ISomeService*. The problem with injecting *IEnumerable<T>* into multiple consumers is that you will have to iterate that collection in multiple places. This forces the consumers to know about having multiple implementations and how to iterate and process that collection. As far as the consumer is concerned this should be an implementation detail. If you ever need to change the way a collection is processed you will have to go through the application, since this logic will have be duplicated throughout the system.
 
-Instead of injecting an *IEnumerable<T>*, a consumer should instead depend on a single abstraction and you can achieve this using a `Composite <https://en.wikipedia.org/wiki/Composite_pattern>`_ Implementation that wraps the actual collection and contains the logic of processing the collection. Registering composite implementation is so much easier with Simple Injector because of the clear separation between a single implementation and a collection of implementations. Take the following configuration for example, where we register a collection of *ILogger* implementations and a single composite implementation for use in the rest of our code:
+Instead of injecting an *IEnumerable<T>*, a consumer should instead depend on a single abstraction and you can achieve this using a `Composite <https://en.wikipedia.org/wiki/Composite_pattern>`_ implementation that wraps the actual collection and contains the logic of processing the collection. Registering composite implementation is so much easier with Simple Injector because of the clear separation between a single implementation and a collection of implementations. Take the following configuration for example, where we register a collection of *ILogger* implementations and a single composite implementation for use in the rest of our code:
 
 .. code-block:: c#
 
@@ -78,7 +78,7 @@ Instead of injecting an *IEnumerable<T>*, a consumer should instead depend on a 
     
     container.Register<ILogger, CompositeLogger>(Lifestyle.Singleton);
 
-In case the unusual scenario that you need both a default registration and list of registrations, this is still easy to configure in Simple Injector. Take a look at the following example:
+In the unusual scenario that you need both a default registration and list of registrations, this is still easy to configure in Simple Injector. Take a look at the following example:
 
 
 .. code-block:: c#

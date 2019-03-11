@@ -536,7 +536,7 @@ With the given classes, the code snippet above will give the following output:
     SendFlowersToMovedCustomer
     WarnShippingDepartmentAboutMove
     
-Although we requested all registrations for *IEventHandler<CustomerMovedAbroadEvent>*, the container returned *IEventHandler<CustomerMovedEvent>* and *IEventHandler<CustomerMovedAbroadEvent>*. Simple Injector did this because the *IEventHandler<in TEvent>* interface was defined with the ***in*** keyword, which makes *IEventHandler<SendFlowerToMovedCustomer>* assignable to *IEventHandler<CustomerMovedAbroadEvent>* (since *CustomerMovedAbroadEvent* inherits from *CustomerMovedEvent*, *SendFlowerToMovedCustomer* can also process *CustomerMovedAbroadEvent* events). 
+Although we requested all registrations for _IEventHandler<CustomerMovedAbroadEvent>_, the container returned both _IEventHandler<CustomerMovedEvent>_ and _IEventHandler<CustomerMovedAbroadEvent>_ implementations. Simple Injector did this because the _IEventHandler<in TEvent>_ interface was defined with the _**in**_ keyword, which allows _IEventHandler<CustomerMovedEvent>_ implementations to be part of _IEventHandler<CustomerMovedAbroadEvent>_ collections—because _CustomerMovedAbroadEvent_ inherits from _CustomerMovedEvent_, _SendFlowerToMovedCustomer_ can also process _CustomerMovedAbroadEvent_ events.
 
 .. container:: Note
 
