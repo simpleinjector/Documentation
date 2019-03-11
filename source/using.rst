@@ -283,7 +283,13 @@ When supplying a list of assemblies to the **Register** method, Simple Injector 
 Collections
 ===========
 
-Simple Injector contains several methods for registering and resolving collections of types. Here are some examples:
+Besides making one-to-one mappings between an abstraction and an implementation, Simple Injector allows a set of implementations to be registered for a given abstraction. Those implementations can than be requested from the container as a collection of instances. Simple Injector contains dedicated methods for registering and resolving collections of types.
+
+.. container:: Note
+
+    **Note**: In contrast to most other DI Containers, Simple Injector differentiates between the registration of collections of services from normal one-to-one registrations. To learn more about why this is done, please read :ref:`this <separate-collections>`.
+
+Here are some examples that show how collections can be registered and resolved:
 
 .. code-block:: c#
 
@@ -303,12 +309,11 @@ Simple Injector contains several methods for registering and resolving collectio
 
 .. container:: Note
 
-    **Note**:  When zero instances are registered using **Collection.Register**, each call to **Container.GetAllInstances** will return an empty list.
+    **Note**: When zero instances are registered using **Collection.Register**, each call to **Container.GetAllInstances** will return an empty list.
 
 .. container:: Note
 
-    **Warning**:  Simple Injector requires a call to **Collection.Register** to be made, even in the absence of any instances. Without a call to **Collection.Register**, Simple Injector will throw an exception.
-
+    **Warning**: Simple Injector requires a call to **Collection.Register** to be made, even in the absence of any instances. Without a call to **Collection.Register**, Simple Injector will throw an exception.
 
 Just as with normal types, Simple Injector can inject collections of instances into constructors:
 
