@@ -56,7 +56,10 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
             private static Container container;
 
             public static void InitializeHandler(IHttpHandler handler) {
-                container.GetRegistration(handler.GetType(), true).Registration
+				Type handlerType = handler is Page
+					? handler.GetType().BaseType
+					: handler.GetType();
+                container.GetRegistration(handlerType, true).Registration
                     .InitializeInstance(handler);
             }
 
