@@ -111,7 +111,7 @@ There's an overload of the **RegisterDecorator** available that allows you to su
         context => typeof(IAccessRestricted).IsAssignableFrom(
             context.ServiceType.GetGenericArguments()[0]));
 
-The given context contains several properties that allows you to analyze whether a decorator should be applied to a given service type, such as the current closed generic service type (using the *ServiceType* property) and the concrete type that will be created (using the *ImplementationType* property). The predicate will (under normal circumstances) be called only once per closed generic type, so there is no performance penalty for using it.
+The given context contains several properties that allows you to analyze whether a decorator should be applied to a given service type, such as the current closed-generic service type (using the *ServiceType* property) and the concrete type that will be created (using the *ImplementationType* property). The predicate will (under normal circumstances) be called only once per closed-generic type, so there is no performance penalty for using it.
 
 .. _Applying-decorators-conditionally-using-type-constraints:
 
