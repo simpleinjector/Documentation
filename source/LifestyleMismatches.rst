@@ -119,9 +119,9 @@ Simple Injector v4.5 improved the ability to find Lifestyle Mismatches by trying
 
 .. container:: Note
 
-    MyLogger is part of the IEnumerable<ILogger> that is injected into Consumer. The problem in Consumer is that instead of storing the injected Enumerable<ILogger> in a private field and iterating over it at the point its instances are required, MyLogger is being resolved (from the collection) during object construction. Resolving services from an injected collection during object construction (e.g. by calling loggers.ToList() in the constructor) is not advised.
+    {dependency} is part of the {collection} that is injected into {consumer}. The problem in {consumer} is that instead of storing the injected {collection} in a private field and iterating over it at the point its instances are required, {dependency} is being resolved (from the collection) during object construction. Resolving services from an injected collection during object construction (e.g. by calling {parameter name}.ToList() in the constructor) is not advised.
     
-This warning is stating that the `IEnumerable<ILogger>`, which was injected into a class called `Consumer`, was iterated during object construction—most likely inside the constructor.
+This warning is stating that the `collection` (e.g. an `IEnumerable<ILogger>`), which was injected into a class called `consumer`, was iterated during object construction—most likely inside the constructor.
 
 The following code will reproduce the issue:
 
