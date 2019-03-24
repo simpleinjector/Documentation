@@ -139,7 +139,7 @@ Simple Injector will automatically apply decorators conditionally based on defin
         }
     }
     
-Since Simple Injector natively understands generic type constraints, we can reduce the previous registration to the following:
+Because Simple Injector natively understands generic type constraints, we can reduce the previous registration to the following:
     
 .. code-block:: c#
 
@@ -212,7 +212,7 @@ This special decorator is registered just as any other decorator:
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-The *AsyncCommandHandlerDecorator<T>* however, has only singleton dependencies (the *Func<T>* is a singleton) and the *Func<ICommandHandler<T>>* factory always calls back into the container to register a decorated instance conforming the decoratee's lifestyle, each time it's called. If for instance the decoratee is registered as transient, each call to the factory will result in a new instance. It is therefore safe to register this decorator as a singleton:
+The *AsyncCommandHandlerDecorator<T>* however, has only singleton dependencies (the *Func<T>* is a singleton) and the *Func<ICommandHandler<T>>* factory always calls back into the container to register a decorated instance conforming the decoratee's lifestyle, each time it's called. If, for instance, the decoratee is registered as transient, each call to the factory will result in a new instance. It is, therefore, safe to register this decorator as a singleton:
 
 .. code-block:: c#
 
@@ -254,7 +254,7 @@ This configuration has an interesting mix of decorator registrations.
 
 .. container:: Note
 
-    **Warning**: Please note that the previous example is just meant for educational purposes. In practice, you don't want your commands to be processed this way, since it could lead to message loss. Instead you want to use a durable queue.
+    **Warning**: Please note that the previous example is just meant for educational purposes. In practice, you don't want your commands to be processed this way, because it could lead to message loss. Instead you want to use a durable queue.
 
 Another useful application for *Func<T>* decoratee factories is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new thread-specific scope, as follows:
 
