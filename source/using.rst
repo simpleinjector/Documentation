@@ -349,7 +349,7 @@ The **Collection.Register** overloads that take a collection of *Type* instances
 
     // Configuration
     container.Register<MailLogger>(Lifestyle.Singleton);
-    container.Register<ILogger, FileLogger>();
+    container.RegisterInstance<ILogger>(new FileLogger());
 
     container.Collection.Register<ILogger>(
         typeof(MailLogger), 
@@ -368,7 +368,7 @@ Alternatively, if the components of the collections are supplied explicity, as t
 
     container.Register.Append<ILogger, MailLogger>(Lifestyle.Singleton);
     container.Register.Append<ILogger, SqlLogger>();
-    container.Register.Append<ILogger, FileLogger>();
+    container.Register.AppendInstance<ILogger>(new FileLogger>());
 	
 This set of registrations is _identical_ to the previous construct using **Collection.Register**.
 

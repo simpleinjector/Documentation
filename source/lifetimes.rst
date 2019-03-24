@@ -197,12 +197,12 @@ When a component *A* depends on component *B*, *B* will be created before *A*. T
 
 .. _Retrieving-disposables:
 
-Retrieving list of disposables from the Scope
----------------------------------------------
+Retrieving list of container-created disposables
+------------------------------------------------
 
 By calling **Scope.GetDisposables**, the scope's created, and cached, *Scoped* instances that implement `IDisposable` are returned. This list of instances will get disposed automatically, when the `Scope` instance is disposed.
 
-Retrieving the disposable instances, however, can be especially beneficial whenever you require asynchronous disposal. It is impossible for Simple Injector to apply asynchronous disposal, because that requires a framework-supplied abstraction that allows asynchronous disposal, e.g an `IAsyncDisposable`. Such abstraction however does not exist (yet).
+Retrieving the disposable instances can be especially beneficial whenever you require asynchronous disposal. It is impossible for Simple Injector to apply asynchronous disposal, because that requires a framework-supplied abstraction that allows asynchronous disposal, e.g an `IAsyncDisposable`. Such abstraction however does not exist (yet).
 
 To mitigate this, you can define your own abstraction that allows disposable objects to flush themselves asynchronously, in such way that their `Dispose()` will not cause any blocking operations. Using the **Scope.GetDisposables** method, the following code can be used before disposing the `Scope` instance:
 
@@ -212,6 +212,22 @@ To mitigate this, you can define your own abstraction that allows disposable obj
     {
         await flushable.FlushAsync();
     }
+	
+The same method can be applied when asynchronously disposing instances that are created with the `Singleton` lifestyle. Those instances are not stored in a request-specific `Scope` instance, but stored for the lifetime of the container. The following code can be used before disposing the `Container` instance:
+
+.. code-block:: c#
+    
+    var disposabless = container.ContainerScope.GetDisposables();
+    foreach (var flushable = disposables.OfType<IAsyncFlushable>().Reverse())
+    {
+        await flushable.FlushAsync();
+    }
+	
+	container.Dispose();
+
+.. container:: Note
+    
+    The **Container.ContainerScope** property is new in v4.5.
 
 .. _PerLifetimeScope:
 .. _ThreadScoped:
