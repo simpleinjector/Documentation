@@ -275,14 +275,14 @@ The following code snippet shows how to replace the built-in `IPageModelActivato
 
 .. code-block:: c#
 
-	services.AddSingleton<IPageModelActivatorProvider>(
-		new SimpleInjectorPageModelActivatorProvider(container));
+    services.AddSingleton<IPageModelActivatorProvider>(
+        new SimpleInjectorPageModelActivatorProvider(container));
 
 To be able for the **SimpleInjectorPageModelActivatorProvider** to resolve Page Model instances, they need to be registered explicitly in the container. This must be done in a later stage, i.e. inside the **Configure** method of the `Startup` class:
 
 .. code-block:: c#
 
-	container.RegisterPageModels(app);
+    container.RegisterPageModels(app);
 
 This method works in similar fashion as its **RegisterMvcControllers** and **RegisterMvcViewComponents** counter parts do, as shown in the page's first code listing. 
 

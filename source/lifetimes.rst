@@ -23,7 +23,7 @@ Below is a list of the most common lifestyles with code examples of how to confi
 |                                               | instance from the container.                                          |                            |
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 
-Many different platform and framework specific flavors are available for the *Scoped* lifestyle. Please see the :ref:`Scoped <Scoped>` section for more information.
+Many different platform and framework-specific flavors are available for the *Scoped* lifestyle. Please see the :ref:`Scoped <Scoped>` section for more information.
 
 Further reading:
 
@@ -65,7 +65,7 @@ The next example instantiates a new *RealService* instance on each call by using
     
 .. container:: Note
 
-    **Warning**: Transient instances are not tracked by the container. This means that Simple Injector will not dispose transient instances. Simple Injector will detect disposable instances that are registered as transient when calling *container.Verify()*. Please view  :doc:`Diagnostic Warning - Disposable Transient Components <disposabletransientcomponent>` for more information.
+    **Warning**: Transient instances are not tracked by the container as tracking transient instances is a common source of memory leaks. This means that Simple Injector will not dispose transient instances. Simple Injector will detect disposable instances that are registered as transient when calling *container.Verify()*. Please view  :doc:`Diagnostic Warning - Disposable Transient Components <disposabletransientcomponent>` for more information.
 
 .. _Singleton:
 
@@ -108,8 +108,6 @@ Alternatively, when needing to register a concrete type as singleton, you can us
     // Which is a more convenient short cut for:
     container.Register<RealService, RealService>(Lifestyle.Singleton);
 
-Registration for concrete singletons is necessarily, because unregistered concrete types will be treated as transient.
-
 .. container:: Note
     
     **Warning**: Simple Injector guarantees that there is at most one instance of the registered **Singleton** inside that **Container** instance, but if multiple **Container** instances are created, each **Container** instance will get its own instance of the registered **Singleton**.
@@ -142,7 +140,7 @@ The Scoped lifestyle is useful for applications where you run a single operation
 In frameworks where Simple Injector supplies out-of-the-box integration for (see the :doc:`integration guide <integration>`), the integration package will typically wrap a scope around a request on your behalf. This is what we call an *implicitly defined scope*, as you are not responsible for defining the scope–the integration package is.
 
 In other situations, where there is no integration package available or, alternatively, you wish to start an operation outside the facilities that the integration package provides, you should start your own scope. This can happen when you wish to run an operation on a background thread of a web application, or when you want start a new operation when running inside a Windows service. When you manage the scope yourself, we call this an *explicitly defined scope*, as you are directly responsible for the creation and disposing of that scope.
- 	
+     
 Simple Injector contains the following scoped lifestyles:
 
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
@@ -164,7 +162,7 @@ Simple Injector contains the following scoped lifestyles:
 |                                               |                                                                       | is released.               |
 +-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 
-*Web Request* and *WCF Operation* implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The *Container* does this for you. With the *Thread Scoped* and *Async Scoped* lifestyles on the other hand, you explicitly define a scope (just like you would do with .NET's TransactionScope class).
+*Web Request* and *WCF Operation* implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The *Container* does this for you. With the *Thread Scoped* and *Async Scoped* lifestyles on the other hand, you explicitly define a scope (just like you would do with .NET's `TransactionScope` class).
 
 Most of the time, you will only use one particular scoped lifestyle per application. To simplify this, Simple Injector allows configuring the default scoped lifestyle in the container. After configuring the default scoped lifestyle, the rest of the configuration can access this lifestyle by calling **Lifestyle.Scoped**, as can be seen in the following example:
     
@@ -189,10 +187,9 @@ Order of disposal
 
 .. container:: Note
 
-    Simple Injector guarantees that instances are disposed in opposite order of creation.
+    Simple Injector guarantees that instances are disposed in opposite order of their creation.
 
-When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B* (assuming both implement *IDisposable*), since the guarantee of opposite order of creation. This allows *A* to use *B* while *A* is being disposed.
-
+When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B* (assuming both implement *IDisposable*). This allows *A* to use *B* while *A* is being disposed.
 
 
 .. _Retrieving-disposables:
@@ -204,7 +201,7 @@ By calling **Scope.GetDisposables**, the scope's created, and cached, *Scoped* i
 
 Retrieving the disposable instances can be especially beneficial whenever you require asynchronous disposal. It is impossible for Simple Injector to apply asynchronous disposal, because that requires a framework-supplied abstraction that allows asynchronous disposal, e.g an `IAsyncDisposable`. Such abstraction however does not exist (yet).
 
-To mitigate this, you can define your own abstraction that allows disposable objects to flush themselves asynchronously, in such way that their `Dispose()` will not cause any blocking operations. Using the **Scope.GetDisposables** method, the following code can be used before disposing the `Scope` instance:
+To mitigate this, you can define your own abstraction that allows disposable objects to flush themselves asynchronously, in such way that their `Dispose()` method will not cause any blocking operations. Using the **Scope.GetDisposables** method, the following code can be used before disposing the `Scope` instance:
 
 .. code-block:: c#
         
@@ -212,7 +209,7 @@ To mitigate this, you can define your own abstraction that allows disposable obj
     {
         await flushable.FlushAsync();
     }
-	
+    
 The same method can be applied when asynchronously disposing instances that are created with the `Singleton` lifestyle. Those instances are not stored in a request-specific `Scope` instance, but stored for the lifetime of the container. The following code can be used before disposing the `Container` instance:
 
 .. code-block:: c#
@@ -222,12 +219,12 @@ The same method can be applied when asynchronously disposing instances that are 
     {
         await flushable.FlushAsync();
     }
-	
-	container.Dispose();
+    
+    container.Dispose();
 
 .. container:: Note
     
-    The **Container.ContainerScope** property is new in v4.5.
+    **Note**: The **Container.ContainerScope** property is new in v4.5.
 
 .. _PerLifetimeScope:
 .. _ThreadScoped:
