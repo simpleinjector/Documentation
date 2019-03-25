@@ -7,7 +7,7 @@ Overview
 
 The goal of Simple Injector is to provide .NET application developers with an easy, flexible, and fast `Inversion of Control library <https://martinfowler.com/articles/injection.html>`_ that promotes best practice to steer developers towards the pit of success.
 
-Many of the existing DI libraries have a big complicated legacy API or are new, immature, and lack features often required by large scale development projects. Simple Injector fills this gap by supplying a simple implementation with a carefully selected and complete set of features. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any :doc:`advanced scenario <advanced>`.
+Many of the existing DI libraries have a big complicated legacy API or are new, immature, and lack features often required by large scale development projects. Simple Injector fills this gap by supplying a simple implementation with a carefully selected and complete set of features. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code-based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any :doc:`advanced scenario <advanced>`.
 
 The following platforms are supported:
 
@@ -78,12 +78,12 @@ The general idea behind Simple Injector (or any DI library for that matter) is t
         }        
     }
 
-The *CancelOrderHandler* class depends on the *IOrderRepository*, *ILogger* and *IEventPublisher* interfaces. By not depending on concrete implementations, we can test *CancelOrderHandler* in isolation. But ease of testing is only one of a number of things that Dependency Injection gives us. It also enables us, for example, to design highly flexible systems that can be completely composed in one specific location (often the startup path) of the application.
+The *CancelOrderHandler* class depends on the *IOrderRepository*, *ILogger* and *IEventPublisher* interfaces. By not depending on concrete implementations, you can test *CancelOrderHandler* in isolation. But ease of testing is only one of a number of things that Dependency Injection gives us. It also enables you, for example, to design highly flexible systems that can be completely composed in one specific location (often the startup path) of the application.
 
 Introducing Simple Injector
 ---------------------------
 
-Using Simple Injector, the configuration of the application using the *CancelOrderHandler* and *SqlOrderRepository* classes shown above, might look something like this:
+Using Simple Injector in a simple Console application, the configuration of the application using the *CancelOrderHandler* and *SqlOrderRepository* classes shown above, might look something like this:
 
 .. code-block:: csharp
 
@@ -119,7 +119,7 @@ Using Simple Injector, the configuration of the application using the *CancelOrd
 
 The given configuration registers implementations for the *IOrderRepository* and *ILogger* interfaces, as well as registering the concrete class *CancelOrderHandler*. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as *SqlOrderRepository*) to an interface or base type (such as *IOrderRepository*). In the given example, every time you ask the container for an *IOrderRepository*, it will always create a new *SqlOrderRepository* on your behalf (in DI terminology: an object with a **Transient** lifestyle).
 
-The second registration maps the *ILogger* interface to a *FileLogger* implementation. This *FileLogger* is registered with the **Singleton** lifestyle; only one instance of *FileLogger* will ever be created by the **Container**.
+The second registration maps the *ILogger* interface to a *FileLogger* implementation. This *FileLogger* is registered with the **Singleton** lifestyle—only one instance of *FileLogger* will ever be created by the **Container**.
 
 Further more, you can map a concrete implementation to itself (as shown with the *CancelOrderHandler*). This registration is a short-hand for the following registration:
 
@@ -138,7 +138,7 @@ Using this configuration, when a *CancelOrderHandler* is requested, the followin
             logger),
         logger);
         
-Note that object graphs can become very deep. What you can see is that not only *CancelOrderHandler* contains dependencies, so does *SqlOrderRepository*. In this case *SqlOrderRepository* itself contains an *ILogger* dependency. Simple Injector will not only resolve the dependencies of *CancelOrderHandler* but will instead build a whole tree structure of any level deep for you.
+Note that object graphs can become very deep. What you can see is that not only *CancelOrderHandler* contains dependencies—so does *SqlOrderRepository*. In this case *SqlOrderRepository* itself contains an *ILogger* dependency. Simple Injector will not only resolve the dependencies of *CancelOrderHandler* but will instead build a whole tree structure of any level deep for you.
 
 And this is all it takes to start using Simple Injector. Design your classes around the SOLID principles and the Dependency Injection pattern (which is actually the hard part) and configure them during application initialization. Some frameworks (such as ASP.NET MVC) will do the rest for you, other frameworks (like ASP.NET Web Forms) will need a little bit more work. See the :doc:`integration` for examples of integrating with many common frameworks.
 
@@ -160,6 +160,4 @@ For more information about Simple Injector please visit the following links:
 * For more information about dependency injection in general, please visit `this page on Stackoverflow <https://stackoverflow.com/tags/dependency-injection/info>`_.
 * If you have any questions about how to use Simple Injector or about dependency injection in general, the experts at `Stackoverflow.com <https://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23>`_ are waiting for you.
 * For all other Simple Injector related question and discussions, such as bug reports and feature requests, the `Simple Injector discussion forum <https://simpleinjector.org/forum>`_ will be the place to start.
-* The book `Dependency Injection in .NET <https://manning.com/seemann/>`_ presents core DI patterns in plain C# so you'll fully understand how DI works.
-
-**Happy injecting!**
+* The book `Dependency Injection Principles, Practices, and Patterns <https://manning.com/seemann2/>`_ presents core DI patterns in plain C# so you'll fully understand how DI works.

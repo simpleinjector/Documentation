@@ -2,7 +2,7 @@
 Aspect-Oriented Programming
 ===========================
 
-The `SOLID <https://en.wikipedia.org/wiki/SOLID>`_ principles give us important guidance when it comes to writing maintainable software. The 'O' of the 'SOLID' acronym stands for the `Open/closed Principle <https://en.wikipedia.org/wiki/Open/closed_principle>`_ which states that classes should be open for extension, but closed for modification. Designing systems around the Open/closed principle means that new behavior can be plugged into the system, without the need to change any existing parts, making the chance of breaking existing code much smaller and prevent having to make sweeping changes throughout the code base. This way of working is often referred to as Aspect-oriented programming.
+The `SOLID <https://en.wikipedia.org/wiki/SOLID>`_ principles give us important guidance when it comes to writing maintainable software. The 'O' of the 'SOLID' acronym stands for the `Open/closed Principle <https://en.wikipedia.org/wiki/Open/closed_principle>`_ which states that classes should be open for extension, but closed for modification. Designing systems around the Open/closed principle means that new behavior can be plugged into the system, without the need to change any existing parts, making the chance of breaking existing code much smaller and prevent having to make sweeping changes throughout the code base. This way of working is often referred to as aspect-oriented programming.
 
 Aspect-oriented programming (AOP) is a programming paradigm that aims to increase modularity by allowing the separation of cross-cutting concerns. It allows new behavior to be plugged in or changed, without having to change or even recompile existing code. Simple Injector's main support for AOP is by the use of decorators. Besides decorators, one can also plugin interception using a dynamic proxy framework.
 
@@ -111,7 +111,7 @@ There's an overload of the **RegisterDecorator** available that allows you to su
         context => typeof(IAccessRestricted).IsAssignableFrom(
             context.ServiceType.GetGenericArguments()[0]));
 
-The given context contains several properties that allows you to analyze whether a decorator should be applied to a given service type, such as the current closed generic service type (using the *ServiceType* property) and the concrete type that will be created (using the *ImplementationType* property). The predicate will (under normal circumstances) be called only once per closed generic type, so there is no performance penalty for using it.
+The given context contains several properties that allows you to analyze whether a decorator should be applied to a given service type, such as the current closed-generic service type (using the *ServiceType* property) and the concrete type that will be created (using the *ImplementationType* property). The predicate will (under normal circumstances) be called only once per closed-generic type, so there is no performance penalty for using it.
 
 .. _Applying-decorators-conditionally-using-type-constraints:
 
@@ -139,7 +139,7 @@ Simple Injector will automatically apply decorators conditionally based on defin
         }
     }
     
-Since Simple Injector natively understands generic type constraints, we can reduce the previous registration to the following:
+Because Simple Injector natively understands generic type constraints, we can reduce the previous registration to the following:
     
 .. code-block:: c#
 
@@ -212,7 +212,7 @@ This special decorator is registered just as any other decorator:
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-The *AsyncCommandHandlerDecorator<T>* however, has only singleton dependencies (the *Func<T>* is a singleton) and the *Func<ICommandHandler<T>>* factory always calls back into the container to register a decorated instance conforming the decoratee's lifestyle, each time it's called. If for instance the decoratee is registered as transient, each call to the factory will result in a new instance. It is therefore safe to register this decorator as a singleton:
+The *AsyncCommandHandlerDecorator<T>* however, has only singleton dependencies (the *Func<T>* is a singleton) and the *Func<ICommandHandler<T>>* factory always calls back into the container to register a decorated instance conforming the decoratee's lifestyle, each time it's called. If, for instance, the decoratee is registered as transient, each call to the factory will result in a new instance. It is, therefore, safe to register this decorator as a singleton:
 
 .. code-block:: c#
 
@@ -254,7 +254,7 @@ This configuration has an interesting mix of decorator registrations.
 
 .. container:: Note
 
-    **Warning**: Please note that the previous example is just meant for educational purposes. In practice, you don't want your commands to be processed this way, since it could lead to message loss. Instead you want to use a durable queue.
+    **Warning**: Please note that the previous example is just meant for educational purposes. In practice, you don't want your commands to be processed this way, because it could lead to message loss. Instead you want to use a durable queue.
 
 Another useful application for *Func<T>* decoratee factories is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new thread-specific scope, as follows:
 
@@ -293,9 +293,9 @@ This proxy class starts a new :ref:`thread scoped lifestyle <ThreadScoped>` and 
 
 .. container:: Note
 
-    **Note**: Since the *ThreadScopedCommandHandlerProxy<T>* only depends on singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it too can safely be registered as singleton.
+    **Note**: Because the *ThreadScopedCommandHandlerProxy<T>* only depends on singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it too can safely be registered as singleton.
         
-Since a typical application will not use the thread scoped lifestyle, but would prefer a scope specific to the application type, a special :ref:`hybrid lifestyle <Hybrid>` needs to be defined that allows object graphs to be resolved in this mixed-request scenario:
+Because a typical application will not use the thread-scoped lifestyle, but would prefer a scope specific to the application type, a special :ref:`hybrid lifestyle <Hybrid>` needs to be defined that allows object graphs to be resolved in this mixed-request scenario:
 
 .. code-block:: c#
 
@@ -305,7 +305,7 @@ Since a typical application will not use the thread scoped lifestyle, but would 
 
     container.Register<IUnitOfWork, DbUnitOfWork>(Lifestyle.Scoped);
 
-Obviously, if you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use both the *ThreadScopedCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
+If you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use both the *ThreadScopedCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
 
 .. code-block:: c#
 
@@ -353,7 +353,7 @@ When registering a decorator, Simple Injector will automatically decorate any co
 
 The previous registration registers a collection of *IEventHandler<CustomerMovedEvent>* services. Those services are decorated with a *TransactionEventHandlerDecorator<TEvent>* when the supplied predicate holds.
 
-For collections of elements that are created by the container (container controlled), the predicate is checked for each element in the collection. For collections of uncontrolled elements (a list of items that is not created by the container), the predicate is checked once for the whole collection. This means that controlled collections can be partially decorated. Taking the previous example for instance, you could let the *CustomerMovedEventHandler* be decorated, while leaving the *NotifyStaffWhenCustomerMovedEventHandler* undecorated (determined by the supplied predicate).
+For collections of elements that are created by the container (container controlled), the predicate is checked for each element in the collection. For collections of uncontrolled elements (a list of items that is not created by the container), the predicate is checked once for the whole collection. This means that only controlled collections can be partially decorated. Taking the previous example for instance, you could let the *CustomerMovedEventHandler* be decorated, while leaving the *NotifyStaffWhenCustomerMovedEventHandler* undecorated (determined by the supplied predicate).
 
 When a collection is uncontrolled, it means that the lifetime of its elements are unknown to the container. The following registration is an example of an uncontrolled collection:
 
@@ -371,7 +371,7 @@ Although this registration contains a list of singletons, the container has no w
 
 .. container:: Note
 
-    **Warning**: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can't help you in doing :doc:`diagnostics <diagnostics>`. Since the lifetime of those items is unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the **Collection.Register** overloads that take a collection of *System.Type* instances.
+    **Warning**: In general you should prevent registering uncontrolled collections. The container knows nothing about them, and can't help you in doing :doc:`diagnostics <diagnostics>`. With the lifetime of those items unknown, the container will be unable to wrap a decorator with a lifestyle other than transient. Best practice is to register container-controlled collections which is done by using one of the **Collection.Register** overloads that take a collection of *System.Type* instances.
 
 .. _Using-contextual-information-inside-decorators:
 
@@ -387,7 +387,7 @@ As we shown before, you can apply a decorator conditionally based on a predicate
         typeof(AsyncCommandHandlerDecorator<>),
         c => c.ImplementationType.Name.StartsWith("Async"));
 
-Sometimes however you might want to apply a decorator unconditionally, but let the decorator act at runtime based on this contextual information. You can do this by injecting the **DecoratorContext** into the decorator's constructor as can be seem in the following example:
+Sometimes, however, you might want to apply a decorator unconditionally, but let the decorator act at runtime based on this contextual information. You can do this by injecting a **DecoratorContext** into the decorator's constructor as can be seem in the following example:
 
 .. code-block:: c#
 
@@ -396,8 +396,10 @@ Sometimes however you might want to apply a decorator unconditionally, but let t
         private readonly ICommandHandler<T> decoratee;
         private readonly TransactionType transactionType;
 
-        public TransactionCommandHandlerDecorator(DecoratorContext decoratorContext,
-            ITransactionBuilder builder, ICommandHandler<T> decoratee) {
+        public TransactionCommandHandlerDecorator(
+            DecoratorContext decoratorContext,
+            ITransactionBuilder builder, 
+            ICommandHandler<T> decoratee) {
             this.builder = builder;
             this.decoratee = decoratee;
             this.transactionType = decoratorContext.ImplementationType
@@ -424,9 +426,9 @@ The previous code snippet shows a decorator that applies a transaction behavior 
         }
     }
 
-If the attribute was applied to the command class instead of the command handler, this decorator would been able to gather this information without the use of the **DecoratorContext**. This would however leak implementation details into the command, since which type of transaction a handler should run is clearly an implementation detail and is of no concern to the consumer of that command. Placing that attribute on the handler instead of the command is therefore a much more reasonable thing to do.
+If the attribute was applied to the command class instead of the command handler, this decorator would been able to gather this information without the use of the **DecoratorContext**. This would, however, leak implementation details into the command—which type of transaction a handler should run is an implementation detail and is of no concern to the consumers of that command. Placing that attribute on the handler instead of the command is therefore a much more reasonable thing to do.
 
-The decorator would also be able to get the attribute by using the injected decoratee, but this would only work when the decorator would directly wrap the handler. This would make the system quite fragile, since it would break once you start placing other decorator in between this decorator and the handler, which is a very likely thing to happen.
+The decorator would also be able to get the attribute by using the injected decoratee, but this would only work if the decorator would directly wrap the handler. This would make the system quite fragile, as it would break once you start placing other decorator in between this decorator and the handler, which is a likely thing to happen.
 
 .. _Applying-decorators-conditionally-based-on-consumer:
 
@@ -446,7 +448,7 @@ Although the **RegisterDecorator** methods don't have any built-in support for t
 
     container.RegisterConditional<IMailSender, SmtpMailSender>(c => !c.Handled);
 
-Here we use **RegisterConditional** to register two decorators. Both decorator will wrap the *SmtpMailSender* that is registered last. The *AsyncMailSenderDecorator* is wrapped around the *SmtpMailSender* in case it is injected into the *UserController*, while the *BufferedMailSenderDecorator* is wrapped when injected into the *EmailBatchProcessor*. Note that the *SmtpMailSender* is registered as conditional as well, and is registered as fallback registration using **!c.Handled**, which basically means that in case no other registration applies, that registration is used.
+Here you use **RegisterConditional** to register two decorators. Both decorator will wrap the *SmtpMailSender* that is registered last. The *AsyncMailSenderDecorator* is wrapped around the *SmtpMailSender* in case it is injected into the *UserController*, while the *BufferedMailSenderDecorator* is wrapped when injected into the *EmailBatchProcessor*. Note that the *SmtpMailSender* is registered as conditional as well, and is registered as fallback registration using `!c.Handled`. This basically means that in case no other registration applies, that registration is used.
     
     
 .. _Decorator-registration-factories:
@@ -468,17 +470,15 @@ Take the following registration for instance:
         Lifestyle.Transient,
         predicateContext => true);
 
-This example registers the *LoggingEventHandlerDecorator<TEvent, TLogTarget>* decorator for the *IEventHandler<TEvent>* abstraction. The supplied factory delegate builds up a partially-closed generic type by filling in the *TLogTarget* argument, where the *TEvent* is left 'open'. This is done by requesting the first generic type argument (the *TEvent*) from the open-generic *LoggingEventHandler<,>* type itself and using the **ImplementationType** as second argument. This means that when this decorator is wrapped around a type called *CustomerMovedEventHandler*, the factory method will create the type *LoggingEventHandler<TEvent, CustomerMovedEventHandler>*. In other words, the second argument is a concrete type (and thus closed), while the first argument is still a blank.
-
-When a closed version of *IEventHandler<TEvent>* is requested later on, Simple Injector will know how to fill in the blank with the correct type for this *TEvent* argument.
+In this example you register the *LoggingEventHandlerDecorator<TEvent, TLogTarget>* decorator for the *IEventHandler<TEvent>* abstraction. The supplied factory delegate builds up a partially closed generic type by filling in the *TLogTarget* argument, where the *TEvent* is left 'open'. This is done by requesting the first generic type argument (the *TEvent*) from the open-generic *LoggingEventHandler<,>* type itself and using the **ImplementationType** as second argument. This means that when this decorator is wrapped around a type called *CustomerMovedEventHandler*, the factory method will create the type *LoggingEventHandler<TEvent, CustomerMovedEventHandler>*. In other words, the second argument is a concrete type (and thus closed), while the first argument is still a blank. When a closed version of *IEventHandler<TEvent>* is requested later on, Simple Injector will know how to fill in the blank with the correct type for this *TEvent* argument.
 
 .. container:: Note
 
-    **Tip**: Simple Injector doesn't care in which order you define your generic type arguments, nor how you name them; it will be able to figure out the correct type to build any way.
+    **Tip**: Simple Injector doesn't care in which order you define your generic type arguments, nor how you name them—it will be able to figure out the correct type to build any way.
 
 .. container:: Note
 
-    **Note**: The type factory delegate is typically called once per closed-type and the result is burned in the compiled object graph. You can't use this delegate to make runtime decisions.
+    **Note**: The type factory delegate is typically called once per closed type and the result is burned in the compiled object graph. You can't use this delegate to make runtime decisions.
 
 .. _Interception-using-Dynamic-Proxies:
 .. _Interception:
@@ -486,13 +486,13 @@ When a closed version of *IEventHandler<TEvent>* is requested later on, Simple I
 Interception using Dynamic Proxies
 ==================================
 
-Interception is the ability to intercept a call from a consumer to a service, and add or change behavior. The `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_ describes a form of interception, but when it comes to applying cross-cutting concerns, you might end up writing decorators for many service interfaces, but with the exact same code. If this is happening, it's time to take a close look at your design. If, for what ever reason, it's impossible for you to make the required improvements to your design, your second best bet is to explore the possibilities of _dynamic_ interception through dynamic proxies.
+Interception is the ability to intercept a call from a consumer to a service, and add or change behavior. The `decorator pattern <https://en.wikipedia.org/wiki/Decorator_pattern>`_ describes a form of interception, but when it comes to applying cross-cutting concerns, you might end up writing decorators for many service interfaces, but with the exact same code. If this is happening, it's time to take a close look at your design. If, for what ever reason, it's impossible for you to make the required improvements to your design, your second best bet is to explore the possibilities of *Dynamic  Interception* through dynamic proxies.
 
 .. container:: Note
 
-    **Warning**: Simple Injector has :ref:`no out-of-the-box support for interception <No-interception>` because the use of interception is an indication of a sub optimal design and we are keen on pushing developers into best practices. Whenever possible, choose to improve your design to make decoration possible.    
+    **Warning**: Simple Injector has :ref:`no out-of-the-box support for interception <No-interception>` because the use of interception is an indication of a sub-optimal design and we are keen on pushing developers into best practices. Whenever possible, choose to improve your design to make decoration possible.    
 
-Using the :doc:`Interception extensions <InterceptionExtensions>` code snippets, you can add the ability to do interception with Simple Injector. Using the given code, you can for instance define a *MonitoringInterceptor* that allows logging the execution time of the called service method:
+Using the :doc:`Interception extensions <InterceptionExtensions>` code snippets, you can add the ability to do dynamic interception with Simple Injector. Using the given code, you can for instance define a *MonitoringInterceptor* that allows logging the execution time of the called service method:
 
 .. code-block:: c#
 
@@ -523,7 +523,7 @@ This interceptor can be registered to be wrapped around a concrete implementatio
 
     container.InterceptWith<MonitoringInterceptor>(type => type == typeof(IUserRepository));
 
-This registration ensures that every time an *IUserRepository* interface is requested, an interception proxy is returned that wraps that instance and uses the *MonitoringInterceptor* to extend the behavior.
+This registration ensures that every time an *IUserRepository* interface is requested, a proxy is returned that wraps that instance and uses the *MonitoringInterceptor* to extend the behavior.
 
 The current example doesn't add much compared to simply using a decorator. When having many interface service types that need to be decorated with the same behavior however, it gets different:
 
@@ -541,4 +541,4 @@ The current example doesn't add much compared to simply using a decorator. When 
 
 .. container:: Note
 
-    **Note**: Don't use interception for intercepting types that all implement the same generic interface, such as *ICommandHandler<T>* or *IValidator<T>*. Try using decorator classes instead, as shown in the :ref:`Decoration <decoration>` section on this page.
+    **Note**: Don't use dynamic interception for intercepting types that all implement the same generic interface, such as *ICommandHandler<T>* or *IValidator<T>*. Try using decorator classes instead, as shown in the :ref:`Decoration <decoration>` section on this page.

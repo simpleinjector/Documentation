@@ -29,7 +29,7 @@ Creating and configuring a *Container* is done by newing up an instance and call
     // Registrations here
     container.Register<ILogger, FileLogger>();
 
-Ideally, the only place in an application that should directly reference and use Simple Injector is the startup path. For an ASP.NET Web Forms or MVC application this will usually be the **{"Application_OnStart"}** event in the `Global.asax <https://msdn.microsoft.com/en-us/library/1xaas8a2%28VS.71%29.aspx>`_ page of the web application project. For a Windows Forms or console application this will be the *Main* method in the application assembly.
+Ideally, the only place in an application that should directly reference and use Simple Injector is the startup path. For an ASP.NET Core application this will usually be the **Startup** class of the web application project. For a Windows Forms or console application this will be the *Main* method in the application assembly.
 
 .. container:: Note
 
@@ -358,7 +358,7 @@ The **Collection.Register** overloads that take a collection of *Type* instances
 
 When the registered collection of *ILogger* instances are resolved, the *Container* will resolve each of them applying the specific rules of their configuration. When no registration exists, the type is created with the default **Transient** lifestyle (*transient* means that a new instance is created every time the returned collection is iterated). In the example, the *MailLogger* type is registered as **Singleton**, and so each resolved *ILogger* collection will always have the same instance of *MailLogger* in their collection.
 
-Since the creation is forwarded, abstract types can also be registered using **Collection.Register**. In the above example the *ILogger* type itself is registered using **Collection.Register**. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of *ILogger* instances as well. A more usual scenario however is the use of a composite as shown below.
+Because the creation is forwarded, abstract types can also be registered using **Collection.Register**. In the above example the *ILogger* type itself is registered using **Collection.Register**. This seems like a recursive definition, but it will work nonetheless. In this particular case you could imagine this to be a registration with a default ILogger registration which is also included in the collection of *ILogger* instances as well. A more usual scenario however is the use of a composite as shown below.
 
 Alternatively, if the components of the collections are supplied explicity, as the previous example shows, opposed to supplying an assembly instance, the **Collection.Append** method can be used to achieve the same:
 
@@ -369,8 +369,8 @@ Alternatively, if the components of the collections are supplied explicity, as t
     container.Register.Append<ILogger, MailLogger>(Lifestyle.Singleton);
     container.Register.Append<ILogger, SqlLogger>();
     container.Register.AppendInstance<ILogger>(new FileLogger>());
-	
-This set of registrations is _identical_ to the previous construct using **Collection.Register**.
+    
+This set of registrations is identical to the previous construct using **Collection.Register**.
 
 While resolving collections is useful and also works with :ref:`automatic constructor injection <Automatic-constructor-injection>`, the registration of *Composites* is preferred over the use of collections as constructor arguments in application code. Register a composite whenever possible, as shown in the example below:
 
@@ -400,14 +400,14 @@ While resolving collections is useful and also works with :ref:`automatic constr
     var service = container.GetInstance<IService>();
     service.DoStuff();
 
-When using this approach none of your services (except *CompositeLogger*) need a dependency on *IEnumerable<ILogger>* - they can all simply have a dependency on the *ILogger* interface itself.
+When using this approach none of your services (except *CompositeLogger*) need a dependency on *IEnumerable<ILogger>*—they can all simply have a dependency on the *ILogger* interface itself.
 
 .. _Collection-types:
 
 Collection types
 ----------------
 
-Besides *IEnumerable<ILogger>*, Simple Injector natively supports some other collection types as well. The following types are supported:
+Besides *IEnumerable<ILogger>*, Simple Injector natively supports other collection types as well. The following types are supported:
 
  - *IEnumerable<T>*
  - *ICollection<T>*
@@ -422,7 +422,7 @@ Besides *IEnumerable<ILogger>*, Simple Injector natively supports some other col
 
     **Note:** The *IReadOnlyCollection<T>* and *IReadOnlyList<T>* interfaces are new in .NET 4.5. Only the .NET 4.5 and .NET Standard (including .NET Core and Xamarin) builds of Simple Injector will be able to automatically inject these abstractions into your components. These interfaces are *not* supported by the .NET 4.0 version of Simple Injector.
 
-Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>*, *ICollection<T>*, *Collection<T>*, *IList<T>*, *IReadOnlyCollection<T>* and *IReadOnlyList<T>* instance. In reality you should not see the injected *IEnumerable<T>* as a collection of instances; you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* or *ICollection<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component.
+Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>*, *ICollection<T>*, *Collection<T>*, *IList<T>*, *IReadOnlyCollection<T>* and *IReadOnlyList<T>* instance. In reality you should not see the injected *IEnumerable<T>* as a collection of instances—you should consider it a ***stream*** of instances. Simple Injector will always inject a reference to the same stream (the *IEnumerable<T>* or *ICollection<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component.
 
 .. container:: Note
 
@@ -444,7 +444,7 @@ The previous code snippet will register all *ILogger* implementations that can b
 
 .. container:: Note
 
-    **Warning**: This **Collection.Register** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees what so ever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart.
+    **Warning**: This **Collection.Register** overload will request all the types from the supplied *Assembly* instances. The CLR however does not give *any* guarantees whatsoever about the order in which these types are returned. Don't be surprised if the order of these types in the collection change after a recompile or an application restart.
 
 .. container:: Note
 
@@ -490,11 +490,13 @@ Simple Injector uses the public constructor of a registered type and analyzes ea
 
 Simple Injector has the following prerequisites to be able to provide auto-wiring:
 
-#. Each type to be created must be concrete (not abstract, an interface or an open generic type). Types may be internal, although this can be limited if you're running in a sandbox (e.g. Silverlight or Windows Phone).
+#. Each type to be created must be concrete (not abstract, an interface or an open-generic type). Types may be internal, although this can be limited if you're running in a sandbox (e.g. Silverlight or Windows Phone).
 #. The type *should* have one public constructor (this may be a default constructor).
 #. All the types of the arguments in that constructor must be resolvable by the *Container*; optional arguments are not supported.
 
-Simple Injector can create a concrete type even if it hasn't been registered explicitly in the container by using constructor injection.
+.. container:: Note
+
+    **Tip**: Even though Simple Injector can create a concrete type even if it hasn't been registered explicitly in the container, best practice is to register *all* types explicitly in the container.
 
 The following code shows an example of the use of automatic constructor injection. The example shows an *IUserRepository* interface with a concrete *SqlUserRepository* implementation and a concrete *UserService* class. The *UserService* class has one public constructor with an *IUserRepository* argument. Because the dependencies of the *UserService* are registered, Simple Injector is able to create a new *UserService* instance.
 
@@ -519,14 +521,6 @@ The following code shows an example of the use of automatic constructor injectio
     // Usage
     var service = container.GetInstance<IUserService>();
 
-.. container:: Note
-
-    **Note**: Because *UserService* is a concrete type, calling *container.GetInstance<UserService>()* without registering it explicitly will work. This feature can simplify the *Container*'s configuration for some scenarios. Always keep in mind that best practice is to program to an interface not a concrete type. Prevent using and depending on concrete types as much possible.
-
-.. container:: Note
-
-    **Warning**: Even though registration of concrete types is not required, it is adviced to register all root types explicitly. For instance, register all ASP.NET MVC Controller instances explicitly in the container (Controller instances are requested directly and are therefore called 'root objects'). This way the container can check the complete dependency graph starting from the root object when you call **Verify()**.
-
 .. _More-Information:
 
 More information
@@ -538,3 +532,4 @@ For more information about Simple Injector please visit the following links:
 * For more information about dependency injection in general, please visit `this page on Stackoverflow <https://stackoverflow.com/tags/dependency-injection/info>`_.
 * If you have any questions about how to use Simple Injector or about dependency injection in general, the experts at `Stackoverflow.com <https://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23>`_ are waiting for you.
 * For all other Simple Injector related question and discussions, such as bug reports and feature requests, the `Simple Injector discussion forum <https://simpleinjector.org/forum>`_ will be the place to start.
+* The book `Dependency Injection Principles, Practices, and Patterns <https://manning.com/seemann2/>`_ presents core DI patterns in plain C# so you'll fully understand how DI works.
