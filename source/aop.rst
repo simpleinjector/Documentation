@@ -22,7 +22,7 @@ The best way to add new functionality (such as `cross-cutting concerns <https://
 
     **Tip**: `This article <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91>`_ describes an architecture based on the use of the *ICommandHandler<TCommand>* interface.
 
-Take the plausible scenario where we want to validate all commands that get executed by an *ICommandHandler<TCommand>* implementation. The Open/Closed principle states that we want to do this, without having to alter each and every implementation. We can do this using a (single) decorator:
+Take the plausible scenario where you want to validate all commands that get executed by an *ICommandHandler<TCommand>* implementation. The Open/Closed principle states that you want to do this without having to alter each and every implementation. You can achieve this using a (single) decorator:
 
 .. code-block:: c#
 
@@ -45,7 +45,7 @@ Take the plausible scenario where we want to validate all commands that get exec
         }
     }
 
-The *ValidationCommandHandlerDecorator<TCommand>* class is an implementation of the *ICommandHandler<TCommand>* interface, but it also wraps / decorates an *ICommandHandler<TCommand>* instance. Instead of injecting the real implementation directly into a consumer, we can (let Simple Injector) inject a validator decorator that wraps the real implementation.
+The *ValidationCommandHandlerDecorator<TCommand>* class is an implementation of the *ICommandHandler<TCommand>* interface, but it also wraps / decorates an *ICommandHandler<TCommand>* instance. Instead of injecting the real implementation directly into a consumer, you can (let Simple Injector) inject a validator decorator that wraps the real implementation.
 
 The *ValidationCommandHandlerDecorator<TCommand>* depends on an *IValidator* interface. An implementation that used Microsoft Data Annotations might look like this:
 
@@ -120,7 +120,7 @@ Applying Decorators conditionally using type constraints
 
 The previous example shows the conditional registration of the *AccessValidationCommandHandlerDecorator<T>* decorator. It is applied in case the closed *TCommand* type (of *ICommandHandler<TCommand>*) implements the *IAccessRestricted* interface.
 
-Simple Injector will automatically apply decorators conditionally based on defined `generic type constraints <https://msdn.microsoft.com/en-us/library/d5x73970.aspx>`_. We can therefore define the *AccessValidationCommandHandlerDecorator<T>* with a generic type constraint, as follows:
+Simple Injector will automatically apply decorators conditionally based on defined `generic type constraints <https://msdn.microsoft.com/en-us/library/d5x73970.aspx>`_. You can, therefore, define the *AccessValidationCommandHandlerDecorator<T>* with a generic type constraint:
 
 .. code-block:: c#
 
@@ -139,7 +139,7 @@ Simple Injector will automatically apply decorators conditionally based on defin
         }
     }
     
-Because Simple Injector natively understands generic type constraints, we can reduce the previous registration to the following:
+Because Simple Injector natively understands generic type constraints, you can reduce the previous registration to the following:
     
 .. code-block:: c#
 
@@ -163,7 +163,7 @@ Obviously there are cases where these conditions can't or shouldn't be defined u
         typeof(AccessValidationCommandHandlerDecorator<>),
         c => c.ImplementationType.GetCustomAttributes(typeof(AccessAttribute)).Any());
 
-This registration applies the decorator conditionally based on an attribute on the (initially) decorated handler type. There is obviously no way to express this using generic type constraints, so we will have to fallback to the predicate syntax.
+This registration applies the decorator conditionally based on an attribute on the (initially) decorated handler type. There is obviously no way to express this using generic type constraints, so you will have to fallback to the predicate syntax.
         
 .. _Decorators-with-Func-factories:
 
@@ -174,7 +174,7 @@ There are certain scenarios where it is necessary to postpone the building of pa
 
 You can easily delay the building of part of the graph by depending on a factory; the factory allows building that part of the object graph to be postponed until the moment the type is actually required. However, when working with decorators, injecting a factory to postpone the creation of the decorated instance will not work. This is best demonstrated with an example.
 
-Take for instance an *AsyncCommandHandlerDecorator<T>* that executes a command handler on a different thread. We could let the *AsyncCommandHandlerDecorator<T>* depend on a *CommandHandlerFactory<T>*, and let this factory call back into the container to retrieve a new *ICommandHandler<T>* but this would fail, since requesting an *ICommandHandler<T>* would again wrap the new instance with a *AsyncCommandHandlerDecorator<T>* and we'd end up recursively creating the same instance type again and again resulting in an endless loop.
+Take for instance an *AsyncCommandHandlerDecorator<T>* that executes a command handler on a different thread. You could let the *AsyncCommandHandlerDecorator<T>* depend on a *CommandHandlerFactory<T>*, and let this factory call back into the container to retrieve a new *ICommandHandler<T>* but this would fail, because requesting an *ICommandHandler<T>* would again wrap the new instance with a *AsyncCommandHandlerDecorator<T>* and you'd end up recursively creating the same instance type again and again resulting in an endless loop.
 
 This particular scenario is really hard to solve without library support and as such Simple Injector allows injecting a *Func<T>* delegate into registered decorators. This delegate functions as a factory for the creation of the decorated instance and avoids the recursive decoration explained above.
 
