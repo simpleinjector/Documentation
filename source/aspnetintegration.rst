@@ -46,7 +46,7 @@ The following code snippet shows how to use the integration package to apply Sim
         private void IntegrateSimpleInjector(IServiceCollection services) {
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
         
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
         
             services.AddSingleton<IControllerActivator>(
                 new SimpleInjectorControllerActivator(container));
@@ -258,8 +258,32 @@ Compared to constructor injection, the use of method injection in action methods
 
 You might be tempted to apply method injection to prevent the controller’s constructor from becoming too large. But big constructors are actually an indication that the controller itself is too big. It is a common code smell named `Constructor over-injection <https://blog.ploeh.dk/2018/08/27/on-constructor-over-injection/>`_. This is typically an indication that the class violates the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ meaning that the class is too complex and will be hard to maintain.
 
-A typical solution to this problem is to split up the class into multiple smaller classes. At first this might seem problematic for controller classes, because they can act as gateway to the business layer and the API signature follows the naming of controllers and their actions. Do note, however, that this one-to-one mapping between controller names and the route of your application is not a requirement. ASP.NET Core has a very flexible `routing system <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-2.1>`_ that allows you to completely change how routes map to controller names and even action names. This allows you to split controllers into very small chunks with a very limited number of constructor dependencies and without the need to fall back to method injection using `[FromServices]`.
+A typical solution to this problem is to split up the class into multiple smaller classes. At first this might seem problematic for controller classes, because they can act as gateway to the business layer and the API signature follows the naming of controllers and their actions. Do note, however, that this one-to-one mapping between controller names and the route of your application is not a requirement. ASP.NET Core has a very flexible `routing system <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing>`_ that allows you to completely change how routes map to controller names and even action names. This allows you to split controllers into very small chunks with a very limited number of constructor dependencies and without the need to fall back to method injection using `[FromServices]`.
 
 Simple Injector :ref:`promotes <Push-developers-into-best-practices>` best practices, and because of downsides described above, we consider the use of the `[FromServices]` attribute *not* to be a best practice. This is why we choose not to provide out-of-the-box support for injecting Simple Injector registered dependencies into controller actions. 
 
 In case you still feel method injection is the best option for you, you can plug in a custom `IModelBinderProvider` implementation returning a custom `IModelBinder` that resolves instances from Simple Injector.
+
+Using Razor Pages
+=================
+
+ASP.NET Core 2.0 introduced an MVVM-like model, called `Razor Pages <https://docs.microsoft.com/en-us/aspnet/core/razor-pages/>`_. A Razor Page combines both data and behavior in a single class.
+
+Simple Injector v4.5 adds integration for Razor Pages inside the *SimpleInjector.Integration.AspNetCore.Mvc* integration package. This integration comes in the form of a custom `IPageModelActivatorProvider` implementation and extension method to auto-register all application's Razor Pages.
+
+The following code snippet shows how to replace the built-in `IPageModelActivatorProvider` with one that allows Simple Injector to resolve Razor Page's Page Models. This code should be placed in the **ConfigureServices** method of your `Startup` class:
+
+.. code-block:: c#
+
+	services.AddSingleton<IPageModelActivatorProvider>(
+		new SimpleInjectorPageModelActivatorProvider(container));
+
+To be able for the **SimpleInjectorPageModelActivatorProvider** to resolve Page Model instances, they need to be registered explicitly in the container. This must be done in a later stage, i.e. inside the **Configure** method of the `Startup` class:
+
+.. code-block:: c#
+
+	container.RegisterPageModels(app);
+
+This method works in similar fashion as its **RegisterMvcControllers** and **RegisterMvcViewComponents** counter parts do, as shown in the page's first code listing. 
+
+This is all that is required to integrate Simple Injector with ASP.NET Core Razor Pages.
