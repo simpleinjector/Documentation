@@ -12,7 +12,7 @@ Our :doc:`design principles <principles>` have influenced the direction of the d
 * :ref:`Never force users to release what they resolve <Never-force-release>`
 * :ref:`Don't allow resolving scoped instances outside an active scope <Dont-allow-resolving-outside-an-active-scope>`
 * :ref:`No out-of-the-box support for property injection <No-property-injection>`
-* :ref:`No out-of-the-box support for interception <No-interception>`
+* :ref:`No out-of-the-box support for dynamic interception <No-interception>`
 * :ref:`Limited batch-registration API <Limited-batch-registration>`
 * :ref:`No per-thread lifestyle <No-per-thread-lifestyle>`
 * :ref:`Allow only a single constructor <One-constructor>`
@@ -162,20 +162,22 @@ This doesn't mean that you can't do property injection with Simple Injector, but
 
 .. _No-interception:
 
-No out-of-the-box support for interception
-==========================================
+No out-of-the-box support for dynamic interception
+==================================================
 
-Simple Injector does not support interception out of the box, because we want to:
+Dynamic interception is a tool-based approach where the decorator classes are generated a library at runtime. Cross-cutting concerns are written in the form of *interceptor* classes. Those interceptors can than be applied together with the generated decorators to wide range of classes.
+
+Simple Injector does not support dynamic interception out of the box, because we want to:
 
 * :ref:`Push developers into best practices <Push-developers-into-best-practices>`
 * :ref:`Fast by default <Fast-by-default>`
 * :ref:`Don't force vendor lock-in <Vendor-lock-in>`
 
-Simple Injector tries to push developers into good design, and the use of interception is often an indication of a suboptimal design. We prefer to promote the use of decorators. If you can't apply a decorator around a group of related types, you are probably missing a common (generic) abstraction.
+Simple Injector tries to push developers into good design, and the use of dynamic interception is often an indication of a suboptimal design. We prefer to promote the use of interception through the use of decorators. If you can't apply a decorator around a group of related types, you are probably missing a common (generic) abstraction.
 
-Simple Injector is designed to be fast by default. Applying decorators in Simple Injector is just as fast as normal injection, while applying interceptors has a much higher cost, since it involves the use of reflection.
+Simple Injector is designed to be fast by default. Applying decorators in Simple Injector is just as fast as normal injection, while applying interceptors has a much higher cost, because it involves the use of reflection.
 
-To be able to intercept, you will need to take a dependency on your interception library, since this library defines an *IInterceptor* interface or something similar (such as Castle's *IInterceptor* or Unity's *ICallHandler*). Decorators on the other hand can be created without asking you to take a dependency on an external library. Since vendor lock-in should be avoided, Simple Injector doesn't define any interfaces or attributes to be used at the application level.
+To be able to intercept, you will need to take a dependency on your interception library, because this library defines an interceptor interface (such as Castle's *IInterceptor* or Unity's *ICallHandler*). Decorators on the other hand can be created without requiring a dependency on an external library. Because vendor lock-in should be avoided, Simple Injector doesn't define any interfaces or attributes to be used at the application level.
 
 .. _Limited-batch-registration:
 
