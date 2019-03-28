@@ -20,7 +20,7 @@ The best way to add new functionality (such as `cross-cutting concerns <https://
 
 .. container:: Note
 
-    **Tip**: `This article <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=91>`_ describes an architecture based on the use of the *ICommandHandler<TCommand>* interface.
+    **Tip**: `This article <https://blogs.cuttingedge.it/steven/posts/2011/meanwhile-on-the-command-side-of-my-architecture/>`_ describes an architecture based on the use of the *ICommandHandler<TCommand>* interface.
 
 Take the plausible scenario where you want to validate all commands that get executed by an *ICommandHandler<TCommand>* implementation. The Open/Closed principle states that you want to do this without having to alter each and every implementation. You can achieve this using a (single) decorator:
 

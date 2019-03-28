@@ -18,7 +18,7 @@ Simple Injector allows much of its default behavior to be changed or extended. T
 Overriding Constructor Resolution Behavior
 ==========================================
 
-Out of the box, Simple Injector only allows the creation of classes that contain a single public constructor. This behavior is chosen deliberately because `having multiple constructors is an anti-pattern <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=97>`_.
+Out of the box, Simple Injector only allows the creation of classes that contain a single public constructor. This behavior is chosen deliberately because `having multiple constructors is an anti-pattern <https://blogs.cuttingedge.it/steven/posts/2013/di-anti-pattern-multiple-constructors/>`_.
 
 There are some exceptional circumstances though, where we don't control the amount of public constructors a type has. Code generators for instance, can have this annoying side effect. Earlier versions of the `T4MVC <https://github.com/T4MVC/T4MVC>`_ template for instance did this.
 
@@ -197,7 +197,7 @@ Overriding Parameter Injection Behavior
 
 Simple Injector does not allow injecting primitive types (such as integers and string) into constructors. The **IDependencyInjectionBehavior** interface is defined by the library to change this default behavior.
 
-The following article contains more information about changing the library's default behavior: `Primitive Dependencies with Simple Injector <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=94>`_.
+The following article contains more information about changing the library's default behavior: `Primitive Dependencies with Simple Injector <https://blogs.cuttingedge.it/steven/posts/2012/primitive-dependencies-with-simple-injector/>`_.
 
 .. _Resolving-Unregistered-Types:
 

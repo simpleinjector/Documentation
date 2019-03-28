@@ -160,7 +160,7 @@ The following example visualizes this:
 
 By moving all the logic and dependencies out of the attribute, the attribute becomes a small infrastructural piece of code; a humble object that simply forwards the call to the real service.
     
-If the number of required filter attributes grows, a different model might be in place. In that case you might want to make your attributes `passive <https://blog.ploeh.dk/2014/06/13/passive-attributes/>`_ as explained `here <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=98>`_.
+If the number of required filter attributes grows, a different model might be in place. In that case you might want to make your attributes `passive <https://blog.ploeh.dk/2014/06/13/passive-attributes/>`_ as explained `here <https://blogs.cuttingedge.it/steven/posts/2014/dependency-injection-in-attributes-dont-do-it/>`_.
 
 .. _Injecting-dependencies-into-Web-API-message-handlers:
 

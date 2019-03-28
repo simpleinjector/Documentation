@@ -234,6 +234,6 @@ Out of the box, Simple Injector only allows building up types that contain a sin
 * :ref:`Push developers into best practices <Push-developers-into-best-practices>`
 * :ref:`Never fail silently <Never-fail-silently>`
 
-Having multiple public constructors on the components that you resolve is an anti-pattern. This anti-pattern is described in more detail in `this article <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=97>`_
+Having multiple public constructors on the components that you resolve is an anti-pattern. This anti-pattern is described in more detail in `this article <https://blogs.cuttingedge.it/steven/posts/2013/di-anti-pattern-multiple-constructors/>`_
 
 This doesn't mean that it is impossible to do auto-wiring on types with multiple public constructors, but with Simple Injector this behavior will have to be :ref:`explicitly configured <Overriding-Constructor-Resolution-Behavior>`.
