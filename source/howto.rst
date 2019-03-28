@@ -146,7 +146,7 @@ After calling this *AllowResolvingFuncFactories* extension method, the container
 
 .. container:: Note
 
-    **Warning**: We personally think that allowing to register *Func<T>* delegates by default is a design smell. The use of *Func<T>* delegates makes your design harder to follow and your system harder to maintain and test. Your system should only have a few of those factories at most. If you have many constructors in your system that depend on a *Func<T>*, please take a good look at your dependency strategy. `The following article <https://cuttingedge.it/blogs/steven/pivot/entry.php?id=100>`_ goes into details about why Abstract Factories (such as *Func<T>*) are a design smell.
+    **Warning**: We personally think that allowing to register *Func<T>* delegates by default is a design smell. The use of *Func<T>* delegates makes your design harder to follow and your system harder to maintain and test. Your system should only have a few of those factories at most. If you have many constructors in your system that depend on a *Func<T>*, please take a good look at your dependency strategy. `The following article <https://blogs.cuttingedge.it/steven/posts/2016/abstract-factories-are-a-code-smell/>`_ goes into details about why Abstract Factories (such as *Func<T>*) are a design smell.
 
 .. _lazy:
 

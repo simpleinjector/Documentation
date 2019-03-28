@@ -7,7 +7,7 @@ Although its name may not imply it, Simple Injector is capable of handling many 
 This chapter discusses the following subjects:
 
 * :ref:`Generics <Generics>`
-* :ref:`Batch registration / Automatic registration <Batch-Registration>`
+* :ref:`Batch-Registration / Auto-Registration <Auto-Registration>`
 * :ref:`Registration of open generic types <Registration-Of-Open-Generic-Types>`
 * :ref:`Mixing collections of open-generic and non-generic components <Mixing-collections-of-open-generic-and-non-generic-components>`
 * :ref:`Unregistered type resolution <Unregistered-Type-Resolution>`
@@ -25,16 +25,17 @@ Generics
 
 :doc:`Aspect-Oriented Programming <aop>` is easy with Simple Injector's advanced support for generics. Generic decorators with generic type constraints can be registered with a single line of code and can be applied conditionally using predicates. Simple Injector can handle open generic types, closed generic types and partially-closed generic types. The sections below provides more detail on Simple Injector's support for generic typing:
 
-* :ref:`Batch registration of non-generic types based on an open-generic interface<Batch-Registration>`
+* :ref:`Batch registration of non-generic types based on an open-generic interface <Auto-Registration>`
 * :ref:`Registering open generic types and working with partially-closed types <Registration-Of-Open-Generic-Types>`
 * :ref:`Mixing collections of open-generic and non-generic components <Mixing-collections-of-open-generic-and-non-generic-components>`
 * :ref:`Resolving Covariant/Contravariant types <Covariance-Contravariance>`
 * :ref:`Registration of generic decorators <Decoration>`
 
 .. _Batch-Registration:
+.. _Auto-Registration:
 
-Batch / Automatic registration
-==============================
+Batch-Registration / Auto-Registration
+======================================
 
 Batch or automatic registration is a way of registering a set of (related) types in one go based on some convention. This feature removes the need to constantly update the container's configuration each and every time a new type is added. The following example show a series of manually registered repositories: 
 
