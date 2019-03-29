@@ -25,7 +25,7 @@ The Diagnostic Services detect this kind of misconfiguration and report it. The 
 
 .. container:: Note
 
-    **Note**: This kind of error is also known as `Captive Dependency <http://blog.ploeh.dk/2014/06/02/captive-dependency/>`_.
+    **Note**: This kind of error is also known as `Captive Dependency <https://blog.ploeh.dk/2014/06/02/captive-dependency/>`_.
     
 .. container:: Note
 
@@ -37,8 +37,8 @@ How to Fix Violations
 
 There are multiple ways to fix this violation:
 
-* Change the lifestyle of the component to a lifestyle that is as short or shorter than that of the dependency.
-* Change the lifestyle of the dependency to a lifestyle as long or longer than that of the component.
+* Change the lifestyle of the component to a lifestyle that is as short as or shorter than that of the dependency.
+* Change the lifestyle of the dependency to a lifestyle as long as or longer than that of the component.
 * Instead of injecting the dependency, inject a factory for the creation of that dependency and call that factory every time an instance is required.
 
 When to Ignore Warnings
@@ -108,6 +108,67 @@ A :ref:`Hybrid lifestyle <Hybrid>` is a mix between two or more other lifestyles
 
 As explained, components should only depend on equal length or longer lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of `someCondition`. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).
 
-From the Diagnostic Services' perspective, a component can only safely depend on a hybrid lifestyled service if the consuming component's lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid lifestyled component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the **longest** lifestyle is used in the comparison when the hybrid is part of the consuming component, and the **shortest** lifestyle is used when the hybrid is part of the dependency.
+From the Diagnostic Services' perspective, a component can only safely depend on a hybrid-lifestyled service if the consuming component's lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid-lifestyled component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the **longest** lifestyle is used in the comparison when the hybrid is part of the consuming component, and the **shortest** lifestyle is used when the hybrid is part of the dependency.
 
 This does imply that two components with the same hybrid lifestyle can't safely depend on each other. This is true since in theory the supplied predicate could change results in each call. In practice however, those components would usually be able safely relate, since it is normally unlikely that the predicate changes lifestyles within a single object graph. This is an exception the Diagnostic Services can make pretty safely. From the Diagnostic Services' perspective, components can safely be related when both share the exact same lifestyle instance and no warning will be displayed in this case. This does mean however, that you should be very careful using predicates that change the lifestyle during the object graph.
+
+Iterating injected collections during construction can lead to warnings
+=======================================================================
+
+Simple Injector v4.5 improved the ability to find Lifestyle Mismatches by trying to detect when injected collections are iterated during object composition. This can lead to warnings similar to the following:
+
+.. container:: Note
+
+    {dependency} is part of the {collection} that is injected into {consumer}. The problem in {consumer} is that instead of storing the injected {collection} in a private field and iterating over it at the point its instances are required, {dependency} is being resolved (from the collection) during object construction. Resolving services from an injected collection during object construction (e.g. by calling {parameter name}.ToList() in the constructor) is not advised.
+    
+This warning is stating that the `collection` (e.g. an `IEnumerable<ILogger>`), which was injected into a class called `consumer`, was iterated during object construction—most likely inside the constructor.
+
+The following code will reproduce the issue:
+
+.. code-block:: c#
+
+    public class Consumer
+    {
+        private readonly IEnumerable<ILogger> loggers;
+        public Consumer(IEnumerable<ILogger> loggers)
+        {
+            // Calling ToArray will cause the warning
+            this.loggers = loggers.ToArray();
+        }
+    }
+    
+    // Registrations
+    var container = new Container();
+
+    container.Collection.Append<ILogger, MyLogger>(Lifestyle.Transient);
+    container.Register<Consumer>(Lifestyle.Singleton);
+
+    container.Verify();
+
+This warning will appear in case the following conditions hold:
+
+* The consuming component is registered as **Singleton**. In this case, `Consumer` is registered as **Singleton**.
+* The injected collection contains any components with a lifetime smaller than **Singleton**. In this case, the injected `IEnumerable<ILogger>` contains a component called `MyLogger` with the **Transient** lifestyle.
+* The injected collection is iterated in a way that its instances are created and returned. In this case, the call to `.ToArray()` causes the `MyLogger` component to be marked as Lifestyle Mismatched.
+
+All collection abstractions (i.e. `IEnumerable<T>`, `IList<T>`, `IReadOnlyList<T>`, `ICollection<T>`, and `IReadOnlyCollection<T>`) that Simple Injector injects behave as *streams*. This means that during injection no instances are created. Instead, instances are created according to their lifestyle every time the stream is iterated. This means that storing a copy of the injected stream, as the `Consumer` in the previous example did, can cause Lifestyle Mismatches, which is why Simple Injector warns about this.
+
+Do note that it is impossible for Simple Injector to detect whether you store the original stream or its copy in its private instance field. This means that Simple Injector will report the warning, even when `Consumer` is written as follows:
+
+.. code-block:: c#
+
+    public class Consumer
+    {
+        private readonly IEnumerable<ILogger> loggers;
+        public Consumer(IEnumerable<ILogger> loggers)
+        {
+            if (!loggers.ToArray().Any()) throw new ArgumentException();
+            this.loggers = loggers;
+        }
+    }
+
+In this case, Simple Injector will still report the Lifestyle Mismatch between `Consumer` and `MyLogger` even though this is a false positive.
+
+.. container:: Note
+
+    Even though false positives might occur, best practice is to prevent iterating the injected stream inside the constructor, as prescribed `here <https://blog.ploeh.dk/2011/03/03/InjectionConstructorsshouldbesimple/>`_.
