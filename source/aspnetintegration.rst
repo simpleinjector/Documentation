@@ -2,7 +2,7 @@
 ASP.NET Core MVC Integration Guide
 ==================================
 
-Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_.
+Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_ for integration with ASP.NET Core.
 
 .. container:: Note
 
@@ -177,15 +177,15 @@ This will accomplish the following:
 * Anytime Simple Injector needs to resolve a dependency that is not registered, it will query the `IServiceCollection` to see whether this dependency exists in the ASP.NET Core configuration system.
 * In case the dependency exists in `IServiceCollection`, Simple Injector will ensure that the dependency is resolved from ASP.NET Core anytime it is requested, by requesting it from `IApplicationBuilder`.
 * In doing so, Simple Injector will preserve the dependency's lifestyle. This allows application components that depend on external services to be :doc:`diagnosed <diagnostics>` for :doc:`Lifestyle Mismatches <LifestyleMismatches>`.
-* In case no suitable dependency exists in the `IServiceCollection`, Simple Injector will fall back to its default behavior. This most likely means that an expressive exception is thrown, since the object graph can't be fully composed.
+* In case no suitable dependency exists in the `IServiceCollection`, Simple Injector will fall back to its default behavior. This most likely means that an expressive exception is thrown, because the object graph can't be fully composed.
 
 Simple Injector's auto cross-wiring has the following limitations:
 
-* Collections (i.e. `IEnumerable<T>`) will not be auto cross-wired because of unbridgeable differences between how Simple Injector and ASP.NET Core's configuration system handle collections. If a framework or third-party supplied collection should be injected into an application component that is constructed by Simple injector, such collection should be cross-wired manually. In that case, you must take explicit care to ensure no Lifestyle Mismatches occur—i.e. you should not make the cross-wired registration with the lifestyle equal to the shortest lifestyle of the elements of the collection.
+* Collections (e.g. `IEnumerable<T>`) will not be auto cross-wired because of unbridgeable differences between how Simple Injector and ASP.NET Core's configuration system handle collections. If a framework or third-party supplied collection should be injected into an application component that is constructed by Simple injector, such collection should be cross-wired manually. In that case, you must take explicit care to ensure no Lifestyle Mismatches occur—i.e. you should not make the cross-wired registration with the lifestyle equal to the shortest lifestyle of the elements of the collection.
 * Cross-wiring is a one-way process. By using **AutoCrossWireAspNetComponents**, ASP.NET's configuration system will not automatically resolve its missing dependencies from Simple Injector. When an application component, composed by Simple Injector, needs to be injected into a framework or third-party component, this has to be set up manually by adding a `ServiceDescriptor` to the `IServiceCollection` that requests the dependency from Simple Injector. This practice however should be quite rare.
 * Simple Injector will not be able to verify and diagnose object graphs built by the configuration system itself. Those components and their registrations are provided by Microsoft and third-party library makers—you should assume their correctness.
 
-The **AutoCrossWireAspNetComponents** method is new in v4.1 and supersedes the old **CrossWire<TService>** method, since the latter requires every missing dependency to be cross-wired explicitly. **CrossWire<TService>** is still available for backwards compatibility and to handle corner-case scenarios.
+The **AutoCrossWireAspNetComponents** method is new in v4.1 and supersedes the old **CrossWire<TService>** method, because the latter requires every missing dependency to be cross-wired explicitly. **CrossWire<TService>** is still available for backwards compatibility and to handle corner-case scenarios.
 
 Like **AutoCrossWireAspNetComponents**, **CrossWire<TService>** does the required plumbing such as making sure the type is registered with the same lifestyle as configured in ASP.NET Core, but with the difference of just cross-wiring that single supplied type. The following listing demonstrates its use:
 
@@ -215,15 +215,15 @@ The default Visual Studio template comes with built-in authentication through th
 Working with `IOptions<T>`
 ==========================
 
-ASP.NET Core contains a new configuration model based on an `IOptions<T>` abstraction. We advise against injecting `IOptions<T>` dependencies into your application components. Instead let components depend directly on configuration objects and register those objects as *Singleton*. This ensures that configuration values are read during application start up and it allows verifying them at that point in time, allowing the application to fail-fast.
+ASP.NET Core contains a new configuration model based on an `IOptions<T>` abstraction. We advise against injecting `IOptions<T>` dependencies into your application components. Instead let components depend directly on configuration objects and register those objects as *Singleton*. This ensures that configuration values are read during application start up and it allows verifying them at that point in time, allowing the application to fail fast.
 
-Letting application components depend on `IOptions<T>` has some unfortunate downsides. First of all, it causes application code to take an unnecessary dependency on a framework abstraction. This is a violation of the Dependency Inversion Principle, which prescribes the use of application-tailored abstractions. Injecting an `IOptions<T>` into an application component only makes this component more difficult to test, while providing no additional benefits. Application components should instead depend directly on the configuration values they require.
+Letting application components depend on `IOptions<T>` has some unfortunate downsides. First of all, it causes application code to take an unnecessary dependency on a framework abstraction. This is a violation of the Dependency Inversion Principle, which prescribes the use of application-tailored abstractions. Injecting an `IOptions<T>` into an application component only makes this component more difficult to test, while providing no additional benefits for that component. Application components should instead depend directly on the configuration values they require.
 
 `IOptions<T>` configuration values are read lazily. Although the configuration file might be read upon application start up, the required configuration object is only created when `IOptions<T>.Value` is called for the first time. When deserialization fails, because of application misconfiguration, such error will only be appear after the call to `IOptions<T>.Value`. This can cause misconfigurations to keep undetected for much longer than required. By reading—and verifying—configuration values at application start up, this problem can be prevented. Configuration values can be injected as singletons into the component that requires them.
 
 To make things worse, in case you forget to configure a particular section (by omitting a call to `services.Configure<T>`) or when you make a typo while retrieving the configuration section (e.g. by supplying the wrong name to `Configuration.GetSection(name)`), the configuration system will simply supply the application with a default and empty object instead of throwing an exception! This may make sense in some cases but it will easily lead to fragile applications.
 
-Since you want to verify the configuration at start-up, it makes no sense to delay reading it, and that makes injecting `IOptions<T>` into your components plain wrong. Depending on `IOptions<T>` might still be useful when bootstrapping the application, but not as a dependency anywhere else.
+Because you want to verify the configuration at start-up, it makes no sense to delay reading it, and that makes injecting `IOptions<T>` into your components plain wrong. Depending on `IOptions<T>` might still be useful when bootstrapping the application, but not as a dependency anywhere else.
 
 Once you have a correctly read and verified configuration object, registration of the component that requires the configuration object is as simple as this:
 
