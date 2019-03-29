@@ -193,7 +193,7 @@ Instead of polluting the API of your application with *Lazy<T>* dependencies, ho
     }
 
     // Registration
-	container.Register<RealService>();
+    container.Register<RealService>();
     container.Register<IMyService>(() => new LazyServiceProxy(
         new Lazy<IMyService>(container.GetInstance<RealService>)));
     
@@ -261,10 +261,10 @@ With this class, you can register *Func<IRequestHandler>* factory methods by a k
 .. code-block:: c#
 
     var container = new Container();
-	
-	container.Register<DefaultRequestHandler>();
-	container.Register<OrdersRequestHandler>();
-	container.Register<CustomersRequestHandler>();
+    
+    container.Register<DefaultRequestHandler>();
+    container.Register<OrdersRequestHandler>();
+    container.Register<CustomersRequestHandler>();
      
     container.RegisterInstance<IRequestHandlerFactory>(new RequestHandlerFactory {
         { "default", () => container.GetInstance<DefaultRequestHandler>() },
@@ -293,10 +293,10 @@ The registration will then look as follows:
 
     var container = new Container();
 
-	container.Register<DefaultRequestHandler>();
-	container.Register<OrdersRequestHandler>();
-	container.Register<CustomersRequestHandler>();	
-	
+    container.Register<DefaultRequestHandler>();
+    container.Register<OrdersRequestHandler>();
+    container.Register<CustomersRequestHandler>();    
+    
     container.RegisterInstance<IRequestHandlerFactory>(new RequestHandlerFactory(container) {
         { "default", typeof(DefaultRequestHandler) },
         { "orders", typeof(OrdersRequestHandler) },
