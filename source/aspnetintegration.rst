@@ -241,6 +241,9 @@ Once you have a correctly read and verified configuration object, registration o
     container.RegisterInstance<MyMailSettings>(mailSettings);
     container.Register<IMessageSender, MailMessageSender>();
 
+
+.. _fromservices:
+	
 Using [FromServices] in ASP.NET Core Controllers
 ================================================
 
@@ -263,6 +266,9 @@ A typical solution to this problem is to split up the class into multiple smalle
 Simple Injector :ref:`promotes <Push-developers-into-best-practices>` best practices, and because of downsides described above, we consider the use of the `[FromServices]` attribute *not* to be a best practice. This is why we choose not to provide out-of-the-box support for injecting Simple Injector registered dependencies into controller actions. 
 
 In case you still feel method injection is the best option for you, you can plug in a custom `IModelBinderProvider` implementation returning a custom `IModelBinder` that resolves instances from Simple Injector.
+
+
+.. _razor-pages:
 
 Using Razor Pages
 =================
