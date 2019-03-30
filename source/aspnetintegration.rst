@@ -243,7 +243,7 @@ Once you have a correctly read and verified configuration object, registration o
 
 
 .. _fromservices:
-	
+
 Using [FromServices] in ASP.NET Core Controllers
 ================================================
 
@@ -266,6 +266,108 @@ A typical solution to this problem is to split up the class into multiple smalle
 Simple Injector :ref:`promotes <Push-developers-into-best-practices>` best practices, and because of downsides described above, we consider the use of the `[FromServices]` attribute *not* to be a best practice. This is why we choose not to provide out-of-the-box support for injecting Simple Injector registered dependencies into controller actions. 
 
 In case you still feel method injection is the best option for you, you can plug in a custom `IModelBinderProvider` implementation returning a custom `IModelBinder` that resolves instances from Simple Injector.
+
+
+.. _hosted-services:
+
+Using Hosted Services
+=====================
+
+A hosted service is a background task running in an ASP.NET Core service. A hosted service implements the `IHostedService` interface and can run at certain intervals. When added to the ASP.NET Core pipeline, a hosted service instance will be referenced indefinitely by ASP.NET Core. This means that your hosted service implementation is effectively a **Singleton** and should be configured as such.
+
+When you want your hosted service implementation to be resolved from Simple Injector, the most straight forward way is to register it both in Simple Injector and cross-wire it in the `services` instance (the `IServiceCollection` implementation) as shown here:
+
+.. code-block:: c#
+
+    container.RegisterSingleton<MyHostedService>();
+    services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(
+        _ => container.GetInstance<MyHostedService>());
+
+.. container:: Note
+
+    **WARNING**: As hosted service instances are referenced indefinitely by ASP.NET Core, it is important to register it as **Singleton** in Simple Injector. This allows Simple Injector's diagnostics to check for lifestyle mismatches.
+
+In case your hosted service needs to run repeatedly at certain intervals, it becomes important to start the service's operation in a **Scope**. This allows instances with **Transient** and **Scoped** lifestyles to be resolved. 
+    
+In case you require multiple hosted services that need to run at specific intervals, at can be beneficial to create a wrapper implementation that takes care of the most important plumbing. The `TimedHostedService<TService>` below defines such reusable wrapper:
+
+.. code-block:: c#
+
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using SimpleInjector;
+    using SimpleInjector.Lifestyles;
+
+    public class TimedHostedService<TService> : IHostedService, IDisposable
+        where TService : class {
+        private readonly Settings settings;
+        private readonly ILogger logger;
+        private readonly Timer timer;
+
+        public TimedHostedService(Settings settings, ILoggerFactory loggerFactory) {
+            this.settings = settings;
+            this.logger = loggerFactory.CreateLogger<TimedHostedService<TService>>();
+            this.timer = new Timer(callback: _ => this.DoWork(settings.Container));
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken) {
+            // Verify if TService can be resolved
+            this.settings.Container.GetRegistration(typeof(TService), true);
+            // Start the timer
+            this.timer.Change(dueTime: TimeSpan.Zero, period: this.settings.Interval);
+            return Task.CompletedTask;
+        }
+
+        private void DoWork(Container container) {
+            try {
+                using (AsyncScopedLifestyle.BeginScope(container)) {
+                    var service = container.GetInstance<TService>();
+                    this.settings.Action(service);
+                }
+            }
+            catch (Exception ex) {
+                this.logger.LogError(ex, ex.Message);
+            }
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken) {
+            this.timer.Change(Timeout.Infinite, 0);
+            return Task.CompletedTask;
+        }
+
+        public void Dispose() => this.timer.Dispose();
+        
+        public class Settings {
+            public readonly Container Container;
+            public readonly TimeSpan Interval;
+            public readonly Action<TService> Action;
+            
+            public Settings(
+                Container container, TimeSpan interval, Action<TService> action) {
+                this.Container = container;
+                this.Interval = interval;
+                this.Action = action;
+            }
+        }
+    }
+
+This reusable `TimedHostedService<TService>` allows a given service to be resolved and executed within a new **AsyncScopedLifestyle**, while ensuring that any errors are logged.
+
+The following code snippet shows how this `TimedHostedService<TService>` can be configured for an `IProcessingService`
+
+.. code-block:: c#
+
+    // AddHostedService method is part of the Microsoft.Extensions.Hosting package
+    services.AddHostedService<TimedHostedService<IProcessingService>>();
+    services.AddSingleton(new TimedHostedService<IProcessingService>.Settings(
+        container,
+        interval: TimeSpan.FromSeconds(10),
+        action: service => service.DoSomeWork()));
+        
+The previous snippet uses the *AddHostedService<T>* extension method of the Microsoft.Extensions.Hosting package to register the `TimedHostedService<IProcessingService>` to the ASP.NET Core configuration system. This class requires a `TimedHostedService<TService>.Settings` object in its constructor, which is configured using the second line. The settings specifies the interval and the action to execute—in this case the action on `IProcessingService`.
 
 
 .. _razor-pages:
