@@ -359,6 +359,18 @@ Simple Injector :ref:`promotes <Push-developers-into-best-practices>` best pract
 In case you still feel method injection is the best option for you, you can plug in a custom `IModelBinderProvider` implementation returning a custom `IModelBinder` that resolves instances from Simple Injector.
 
 
+.. _resolving-from-validationcontext:
+
+Resolving services from MVC's ValidationContext
+===============================================
+
+ASP.NET Core MVC allows you to implement custom validation logic inside model classes using the `IValidatableObject` interface. Although there is nothing inherently wrong with placing validation logic inside the model object itself, problems start to appear when that validation logic requires services to work. By default this will not work with Simple Injector, as the `ValidationContext.GetService` method forwards the call to the built-in configuration system—not to Simple Injector.
+
+In general, however, you should prevent calling `GetService` or similar methods from within application code, such as MVC model classes. This leads to the Service Locator anti-pattern.
+
+Instead, follow the advice given in `this Stack Overflow answer <https://stackoverflow.com/a/55846598/264697>`_.
+
+
 .. _razor-pages:
 
 Using Razor Pages
