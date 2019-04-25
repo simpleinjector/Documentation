@@ -150,7 +150,7 @@ The easiest way to use cross wiring is to use the **AutoCrossWireAspNetComponent
 
 .. container:: Note
 
-    **NOTE**: The **AutoCrossWireAspNetComponents** extension method is new in Simple Injector v4.1. This requires .NET Core 2.0 or up.
+    **NOTE**: The **AutoCrossWireAspNetComponents** extension method is new in Simple Injector v4.1.
     
 To setup cross wiring, first you must make a call to **EnableSimpleInjectorCrossWiring** on `IServiceCollection` in the `ConfigureServices` method of your `Startup` class.
 
@@ -198,32 +198,21 @@ Like **AutoCrossWireAspNetComponents**, **CrossWire<TService>** does the require
 
     **NOTE**: Even though **AutoCrossWireAspNetComponents** makes cross wiring very easy, you should still prevent letting application components depend on types provided by ASP.NET as much as possible. In most cases it not the best solution and in violation of the `Dependency Inversion Principle <https://en.wikipedia.org/wiki/Dependency_inversion_principle>`_. Instead, application components should typically depend on *application-provided abstractions*. These abstractions can be implemented by proxy and/or adapter implementations that forward the call to the framework component. In that case cross wiring can still be used to allow the framework component to be injected into the adapter, but this isn't required.
 
-.. _identity:
-    
-Working with ASP.NET Core Identity
-==================================
-
-The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. The default template requires a fair amount of cross wired dependencies. Using the new **AutoCrossWireAspNetComponents** method of version 4.1 of the Simple Injector ASP.NET Core Integration package, however, integration with ASP.NET Core Identity couldn't be more straightforward. When you followed the :ref:`cross wire guidelines <cross-wiring>`, this is all you'll have to do to get Identity running.
-
-.. container:: Note
-
-    **NOTE**: It is highly advisable to refactor the `AccountController` to *not* to depend on `IOptions<IdentityCookieOptions>` and `ILoggerFactory`. See the next topic about `IOptions<T>` for more information.
-
 .. _ioption:
 .. _ioptions:
     
 Working with `IOptions<T>`
 ==========================
 
-ASP.NET Core contains a new configuration model based on an `IOptions<T>` abstraction. We advise against injecting `IOptions<T>` dependencies into your application components. Instead let components depend directly on configuration objects and register those objects as *Singleton*. This ensures that configuration values are read during application start up and it allows verifying them at that point in time, allowing the application to fail fast.
+ASP.NET Core contains a new configuration model based on an `IOptions<T>` abstraction. We advise against injecting `IOptions<T>` dependencies into your *application components*. Instead let components depend directly on configuration objects and register those objects as *instances* (using `RegisterInstance`). This ensures that configuration values are read during application start up and it allows verifying them at that point in time, allowing the application to fail fast.
 
 Letting application components depend on `IOptions<T>` has some unfortunate downsides. First of all, it causes application code to take an unnecessary dependency on a framework abstraction. This is a violation of the Dependency Inversion Principle, which prescribes the use of application-tailored abstractions. Injecting an `IOptions<T>` into an application component only makes this component more difficult to test, while providing no additional benefits for that component. Application components should instead depend directly on the configuration values they require.
 
 `IOptions<T>` configuration values are read lazily. Although the configuration file might be read upon application start up, the required configuration object is only created when `IOptions<T>.Value` is called for the first time. When deserialization fails, because of application misconfiguration, such error will only be appear after the call to `IOptions<T>.Value`. This can cause misconfigurations to keep undetected for much longer than required. By reading—and verifying—configuration values at application start up, this problem can be prevented. Configuration values can be injected as singletons into the component that requires them.
 
-To make things worse, in case you forget to configure a particular section (by omitting a call to `services.Configure<T>`) or when you make a typo while retrieving the configuration section (e.g. by supplying the wrong name to `Configuration.GetSection(name)`), the configuration system will simply supply the application with a default and empty object instead of throwing an exception! This may make sense in some cases but it will easily lead to fragile applications.
+To make things worse, in case you forget to configure a particular section (by omitting a call to `services.Configure<T>`) or when you make a typo while retrieving the configuration section (e.g. by supplying the wrong name to `Configuration.GetSection(name)`), the configuration system will simply supply the application with a default and empty object instead of throwing an exception! This may make sense when building framework or third-party components, but not so much for application development, as it easily leads to fragile applications.
 
-Because you want to verify the configuration at start-up, it makes no sense to delay reading it, and that makes injecting `IOptions<T>` into your components plain wrong. Depending on `IOptions<T>` might still be useful when bootstrapping the application, but not as a dependency anywhere else.
+Because you want to verify the configuration at start-up, it makes no sense to delay reading it, and that makes injecting `IOptions<T>` into your application components plain wrong. Depending on `IOptions<T>` might still be useful when bootstrapping the application, but not as a dependency anywhere else in your application.
 
 Once you have a correctly read and verified configuration object, registration of the component that requires the configuration object is as simple as this:
 
@@ -242,40 +231,14 @@ Once you have a correctly read and verified configuration object, registration o
     container.Register<IMessageSender, MailMessageSender>();
 
 
-.. _fromservices:
-
-Using [FromServices] in ASP.NET Core Controllers
-================================================
-
-Besides injecting dependencies into a controller's constructor, ASP.NET Core allows injecting dependencies `directly into action methods <https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/dependency-injection?view=aspnetcore-2.1#action-injection-with-fromservices>`_ using method injection. This is done by marking a corresponding action method argument with the `[FromServices]` attribute.
-
-While the use of `[FromServices]` works for services registered in ASP.NET Core's built-in configuration system (i.e. `IServiceCollection`), the Simple Injector integration package, however, does not integrate with `[FromServices]` out of the box. This is by design and adheres to our :doc:`design guidelines <principles>`, as explained below.
-
-.. container:: Note
-
-    **IMPORTANT**: Simple Injector's ASP.NET Core integration packages do not allow any Simple Injector registered dependencies to be injected into ASP.NET Core controller action methods using the `[FromServices]` attribute.
-
-The use of method injection, as the `[FromServices]` attribute allows, has a few considerate downsides that should be prevented.
-
-Compared to constructor injection, the use of method injection in action methods hides the relationship between the controller and its dependencies from the container. This allows a controller to be created by Simple Injector (or ASP.NET Core's built-in container for that matter), while the invocation of an individual action might fail, because of the absence of a dependency or a misconfiguration of the dependency's object graph. This can cause configuration errors to stay undetected longer :ref:`than strictly necessary <Never-fail-silently>`. Especially when using Simple Injector, it blinds its :doc:`diagnostic abilities <diagnostics>` which allow you to verify the correctness at application start-up or as part of a unit test.
-
-You might be tempted to apply method injection to prevent the controller’s constructor from becoming too large. But big constructors are actually an indication that the controller itself is too big. It is a common code smell named `Constructor over-injection <https://blog.ploeh.dk/2018/08/27/on-constructor-over-injection/>`_. This is typically an indication that the class violates the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ meaning that the class is too complex and will be hard to maintain.
-
-A typical solution to this problem is to split up the class into multiple smaller classes. At first this might seem problematic for controller classes, because they can act as gateway to the business layer and the API signature follows the naming of controllers and their actions. Do note, however, that this one-to-one mapping between controller names and the route of your application is not a requirement. ASP.NET Core has a very flexible `routing system <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing>`_ that allows you to completely change how routes map to controller names and even action names. This allows you to split controllers into very small chunks with a very limited number of constructor dependencies and without the need to fall back to method injection using `[FromServices]`.
-
-Simple Injector :ref:`promotes <Push-developers-into-best-practices>` best practices, and because of downsides described above, we consider the use of the `[FromServices]` attribute *not* to be a best practice. This is why we choose not to provide out-of-the-box support for injecting Simple Injector registered dependencies into controller actions. 
-
-In case you still feel method injection is the best option for you, you can plug in a custom `IModelBinderProvider` implementation returning a custom `IModelBinder` that resolves instances from Simple Injector.
-
-
 .. _hosted-services:
 
 Using Hosted Services
 =====================
 
-A hosted service is a background task running in an ASP.NET Core service. A hosted service implements the `IHostedService` interface and can run at certain intervals. When added to the ASP.NET Core pipeline, a hosted service instance will be referenced indefinitely by ASP.NET Core. This means that your hosted service implementation is effectively a **Singleton** and should be configured as such.
+A hosted service is a background task running in an ASP.NET Core service. A hosted service implements the `IHostedService` interface and can run at certain intervals. When added to the ASP.NET Core pipeline, a hosted service instance will be referenced indefinitely by ASP.NET Core. This means that your hosted service implementation is effectively a **Singleton** *and should be configured as such*.
 
-When you want your hosted service implementation to be resolved from Simple Injector, the most straight forward way is to register it both in Simple Injector and cross wire it in the `services` instance (the `IServiceCollection` implementation) as shown here:
+When you want your hosted service implementation to be resolved from Simple Injector, the most straight-forward way is to register it both in Simple Injector and cross wire it in the `services` instance (the `IServiceCollection` implementation) as shown here:
 
 .. code-block:: c#
 
@@ -287,7 +250,7 @@ When you want your hosted service implementation to be resolved from Simple Inje
 
     **WARNING**: As hosted service instances are referenced indefinitely by ASP.NET Core, it is important to register it as **Singleton** in Simple Injector. This allows Simple Injector's diagnostics to check for lifestyle mismatches.
 
-In case your hosted service needs to run repeatedly at certain intervals, it becomes important to start the service's operation in a **Scope**. This allows instances with **Transient** and **Scoped** lifestyles to be resolved. 
+In case your hosted service needs to run repeatedly at certain intervals, it becomes important to start the service's operation in a **Scope**. This allows instances with **Transient** and **Scoped** lifestyles to be resolved.
     
 In case you require multiple hosted services that need to run at specific intervals, at can be beneficial to create a wrapper implementation that takes care of the most important plumbing. The `TimedHostedService<TService>` below defines such reusable wrapper:
 
@@ -370,6 +333,32 @@ The following code snippet shows how this `TimedHostedService<TService>` can be 
 The previous snippet uses the *AddHostedService<T>* extension method of the Microsoft.Extensions.Hosting package to register the `TimedHostedService<IProcessingService>` to the ASP.NET Core configuration system. This class requires a `TimedHostedService<TService>.Settings` object in its constructor, which is configured using the second line. The settings specifies the interval and the action to execute—in this case the action on `IProcessingService`.
 
 
+.. _fromservices:
+
+Using [FromServices] in ASP.NET Core MVC Controllers
+====================================================
+
+Besides injecting dependencies into a controller's constructor, ASP.NET Core allows injecting dependencies `directly into action methods <https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/dependency-injection?view=aspnetcore-2.1#action-injection-with-fromservices>`_ using method injection. This is done by marking a corresponding action method argument with the `[FromServices]` attribute.
+
+While the use of `[FromServices]` works for services registered in ASP.NET Core's built-in configuration system (i.e. `IServiceCollection`), the Simple Injector integration package, however, does not integrate with `[FromServices]` out of the box. This is by design and adheres to our :doc:`design guidelines <principles>`, as explained below.
+
+.. container:: Note
+
+    **IMPORTANT**: Simple Injector's ASP.NET Core integration packages do not allow any Simple Injector registered dependencies to be injected into ASP.NET Core controller action methods using the `[FromServices]` attribute.
+
+The use of method injection, as the `[FromServices]` attribute allows, has a few considerate downsides that should be prevented.
+
+Compared to constructor injection, the use of method injection in action methods hides the relationship between the controller and its dependencies from the container. This allows a controller to be created by Simple Injector (or ASP.NET Core's built-in container for that matter), while the invocation of an individual action might fail, because of the absence of a dependency or a misconfiguration of the dependency's object graph. This can cause configuration errors to stay undetected longer :ref:`than strictly necessary <Never-fail-silently>`. Especially when using Simple Injector, it blinds its :doc:`diagnostic abilities <diagnostics>` which allow you to verify the correctness at application start-up or as part of a unit test.
+
+You might be tempted to apply method injection to prevent the controller’s constructor from becoming too large. But big constructors are actually an indication that the controller itself is too big. It is a common code smell named `Constructor over-injection <https://blog.ploeh.dk/2018/08/27/on-constructor-over-injection/>`_. This is typically an indication that the class violates the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ meaning that the class is too complex and will be hard to maintain.
+
+A typical solution to this problem is to split up the class into multiple smaller classes. At first this might seem problematic for controller classes, because they can act as gateway to the business layer and the API signature follows the naming of controllers and their actions. Do note, however, that this one-to-one mapping between controller names and the route of your application is not a requirement. ASP.NET Core has a very flexible `routing system <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing>`_ that allows you to completely change how routes map to controller names and even action names. This allows you to split controllers into very small chunks with a very limited number of constructor dependencies and without the need to fall back to method injection using `[FromServices]`.
+
+Simple Injector :ref:`promotes <Push-developers-into-best-practices>` best practices, and because of downsides described above, we consider the use of the `[FromServices]` attribute *not* to be a best practice. This is why we choose not to provide out-of-the-box support for injecting Simple Injector registered dependencies into controller actions. 
+
+In case you still feel method injection is the best option for you, you can plug in a custom `IModelBinderProvider` implementation returning a custom `IModelBinder` that resolves instances from Simple Injector.
+
+
 .. _razor-pages:
 
 Using Razor Pages
@@ -395,3 +384,16 @@ To be able for the **SimpleInjectorPageModelActivatorProvider** to resolve Page 
 This method works in similar fashion as its **RegisterMvcControllers** and **RegisterMvcViewComponents** counter parts do, as shown in the page's first code listing. 
 
 This is all that is required to integrate Simple Injector with ASP.NET Core Razor Pages.
+
+
+
+.. _identity:
+    
+Working with ASP.NET Core Identity
+==================================
+
+The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. The default template requires a fair amount of cross wired dependencies. Using the new **AutoCrossWireAspNetComponents** method of version 4.1 of the Simple Injector ASP.NET Core Integration package, however, integration with ASP.NET Core Identity couldn't be more straightforward. When you followed the :ref:`cross wire guidelines <cross-wiring>`, this is all you'll have to do to get Identity running.
+
+.. container:: Note
+
+    **NOTE**: It is highly advisable to refactor the `AccountController` to *not* to depend on `IOptions<IdentityCookieOptions>` and `ILoggerFactory`. See the next topic about `IOptions<T>` for more information.
