@@ -23,6 +23,7 @@ Other Technologies
 Besides integration with standard .NET technologies, Simple Injector can be integrated with a wide range of other technologies. Here are a few links to help you get started quickly:
 
 * `ASP.NET Identity Framework <https://github.com/simpleinjector/SimpleInjector/issues/597>`_
+* `Microsoft.Extensions.Logging <https://stackoverflow.com/questions/41243485/simple-injector-register-iloggert-by-using-iloggerfactory-createloggert>`_
 * `Azure Functions <https://github.com/simpleinjector/SimpleInjector/issues/536>`_
 * `Castle DynamicProxy Interception <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_
 * `Nancy <https://github.com/NancyFx/Nancy/issues/1227#issuecomment-163279040>`_
