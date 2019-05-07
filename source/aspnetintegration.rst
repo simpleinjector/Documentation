@@ -408,4 +408,4 @@ The default Visual Studio template comes with built-in authentication through th
 
 .. container:: Note
 
-    **NOTE**: It is highly advisable to refactor the `AccountController` to *not* to depend on `IOptions<IdentityCookieOptions>` and `ILoggerFactory`. See the next topic about `IOptions<T>` for more information.
+    **NOTE**: It is highly advisable to refactor the `AccountController` to *not* to depend on `IOptions<IdentityCookieOptions>` and `ILoggerFactory`. See :ref:`the topic about IOptions\<T\> <ioptions>` for more information.
