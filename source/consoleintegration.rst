@@ -2,9 +2,9 @@
 Console Application Integration Guide
 =====================================
 
-Simple Injector contains several integration packages that simplify plugging-in Simple Injector into a wide variety of frameworks. These packages allow you to hook Simple Injector onto the framework's integration point.
+Simple Injector contains several integration packages that simplify plugging-in Simple Injector into a wide variety of frameworks. These packages allow you to hook Simple Injector onto the framework's integration points.
 
-When it comes to writing Console applications however, there are no integration packages. That's because Console applications are not backed by a particular framework. .NET just does the bare minimum when a Console application is started and there are no integration hooks that you can use. This means that you are in complete control over the application.
+When it comes to writing Console applications, however, there are no integration packages. That's because Console applications are not backed by a particular framework. .NET just does the bare minimum when a Console application is started and there are no integration hooks that you can use. This means that you are in complete control over the application.
 
 When a Console application is short-lived, and runs just a single operation and exits, the application could have a structure similar to the following:
 
@@ -14,7 +14,7 @@ When a Console application is short-lived, and runs just a single operation and 
     
     static class Program
     {
-        static readonly Container container;
+        private static readonly Container container;
     
         static Program()
         {
@@ -46,12 +46,14 @@ The following example demonstrates a simple Console application that runs indefi
     using SimpleInjector;
     using SimpleInjector.Lifestyles;
    
-    static class Program {
-        static readonly Container container;
+    static class Program
+    {
+        private static readonly Container container;
     
-        static Program() {
+        static Program()
+        {
             container = new Container();
-            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
             
             container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
             container.Register<MyRootType>();
@@ -59,9 +61,12 @@ The following example demonstrates a simple Console application that runs indefi
             container.Verify();
         }
     
-        static void Main()  {
-            while (true) {
-                using (ThreadScopedLifestyle.BeginScope(container)) {
+        static void Main()
+        {
+            while (true)
+            {
+                using (AsyncScopedLifestyle.BeginScope(container))
+                {
                     var service = container.GetInstance<MyRootType>();
 
                     service.DoSomething();
