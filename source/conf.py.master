@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Simple Injector'
-copyright = '2014-2017, Simple Injector Contributors'
+copyright = '2014-2019, Simple Injector Contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
