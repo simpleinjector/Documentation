@@ -142,7 +142,7 @@ This registration maps the open-generic *IValidator<T>* interface to the open-ge
 
 .. container:: Note
 
-    **Note**: Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>* instance. In reality you should not see the the injected *IEnumerable<IValidator<T>>* as a collection of implementations, you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same object (the *IEnumerable<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the *CompositeValidator<T>* is registered as singleton the validators it wraps will each have their own specific lifestyle.
+    **Note**: Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>* instance. In reality you should not see the injected *IEnumerable<IValidator<T>>* as a collection of implementations—you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same object (the *IEnumerable<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the *CompositeValidator<T>* is registered as singleton, the validators it wraps will each have their own specific lifestyle.
 
 The next section will explain mapping of open-generic types, just like the *CompositeValidator<T>* as seen above.
 
@@ -337,6 +337,10 @@ Alternatively, we can make use of the Container's **GetTypesToRegister** to find
 
     The **Register** and **Collection.Register** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well. Each, however, use their own **TypesToRegisterOptions** configuration.
 
+.. container:: Note
+
+    **Note**: Collections in Simple Injector behave as **streams**. Please see the section about :ref:`collection types <Collection-types>` for more information.
+
 
 .. _Unregistered-Type-Resolution:
 
@@ -412,6 +416,57 @@ In the previous code snippet you supply the **RegisterConditional** method with 
 .. container:: Note
 
     **Note**: Even though the use of a generic *Logger<T>* is a common design (with log4net as the grand godfather of this design), doesn't always make it a good design. The need for having the logger contain information about its parent type, might indicate design problems. If you're doing this, please take a look at `this Stackoverflow answer <https://stackoverflow.com/a/9915056/264697>`_. It talks about logging in conjunction with the SOLID design principles.
+
+.. _contextual-parent-metadata:
+
+Making contextual registrations based on the parent's metadata
+--------------------------------------------------------------
+
+Apart from making the conditional registration based on the consumer's type, other metadata can be used to make the decision of whether to inject the dependency or not. For instance, Simple Injector provides the predicate, supplied by you to the **RegisterConditional** method, with information about the member or parameter that the dependency will be injected into—this is called the injection *target*. This allows you check the target's name or its attributes and make a decision based on that metadata. Take the following example, for instance:
+
+.. code-block:: c#
+
+    public class ShipmentRepository : IShipmentRepository
+    {
+        private readonly IDbContextProvider productsContextProvider;
+        private readonly IDbContextProvider customersContextProvider;
+    
+        public ProductRepository(
+            IDbContextProvider productsContextProvider,
+            IDbContextProvider customersContextProvider)
+        {
+            this.productsContextProvider = productsContextProvider;
+            this.customersContextProvider = customersContextProvider;
+        }
+    }
+    
+The previous `ShipmentRepository` contains two dependencies, both of type `IDbContextProvider`. As a convention, the `ShipmentRepository` prefixes the parameter names with either "products" or "customers" and this allows you to make the registrations conditionally: 
+
+.. code-block:: c#
+
+    container.RegisterConditional<IDbContextProvider, ProductsContextProvider>(
+        c => c.Consumer.Target.Name.StartsWith("products"));
+
+    container.RegisterConditional<IDbContextProvider, CustomersContextProvider>(
+        c => c.Consumer.Target.Name.StartsWith("customers"));
+
+In this example, the name of the consumer's *injection target* (the constructor parameter) is used to determine whether the dependency should be injected or not.
+
+.. container:: Note
+
+    **Note**: Do note that in the previous example, the `ProductsContextProvider` and `CustomersContextProvider` implementations likely violate the Liskov Substitution Principle. In this case, a better solution is to give each implementation its own abstraction (e.g. `IProductsContextProvider` and `ICustomersContextProvider`.
+
+
+.. _contextual-parent-parent:
+
+Making contextual registrations based on the parent's parent
+------------------------------------------------------------
+
+As shown in the previous examples, Simple Injector allows looking at the dependency's direct consumer to determine whether or not the dependency should be injected, or that Simple Injector should try the next conditional registration on the consumer. This 'looking up' the dependency graph, however, is limited to looking at the dependency's direct consumer. This limitation is deliberate. Making a decision based on the parent's parent can lead to all sorts of complications and subtle bugs.
+
+There are several ways to work around this seeming limitation in Simple Injector. The first thing you should do, however, is take a step back and see whether or not you can simplify your design, as these kinds of requirements often (but not always) come from design inefficiencies. One such issue is `Liskov Substitution Principle <https://en.wikipedia.org/wiki/Liskov_substitution_principle>`_ (LSP) violations. From this perspective, it's good to ask yourself the question: "would my consumer break when it gets injected with a dependency for another consumer?" If the answer is "yes," you are likely violating the LSP and you should first and foremost try to fix that problem first. When fixed, you'll likely see your configuration problems go away as well.
+
+If the LSP is not violated, and changing the design is not feasible, a common solution is to make the intermediate consumer(s) generic. This is discussed in more detail in `this Stack Overflow Q/A <https://stackoverflow.com/questions/53815493/inject-dependency-dynamically-based-on-call-chain-using-simple-injector>`_.
 
 
 .. _Property-Injection:
@@ -589,3 +644,7 @@ Applications with a plugin architecture often allow plugin assemblies to be drop
     container.Collection.Register<IPlugin>(pluginAssemblies);
 
 The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all concrete, non-generic types that implement *IPlugin* (and are neither a composite nor decorator) will be registered using the **Collection.Register** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.
+
+.. container:: Note
+
+    **Note**: Collections in Simple Injector behave as **streams**. Please see the section about :ref:`collection types <Collection-types>` for more information.
