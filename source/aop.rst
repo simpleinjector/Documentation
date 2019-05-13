@@ -353,6 +353,10 @@ When registering a decorator, Simple Injector will automatically decorate any co
 
 The previous registration registers a collection of *IEventHandler<CustomerMovedEvent>* services. Those services are decorated with a *TransactionEventHandlerDecorator<TEvent>* when the supplied predicate holds.
 
+.. container:: Note
+
+    **Note**: Collections in Simple Injector behave as **streams**. Please see the section about :ref:`collection types <Collection-types>` for more information.
+
 For collections of elements that are created by the container (container controlled), the predicate is checked for each element in the collection. For collections of uncontrolled elements (a list of items that is not created by the container), the predicate is checked once for the whole collection. This means that only controlled collections can be partially decorated. Taking the previous example for instance, you could let the *CustomerMovedEventHandler* be decorated, while leaving the *NotifyStaffWhenCustomerMovedEventHandler* undecorated (determined by the supplied predicate).
 
 When a collection is uncontrolled, it means that the lifetime of its elements are unknown to the container. The following registration is an example of an uncontrolled collection:

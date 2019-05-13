@@ -337,6 +337,10 @@ Alternatively, we can make use of the Container's **GetTypesToRegister** to find
 
     The **Register** and **Collection.Register** overloads that accept a list of assemblies use this **GetTypesToRegister** method internally as well. Each, however, use their own **TypesToRegisterOptions** configuration.
 
+.. container:: Note
+
+    **Note**: Collections in Simple Injector behave as **streams**. Please see the section about :ref:`collection types <Collection-types>` for more information.
+
 
 .. _Unregistered-Type-Resolution:
 
@@ -640,3 +644,7 @@ Applications with a plugin architecture often allow plugin assemblies to be drop
     container.Collection.Register<IPlugin>(pluginAssemblies);
 
 The given example makes use of an *IPlugin* interface that is known to the application, and probably located in a shared assembly. The dynamically loaded plugin .dll files can contain multiple classes that implement *IPlugin*, and all concrete, non-generic types that implement *IPlugin* (and are neither a composite nor decorator) will be registered using the **Collection.Register** method and can get resolved using the default auto-wiring behavior of the container, meaning that the plugin must have a single public constructor and all constructor arguments must be resolvable by the container. The plugins can get resolved using *container.GetAllInstances<IPlugin>()* or by adding an *IEnumerable<IPlugin>* argument to a constructor.
+
+.. container:: Note
+
+    **Note**: Collections in Simple Injector behave as **streams**. Please see the section about :ref:`collection types <Collection-types>` for more information.
