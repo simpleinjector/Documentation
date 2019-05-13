@@ -142,7 +142,7 @@ This registration maps the open-generic *IValidator<T>* interface to the open-ge
 
 .. container:: Note
 
-    **Note**: Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>* instance. In reality you should not see the the injected *IEnumerable<IValidator<T>>* as a collection of implementations, you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same object (the *IEnumerable<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the *CompositeValidator<T>* is registered as singleton the validators it wraps will each have their own specific lifestyle.
+    **Note**: Simple Injector preserves the lifestyle of instances that are returned from an injected *IEnumerable<T>* instance. In reality you should not see the injected *IEnumerable<IValidator<T>>* as a collection of implementations—you should consider it a **stream** of instances. Simple Injector will always inject a reference to the same object (the *IEnumerable<T>* itself is a singleton) and each time you iterate the *IEnumerable<T>*, for each individual component, the container is asked to resolve the instance based on the lifestyle of that component. Regardless of the fact that the *CompositeValidator<T>* is registered as singleton, the validators it wraps will each have their own specific lifestyle.
 
 The next section will explain mapping of open-generic types, just like the *CompositeValidator<T>* as seen above.
 
