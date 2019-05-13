@@ -413,6 +413,17 @@ In the previous code snippet you supply the **RegisterConditional** method with 
 
     **Note**: Even though the use of a generic *Logger<T>* is a common design (with log4net as the grand godfather of this design), doesn't always make it a good design. The need for having the logger contain information about its parent type, might indicate design problems. If you're doing this, please take a look at `this Stackoverflow answer <https://stackoverflow.com/a/9915056/264697>`_. It talks about logging in conjunction with the SOLID design principles.
 
+.. _contextual-parent-parent:
+
+Making contextual registrations based on the parent's parent
+------------------------------------------------------------
+
+As shown in the previous examples, Simple Injector allows looking at the dependency's direct consumer to determine whether or not the dependency should be injected, or that Simple Injector should try the next conditional registration on the consumer. This 'looking up' the dependency graph, however, is limited to looking at the dependency's direct consumer. This limitation is deliberate. Making a decision based on the parent's parent can lead to all sorts of complications and subtle bugs.
+
+There are several ways to work around this seeming limitation in Simple Injector. The first thing you should do, however, is take a step back and see whether or not you can simplify your design, as these kinds of requirements often (but not always) come from design inefficiencies. One such issue is `Liskov Substitution Principle <https://en.wikipedia.org/wiki/Liskov_substitution_principle>`_ (LSP) violations. From this perspective, it's good to ask yourself the question: "would my consumer break when it gets injected with a dependency for another consumer?" If the answer is "yes," you are likely violating the LSP and you should first and foremost try to fix that problem first. When fixed, you'll likely see your configuration problems go away as well.
+
+If the LSP is not violated, and changing the design is not feasible, a common solution is to make the intermediate consumer(s) generic. This is discussed in more detail in `this Stack Overflow Q/A <https://stackoverflow.com/questions/53815493/inject-dependency-dynamically-based-on-call-chain-using-simple-injector>`_.
+
 
 .. _Property-Injection:
 
