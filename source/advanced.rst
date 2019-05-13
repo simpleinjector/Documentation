@@ -413,6 +413,46 @@ In the previous code snippet you supply the **RegisterConditional** method with 
 
     **Note**: Even though the use of a generic *Logger<T>* is a common design (with log4net as the grand godfather of this design), doesn't always make it a good design. The need for having the logger contain information about its parent type, might indicate design problems. If you're doing this, please take a look at `this Stackoverflow answer <https://stackoverflow.com/a/9915056/264697>`_. It talks about logging in conjunction with the SOLID design principles.
 
+.. _contextual-parent-metadata:
+
+Making contextual registrations based on the parent's metadata
+--------------------------------------------------------------
+
+Apart from making the conditional registration based on the consumer's type, other metadata can be used to make the decision of whether to inject the dependency or not. For instance, Simple Injector provides the predicate, supplied by you to the **RegisterConditional** method, with information about the member or parameter that the dependency will be injected into—this is called the injection *target*. This allows you check the target's name or its attributes and make a decision based on that metadata. Take the following example, for instance:
+
+.. code-block:: c#
+
+    public class ShipmentRepository : IShipmentRepository
+    {
+        private readonly IDbContextProvider productsContextProvider;
+        private readonly IDbContextProvider customersContextProvider;
+    
+        public ProductRepository(
+            IDbContextProvider productsContextProvider,
+            IDbContextProvider customersContextProvider)
+        {
+            this.productsContextProvider = productsContextProvider;
+            this.customersContextProvider = customersContextProvider;
+        }
+    }
+    
+The previous `ShipmentRepository` contains two dependencies, both of type `IDbContextProvider`. As a convention, the `ShipmentRepository` prefixes the parameter names with either "products" or "customers" and this allows you to make the registrations conditionally: 
+
+.. code-block:: c#
+
+    container.RegisterConditional<IDbContextProvider, ProductsContextProvider>(
+        c => c.Consumer.Target.Name.StartsWith("products"));
+
+    container.RegisterConditional<IDbContextProvider, CustomersContextProvider>(
+        c => c.Consumer.Target.Name.StartsWith("customers"));
+
+In this example, the name of the consumer's *injection target* (the constructor parameter) is used to determine whether the dependency should be injected or not.
+
+.. container:: Note
+
+    **Note**: Do note that in the previous example, the `ProductsContextProvider` and `CustomersContextProvider` implementations likely violate the Liskov Substitution Principle. In this case, a better solution is to give each implementation its own abstraction (e.g. `IProductsContextProvider` and `ICustomersContextProvider`.
+
+
 .. _contextual-parent-parent:
 
 Making contextual registrations based on the parent's parent
