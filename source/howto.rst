@@ -444,6 +444,10 @@ Calling the **Verify()** method, however, is just part of the story. It is very 
 
 #. But even if all registrations can be resolved successfully by the container, that still doesn't mean your configuration is correct. It is very easy to accidentally misconfigure the container in a way that only shows up late in the development process. Simple Injector contains :doc:`Diagnostics Services <diagnostics>` to help you spot common configuration mistakes. To help you, all the diagnostic warnings are integrated into the verification mechanism. This means that a call to **Verify()** will also check for diagnostic warnings for you. It is advisable to analyze the container by calling **Verify** or by using the diagnostic services either during application startup or as part of an automated test that does this for you.
 
+.. container:: Note
+
+    **TIP:** A call to **Verify** causes the construction and compilation of the expression trees for all the container's registrations—this can be a slow process when the container contains several thousands of components. In case verification causes application startup to take more time than required due to verification, consider wrapping the **Verify** call in an `#IF DEBUG` compiler directive, or run **Verify** only as part of an unit/integration test. This keeps startup time short, and moves the performance penalty to every first resolve of an individual registration.
+
 .. _Multi-Threaded-Applications:
 
 Work with dependency injection in multi-threaded applications
