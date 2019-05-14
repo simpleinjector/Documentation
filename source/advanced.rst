@@ -60,7 +60,7 @@ To prevent having to change the container for each new repository we can use the
         select new { service, implementation = type };
 
     foreach (var reg in registrations) {
-        container.Register(reg.service, reg.type, Lifestyle.Transient);
+        container.Register(reg.service, reg.implementation, Lifestyle.Transient);
     }
 
 Although many other DI libraries contain an advanced API for doing convention based registration, we found that doing this with custom LINQ queries is easier to write, more understandable, and can often prove to be more flexible than using a predefined and restrictive API.
