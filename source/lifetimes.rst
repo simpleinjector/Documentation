@@ -43,7 +43,7 @@ Transient Lifestyle
     
     A new instance of the service type will be created each time the service is requested from the container. If multiple consumers depend on the service within the same graph, each consumer will get its own new instance of the given service.
 
-This example instantiates a new *IService* implementation for each call, while leveraging the power of :ref:`automatic constructor injection <Automatic-constructor-injection>`.
+This example instantiates a new *IService* implementation for each call, while leveraging the power of :ref:`Auto-Wiring <Automatic-constructor-injection>`.
 
 .. code-block:: c#
 
@@ -61,11 +61,13 @@ The next example instantiates a new *RealService* instance on each call by using
 
 .. container:: Note
     
-    **Note**: It is normally recommended that registrations are made using **Register<TService, TImplementation>()**. It is easier, leads to less fragile configuration, and results in faster retrieval than registrations using a *Func<T>* delegate. Always try the former approach before resorting to using delegates.
+    **Note**: It is recommended that registrations for your application components are made using the former Auto-Wiring overload, while registrations of components that are out of your control (e.g. framework or third-party components) are made using the latter delegate overload. This typically results in the most maintainable `Composition Root <https://mng.bz/K1qZ>`_.
+    
+Simple Injector considers Transient registrations to be *lasting for only a short time; temporary*, i.e. short lived and not reused. For that reason, Simple Injector prevents the injection of Transient components into Scoped and Singleton consumers as they are expected to be longer lived, which would otherwise result in :doc:`Lifestyle Mismatches <LifestyleMismatches>`.
     
 .. container:: Note
 
-    **Warning**: Transient instances are not tracked by the container as tracking transient instances is a common source of memory leaks. This means that Simple Injector will not dispose transient instances. Simple Injector will detect disposable instances that are registered as transient when calling *container.Verify()*. Please view  :doc:`Diagnostic Warning - Disposable Transient Components <disposabletransientcomponent>` for more information.
+    **Warning**: Transient instances are not tracked by the container as tracking transient instances is a common source of memory leaks. This means that Simple Injector can't dispose transient instances as that would require tracking. Simple Injector detects disposable instances that are registered as transient when calling *container.Verify()*. Please view  :doc:`Diagnostic Warning - Disposable Transient Components <disposabletransientcomponent>` for more information.
 
 .. _Singleton:
 

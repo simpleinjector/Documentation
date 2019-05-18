@@ -4,9 +4,9 @@ Using Simple Injector
 
 This section will walk you through the basics of Simple Injector. After reading this section, you will have a good idea how to use Simple Injector.
 
-Good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library (if ever required). The technique for keeping this dependency to a minimum can be achieved by designing the types in your application around the constructor injection pattern: Define all dependencies of a class in the single public constructor of that type; do this for all service types that need to be resolved and resolve only the top most types in the application directly (i.e. let the container build up the complete graph of dependent objects for you).
+Good practice is to minimize the dependency between your application and the DI library. This increases the testability and the flexibility of your application, results in cleaner code, and makes it easier to migrate to another DI library (if ever required). The technique for keeping this dependency to a minimum can be achieved by designing the types in your application around the `Constructor Injection pattern <https://mng.bz/oN9j>`_: Define all dependencies of a class in the single public constructor of that type; do this for all classes that need to be resolved and resolve only the top most types in the application directly (i.e. let the container build up the complete graph of dependent objects for you).
 
-Simple Injector's main type is the `Container <https://simpleinjector.org/ReferenceLibrary/?topic=html/T_SimpleInjector_Container.htm>`_ class. An instance of *Container* is used to register mappings between each abstraction (service) and its corresponding implementation (component). Your application code should depend on abstractions and it is the role of the *Container* to supply the application with the right implementation. The easiest way to view the *Container* is as a big dictionary where the type of the abstraction is used as key, and each key's related value is the definition of how to create that particular implementation. Each time the application requests a service, a look up is made within the dictionary and the correct implementation is returned.
+Simple Injector's main type is the *Container* class. An instance of *Container* is used to register mappings between each abstraction (service) and its corresponding implementation (component). Your application code should depend on abstractions and it is the role of the *Container* to supply the application with the right implementation, based on the supplied configuration. As a mental model, you can view the *Container* as a big dictionary where the abstraction is the key, and each key's related value is the definition of how to create that particular implementation. Each time the application requests a service, a look-up is made within the dictionary and the correct implementation instance is returned.
 
 .. container:: Note
 
@@ -18,7 +18,7 @@ Simple Injector's main type is the `Container <https://simpleinjector.org/Refere
 
 .. container:: Note
 
-    **Warning**: Do not create an infinite number of *Container* instances (such as one instance per request). Doing so will drain the performance of your application. The library is optimized for using a very limited number of *Container* instances. Creating and initializing *Container* instances has a large overhead, but resolving from the *Container* is extremely fast once initialized.
+    **Warning**: Do not create an infinite number of *Container* instances (such as one *Container* instance per request). Doing so will drain the performance of your application. Simple Injector is optimized for using a very limited number of *Container* instances. Creating and initializing *Container* instances has a large overhead, but resolving from the *Container* is extremely fast once initialized.
 
 Creating and configuring a *Container* is done by newing up an instance and calling the **Register** overloads to register each of your services:
 
@@ -30,6 +30,10 @@ Creating and configuring a *Container* is done by newing up an instance and call
     container.Register<ILogger, FileLogger>();
 
 Ideally, the only place in an application that should directly reference and use Simple Injector is the startup path. For an ASP.NET Core application this will usually be the **Startup** class of the web application project. For a Windows Forms or console application this will be the *Main* method in the application assembly.
+
+.. container:: Note
+
+    **Tip**: In the context of Dependency Injection, this *start path* is typically referred to as the *Composition Root*. It is good to familirize you with the concept of the Composition Root. `This article <https://mng.bz/K1qZ>`_ is a great place to start. For an even more-detailed discussion of the Composition Root, read `this book <https://manning.com/seemann2>`_.
 
 .. container:: Note
 
@@ -52,9 +56,10 @@ The first four steps are performed only once at application startup. The fifth s
     using SimpleInjector;
     using SimpleInjector.Integration.Web.Mvc;
 
-    public class Global : System.Web.HttpApplication {
-
-        protected void Application_Start(object sender, EventArgs e) {
+    public class Global : System.Web.HttpApplication
+    {
+        protected void Application_Start(object sender, EventArgs e)
+        {
             // 1. Create a new Simple Injector container
             var container = new Container();
 
@@ -81,17 +86,20 @@ The example below is a very basic MVC Controller:
     using System;
     using System.Web.Mvc;
 
-    public class UserController : Controller {
+    public class UserController : Controller
+    {
         private readonly IUserRepository repository;
         private readonly ILogger logger;
 
-        public UserController(IUserRepository repository, ILogger logger) {
+        public UserController(IUserRepository repository, ILogger logger)
+        {
             this.repository = repository;
             this.logger = logger;
         }
 
         [HttpGet]
-        public ActionResult Index(Guid id) {
+        public ActionResult Index(Guid id)
+        {
             this.logger.Log("Index called.");
             User user = this.repository.GetById(id);
             return this.View(user);
@@ -132,7 +140,7 @@ The *Container* class consists of several methods that enable registering instan
 
 **Configuring an automatically constructed single instance (Singleton) to always be returned:**
 
-The following example configures a single instance of type *RealUserService* to always be returned when an instance of *IUserService* is requested. The *RealUserService* will be constructed using :ref:`automatic constructor injection <Automatic-constructor-injection>`.
+The following example configures a single instance of type *RealUserService* to always be returned when an instance of *IUserService* is requested. The *RealUserService* will be constructed using :ref:`Auto-Wiring <Automatic-constructor-injection>`.
 
 .. code-block:: c#
 
@@ -144,9 +152,9 @@ The following example configures a single instance of type *RealUserService* to 
 
 .. container:: Note
 
-    **Note**: instances that are declared as *Singleton* should be thread-safe in a multi-threaded environment.
+    **Important**: instances that are declared as *Singleton* should be thread-safe in a multi-threaded environment.
 
-**Configuring a single - manually created - instance (Singleton) to always be returned:**
+**Configuring a single—manually created—instance (Singleton) to always be returned:**
 
 The following example configures a single instance of a manually created object `SqlUserRepository` to always be returned when a type of `IUserRepository` is requested.
 
@@ -160,7 +168,7 @@ The following example configures a single instance of a manually created object 
 
 .. container:: Note
 
-    **Note**: Registering types using :ref:`automatic constructor injection <Automatic-constructor-injection>` (auto-wiring) is the preferred method of registering types. Only new up instances manually when automatic constructor injection is not possible.
+    **Note**: Registering types using :ref:`Auto-Wiring <Automatic-constructor-injection>` is the preferred method of registering types. Only new up instances manually when automatic constructor injection is not possible or when the constructor does not have any dependencies of its own.
 
 **Configuring a single instance using a delegate:**
 
@@ -174,14 +182,14 @@ This example configures a single instance as a delegate. The *Container* will en
 
     // Usage
     IUserRepository repository = container.GetInstance<IUserRepository>();
-
+    
 .. container:: Note
-
-    **Note**: Registering types using :ref:`automatic constructor injection <Automatic-constructor-injection>` (auto-wiring) is the recommended method of registering types. Only new up instances manually when automatic constructor injection is not possible.
+    
+    **Note**: It is recommended that registrations for your application components are made using the former Auto-Wiring overload, while registrations of components that are out of your control (e.g. framework or third-party components) are made using the latter delegate overload. This typically results in the most maintainable Composition Root.
 
 **Configuring an automatically constructed new instance to be returned:**
 
-By supplying the service type and the created implementation as generic types, the container can create new instances of the implementation (*MoveCustomerHandler* in this case) by :ref:`automatic constructor injection <Automatic-constructor-injection>`.
+By supplying the service type and the created implementation as generic types, the container can create new instances of the implementation (*MoveCustomerHandler* in this case) by :ref:`Auto-Wiring <Automatic-constructor-injection>`.
 
 .. code-block:: c#
 
@@ -197,8 +205,7 @@ By supplying the service type and the created implementation as generic types, t
 
 **Configuring a new instance to be returned on each call using a delegate:**
 
-By supplying a delegate, types can be registered that cannot be created by using :ref:`automatic constructor injection <Automatic-constructor-injection>`.
-
+By supplying a delegate, types can be registered that cannot be created by using :ref:`Auto-Wiring <Automatic-constructor-injection>`.
 
 .. container:: Note
 
@@ -236,7 +243,8 @@ For types that need to be injected we recommend that you define a single public 
     container.Register<IHandler<ShipOrderCommand>>, ShipOrderHandler>();
 
     // IHandler<T> implements IHandler
-    container.RegisterInitializer<IHandler>(handlerToInitialize => {
+    container.RegisterInitializer<IHandler>(handlerToInitialize =>
+    {
         handlerToInitialize.ExecuteAsynchronously = true;
     });
 
@@ -251,7 +259,7 @@ The *Action<T>* delegate that is registered by the **RegisterInitializer** metho
 
 .. container:: Note
 
-    **Note**: The *Container* will not be able to call an initializer delegate on a type that is manually constructed using the *new* operator. Use :ref:`automatic constructor injection <Automatic-constructor-injection>` whenever possible.
+    **Note**: The *Container* will not be able to call an initializer delegate on a type that is manually constructed using the *new* operator. Use :ref:`Auto-Wiring <Automatic-constructor-injection>` whenever possible.
 
 .. container:: Note
 
@@ -259,8 +267,8 @@ The *Action<T>* delegate that is registered by the **RegisterInitializer** metho
 
 .. _Automatic-Batch-registration:
 
-Automatic/Batch-registration
-----------------------------
+Auto-Registration/Batch-registration
+------------------------------------
 
 When an application starts to grow, so does the number of types to register in the container. This can cause a lot of maintenance on part of your application that holds your container registration. When working with a team, you'll start to experience many merge conflicts which increases the chance of errors.
 
@@ -272,7 +280,7 @@ To minimize these problems, Simple Injector allows groups of types to be registe
     Assembly[] assemblies = // determine list of assemblies to search in
     container.Register(typeof(IHandler<>), assemblies);
 
-When supplying a list of assemblies to the **Register** method, Simple Injector will go through the assemblies and will register all types that implement the given interface. In this example, an open-generic type (*IHandler<T>*) is supplied. Simple Injector will automatically find all implementations of this interface.
+When supplying a list of assemblies to the **Register** method, Simple Injector goes through the assemblies and registers all types that implement the given interface. In this example, an open-generic type (*IHandler<T>*) is supplied. Simple Injector will automatically find all implementations of this interface.
 
 .. container:: Note
 
@@ -320,16 +328,20 @@ Just as with normal types, Simple Injector can inject collections of instances i
 .. code-block:: c#
 
     // Definition
-    public class Service : IService {
+    public class Service : IService
+    {
         private readonly IEnumerable<ILogger> loggers;
 
-        public Service(IEnumerable<ILogger> loggers) {
+        public Service(IEnumerable<ILogger> loggers)
+        {
             this.loggers = loggers;
         }
 
-        void IService.DoStuff() {
+        void IService.DoStuff()
+        {
             // Log to all loggers
-            foreach (var logger in this.loggers) {
+            foreach (var logger in this.loggers)
+            {
                 logger.Log("Some message");
             }
         }
@@ -377,15 +389,19 @@ While resolving collections is useful and also works with :ref:`automatic constr
 .. code-block:: c#
 
     // Definition
-    public class CompositeLogger : ILogger {
+    public class CompositeLogger : ILogger
+    {
         private readonly IEnumerable<ILogger> loggers;
 
-        public CompositeLogger(IEnumerable<ILogger> loggers) {
+        public CompositeLogger(IEnumerable<ILogger> loggers)
+        {
             this.loggers = loggers;
         }
 
-        public void Log(string message) {
-            foreach (var logger in this.loggers) {
+        public void Log(string message)
+        {
+            foreach (var logger in this.loggers)
+            {
                 logger.Log(message);
             }
         }
@@ -412,8 +428,8 @@ Besides *IEnumerable<ILogger>*, Simple Injector natively supports other collecti
  - *IEnumerable<T>*
  - *ICollection<T>*
  - *IList<T>*
- - *IReadOnlyCollection<T>* (.NET v4.5 and .NET Standard only)
- - *IReadOnlyList<T>* (.NET v4.5 and .NET Standard only)
+ - *IReadOnlyCollection<T>* (.NET >= v4.5 and .NET Standard only)
+ - *IReadOnlyList<T>* (.NET >= v4.5 and .NET Standard only)
  - *Collection<T>* (Simple Injector >= v4.4)
  - *T[]* (array)
  - *List<T>* (Simple Injector >= v4.4)
@@ -430,10 +446,10 @@ Simple Injector preserves the lifestyle of instances that are returned from an i
 
 .. _Batch-registering-collections:
 
-Batch-registering collections
------------------------------
+Auto-registering collections
+----------------------------
 
-Just as with one-to-one mappings, Simple Injector allows collections of types to be batch-registered. There are overloads of the **Collection.Register** method that accept a list of *Assembly* instances. Simple Injector will go through those assemblies to look for implementations of the supplied type:
+Just as with one-to-one mappings, Simple Injector allows collections of types to be auto-registered. There are overloads of the **Collection.Register** method that accept a list of *Assembly* instances. Simple Injector will go through those assemblies to look for implementations of the supplied type:
 
 .. code-block:: c#
 
@@ -448,7 +464,7 @@ The previous code snippet will register all *ILogger* implementations that can b
 
 .. container:: Note
 
-    **Note**: For more information about batch registration, please see the :ref:`Batch-registration <batch-registration>` section.
+    **Note**: For more information about batch registration, please see the :ref:`Auto-registration <batch-registration>` section.
 
 .. _Appending-to-collections:
 
@@ -486,7 +502,7 @@ For more information about creating an application and container configuration t
 Automatic constructor injection / auto-wiring
 =============================================
 
-Simple Injector uses the public constructor of a registered type and analyzes each constructor argument. The *Container* will resolve an instance for each argument type and then invoke the constructor using those instances. This mechanism is called *Automatic Constructor Injection* or *auto-wiring* and is one of the fundamental features that separates a DI Container from applying DI by hand. 
+Simple Injector uses the public constructor of a registered type and analyzes each constructor argument. The *Container* will resolve an instance for each argument type and then invoke the constructor using those instances. This mechanism is called *Auto-Wiring* and is one of the fundamental features that separates a DI Container from applying DI by hand. 
 
 Simple Injector has the following prerequisites to be able to provide auto-wiring:
 
@@ -505,9 +521,12 @@ The following code shows an example of the use of automatic constructor injectio
     // Definitions
     public interface IUserRepository { }
     public class SqlUserRepository : IUserRepository { }
-    public class UserService : IUserService {
+    
+    public class UserService : IUserService
+    {
         private readonly IUserRepository repository;
-        public UserService(IUserRepository repository) { 
+        public UserService(IUserRepository repository)
+        { 
             this.repository = repository;
         }
     }
