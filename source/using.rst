@@ -378,9 +378,9 @@ Alternatively, if the components of the collections are supplied explicity, as t
 
     container.Register<ILogger, FileLogger>();
 
-    container.Register.Append<ILogger, MailLogger>(Lifestyle.Singleton);
-    container.Register.Append<ILogger, SqlLogger>();
-    container.Register.AppendInstance<ILogger>(new FileLogger>());
+    container.Collection.Append<ILogger, MailLogger>(Lifestyle.Singleton);
+    container.Collection.Append<ILogger, SqlLogger>();
+    container.Collection.AppendInstance<ILogger>(new FileLogger>());
     
 This set of registrations is identical to the previous construct using **Collection.Register**.
 
