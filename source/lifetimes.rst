@@ -465,7 +465,7 @@ Per HTTP Session Lifestyle
 
 .. container:: Note
     
-    There will be one instance of the registered session per (user) session in a ASP.NET web application.
+    There will be one instance of the registered service per (user) session in a ASP.NET web application.
 
 This lifestyle is deliberately left out of Simple Injector because `it is be used with care <https://stackoverflow.com/questions/17702546>`_. Instead of using Per HTTP Session lifestyle, you will usually be better of by writing a stateless service that can be registered as singleton and let it communicate with the ASP.NET Session cache to handle cached user-specific data.
 
