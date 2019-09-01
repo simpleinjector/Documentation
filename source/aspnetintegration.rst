@@ -34,6 +34,9 @@ The following code snippet shows how to use the integration package to apply Sim
             // ASP.NET default stuff here
             services.AddMvc();
 
+            services.AddLogging();
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+
             services.AddSimpleInjector(container, options =>
             {
                 // AddAspNetCore() wraps web requests in a Simple Injector scope.
@@ -58,8 +61,10 @@ The following code snippet shows how to use the integration package to apply Sim
                 options.UseMiddleware<CustomMiddleware2>(app);
                 
                 // Optionally, allow application components to depend on the
-                // non-generic Microsoft.Extensions.Logging.ILogger abstraction.
+                // non-generic Microsoft.Extensions.Logging.ILogger 
+                // or Microsoft.Extensions.Localization.IStringLocalizer abstractions.
                 options.UseLogging();
+                options.UseLocalization();
             });
             
             InitializeContainer();
