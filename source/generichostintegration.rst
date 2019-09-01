@@ -17,6 +17,8 @@ The following code snippet shows how to use the integration package to apply Sim
             .ConfigureAppConfiguration((hostContext, configApp) => { ... })
             .ConfigureServices((hostContext, services) =>
             {
+                services.AddLocalization(options => options.ResourcesPath = "Resources");
+
                 services.AddSimpleInjector(container, options =>
                 {
                     // Hooks hosted services into the Generic Host pipeline
@@ -29,9 +31,10 @@ The following code snippet shows how to use the integration package to apply Sim
             .Build()
             .UseSimpleInjector(container, options =>
             {
-                // Allows injection of ILogger dependencies into
+                // Allows injection of ILogger & IStringLocalizer dependencies into
                 // application components.
                 options.UseLogging();
+                options.UseLocalization();
             });
             
         // Register application components.
@@ -51,7 +54,7 @@ Both **AddSimpleInjector** and **UseSimpleInjector** methods can be enriched by 
 
 * The **AddHostedService<T>** method can be used inside the **AddSimpleInjector** method to hook Hosted Services to the Generic Host pipeline, as discussed below.
 * The **UseLogging** method can be used inside the **UseSimpleInjector** method to allow application components to be injected with `Microsoft.Extensions.Logging.ILogger`. For more information, see :ref:`the Microsoft Logging integration section <microsoft-logging>`.
-
+* The **UseLocalization** method can be used inside the **UseSimpleInjector** method to allow application components to be injected with `Microsoft.Extensions.Localization.IStringLocalizer`. For more information, see :ref:`the Microsoft Logging integration section <microsoft-localization>`.
 
 .. _using-hosted-services:
 
