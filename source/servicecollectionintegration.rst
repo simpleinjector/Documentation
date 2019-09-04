@@ -185,6 +185,49 @@ When resolved, Simple Injector ensures that `CancelOrderHandler` gets injected w
 
     **IMPORTANT**: Opposite to Microsoft's guidance to use `ILogger<T>`, with Simple Injector you do not let `CancelOrderHandler` depend on `ILogger<CancelOrderHandler>`, but simply on `ILogger`. This makes your code simpler, easier to test, and less error prone. The sole reason the existence of this guidance is because of limitations of the built-in configuration system. As Simple Injector is more advanced, Microsoft's guidance can safely be ignored.
     
+.. _microsoft-localization:
+
+Integrating with Microsoft Localization
+==================================
+
+The *SimpleInjector.Integration.ServiceCollection* package simplifies integration with Microsoft's `Microsoft.Extensions.Localization.IStringLocalizer` by introducing an **UseLocalization** extension method:
+
+.. code-block:: c#
+
+    .UseSimpleInjector(container, options =>
+    {
+        options.UseLocalization();
+    });
+
+Calling **UseLocalization()** allows application components to depend on the (non-generic) `Microsoft.Extensions.Localization.IStringLocalizer` abstraction, as shown in the following listing:
+
+.. code-block:: c#
+
+    [Route("api/[controller]")]
+    public class AboutController : Controller
+    {
+        private readonly IStringLocalizer localizer;
+
+        public AboutController(IStringLocalizer localizer)
+        {
+            this.localizer = localizer;
+        }
+
+        [HttpGet]
+        public string Get()
+        {
+            return this.localizer["About Title"];
+        }
+    }
+When resolved, Simple Injector ensures that `AboutController` gets injected with a IStringLocalizer specific for its usage. In practice this means the injected StringLocalizer is an `StringLocalizer<AboutController>`.
+
+.. container:: Note
+
+    **IMPORTANT**: Opposite to Microsoft's guidance to use `IStringLocalizer<T>`, with Simple Injector you do not let `AboutController` depend on `IStringLocalizer<AboutController>`, but simply on `IStringLocalizer`. This makes your code simpler, easier to test, and less error prone. The sole reason the existence of this guidance is because of limitations of the built-in configuration system. As Simple Injector is more advanced, Microsoft's guidance can safely be ignored.
+    
+.. container:: Note
+
+    **IMPORTANT**: The UseLocalization provide only integration for the IStringLocalizer with Simple Injector. The `Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer` abstraction is not part of this integration option.
 
 .. _working-with-ioptions:
     
@@ -216,5 +259,4 @@ Once you have a correctly read and verified configuration object, registration o
     // or register MailSettings as singleton in the container.
     container.RegisterInstance<MyMailSettings>(mailSettings);
     container.Register<IMessageSender, MailMessageSender>();
-
 
