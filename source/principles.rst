@@ -21,7 +21,7 @@ The design principles:
 Make simple use cases easy, make complex use cases possible
 ===========================================================
 
-This guideline comes directly from the `Framework Design Guidelines <https://www.microsoft.com/en-us/p/framework-design-guidelines/fgqpf3h0qjqc>`_ and is an important guidance for us. Commonly used features should be easy to implement, even for a new user, but the library must be flexible and extensible enough to support complex scenarios.
+This guideline comes directly from the `Framework Design Guidelines <https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/>`_ and is an important guidance for us. Commonly used features should be easy to implement, even for a new user, but the library must be flexible and extensible enough to support complex scenarios.
 
 .. _Push-developers-into-best-practices:
 
