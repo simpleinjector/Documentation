@@ -243,8 +243,7 @@ This doesn't mean that it is impossible to do auto-wiring on types with multiple
 No support for optional constructor arguments
 =============================================
 
-Out of the box, Simple Injector does not support optional constructor arguments. 
-
+Optional constructor arguments allow you to mark an argument as optional, by specifying a default value in its definition. This allows a call to the constructor to be made without supplying a value, in which case the default value will be used. The following code snippet demonstrates a `HomeController` class with an optional `logger` argument in its constructor:
 
 .. code-block:: c#
 
@@ -258,17 +257,11 @@ Out of the box, Simple Injector does not support optional constructor arguments.
         }
     }
 
+Even though C# supports optional arguments, Simple Injector does not allow skipping constructor arguments out of the box, because we want to adhere to the following principles:
+
 * :ref:`Push developers into best practices <Push-developers-into-best-practices>`
 * :ref:`Never fail silently <Never-fail-silently>`
-* :ref:`Features should be intuitive <Features-should-be-intuitive>`
-* :ref:`Fast by default <Fast-by-default>`
-* :ref:`Don't force vendor lock-in <Vendor-lock-in>`
 
+Simple Injector does not support optional constructor arguments because constructor dependencies should not be optional. Please read `this blog post <https://blogs.cuttingedge.it/steven/posts/2013/di-anti-pattern-multiple-constructors/#optional-dependencies>`_ to understand why optional arguments are a bad idea and what alternatives to optional dependencies exist.
 
-* :ref:`Make simple use cases easy, make complex use cases possible <Make-simple-use-cases-easy>`
-* :ref:`Push developers into best practices <Push-developers-into-best-practices>`
-* :ref:`Fast by default <Fast-by-default>`
-* :ref:`Don't force vendor lock-in <Vendor-lock-in>`
-* :ref:`Never fail silently <Never-fail-silently>`
-* :ref:`Features should be intuitive <Features-should-be-intuitive>`
-* :ref:`Communicate errors clearly and describe how to solve them <Communicate-errors-clearly>`
+Even though Simple Injector allows its default behavior to be replaced using a custom **IDependencyInjectionBehavior**, developers are advised *not* to replace the default behavior to enable optional constructor dependencies, because of the reasons given in the post.
