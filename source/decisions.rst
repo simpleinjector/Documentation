@@ -8,7 +8,7 @@ Our :doc:`design principles <principles>` have influenced the direction of the d
 
 * :ref:`The container is locked after the first call to resolve <Container-is-locked>`
 * :ref:`The API clearly separates registration of collections from other registrations <Separate-collections>`
-* :ref:`No support for  XML based configuration <No-support-for-XML>`
+* :ref:`No support for XML based configuration <No-support-for-XML>`
 * :ref:`Never force users to release what they resolve <Never-force-release>`
 * :ref:`Don't allow resolving scoped instances outside an active scope <Dont-allow-resolving-outside-an-active-scope>`
 * :ref:`No out-of-the-box support for property injection <No-property-injection>`
@@ -30,7 +30,7 @@ In most situations it makes little sense to change the configuration once the ap
 
 Allowing to alter the DI configuration while the application is running could easily cause strange, hard to debug, and hard to verify behavior. This may also mean the application has numerous hard references to the container and this is something you should strive to prevent. Attempting to alter the configuration when running a multi-threaded application would lead to nondeterministic behavior, even if the container itself is thread-safe.
 
-Imagine the scenario where you want to replace some *FileLogger* component for a different implementation with the same *ILogger* interface. If there's a component that directly or indirectly depends on *ILogger*, replacing the *ILogger* implementation might not work as you would expect. If the consuming component is registered as singleton, for example, the container should guarantee that only one instance of this component will be created. When you are allowed to change the implementation of *ILogger* after a singleton instance already holds a reference to the "old" registered implementation the container has two choices—neither of which are correct:
+Imagine the scenario where you want to replace some *FileLogger* component for a different implementation with the same *ILogger* interface. If there's a component that directly or indirectly depends on *ILogger*, replacing the *ILogger* implementation might not work as you would expect. If the consuming component is registered as singleton, for example, the container should guarantee that only one instance of this component will be created. When you are allowed to change the implementation of *ILogger* after a singleton instance already holds a reference to the "old" registered implementation, the container has two choices—neither of which are correct:
 
 #. Return the cached instance of the consuming component that has a reference to the "wrong" *ILogger* implementation.
 #. Create and cache a new instance of that component and, in doing so, break the promise of the type being registered as a singleton and the guarantee that the container will always return the same instance.
@@ -237,3 +237,38 @@ Out of the box, Simple Injector only allows building up types that contain a sin
 Having multiple public constructors on the components that you resolve is an anti-pattern. This anti-pattern is described in more detail in `this article <https://blogs.cuttingedge.it/steven/posts/2013/di-anti-pattern-multiple-constructors/>`_
 
 This doesn't mean that it is impossible to do auto-wiring on types with multiple public constructors, but with Simple Injector this behavior will have to be :ref:`explicitly configured <Overriding-Constructor-Resolution-Behavior>`.
+
+.. _No-optional-arguments:
+
+No support for optional constructor arguments
+=============================================
+
+Out of the box, Simple Injector does not support optional constructor arguments. 
+
+
+.. code-block:: c#
+
+    public class HomeController
+    {
+        private readonly ILogger logger;
+    
+        public HomeController(ILogger logger = null)
+        {
+            this.logger = logger;
+        }
+    }
+
+* :ref:`Push developers into best practices <Push-developers-into-best-practices>`
+* :ref:`Never fail silently <Never-fail-silently>`
+* :ref:`Features should be intuitive <Features-should-be-intuitive>`
+* :ref:`Fast by default <Fast-by-default>`
+* :ref:`Don't force vendor lock-in <Vendor-lock-in>`
+
+
+* :ref:`Make simple use cases easy, make complex use cases possible <Make-simple-use-cases-easy>`
+* :ref:`Push developers into best practices <Push-developers-into-best-practices>`
+* :ref:`Fast by default <Fast-by-default>`
+* :ref:`Don't force vendor lock-in <Vendor-lock-in>`
+* :ref:`Never fail silently <Never-fail-silently>`
+* :ref:`Features should be intuitive <Features-should-be-intuitive>`
+* :ref:`Communicate errors clearly and describe how to solve them <Communicate-errors-clearly>`
