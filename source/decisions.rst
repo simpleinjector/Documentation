@@ -16,6 +16,7 @@ Our :doc:`design principles <principles>` have influenced the direction of the d
 * :ref:`Limited auto-registration API <Limited-auto-registration>`
 * :ref:`No per-thread lifestyle <No-per-thread-lifestyle>`
 * :ref:`Allow only a single constructor <One-constructor>`
+* :ref:`No support for optional constructor arguments <No-optional-arguments>`
 
 .. _Container-is-locked:
 
