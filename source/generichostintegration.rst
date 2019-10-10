@@ -4,6 +4,10 @@
 
 Simple Injector offers the `Simple Injector Generic Host Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.GenericHost>`_ for integration with .NET Core 2.1 Generic Host applications.
 
+.. container:: Note
+
+    **WARNING**: Due to breaking changes in ASP.NET Core 3, it is currently impossible to use the `AddHostedService` extension methods with the new `Microsoft.Extensions.Hosting.Host` class. If you want to resolve hosted services from Simple Injector while using ASP.NET Core 3, please revert to using `Microsoft.AspNetCore.WebHost` in your `Program` class until we have a fix.
+
 The following code snippet shows how to use the integration package to apply Simple Injector to your Console application's `Main` method:
 
 .. code-block:: c#
@@ -60,6 +64,10 @@ Both **AddSimpleInjector** and **UseSimpleInjector** methods can be enriched by 
 
 Using Hosted Services
 =====================
+
+.. container:: Note
+
+    **WARNING**: Due to breaking changes in ASP.NET Core 3, it is currently impossible to use the `AddHostedService` extension methods with the new `Microsoft.Extensions.Hosting.Host` class. If you want to resolve hosted services from Simple Injector while using ASP.NET Core 3, please revert to using `Microsoft.AspNetCore.WebHost` in your `Program` class until we have a fix.
 
 A Hosted Service is a background task running in an ASP.NET Core service or Console application. A Hosted Service implements the `IHostedService` interface and can run at certain intervals. When added to the Generic Host or ASP.NET Core pipeline, a Hosted Service instance will be referenced indefinitely by the host. This means that your Hosted Service implementation is effectively a **Singleton** and, therefore, will be configured as such by Simple Injector when you call Simple Injector's **AddHostedService<THostedService>** method:
 
