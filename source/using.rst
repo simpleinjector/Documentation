@@ -33,7 +33,7 @@ Ideally, the only place in an application that should directly reference and use
 
 .. container:: Note
 
-    **Tip**: In the context of Dependency Injection, this *start path* is typically referred to as the *Composition Root*. It is good to familirize you with the concept of the Composition Root. `This article <https://mng.bz/K1qZ>`_ is a great place to start. For an even more-detailed discussion of the Composition Root, read `this book <https://manning.com/seemann2>`_.
+    **Tip**: In the context of Dependency Injection, this *start path* is typically referred to as the *Composition Root*. It is good to familiarize you with the concept of the Composition Root. `This article <https://mng.bz/K1qZ>`_ is a great place to start. For an even more-detailed discussion of the Composition Root, read `this book <https://manning.com/seemann2>`_.
 
 .. container:: Note
 
