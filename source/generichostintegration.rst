@@ -4,15 +4,11 @@
 
 Simple Injector offers the `Simple Injector Generic Host Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.GenericHost>`_ for integration with .NET Core 2.1 Generic Host applications.
 
-.. container:: Note
-
-    **WARNING**: Due to breaking changes in ASP.NET Core 3, it is currently impossible to use the `AddHostedService` extension methods with the new `Microsoft.Extensions.Hosting.Host` class. If you want to resolve hosted services from Simple Injector while using ASP.NET Core 3, please revert to using `Microsoft.AspNetCore.WebHost` in your `Program` class until we have a fix.
-
 The following code snippet shows how to use the integration package to apply Simple Injector to your Console application's `Main` method:
 
 .. code-block:: c#
 
-    public static async Task Main(string[] args)
+    public static async Task Main()
     {
         var container = new Container();
 
@@ -21,6 +17,7 @@ The following code snippet shows how to use the integration package to apply Sim
             .ConfigureAppConfiguration((hostContext, configApp) => { ... })
             .ConfigureServices((hostContext, services) =>
             {
+                services.AddLogging();
                 services.AddLocalization(options => options.ResourcesPath = "Resources");
 
                 services.AddSimpleInjector(container, options =>
@@ -28,18 +25,17 @@ The following code snippet shows how to use the integration package to apply Sim
                     // Hooks hosted services into the Generic Host pipeline
                     // while resolving them through Simple Injector
                     options.AddHostedService<MyHostedService>();
+                    
+                    // Allows injection of ILogger & IStringLocalizer dependencies into
+                    // application components.
+                    options.AddLogging();
+                    options.AddLocalization();
                 });
             })
             .ConfigureLogging((hostContext, configLogging) => { ... })
             .UseConsoleLifetime()
             .Build()
-            .UseSimpleInjector(container, options =>
-            {
-                // Allows injection of ILogger & IStringLocalizer dependencies into
-                // application components.
-                options.UseLogging();
-                options.UseLocalization();
-            });
+            .UseSimpleInjector(container);
             
         // Register application components.
         container.Register<MainService>();
@@ -51,23 +47,19 @@ The following code snippet shows how to use the integration package to apply Sim
 
 The integration consists of two methods, namely **AddSimpleInjector** and **UseSimpleInjector**, that need to be called at certain stages in the startup phase:
 
-* **AddSimpleInjector** is an extension on `IServiceCollection` and sets up the ground work for the next method to complete.
-* **UseSimpleInjector** is an extension on `IHost` and allows Simple Injector to resolve framework components from the underlying `IServiceProvider`. This process is called cross wiring and is described in more detail :ref:`here <cross-wiring-third-party-services>`.
+* **AddSimpleInjector** is an extension on `IServiceCollection` and allows the cross wiring of several framework services, such as hosted services, logging, and localization. This cross-wiring process is described in more details :ref:`here <cross-wiring-third-party-services>`.
+* **UseSimpleInjector** is an extension on `IHost` and finalizes the integration process. It is a mandatory last step that tells Simple Injector which `IServiceProvider` it can use to load cross-wired framework services from. This allows Simple Injector to resolve framework components from the underlying `IServiceProvider`.
 
-Both **AddSimpleInjector** and **UseSimpleInjector** methods can be enriched by supplying a delegate that enables extra integration features. For instance:
+The **AddSimpleInjector** method can be enriched by supplying a delegate that enables extra integration features. For instance:
 
-* The **AddHostedService<T>** method can be used inside the **AddSimpleInjector** method to hook Hosted Services to the Generic Host pipeline, as discussed below.
-* The **UseLogging** method can be used inside the **UseSimpleInjector** method to allow application components to be injected with `Microsoft.Extensions.Logging.ILogger`. For more information, see :ref:`the Microsoft Logging integration section <microsoft-logging>`.
-* The **UseLocalization** method can be used inside the **UseSimpleInjector** method to allow application components to be injected with `Microsoft.Extensions.Localization.IStringLocalizer`. For more information, see :ref:`the Microsoft Logging integration section <microsoft-localization>`.
+* The **AddHostedService<T>** method allows hooking Hosted Services to the Generic Host pipeline, as discussed below.
+* The **AddLogging** method allows application components to be injected with `Microsoft.Extensions.Logging.ILogger`. For more information, see :ref:`the Microsoft Logging integration section <microsoft-logging>`.
+* The **AddLocalization** method allows application components to be injected with `Microsoft.Extensions.Localization.IStringLocalizer`. For more information, see :ref:`the Microsoft Logging integration section <microsoft-localization>`.
 
 .. _using-hosted-services:
 
 Using Hosted Services
 =====================
-
-.. container:: Note
-
-    **WARNING**: Due to breaking changes in ASP.NET Core 3, it is currently impossible to use the `AddHostedService` extension methods with the new `Microsoft.Extensions.Hosting.Host` class. If you want to resolve hosted services from Simple Injector while using ASP.NET Core 3, please revert to using `Microsoft.AspNetCore.WebHost` in your `Program` class until we have a fix.
 
 A Hosted Service is a background task running in an ASP.NET Core service or Console application. A Hosted Service implements the `IHostedService` interface and can run at certain intervals. When added to the Generic Host or ASP.NET Core pipeline, a Hosted Service instance will be referenced indefinitely by the host. This means that your Hosted Service implementation is effectively a **Singleton** and, therefore, will be configured as such by Simple Injector when you call Simple Injector's **AddHostedService<THostedService>** method:
 
@@ -162,11 +154,17 @@ The following code snippet shows how this `TimedHostedService<TService>` can be 
 
     services.AddSimpleInjector(container, options =>
     {
+        // Registers the hosted service as singleton in Simple Injector
+        // and hooks it onto the .NET Core Generic Host pipeline.
         options.AddHostedService<TimedHostedService<IProcessor>>();
-        container.RegisterInstance(new TimedHostedService<IProcessor>.Settings(
-            interval: TimeSpan.FromSeconds(10),
-            action: service => service.DoSomeWork()));        
-        container.Register<IProcessor, ProcessorImpl>();
     });
+    
+    // Registers the hosted service's settings object to define a specific schedule.
+    container.RegisterInstance(new TimedHostedService<IProcessor>.Settings(
+        interval: TimeSpan.FromSeconds(10),
+        action: processor => processor.DoSomeWork()));        
         
-The previous snippet uses Simple Injector's **AddHostedService<T>** method to register the `TimedHostedService<IProcessor>` in Simple Injector and adds it to the Generic Host pipeline. This class requires a `TimedHostedService<TService>.Settings` object in its constructor, which is configured using the second line. The settings specifies the interval and the action to execute—in this case the action on `IProcessor`.
+    container.Register<IProcessor, ProcessorImpl>();
+    
+        
+The previous snippet uses Simple Injector's **AddHostedService<T>** method to register the `TimedHostedService<IProcessor>` in Simple Injector and adds it to the Generic Host pipeline. This class requires a `TimedHostedService<TService>.Settings` object in its constructor, which is configured using the second registration. The settings specifies the interval and the action to execute—in this case the action on `IProcessor`.

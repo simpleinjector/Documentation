@@ -6,7 +6,7 @@ Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet p
 
 .. container:: Note
 
-    **WARNING**: This page is specific for Simple Injector v4.0 till v4.5. For v4.6 and up, there is a new integration page available :doc:`verification <aspnetintegration>`.
+    **WARNING**: This page is specific for Simple Injector v4.0 till v4.5. For v4.6 and up, there is a new integration page available :doc:`verification <aspnetintegration>`. Because of the numerous bug fixes and improvements made, you are advised to updated to the latest v4.x integration packages.
 
 .. container:: Note
 
