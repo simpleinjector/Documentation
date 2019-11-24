@@ -12,6 +12,7 @@ Simple Injector allows much of its default behavior to be changed or extended. T
 * :ref:`Intercepting the Creation of Types <Intercepting-the-Creation-of-Types>`
 * :ref:`Building up external instances <Building-Up-External-Instances>`
 * :ref:`Interception of Resolved Object Graphs <Interception-of-Resolved-Object-Graphs>`
+* :ref:`Getting notified about the container getting locked <Container-Locking>`
 
 .. _Overriding-Constructor-Resolution-Behavior:
 
@@ -418,3 +419,17 @@ When a user calls **Container.GetInstance** or **InstanceProducer.GetInstance**,
 The **InitializationContext** allows access to the **InstanceProducer** and **Registration** instances that describe the service's registration. These two types enable detailed analysis of the resolved service, if required.
 
 An **InstanceProducer** instance is responsible of caching the compiled factory delegate that allows the creation of new instances (according to their lifestyle) that is created. This factory delegate is a *Func<object>*. In case a *resolve interceptor* gets applied to an **InstanceProducer**, instead of calling that *Func<object>*, the **InstanceProducer** will call the resolve interceptor, while supplying that original *Func<object>* to the interceptor.
+
+.. _Container-locking:
+
+Container-locking
+=================
+
+Simple Injector v4.8 added a new **Container.Options.ContainerLocking** event. This allows you to get notified just before the container gets locked. This typically happens when the first instance is resolved, or when the container is being verified. This event can be used to add some last-minute registrations, that should be made last, or to detect who is locking the container to early:
+
+.. code-block:: c#
+    
+    container.Options.ContainerLocking += (sender, e) =>
+    {
+        Console.WriteLine("Container was locked.");
+    };

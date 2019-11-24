@@ -20,7 +20,7 @@ The following code snippet shows how to use the integration package to apply Sim
 
 .. code-block:: c#
 
-    public void Main()
+    public static void Main()
     {
         var container = new Container();
         
@@ -61,11 +61,13 @@ Cross wiring framework and third-party services
 
 When your application code needs a service which is defined by .NET Core or any third-party library, it is sometimes necessary to get such a dependency from .NET Core's built-in configuration system and inject it into your application components, which are constructed by Simple Injector. This is called *cross wiring*. Cross wiring is the process where a type is created and managed by the .NET Core configuration system and fed to Simple Injector so it can use the created instance to supply it as a dependency to your application code.
 
-Simple Injector will automatically cross wire framework components from the framework's `IServiceProvider` in case the **UseSimpleInjector** extension method is called:
+Simple Injector will automatically cross wire framework components from the framework's `IServiceProvider` in case both the **AddSimpleInjector** and **UseSimpleInjector** extension methods are called:
 
 .. code-block:: c#
 
-    IServiceProvider provider = services.BuildServiceProvider(validateScopes: true);
+    IServiceProvider provider = services
+        .AddSimpleInjector()
+        .BuildServiceProvider(validateScopes: true);
         
     // Ensures framework components are cross wired.
     provider.UseSimpleInjector(container);
@@ -84,40 +86,56 @@ In the case where the *SimpleInjector.Integration.AspNetCore* package is used in
         ...
     }
     
-When auto cross wiring is enabled using the **UseSimpleInjector** extension method, it accomplishes the following:
+When auto cross wiring is enabled, it accomplishes the following:
 
 * Anytime Simple Injector needs to resolve a dependency that is not registered, it queries the framework's `IServiceCollection` to see whether this dependency exists in the ASP.NET Core configuration system.
-* In case the dependency exists in `IServiceCollection`, Simple Injector ensures that the dependency is resolved from  the .NET Core configuration system anytime it is requested—in other words, by requesting it from the `IServiceProvider`.
+* In case the dependency exists in `IServiceCollection`, Simple Injector ensures that the dependency is resolved from the .NET Core configuration system anytime it is requested—in other words, by requesting it from the `IServiceProvider`.
 * In doing so, Simple Injector preserves the framework dependency's lifestyle. This allows application components that depend on external services to be :doc:`diagnosed <diagnostics>` for :doc:`Lifestyle Mismatches <LifestyleMismatches>`.
 * In case no suitable dependency exists in the `IServiceCollection`, Simple Injector falls back to its default behavior. This most likely means that an expressive exception is thrown, because the object graph can't be fully composed.
 
 Simple Injector's auto cross wiring has the following limitations:
 
 * Collections (e.g. `IEnumerable<T>`) are not auto cross wired because of unbridgeable differences between how Simple Injector and .NET Core's configuration system handle collections. If a framework or third-party supplied collection needs to be injected into an application component that is constructed by Simple injector, such collection should be cross wired manually. In that case, you must take explicit care to ensure no Lifestyle Mismatches occur—i.e. you should make the cross-wired registration with the lifestyle equal to the shortest lifestyle of the elements of the collection.
-* Cross wiring is a one-way process. By calling **UseSimpleInjector**, .NET's configuration system will not automatically resolve its missing dependencies from Simple Injector. When an application component, composed by Simple Injector, needs to be injected into a framework or third-party component, this has to be set up manually by adding a `ServiceDescriptor` to the `IServiceCollection` that requests the dependency from Simple Injector. This practice, however, should be quite rare.
+* Cross wiring is a one-way process. .NET's configuration system will not automatically resolve its missing dependencies from Simple Injector. When an application component, composed by Simple Injector, needs to be injected into a framework or third-party component, this has to be set up manually by adding a `ServiceDescriptor` to the `IServiceCollection` that requests the dependency from Simple Injector. This practice, however, should be quite rare.
 * Simple Injector will not be able to verify and diagnose object graphs built by the configuration system itself. Those components and their registrations are provided by Microsoft and third-party library makers—you should assume their correctness.
+* Simple Injector's verification can give false positives when cross wiring Transient framework or third-party components. This caused by differences in what 'Transient' means. Simple Injector sees a `Transient` component as something that is *short lived*. This is why a Transient components can't be injected into a Scoped or Singleton consumer. .NET Core, on the other hand, views a Transient component as something that is *stateless*. This is why .NET Core would allow such Transient to be injected into a Scoped and—in case the Transient does not have any Scoped dependencies—even into Singleton consumers. To err on the side of safety, Simple Injector still warns when it injects Transient framework components into your non-Transient application components. To fix this, you can make your consumer Transient, or suppress the warning, as explained in the :doc:`Lifestyle Mismatches <LifestyleMismatches>` documentation guide.
 
 In case the automatic cross wiring of framework components is not desired, it can be disabled by setting **AutoCrossWireFrameworkComponents** to `false`:
 
 .. code-block:: c#
 
-    IServiceProvider provider = services.BuildServiceProvider(validateScopes: true);
-        
-    provider.UseSimpleInjector(container, options =>
+    services.AddSimpleInjector(options =>
     {
         options.AutoCrossWireFrameworkComponents = false;
     });
-    
+
+    IServiceProvider provider = services.BuildServiceProvider(validateScopes: true);
+        
+    provider.UseSimpleInjector(container);
+
+.. container:: Note
+
+    **IMPORTANT**: This section has changed with the introduction of Simple Injector v4.8. There was a **AutoCrossWireFrameworkComponents** property on **UseSimpleInjector**, but it is marked as obsolete. You will get a compile error and a runtime error when using it. You should use the **AutoCrossWireFrameworkComponents** on **AddSimpleInjector** instead, as shown in the previous listing.
+
 Or more specifically for ASP.NET Core:
     
 .. code-block:: c#
 
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    public void ConfigureServices(IServiceCollection services)
     {
-        app.UseSimpleInjector(container, options =>
+        ...
+        
+        services.AddSimpleInjector(container, options =>
         {
             options.AutoCrossWireFrameworkComponents = false;
         });
+        
+        ...
+    }
+
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    {
+        app.UseSimpleInjector(container);
         
         ...
     }
@@ -126,14 +144,17 @@ When auto cross wiring is disabled, individual framework components can still be
 
 .. code-block:: c#
 
-    provider.UseSimpleInjector(container, options =>
+    services.AddSimpleInjector(container, options =>
     {
         options.AutoCrossWireFrameworkComponents = false;
         
         // Cross wires ILoggerFactory
         options.CrossWire<ILoggerFactory>();
     });
-       
+
+.. container:: Note
+
+    **IMPORTANT**: Similar as noted above, cross wiring changed in Simple Injector v4.8. With the introduction of v4.8, cross wiring needs to be applied during **AddSimpleInjector** instead of during **UseSimpleInjector**. You will get a compile warning when using cross wiring inside **UseSimpleInjector**.
 
 Like auto cross wiring, **CrossWire<TService>** does the required plumbing such as making sure the type is registered with the same lifestyle as configured in .NET Core, but with the difference of just cross wiring that single supplied type. The following listing demonstrates its use:
 
@@ -151,16 +172,16 @@ Like auto cross wiring, **CrossWire<TService>** does the required plumbing such 
 Integrating with Microsoft Logging
 ==================================
 
-The *SimpleInjector.Integration.ServiceCollection* package simplifies integration with Microsoft's `Microsoft.Extensions.Logging.ILogger` by introducing an **UseLogging** extension method:
+The *SimpleInjector.Integration.ServiceCollection* package simplifies integration with Microsoft's `Microsoft.Extensions.Logging.ILogger` by introducing an **AddLogging** extension method:
 
 .. code-block:: c#
 
-    .UseSimpleInjector(container, options =>
+    .AddSimpleInjector(container, options =>
     {
-        options.UseLogging();
+        options.AddLogging();
     });
 
-Calling **UseLogging()** allows application components to depend on the (non-generic) `Microsoft.Extensions.Logging.ILogger` abstraction, as shown in the following listing:
+Calling **AddLogging()** allows application components to depend on the (non-generic) `Microsoft.Extensions.Logging.ILogger` abstraction, as shown in the following listing:
 
 .. code-block:: c#
 
@@ -179,7 +200,7 @@ Calling **UseLogging()** allows application components to depend on the (non-gen
         }
     }
 
-When resolved, Simple Injector ensures that `CancelOrderHandler` gets injected with a logger specific for its usage. In practice this means the injected logger is an `Logger<CancelOrderHandler>`.
+When resolved, Simple Injector ensures that `CancelOrderHandler` gets injected with a logger specific for its usage. In practice this means the injected logger is a `Logger<CancelOrderHandler>`.
 
 .. container:: Note
 
@@ -188,18 +209,18 @@ When resolved, Simple Injector ensures that `CancelOrderHandler` gets injected w
 .. _microsoft-localization:
 
 Integrating with Microsoft Localization
-==================================
+=======================================
 
-The *SimpleInjector.Integration.ServiceCollection* package simplifies integration with Microsoft's `Microsoft.Extensions.Localization.IStringLocalizer` by introducing an **UseLocalization** extension method:
+The *SimpleInjector.Integration.ServiceCollection* package simplifies integration with Microsoft's `Microsoft.Extensions.Localization.IStringLocalizer` by introducing an **AddLocalization** extension method:
 
 .. code-block:: c#
 
-    .UseSimpleInjector(container, options =>
+    .AddSimpleInjector(container, options =>
     {
-        options.UseLocalization();
+        options.AddLocalization();
     });
 
-Calling **UseLocalization()** allows application components to depend on the (non-generic) `Microsoft.Extensions.Localization.IStringLocalizer` abstraction, as shown in the following listing:
+Calling **AddLocalization()** allows application components to depend on the (non-generic) `Microsoft.Extensions.Localization.IStringLocalizer` abstraction, as shown in the following listing:
 
 .. code-block:: c#
 
@@ -219,7 +240,8 @@ Calling **UseLocalization()** allows application components to depend on the (no
             return this.localizer["About Title"];
         }
     }
-When resolved, Simple Injector ensures that `AboutController` gets injected with a IStringLocalizer specific for its usage. In practice this means the injected StringLocalizer is an `StringLocalizer<AboutController>`.
+
+When resolved, Simple Injector ensures that `AboutController` gets injected with a IStringLocalizer specific for its usage. In practice this means the injected StringLocalizer is a `StringLocalizer<AboutController>`.
 
 .. container:: Note
 
@@ -227,7 +249,7 @@ When resolved, Simple Injector ensures that `AboutController` gets injected with
     
 .. container:: Note
 
-    **IMPORTANT**: The UseLocalization provide only integration for the IStringLocalizer with Simple Injector. The `Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer` abstraction is not part of this integration option.
+    **IMPORTANT**: **AddLocalization** provides only integration for the IStringLocalizer with Simple Injector. The `Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer` abstraction is not part of this integration option.
 
 .. _working-with-ioptions:
     
@@ -242,7 +264,7 @@ Second, `IOptions<T>` configuration values are read lazily. Although the configu
 
 To make things worse, in case you forget to configure a particular section (by omitting a call to `services.Configure<T>`) or when you make a typo while retrieving the configuration section (e.g. by supplying the wrong name to `Configuration.GetSection(name)`), the configuration system will simply supply the application with a default and empty object instead of throwing an exception! This may make sense when building framework or third-party components, but not so much for application development, as it easily leads to fragile applications.
 
-Because you want to verify the configuration at start-up, it makes no sense to delay reading it, and that makes injecting `IOptions<T>` into your application components plain wrong. Depending on `IOptions<T>` might still be useful when bootstrapping the application, but not as a dependency anywhere else in your application. The `IOptions<T>` architecture is designed for the framework and its components, and makes sense in that particular context—it does not make sense in the context of line of business applications.
+Because you want to verify the configuration at start-up, it makes no sense to delay reading it, and that makes injecting `IOptions<T>` into your application components plain wrong. Depending on `IOptions<T>` might still be useful when bootstrapping the application, but not as a dependency anywhere else in your application. The `IOptions<T>` architecture is designed for the framework and its components, and makes sense in that particular context—it does not make sense in the context of line-of-business applications.
 
 Once you have a correctly read and verified configuration object, registration of the component that requires the configuration object is as simple as this:
 

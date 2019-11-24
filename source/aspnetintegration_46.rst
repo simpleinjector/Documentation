@@ -1,4 +1,4 @@
-﻿===================================================
+===================================================
 ASP.NET Core and ASP.NET Core MVC Integration Guide
 ===================================================
 
@@ -6,7 +6,7 @@ Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet p
 
 .. container:: Note
 
-    **IMPORTANT**: This page is specific to the integration packages for Simple Injector v4.8 and up. In case you are using an older version of Simple Injector, please see the :doc:`old integration page <aspnetintegration_46>`. However, in the context of integration with ASP.NET Core, you are advised to upgrade to v4.8. Those versions fixed numerous bugs concerning integration with ASP.NET Core.
+    **IMPORTANT**: This page is specific to the integration packages for Simple Injector v4.6 and up. In case you are using an older version of Simple Injector, please see the :doc:`old integration page <aspnetintegration_45>`. However, in the context of integration with ASP.NET Core, you are advised to upgrade to v4.8. Those versions fixed numerous bugs concerning integration with ASP.NET Core.
 
 The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
 
@@ -14,100 +14,72 @@ The following code snippet shows how to use the integration package to apply Sim
 
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
     using SimpleInjector;
 
     public class Startup
     {
-        private Container container = new SimpleInjector.Container();
-
-        public Startup(IConfiguration configuration)
+        private Container container = new Container();
+        
+        public Startup(IHostingEnvironment env)
         {
-            // Set to false. This will be the default in v5.x and going forward.
-            container.Options.ResolveUnregisteredConcreteTypes = false;
-
-            Configuration = configuration;
+            // ASP.NET default stuff here
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
             // ASP.NET default stuff here
-            services.AddControllersWithViews();
+            services.AddMvc();
 
             services.AddLogging();
             services.AddLocalization(options => options.ResourcesPath = "Resources");
-                
-            // Sets up the basic configuration that for integrating Simple Injector with
-            // ASP.NET Core by setting the DefaultScopedLifestyle, and setting up auto
-            // cross wiring.
+
             services.AddSimpleInjector(container, options =>
             {
-                // AddAspNetCore() wraps web requests in a Simple Injector scope and
-                // allows request-scoped framework services to be resolved.
+                // AddAspNetCore() wraps web requests in a Simple Injector scope.
                 options.AddAspNetCore()
-
                     // Ensure activation of a specific framework type to be created by
                     // Simple Injector instead of the built-in configuration system.
-                    // All calls are optional. You can enable what you need. For instance,
-                    // PageModels and TagHelpers are not needed when you build a Web API.
                     .AddControllerActivation()
                     .AddViewComponentActivation()
                     .AddPageModelActivation()
                     .AddTagHelperActivation();
-
-                // Optionally, allow application components to depend on the non-generic 
-                // ILogger (Microsoft.Extensions.Logging) or IStringLocalizer
-                // (Microsoft.Extensions.Localization) abstractions.
-                options.AddLogging();
-                options.AddLocalization();
             });
-
-            InitializeContainer();
         }
-
+        
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            // UseSimpleInjector() enables framework services to be injected into
+            // application components, resolved by Simple Injector.
+            app.UseSimpleInjector(container, options =>
+            {
+                // Add custom Simple Injector-created middleware to the ASP.NET pipeline.
+                options.UseMiddleware<CustomMiddleware1>(app);
+                options.UseMiddleware<CustomMiddleware2>(app);
+                
+                // Optionally, allow application components to depend on the
+                // non-generic Microsoft.Extensions.Logging.ILogger 
+                // or Microsoft.Extensions.Localization.IStringLocalizer abstractions.
+                options.UseLogging();
+                options.UseLocalization();
+            });
+            
+            InitializeContainer();
+            
+            // Always verify the container
+            container.Verify();
+            
+            // ASP.NET default stuff here
+            app.UseMvc(routes => ...);
+        }
+        
         private void InitializeContainer()
         {
             // Add application services. For instance: 
-            container.Register<IUserService, UserService>(Lifestyle.Singleton);
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            // UseSimpleInjector() finalizes the integration process.
-            app.UseSimpleInjector(container);
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
-
-            // Default ASP.NET middleware
-            app.UseStaticFiles();
-            app.UseRouting();
-            app.UseAuthorization();
-
-            // Add your custom Simple Injector-created middleware to the pipeline.
-            app.UseMiddleware<CustomMiddleware1>(container);
-            app.UseMiddleware<CustomMiddleware2>(container);
-
-            // ASP.NET MVC default stuff here
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
-
-            // Always verify the container
-            container.Verify();
+            container.Register<IUserService, UserService>(Lifestyle.Scoped);
         }
     }
     
@@ -116,7 +88,7 @@ The following code snippet shows how to use the integration package to apply Sim
     **NOTE**: Please note that when integrating Simple Injector in ASP.NET Core, you do **not** replace ASP.NET's built-in container, as advised by `the Microsoft documentation <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection#replacing-the-default-services-container>`_. The practice with Simple Injector is to use Simple Injector to build up object graphs of your *application components* and let the built-in container build framework and third-party components, as shown in the previous code snippet. To understand the rationale around this, please read `this article <https://simpleinjector.org/blog/2016/06/whats-wrong-with-the-asp-net-core-di-abstraction/>`_.
 
 
-.. _core-integration-packages:
+.. _core-integration-packages_46:
     
 Available integration packages
 ==============================
@@ -150,9 +122,7 @@ In case you need more fine-grained control over the number of Microsoft packages
 |                                                                                   | This package contains the following dependencies:                              |
 |                                                                                   |                                                                                |
 |                                                                                   | * SimpleInjector.Integration.ServiceCollection                                 |
-|                                                                                   | * Microsoft.AspNetCore.Abstractions                                            |
 |                                                                                   | * Microsoft.AspNetCore.Http                                                    |
-|                                                                                   | * Microsoft.AspNetCore.Http.Abstractions                                       |
 |                                                                                   | * Microsoft.Extensions.Hosting.Abstractions                                    |
 +-----------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 | `SimpleInjector.Integration.GenericHost                                           | Adds .NET Core 2.1 **Hosted Service** integration and integration on top of    |
@@ -163,11 +133,10 @@ In case you need more fine-grained control over the number of Microsoft packages
 |                                                                                   | This package contains the following dependencies:                              |
 |                                                                                   |                                                                                |
 |                                                                                   | * SimpleInjector.Integration .ServiceCollection                                |
-|                                                                                   | * Microsoft.Extensions .DependencyInjection.Abstractions                       |
 |                                                                                   | * Microsoft.Extensions.Hosting .Abstractions                                   |
 +-----------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 | `SimpleInjector.Integration.ServiceCollection                                     | Adds integration with .NET Core's configuration system (i.e.                   |
-| <https://www.nuget.org/packages/SimpleInjector.Integration.ServiceCollection>`_   | *IServiceCollection*) by allowing framework-configured services to be          |
+| <https://www.nuget.org/packages/SimpleInjector.Integration.ServiceCollection>`_   | *IServiceCollection*) by allowing framework configured-services to be          |
 |                                                                                   | injected into Simple Injector-managed components. Furthermore, simplifies      |
 |                                                                                   | integration with .NET Core's logging infrastructure.                           |
 |                                                                                   | The features of this package are discussed in the                              |
@@ -177,13 +146,11 @@ In case you need more fine-grained control over the number of Microsoft packages
 |                                                                                   |                                                                                |
 |                                                                                   | * SimpleInjector (core library)                                                |
 |                                                                                   | * Microsoft.Extensions .DependencyInjection.Abstractions                       |
-|                                                                                   | * Microsoft.Extensions.Hosting.Abstractions                                    |
-|                                                                                   | * Microsoft.Extensions.Localization.Abstractions                               |
 |                                                                                   | * Microsoft.Extensions.Logging.Abstractions                                    |
 +-----------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 
     
-.. _wiring-custom-middleware:
+.. _wiring-custom-middleware_46:
     
 Wiring custom middleware
 ========================
@@ -194,64 +161,20 @@ The previous `Startup` snippet already showed how a custom middleware class can 
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
-        app.UseSimpleInjector(container);
- 
-        app.UseMiddleware<CustomMiddleware>(container);
-  
-        ...
-    }
-    
-.. container:: Note
-
-    **IMPORTANT**: The API changed in v4.8 of the Simple Injector ASP.NET Core integration packages. Previously, **UseMiddleware** was called inside the **UseSimpleInjector** method. Doing so, caused middleware to be applied at the wrong stage in the pipeline. This could, for instance, cause your middleware to be executed before the static files middleware (i.e. the `.UseStaticFiles()` call) or before authorization is applied (i.e. the `.UseAuthorization()` call). Instead, take care that you call **.UseMiddleware<TMiddleware>(Container)** at the right stage. This typically means after `.UseStaticFiles()` and `.UseAuthorization()`, but before `.UseEndpoints(...)`, as shown in the next listing.
-    
-.. code-block:: c#
-
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-    {
-        // UseSimpleInjector() enables framework services to be injected into
-        // application components, resolved by Simple Injector.
-        app.UseSimpleInjector(container);
-
-        if (env.IsDevelopment())
+        app.UseSimpleInjector(container, options =>
         {
-            app.UseDeveloperExceptionPage();
-        }
-        else
-        {
-            app.UseExceptionHandler("/Home/Error");
-        }
-
-        app.UseStaticFiles();
-
-        app.UseRouting();
-
-        app.UseAuthorization();
-
-        // In ASP.NET Core, middleware is applied in the order of registration.
-        // (opposite to how decorators are applied in Simple Injector). This means
-        // that the following two custom middleware components are wrapped inside
-        // the authorization middleware, which is typically what you'd want.
-        app.UseMiddleware<CustomMiddleware1>(container);
-        app.UseMiddleware<CustomMiddleware2>(container);
-
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            options.UseMiddleware<CustomMiddleware>(app);
         });
         
-        // Always verify the container
-        container.Verify();
-    }
+        ...
+    }    
     
 The type supplied to **UseMiddleware<T>** should implement the `IMiddleware` interface from the `Microsoft.AspNetCore.Http` namespace. A compile error will be given in case the middleware does not implement that interface.
     
 This **UseMiddleware** overload ensures two particular things:
 
 * Adds a middleware type to the application's request pipeline. The middleware will be resolved from the supplied the Simple Injector container.
-* The middleware type will be added to the container for :doc:`verification <diagnostics>`. This means that you should call **container.Verify()** after the calls to **UseMiddleware** to ensure that your middleware components are verified.
+* The middleware type will be added to the container for :doc:`verification <diagnostics>`.
     
 The following code snippet shows how such `CustomMiddleware` class might look like:
 
@@ -278,7 +201,7 @@ The following code snippet shows how such `CustomMiddleware` class might look li
 Notice how the `CustomMiddleware` class contains dependencies. When the middleware is added to the pipeline using the previously shown **UseMiddleware** overload, it will be resolved from Simple Injector on each request, and its dependencies will be injected.
 
 
-.. _cross-wiring:
+.. _cross-wiring_46:
 
 Cross wiring ASP.NET and third-party services
 =============================================
@@ -286,8 +209,8 @@ Cross wiring ASP.NET and third-party services
 This topic has been moved. Please go :ref:`here <cross-wiring-third-party-services>`.
 
 
-.. _ioption:
-.. _ioptions:
+.. _ioption_46:
+.. _ioptions_46:
     
 Working with `IOptions<T>`
 ==========================
@@ -295,7 +218,7 @@ Working with `IOptions<T>`
 This topic has been moved. Please go :ref:`here <working-with-ioptions>`.
 
 
-.. _hosted-services:
+.. _hosted-services_46:
 
 Using Hosted Services
 =====================
@@ -303,7 +226,7 @@ Using Hosted Services
 Simple Injector simplifies integration of Hosted Services into ASP.NET Core. For this, you need to include the `SimpleInjector.Integration.GenericHost <https://www.nuget.org/packages/SimpleInjector.Integration.GenericHost>`_ NuGet package. For more information on how to integrate Hosted Services into your ASP.NET Core web application, please read the :ref:`Using Hosted Services <using-hosted-services>` section of the :doc:`.NET Generic Host Integration Guide <generichostintegration>`.
 
 
-.. _fromservices:
+.. _fromservices_46:
 
 Using [FromServices] in ASP.NET Core MVC Controllers
 ====================================================
@@ -324,24 +247,24 @@ You might be tempted to apply method injection to prevent the controller’s con
 
 A typical solution to this problem is to split up the class into multiple smaller classes. At first this might seem problematic for controller classes, because they can act as gateway to the business layer and the API signature follows the naming of controllers and their actions. Do note, however, that this one-to-one mapping between controller names and the route of your application is not a requirement. ASP.NET Core has a very flexible `routing system <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing>`_ that allows you to completely change how routes map to controller names and even action names. This allows you to split controllers into very small chunks with a very limited number of constructor dependencies and without the need to fall back to method injection using `[FromServices]`.
 
-Simple Injector :ref:`promotes best practices<Push-developers-into-best-practices>`, and because of downsides described above, we consider the use of the `[FromServices]` attribute *not* to be a best practice. This is why we choose not to provide out-of-the-box support for injecting Simple Injector registered dependencies into controller actions. 
+Simple Injector :ref:`promotes <Push-developers-into-best-practices>` best practices, and because of downsides described above, we consider the use of the `[FromServices]` attribute *not* to be a best practice. This is why we choose not to provide out-of-the-box support for injecting Simple Injector registered dependencies into controller actions. 
 
 In case you still feel method injection is the best option for you, you can plug in a custom `IModelBinderProvider` implementation returning a custom `IModelBinder` that resolves instances from Simple Injector.
 
 
-.. _resolving-from-validationcontext:
+.. _resolving-from-validationcontext_46:
 
 Resolving services from MVC's ValidationContext
 ===============================================
 
 ASP.NET Core MVC allows you to implement custom validation logic inside model classes using the `IValidatableObject` interface. Although there is nothing inherently wrong with placing validation logic inside the model object itself, problems start to appear when that validation logic requires services to work. By default this will not work with Simple Injector, as the `ValidationContext.GetService` method forwards the call to the built-in configuration system—not to Simple Injector.
 
-In general, you should prevent calling `GetService` or similar methods from within application code, such as MVC model classes. This leads to the `Service Locator anti-pattern <https://mng.bz/WaQw>`_.
+In general, you should prevent calling `GetService` or similar methods from within application code, such as MVC model classes. This leads to the Service Locator anti-pattern.
 
 Instead, follow the advice given in `this Stack Overflow answer <https://stackoverflow.com/a/55846598/264697>`_.
 
 
-.. _razor-pages:
+.. _razor-pages_46:
 
 Using Razor Pages
 =================
@@ -366,12 +289,14 @@ Integration for Razor Pages is part of the *SimpleInjector.Integration.AspNetCor
 
 This is all that is required to integrate Simple Injector with ASP.NET Core Razor Pages.
 
-.. _identity:
+
+
+.. _identity_46:
     
 Working with ASP.NET Core Identity
 ==================================
 
-The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. The default template requires a fair amount of cross-wired dependencies. When auto cross wiring is enabled (when calling **AddSimpleInjector**) integration with ASP.NET Core Identity couldn't be more straightforward. When you followed the :ref:`cross wire guidelines <cross-wiring>`, this is all you'll have to do to get Identity running.
+The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. The default template requires a fair amount of cross wired dependencies. When auto cross wiring is enabled (when calling **UseSimpleInjector**) integration with ASP.NET Core Identity couldn't be more straightforward. When you followed the :ref:`cross wire guidelines <cross-wiring>`, this is all you'll have to do to get Identity running.
 
 .. container:: Note
 
