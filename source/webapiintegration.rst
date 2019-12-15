@@ -201,7 +201,8 @@ The solution is to define a proxy class that sits in between. Since Web API lack
                 handler.InnerHandler = this.InnerHandler;
             }
 
-            var invoker = new HttpMessageInvoker(handler);
+            // Do not dispose handler as this is managed by Simple Injector
+            var invoker = new HttpMessageInvoker(handler, disposeHandler: false);
         
             return invoker.SendAsync(request, cancellationToken);
         }

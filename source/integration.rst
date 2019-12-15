@@ -26,10 +26,12 @@ Besides integration with standard .NET technologies, Simple Injector can be inte
 
 * `ASP.NET Identity Framework <https://github.com/simpleinjector/SimpleInjector/issues/597>`_
 * `Azure Functions <https://github.com/simpleinjector/SimpleInjector/issues/536>`_
+* `Azure WebJobs SDK <https://github.com/simpleinjector/SimpleInjector/issues/712#issuecomment-493213757>`_
 * `Castle DynamicProxy Interception <https://stackoverflow.com/questions/24513530/using-simple-injector-with-castle-proxy-interceptor>`_
 * `Drum <https://stackoverflow.com/questions/26661621/how-to-register-drum-urimaker-using-simple-injector>`_
 * `Fluent Validations <https://stackoverflow.com/questions/9984144/what-is-the-correct-way-to-register-fluentvalidation-with-simpleinjector>`_
 * `FluentScheduler <https://stackoverflow.com/a/53956064/264697>`_
+* `gRPC-dotnet <https://github.com/simpleinjector/SimpleInjector/issues/785>`_
 * `HttpClientFactory <https://github.com/simpleinjector/SimpleInjector/issues/654>`_
 * `Membus <https://stackoverflow.com/questions/16123641/membus-and-ioc-simpleinjector-wiring-command-handlers-automatically-by-interfa>`_
 * `Nancy <https://github.com/NancyFx/Nancy/issues/1227#issuecomment-163279040>`_
