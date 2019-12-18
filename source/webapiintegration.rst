@@ -189,7 +189,7 @@ The solution is to define a proxy class that sits in between. Since Web API lack
             this.container = container;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken) {
 
             // Important: Trigger the creation of the scope.
@@ -202,9 +202,10 @@ The solution is to define a proxy class that sits in between. Since Web API lack
             }
 
             // Do not dispose handler as this is managed by Simple Injector
-            var invoker = new HttpMessageInvoker(handler, disposeHandler: false);
-        
-            return invoker.SendAsync(request, cancellationToken);
+            using (var invoker = new HttpMessageInvoker(handler, disposeHandler: false))
+            {        
+                return await invoker.SendAsync(request, cancellationToken);
+            }
         }
     }
     
