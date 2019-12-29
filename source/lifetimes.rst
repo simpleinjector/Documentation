@@ -207,7 +207,7 @@ To mitigate this, you can define your own abstraction that allows disposable obj
 
 .. code-block:: c#
         
-    foreach (var flushable = scope.GetDisposables().OfType<IAsyncFlushable>().Reverse())
+    foreach (var flushable in scope.GetDisposables().OfType<IAsyncFlushable>().Reverse())
     {
         await flushable.FlushAsync();
     }
