@@ -217,7 +217,7 @@ The same method can be applied when asynchronously disposing instances that are 
 .. code-block:: c#
     
     var disposabless = container.ContainerScope.GetDisposables();
-    foreach (var flushable = disposables.OfType<IAsyncFlushable>().Reverse())
+    foreach (var flushable in disposables.OfType<IAsyncFlushable>().Reverse())
     {
         await flushable.FlushAsync();
     }
