@@ -15,7 +15,7 @@ The component depends on a service with a lifestyle that is shorter than that of
 Warning Description
 ===================
 
-In general, components should only depend on other components that are configured to live at least as long. In other words, it is safe for a transient component to depend on a singleton, but not the other way around. Since components store a reference to their dependencies in (private) instance fields, those dependencies are kept alive for the lifetime of that component. This means that dependencies that are configured with a shorter lifetime than their consumer, accidentally live longer than intended. This can lead to all sorts of bugs, such as hard to debug multi-threading issues.
+In general, components should only depend on other components that are configured to live at least as long. In other words, it is safe for a transient component to depend on a singleton, but not the other way around. Because components store a reference to their dependencies in (private) instance fields, those dependencies are kept alive for the lifetime of that component. This means that dependencies that are configured with a shorter lifetime than their consumer, accidentally live longer than intended. This can lead to all sorts of bugs, such as hard to debug multi-threading issues.
 
 The Diagnostic Services detect this kind of misconfiguration and report it. The container will be able to compare all built-in lifestyles (and sometimes even custom lifestyles). Here is an overview of the built-in lifestyles ordered by their length:
 
@@ -29,7 +29,7 @@ The Diagnostic Services detect this kind of misconfiguration and report it. The 
     
 .. container:: Note
 
-    **Note**: Lifestyle mismatches are such a common source of bugs, that the container always checks for mismatches the first time a component is resolved, no matter whether you call *Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
+    **Note**: Lifestyle mismatches are such a common source of bugs, that the container always checks for mismatches the first time a component is resolved, no matter whether you call *Container.Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
 
 
 How to Fix Violations
@@ -90,6 +90,26 @@ The following example shows how to query the Diagnostic API for Lifetime Mismatc
             result.Relationship.Dependency.Lifestyle.Name);
     }
 
+Working with Scoped components
+==============================
+
+Simple Injector's Lifestyle Mismatch verification is strict and will warn about injecting :ref:`Transient <Transient>` dependencies into :ref:`Scoped <Scoped>` components. This is because **Transient**, in the context of Simple Injector, means *short lived*. A **Scoped** component, however, could live for quite a long time, depending on the time you decide to keep the `Scope` alive. Simple Injector does not know how your application handles scoping.
+
+This, however, can be a quite restrictive model. Especially for applications where the lifetime of a scope equals that of a web request. In that case the `Scope` lives very short, and in that case the difference in lifetime between the **Transient** and **Scoped** lifestyle might be non-existing. It can, therefore, make sense in these types of applications to loosen the restriction and allow **Transient** dependencies to be injected into **Scoped** consumers. Especially because Simple Injector does track **Scoped** dependencies and allows them to be disposed, while **Transient** components are not tracked. See the :doc:`Disposable Transient Components diagnostic warning <disposabletransientcomponent>` for more information on this behavior.
+
+To allow **Transient** dependencies to be injected into **Scoped** consumers without causing verification warnings, you can configure **Options.UseLoosenedLifestyleMismatchBehavior** as follows:
+
+.. code-block:: c#
+
+    var container = new Container();
+
+    container.Options.UseLoosenedLifestyleMismatchBehavior = true;
+
+.. container:: Note
+
+    **Note** the **Options.UseLoosenedLifestyleMismatchBehavior** setting requires Simple Injector v4.9 or newer.
+
+
 What about Hybrid lifestyles?
 =============================
 
@@ -120,7 +140,7 @@ Simple Injector v4.5 improved the ability to find Lifestyle Mismatches by trying
 .. container:: Note
 
     {dependency} is part of the {collection} that is injected into {consumer}. The problem in {consumer} is that instead of storing the injected {collection} in a private field and iterating over it at the point its instances are required, {dependency} is being resolved (from the collection) during object construction. Resolving services from an injected collection during object construction (e.g. by calling {parameter name}.ToList() in the constructor) is not advised.
-    
+
 This warning is stating that the `collection` (e.g. an `IEnumerable<ILogger>`), which was injected into a class called `consumer`, was iterated during object construction—most likely inside the constructor.
 
 The following code will reproduce the issue:
