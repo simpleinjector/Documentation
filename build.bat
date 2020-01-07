@@ -19,7 +19,7 @@ if NOT "%PAPER%" == "" (
 	set I18NSPHINXOPTS=-D latex_paper_size=%PAPER% %I18NSPHINXOPTS%
 )
 
-%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
+c:\Python27\Scripts\%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
 if errorlevel 1 exit /b 1
 echo.
 echo.Html build finished. The HTML pages are in %BUILDDIR%/html.
