@@ -33,7 +33,7 @@ Ideally, the only place in an application that should directly reference and use
 
 .. container:: Note
 
-    **Tip**: In the context of Dependency Injection, this *start path* is typically referred to as the *Composition Root*. It is good to familiarize you with the concept of the Composition Root. `This article <https://mng.bz/K1qZ>`_ is a great place to start. For an even more-detailed discussion of the Composition Root, read `this book <https://manning.com/seemann2>`_.
+    **Tip**: In the context of Dependency Injection, this *start path* is typically referred to as the *Composition Root*. It is good to familiarize you with the concept of the Composition Root. `This article <https://mng.bz/K1qZ>`_ is a great place to start. For an even more-detailed discussion of the Composition Root, read `this book <https://mng.bz/BYNl>`_.
 
 .. container:: Note
 
@@ -551,4 +551,4 @@ For more information about Simple Injector please visit the following links:
 * For more information about dependency injection in general, please visit `this page on Stackoverflow <https://stackoverflow.com/tags/dependency-injection/info>`_.
 * If you have any questions about how to use Simple Injector or about dependency injection in general, the experts at `Stackoverflow.com <https://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23>`_ are waiting for you.
 * For all other Simple Injector related question and discussions, such as bug reports and feature requests, the `Simple Injector discussion forum <https://simpleinjector.org/forum>`_ will be the place to start.
-* The book `Dependency Injection Principles, Practices, and Patterns <https://manning.com/seemann2/>`_ presents core DI patterns in plain C# so you'll fully understand how DI works.
+* The book `Dependency Injection Principles, Practices, and Patterns <https://mng.bz/BYNl>`_ presents core DI patterns in plain C# so you'll fully understand how DI works.
