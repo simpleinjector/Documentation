@@ -99,14 +99,14 @@ Optionally you can let transient services dispose when a scope ends. Here's an e
         where TService : class
     {
         var scoped = Lifestyle.Scoped;
-        var r = Lifestyle.Transient.CreateRegistration<TService, TImplementation>(c);
+        var r = Lifestyle.Transient.CreateRegistration<TImplementation>(c);
         r.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent, "ignore");
         c.AddRegistration(typeof(TService), r);
         c.RegisterInitializer<TImplementation>(o => scoped.RegisterForDisposal(c, o));
     }
     
 The following code snippet show the usage of this extension method:
-    
+
 .. code-block:: c#
         
     var container = new Container();
