@@ -62,4 +62,4 @@ With this code in place, we can now write our *Form* classes as follows:
 
 .. container:: Note
 
-    **Note**: It is not possible to use *Constructor Injection* in *User Controls*. *User Controls* are required to have a default constructor. Instead, pass on dependencies to your *User Controls* using *Method Injection*.
+    **Note**: It is not possible to use *Constructor Injection* in *User Controls*. *User Controls* are required to have a default constructor. Instead, pass on dependencies to your *User Controls* using :ref:`Property Injection <property-injection>`.
