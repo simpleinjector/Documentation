@@ -2,12 +2,17 @@
 Diagnostic Services
 ===================
 
-The **Diagnostic Services** allow you to analyze the container's configuration to search for common configuration mistakes. Simple Injector knows about several common issues that might arise when composing the object graph, and can expose this information to the developer via its diagnostics API. Currently, Simple Injector classifies the issues in two severities: Warnings and Informational messages. 
+The **Diagnostic Services** allow you to verify, analyze, diagnose, and visualize the container's configuration to search for common configuration mistakes.
 
-Information messages are are hints of things might want to look into, such as possible Single Responsibility Principle violations. Warnings on the other hand are strong indications that there is a problem with your configuration. See them as the Simple Injector equivalent of C# warnings: Your code will compile (as in: we will be able to resolve your objects), but you rather want to fix those warnings.
+Simple Injector knows about several common issues that might arise when composing object graphs, and can expose this information to the developer via its diagnostics API. Simple Injector classifies the issues in two severities: information messages and diagnostic warnings:
 
-Supported Warnings
-==================
+* *Information messages* are are hints of things might want to look into, such as possible Single Responsibility Principle violations. Information messages can be requested by supplying your *Container* instance to the **Analyzer.Analyze** method.
+* *Diagnostic warnings* on the other hand are strong indications that there is a problem with your configuration. See them as the Simple Injector equivalent of C# warnings: Your code will compile (as in: Simple Injector will be able to resolve your objects), but you rather want to fix the warning or otherwise explicitly suppress it. Like information messages, warnings can be requested by calling **Analyzer.Analyze**. But more conveniently, warnings will be reported in the form of an exception when you call **Container.Verify()**.
+
+This document goes in further detail how to obtain and interpreter these messages.
+
+Supported Diagnostic Warnings
+=============================
 
 .. toctree::
     :titlesonly:
@@ -18,7 +23,7 @@ Supported Warnings
     Ambiguous Lifestyles <ambiguouslifestyles>
     Disposable Transient Components <disposabletransientcomponent>
     
-Supported Information messages
+Supported Information Messages
 ==============================
 
 .. toctree::
@@ -30,41 +35,43 @@ Supported Information messages
 How to view diagnostic results
 ==============================
 
-.. container:: Note
+When you call **Container.Verify()** at the end of the configuration process, Simple Injector will do two things:
 
-    **Note**: In Simple Injector 3, the container now by default checks for problems when calling **Verify()**. In case of a diagnostic warning, the container's **Verify()** method will throw a **DiagnosticVerificationException**.
+* It runs a simple check on all registrations to see if all components can be created. This is done by calling their constructors and injecting their dependencies. If any registrations are missing, an exception is thrown
+* The container checks for diagnostic warnings. If there are any warnings, a exception is thrown that contains a summary of all reported diagnostic warnings.
 
 .. container:: Note
 
     **Tip**: Always call **Verify()** when you're done configuring the **Container**. This allows your application to fail-fast in case of configuration problems.
 
-There are two ways to view the diagnostic results - results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.
+There are two ways to view the diagnostic results—results can be viewed visually during debugging in Visual Studio and programmatically by calling the Diagnostic API.
 
 Diagnostic results are available during debugging in Visual Studio after calling **Container.Verify()**. Set a breakpoint after the line that calls **Verify()** and when the breakpoint hits, hover over the **Container** instance with the mouse. The debugger context menu will appear for the *container* variable which you can unfold to view the diagnostic results. This might look like this:
 
-.. image:: images/diagnosticsdebuggerview.png 
-   :alt: Diagnostics debugger view context menu
+.. image:: images/diagnosticsdebuggerview_4.9.png
+   :alt: Diagnostics Debugger View context menu
 
-Another option is to add the *container* variable to the Visual Studio watch window by right clicking on the variable and selecting 'Add Watch' in the context menu:
+Another option is to add the *container* variable to the Visual Studio Watch window by right clicking on the variable and selecting 'Add Watch' in the context menu:
 
-.. image:: images/diagnostics2.png 
+.. image:: images/diagnostics_4.9.png
    :alt: Diagnostics debugger view watch window
 
-The debugger views also allow visualizing your application's dependency graphs. This can give you a good view of what the end result of your DI configuration is. By drilling into the list of **Registrations** or **Root Registrations**, you can select the text visualizer (the magnifying glass icon) on the **DependencyGraph** property on any of the listed registrations:
+The Debugger View also allows visualizing your application's dependency graphs. This can give you a good view of what the end result of your DI configuration is. By drilling into the list of *Registrations* or *Root Registrations*, you can select the text visualizer (the magnifying glass icon) on the *DependencyGraph* property on any of the listed registrations:
 
-.. image:: images/dependencygraph.png 
+.. image:: images/dependencygraph_4.9.png
    :alt: Viewing dependency graphs  
 
 .. container:: Note
 
-    **Note**: **Root Registrations** are registrations that are not depended upon by any other registration (or at least, not that Simple Injector can statically determine). They form the starting point of an object graph and are usually the types that are directly resolved from the container.
+    **Note**: *Root Registrations* are registrations that are not depended upon by any other registration (or at least, not that Simple Injector can statically determine). They form the starting point of an object graph and are usually the types that are directly resolved from the container.
 
-This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the **SimpleInjector.Diagnostics** namespace. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings and informational messages:
+This same information can be requested programmatically by using the Diagnostic API. The Diagnostic API is located in the **SimpleInjector.Diagnostics** namespace. Interacting with the Diagnostic API is especially useful for automated testing. The following is an example of an integration test that checks whether the container is free of configuration warnings and information messages:
 
 .. code-block:: c#
 
     [TestMethod]
-    public void Container_Never_ContainsDiagnosticWarnings() {
+    public void Container_Never_ContainsDiagnosticWarnings()
+    {
         // Arrange
         var container = Bootstrapper.GetInitializedContainer();
 
@@ -88,29 +95,44 @@ Object graphs can be visualized programmatically as well, by calling the **Visua
     string graph = producer.VisualizeObjectGraph();
 
 The value returned by **VisualizeObjectGraph** is identical as what would be shown in the **DependencyGraph** property in the debugger:
-	
+    
+.. code-block:: text
+
+    UserListController( // Transient
+        SqlRepository<User>( // Transient
+            SqlConnectionFactory()), // Singleton
+        FileLogger()) // Singleton
+
+The visualized graph shows a textual representation of the graph with a C#-like syntax. By default, the graph visualized using **VisualizeObjectGraph** contains information about the lifestyle of each component. There is, however, a **VisualizeObjectGraph** overload that allows controlling the visualized graph:
+
+.. code-block:: c#
+
+    InstanceProducer producer = container.GetRegistration(typeof(UserListController));
+    
+    string graph = producer.VisualizeObjectGraph(new VisualizationOptions
+    {
+        IncludeLifestyleInformation = false, // true by default
+        UseFullyQualifiedTypeNames = false // false by default
+    });
+
+In this case the `graph` variable would contain the following information:
+    
 .. code-block:: text
 
     UserListController(
         SqlRepository<User>(
             SqlConnectionFactory()),
-        FileLogger())	
+        FileLogger())
 
-Instead of interacting with the Diagnostic API directly, you can force the container to fail fast during verification in case one of the more severe warnings is detected:
+A call to **Container.Verify()** forces the container to fail fast when any diagnostic warning is detected. A call to **Verify()** defaults to **Verify(VerificationOption.VerifyAndDiagnose)**. When called, the container will check for all the warning types, since they are most likely to cause bugs in your application. By calling this overload during application startup, or inside an integration test, you'll keep the feedback cycle as short as possible, and you'll get notified about possible bugs that otherwise might have stayed undetected for much too long.
 
-.. code-block:: c#
-
-    var container = Bootstrapper.GetInitializedContainer();
-
-    container.Verify();
-
-A call to **Verify()** defaults to **Verify(VerificationOption.VerifyAndDiagnose)**. When called, the container will check for all the warning types, since they are most likely to cause bugs in your application. By calling this overload during application startup, or inside an integration test, you'll keep the feedback cycle as short as possible, and you'll get notified about possible bugs that otherwise might have stayed undetected for much too long.
+The diagnostic analysis, however, can also be suppressed by calling **Verify(VerificationOption.VerifyOnly)**. In that case, the container will only perform the rudimentary checks to see whether all registrations can be resolved. This can be useful especially in case you want to call **Analyzer.Analyze(container)** to get both information messages and diagnostic warnings at the same time.
 
 
 Suppressing warnings
 ====================
 
-There are rare cases that you want to ignore the warning system for specific registrations. There are scenarios where you are sure that the presented warning does not cause any harm in your case and changing the application's design is not feasible. In such situation you can suppress warnings on a case by case basis. This prevents a call to **Verify()** or **Verify(VerificationOption.VerifyAndDiagnose)** from throwing an exception, it prevents the warning from popping up in the debugger, and it prevents the *Analyzer.Analyze()* method from returning that warning.
+There are rare cases that you want to ignore the warning system for specific registrations. There are scenarios where you are sure that the presented warning does not cause any harm in your case and changing the application's design is not feasible. In such situation you can suppress warnings on a case-by-case basis. This prevents a call to **Verify()** from throwing an exception, it prevents the warning from popping up in the debugger, and it prevents the **Analyzer.Analyze()** method from returning that warning.
 
 A warning can be suppressed by disabling a specific warning type on a **Registration** object. Example:
 
@@ -125,7 +147,7 @@ A warning can be suppressed by disabling a specific warning type on a **Registra
 
 In the previous code sample, a **Registration** instance for the *HomeController* type is created and registered in the container. This **Registration** instance is explicitly marked to suppress the diagnostic warning type **Disposable Transient Component**.
 
-Suppressing this warning type for an MVC controller makes sense, because the MVC framework will ensure proper disposal of MVC controllers.
+Suppressing this warning type for an MVC controller makes sense, because the ASP.NET (classic) MVC framework will ensure proper disposal of MVC controllers.
 
 Alternatively, you can also request an already made registered and suppress a warning on that:
 
