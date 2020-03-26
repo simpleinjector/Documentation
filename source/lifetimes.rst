@@ -6,22 +6,22 @@ Object Lifetime Management is the concept of controlling the number of instances
 
 Below is a list of the most common lifestyles with code examples of how to configure them using Simple Injector:
 
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| Lifestyle                                     | Description                                                           | Disposal                   |
-+===============================================+=======================================================================+============================+
-| :ref:`Transient <Transient>`                  | A new instance of the component will be created each time the         | Never                      |
-|                                               | service is requested from the container. If multiple consumers depend |                            |
-|                                               | on the service within the same graph, each consumer will get its own  |                            |
-|                                               | new instance of the given service.                                    |                            |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| :ref:`Scoped <Scoped>`                        | For every request within an implicitly or explicitly defined scope.   | Instances will be disposed | 
-|                                               |                                                                       | when their scope ends.     |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| :ref:`Singleton <Singleton>`                  | There will be at most one instance of the registered service type and | Instances will be disposed |
-|                                               | the container will hold on to that instance until the container is    | when the container is      |
-|                                               | disposed or goes out of scope. Clients will always receive that same  | disposed.                  |
-|                                               | instance from the container.                                          |                            |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
++------------------------------+-----------------------------------------------------------------------+----------------------------+
+| Lifestyle                    | Description                                                           | Disposal                   |
++==============================+=======================================================================+============================+
+| :ref:`Transient <Transient>` | A new instance of the component will be created each time the         | Never                      |
+|                              | service is requested from the container. If multiple consumers depend |                            |
+|                              | on the service within the same graph, each consumer will get its own  |                            |
+|                              | new instance of the given service.                                    |                            |
++------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Scoped <Scoped>`       | For every request within an implicitly or explicitly defined scope.   | Instances will be disposed | 
+|                              |                                                                       | when their scope ends.     |
++------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Singleton <Singleton>` | There will be at most one instance of the registered service type and | Instances will be disposed |
+|                              | the container will hold on to that instance until the container is    | when the container is      |
+|                              | disposed or goes out of scope. Clients will always receive that same  | disposed.                  |
+|                              | instance from the container.                                          |                            |
++------------------------------+-----------------------------------------------------------------------+----------------------------+
 
 Many different platform and framework-specific flavors are available for the *Scoped* lifestyle. Please see the :ref:`Scoped <Scoped>` section for more information.
 
