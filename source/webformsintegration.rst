@@ -31,18 +31,24 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
 
     namespace MyWebApplication
     {
-        public sealed class PageInitializerModule : IHttpModule {
-            public static void Initialize() {
+        public sealed class PageInitializerModule : IHttpModule
+        {
+            public static void Initialize()
+            {
                 DynamicModuleUtility.RegisterModule(typeof(PageInitializerModule));
             }
 
-            void IHttpModule.Init(HttpApplication app) {
-                app.PreRequestHandlerExecute += (sender, e) => {
+            void IHttpModule.Init(HttpApplication app)
+            {
+                app.PreRequestHandlerExecute += (sender, e) =>
+                {
                     var handler = app.Context.CurrentHandler;
-                    if (handler != null) {
+                    if (handler != null)
+                    {
                         string name = handler.GetType().Assembly.FullName;
                         if (!name.StartsWith("System.Web") &&
-                            !name.StartsWith("Microsoft")) {
+                            !name.StartsWith("Microsoft"))
+                        {
                             Global.InitializeHandler(handler);
                         }
                     }
@@ -52,10 +58,12 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
             void IHttpModule.Dispose() { }
         }
 
-        public class Global : HttpApplication {
+        public class Global : HttpApplication
+        {
             private static Container container;
 
-            public static void InitializeHandler(IHttpHandler handler) {
+            public static void InitializeHandler(IHttpHandler handler)
+            {
                 Type handlerType = handler is Page
                     ? handler.GetType().BaseType
                     : handler.GetType();
@@ -63,11 +71,13 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                     .InitializeInstance(handler);
             }
 
-            protected void Application_Start(object sender, EventArgs e) {
+            protected void Application_Start(object sender, EventArgs e)
+            {
                 Bootstrap();
             }
 
-            private static void Bootstrap() {
+            private static void Bootstrap()
+            {
                 // 1. Create a new Simple Injector container.
                 var container = new Container();
                 
@@ -91,7 +101,8 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                 container.Verify();
             }
 
-            private static void RegisterWebPages(Container container) {
+            private static void RegisterWebPages(Container container)
+            {
                 var pageTypes =
                     from assembly in BuildManager.GetReferencedAssemblies().Cast<Assembly>()
                     where !assembly.IsDynamic
@@ -101,7 +112,8 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                     where !type.IsAbstract && !type.IsGenericType
                     select type;
 
-                foreach (Type type in pageTypes) {
+                foreach (Type type in pageTypes)
+                {
                     var reg = Lifestyle.Transient.CreateRegistration(type, container);
                     reg.SuppressDiagnosticWarning(
                         DiagnosticType.DisposableTransientComponent,
@@ -110,7 +122,8 @@ Instead of doing constructor injection, there are alternatives. The simplest thi
                 }                
             }
 
-            class ImportAttributePropertySelectionBehavior : IPropertySelectionBehavior {
+            class ImportAttributePropertySelectionBehavior : IPropertySelectionBehavior
+            {
                 public bool SelectProperty(Type implementationType, PropertyInfo property) {
                     // Makes use of the System.ComponentModel.Composition assembly
                     return typeof(Page).IsAssignableFrom(implementationType) &&
@@ -127,12 +140,15 @@ With this code in place, we can now write our page classes as follows:
     using System;
     using System.ComponentModel.Composition;
 
-    public partial class Default : System.Web.UI.Page {
+    public partial class Default : System.Web.UI.Page
+    {
         [Import] public IUserRepository UserRepository { get; set; }
         [Import] public IUserContext UserContext { get; set; }
 
-        protected void Page_Load(object sender, EventArgs e) {
-            if (this.UserContext.IsAdministrator) {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (this.UserContext.IsAdministrator)
+            {
                 this.UserRepository.DoSomeStuff();
             }
         }

@@ -27,7 +27,8 @@ In these rare cases we need to override the way Simple Injector does its constru
 
 .. code-block:: c#
 
-    public interface IConstructorResolutionBehavior {
+    public interface IConstructorResolutionBehavior
+    {
         ConstructorInfo GetConstructor(Type implementationType);
     }
 
@@ -38,7 +39,8 @@ The following example changes the constructor resolution behavior to always sele
 .. code-block:: c#
 
     // Custom constructor resolution behavior
-    public class GreediestConstructorBehavior : IConstructorResolutionBehavior {
+    public class GreediestConstructorBehavior : IConstructorResolutionBehavior
+    {
         public ConstructorInfo GetConstructor(Type implementationType) => (
             from ctor in implementationType.GetConstructors()
             orderby ctor.GetParameters().Length descending
@@ -55,17 +57,20 @@ The following bit more advanced example changes the constructor resolution behav
 .. code-block:: c#
 
     public class MostResolvableParametersConstructorResolutionBehavior 
-        : IConstructorResolutionBehavior {
+        : IConstructorResolutionBehavior
+    {
         private readonly Container container;
 
-        public MostResolvableParametersConstructorResolutionBehavior(Container container) {
+        public MostResolvableParametersConstructorResolutionBehavior(Container container)
+        {
             this.container = container;
         }
 
         private bool IsCalledDuringRegistrationPhase => !this.container.IsLocked();
 
         [DebuggerStepThrough]
-        public ConstructorInfo GetConstructor(Type implementationType) {
+        public ConstructorInfo GetConstructor(Type implementationType)
+        {
             var constructor = this.GetConstructors(implementationType).FirstOrDefault();
             if (constructor != null) return constructor;
             throw new ActivationException(BuildExceptionMessage(implementationType));
@@ -122,7 +127,8 @@ Out of the box, Simple Injector does allow explicit property injection based on 
 .. code-block:: c#
 
     container.Register<ILogger, FileLogger>();
-    container.RegisterInitializer<FileLogger>(instance => {
+    container.RegisterInitializer<FileLogger>(instance =>
+    {
         instance.Path = "c:\logs\log.txt";
     });
 
@@ -141,7 +147,8 @@ The Simple Injector API exposes the **IPropertySelectionBehavior** interface to 
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    class PropertySelectionBehavior<T> : IPropertySelectionBehavior where T : Attribute {
+    class PropertySelectionBehavior<T> : IPropertySelectionBehavior where T : Attribute
+    {
         public bool SelectProperty(PropertyInfo prop) =>
             prop.GetCustomAttributes(typeof(T)).Any();
     }
@@ -161,11 +168,13 @@ Implicit property injection can be enabled by creating an **IPropertySelectionBe
 
 .. code-block:: c#
 
-    public class ImplicitPropertyInjectionBehavior : IPropertySelectionBehavior {
+    public class ImplicitPropertyInjectionBehavior : IPropertySelectionBehavior
+    {
         private readonly IPropertySelectionBehavior original;
         private readonly ContainerOptions options;
 
-        internal ImplicitPropertyInjectionBehavior(Container container) {
+        internal ImplicitPropertyInjectionBehavior(Container container)
+        {
             this.options = container.Options;
             this.original = container.Options.PropertySelectionBehavior;
         }
@@ -267,7 +276,8 @@ The following example changes the lifestyle selection behavior to always registe
     using SimpleInjector.Advanced;
 
     // Custom lifestyle selection behavior
-    public class SingletonLifestyleSelectionBehavior : ILifestyleSelectionBehavior {
+    public class SingletonLifestyleSelectionBehavior : ILifestyleSelectionBehavior
+    {
         public Lifestyle SelectLifestyle(Type implementationType) => Lifestyle.Singleton;
     }
 
@@ -296,8 +306,10 @@ It gets more interesting when the lifestyle changes on the given type. The follo
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface,
         Inherited = false, AllowMultiple = false)]
-    public sealed class CreationPolicyAttribute : Attribute {
-        public CreationPolicyAttribute(CreationPolicy policy) {
+    public sealed class CreationPolicyAttribute : Attribute
+    {
+        public CreationPolicyAttribute(CreationPolicy policy)
+        {
             this.Policy = policy;
         }
 
@@ -305,7 +317,8 @@ It gets more interesting when the lifestyle changes on the given type. The follo
     }
 
     // Custom lifestyle selection behavior
-    public class AttributeBasedLifestyleSelectionBehavior : ILifestyleSelectionBehavior {
+    public class AttributeBasedLifestyleSelectionBehavior : ILifestyleSelectionBehavior
+    {
         private const CreationPolicy DefaultPolicy = CreationPolicy.Transient;
 
         public Lifestyle SelectLifestyle(Type type) => ToLifestyle(GetPolicy(type));
@@ -330,7 +343,8 @@ It gets more interesting when the lifestyle changes on the given type. The follo
 
     // Usage in application
     [CreationPolicy(CreationPolicy.Scoped)]
-    public class AspNetUserContext : IUserContext {
+    public class AspNetUserContext : IUserContext
+    {
         // etc
     }
 
@@ -360,7 +374,8 @@ The following code snippet shows how an external instance can be initialized:
 
 .. code-block:: c#
     
-    public static BuildUp(Page page) {
+    public static BuildUp(Page page)
+    {
         InstanceProducer producer =
             container.GetRegistration(page.GetType(), throwOnFailure: true);
         Registration registration = producer.Registration;

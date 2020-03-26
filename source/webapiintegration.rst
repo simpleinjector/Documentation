@@ -24,7 +24,8 @@ The following code snippet shows how to use the integration package (note that t
     using SimpleInjector.Integration.WebApi;
 
     // This is the Application_Start event from the Global.asax file.
-    protected void Application_Start() {
+    protected void Application_Start()
+    {
         // Create the container as usual.
         var container = new Container();
         container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
@@ -53,20 +54,26 @@ Given the configuration above, an actual controller could look like this:
 
 .. code-block:: c#
 
-    public class UserController : ApiController {
+    public class UserController : ApiController
+    {
         private readonly IUserRepository repository;
 
         // Use constructor injection here
-        public UserController(IUserRepository repository) {
+        public UserController(IUserRepository repository)
+        {
             this.repository = repository;
         }
 
         public IEnumerable<User> GetAllUsers() => this.repository.GetAll();
 
-        public User GetUserById(int id) {
-            try {
+        public User GetUserById(int id
+        {
+            try
+            {
                 return this.repository.GetById(id);
-            } catch (KeyNotFoundException) {
+            }
+            catch (KeyNotFoundException)
+            {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
         }
@@ -94,7 +101,8 @@ There are several ways to get the current *HttpRequestMessage* in your services,
 
 .. code-block:: c#
 
-    public interface IRequestMessageAccessor {
+    public interface IRequestMessageAccessor
+    {
         HttpRequestMessage CurrentMessage { get; }
     }
 
@@ -102,10 +110,12 @@ This abstraction can be injected into your services, which can call the *Current
 
 .. code-block:: c#
 
-    private sealed class RequestMessageAccessor : IRequestMessageAccessor {
+    private sealed class RequestMessageAccessor : IRequestMessageAccessor
+    {
         private readonly Container container;
         
-        public RequestMessageAccessor(Container container) {
+        public RequestMessageAccessor(Container container)
+        {
             this.container = container;
         }
 
@@ -139,15 +149,17 @@ The following example visualizes this:
 
 .. code-block:: c#
 
-    public class MinimumAgeActionFilter : FilterAttribute {
+    public class MinimumAgeActionFilter : FilterAttribute
+    {
         public readonly int MinimumAge;
 
-        public MinimumAgeActionFilter(int minimumAge) {
+        public MinimumAgeActionFilter(int minimumAge)
+        {
             this.MinimumAge = minimumAge;
         }
 
-        public override Task OnActionExecutingAsync(HttpActionContext actionContext,
-            CancellationToken cancellationToken)
+        public override Task OnActionExecutingAsync(
+            HttpActionContext actionContext, CancellationToken cancellationToken)
         {
             var checker = GlobalConfiguration.Configuration.DependencyResolver
                 .GetService(typeof(IMinimumAgeChecker)) as IMinimumAgeChecker;
@@ -182,22 +194,26 @@ The solution is to define a proxy class that sits in between. Since Web API lack
 .. code-block:: c#
 
     public sealed class DelegatingHandlerProxy<THandler> : DelegatingHandler
-        where THandler : DelegatingHandler {
+        where THandler : DelegatingHandler
+    {
         private readonly Container container;
 
-        public DelegatingHandlerProxy(Container container) {
+        public DelegatingHandlerProxy(Container container)
+        {
             this.container = container;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request, CancellationToken cancellationToken) {
+            HttpRequestMessage request, CancellationToken cancellationToken)
+        {
 
             // Important: Trigger the creation of the scope.
             request.GetDependencyScope();
 
             var handler = this.container.GetInstance<THandler>();
 
-            if (!object.ReferenceEquals(handler.InnerHandler, this.InnerHandler)) {
+            if (!object.ReferenceEquals(handler.InnerHandler, this.InnerHandler))
+            {
                 handler.InnerHandler = this.InnerHandler;
             }
 

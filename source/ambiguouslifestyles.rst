@@ -91,7 +91,8 @@ The following example shows how to query the Diagnostic API for Torn Lifestyles:
 
     var results = Analyzer.Analyze(container).OfType<AmbiguousLifestylesDiagnosticResult>();
         
-    foreach (var result in results) {
+    foreach (var result in results)
+    {
         Console.WriteLine(result.Description);
         Console.WriteLine("Component name: " + result.ImplementationType.Name);
         Console.WriteLine("Lifestyles of component: " +
@@ -100,4 +101,3 @@ The following example shows how to query the Diagnostic API for Torn Lifestyles:
             string.Join(", ", result.ConflictingRegistrations.Select(
                 r => r.ServiceType.Name)));
     }
-

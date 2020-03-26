@@ -40,14 +40,16 @@ The following code snippet shows how to use the integration package to apply Sim
         }
 
         // This method gets called by the runtime.
-        public void ConfigureServices(IServiceCollection services) {
+        public void ConfigureServices(IServiceCollection services)
+        {
             // ASP.NET default stuff here
             services.AddMvc();
 
             IntegrateSimpleInjector(services);
         }
         
-        private void IntegrateSimpleInjector(IServiceCollection services) {
+        private void IntegrateSimpleInjector(IServiceCollection services)
+        {
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
         
             services.AddHttpContextAccessor();
@@ -62,7 +64,8 @@ The following code snippet shows how to use the integration package to apply Sim
         }
         
         // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
             InitializeContainer(app);
         
             // Add custom middleware
@@ -80,7 +83,8 @@ The following code snippet shows how to use the integration package to apply Sim
             });
         }
         
-        private void InitializeContainer(IApplicationBuilder app) {
+        private void InitializeContainer(IApplicationBuilder app)
+        {
             // Add application presentation components:
             container.RegisterMvcControllers(app);
             container.RegisterMvcViewComponents(app);
@@ -125,16 +129,19 @@ The following code snippet shows how such `CustomMiddleware` might look like:
 .. code-block:: c#
     
     // Example of some custom user-defined middleware component.
-    public sealed class CustomMiddleware : Microsoft.AspNetCore.Http.IMiddleware {
+    public sealed class CustomMiddleware : Microsoft.AspNetCore.Http.IMiddleware
+    {
         private readonly ILoggerFactory loggerFactory;
         private readonly IUserService userService;
 
-        public CustomMiddleware(ILoggerFactory loggerFactory, IUserService userService) {
+        public CustomMiddleware(ILoggerFactory loggerFactory, IUserService userService)
+        {
             this.loggerFactory = loggerFactory;
             this.userService = userService;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next) {
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        {
             // Do something before
             await next(context);
             // Do something after
@@ -160,7 +167,8 @@ To setup cross wiring, first you must make a call to **EnableSimpleInjectorCross
 
 .. code-block:: c#
 
-    public void ConfigureServices(IServiceCollection services) {
+    public void ConfigureServices(IServiceCollection services)
+    {
         ... 
 
         services.EnableSimpleInjectorCrossWiring(container);
@@ -170,7 +178,8 @@ When cross wiring is enabled, Simple Injector can be instructed to resolve missi
 
 .. code-block:: c#
 
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    {
         ...
 
         container.AutoCrossWireAspNetComponents(app);
@@ -268,18 +277,21 @@ In case you require multiple hosted services that need to run at specific interv
     using SimpleInjector.Lifestyles;
 
     public class TimedHostedService<TService> : IHostedService, IDisposable
-        where TService : class {
+        where TService : class
+    {
         private readonly Settings settings;
         private readonly ILogger logger;
         private readonly Timer timer;
 
-        public TimedHostedService(Settings settings, ILoggerFactory loggerFactory) {
+        public TimedHostedService(Settings settings, ILoggerFactory loggerFactory)
+        {
             this.settings = settings;
             this.logger = loggerFactory.CreateLogger<TimedHostedService<TService>>();
             this.timer = new Timer(callback: _ => this.DoWork(settings.Container));
         }
 
-        public Task StartAsync(CancellationToken cancellationToken) {
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
             // Verify if TService can be resolved
             this.settings.Container.GetRegistration(typeof(TService), true);
             // Start the timer
@@ -287,32 +299,38 @@ In case you require multiple hosted services that need to run at specific interv
             return Task.CompletedTask;
         }
 
-        private void DoWork(Container container) {
-            try {
+        private void DoWork(Container container)
+        {
+            try
+            {
                 using (AsyncScopedLifestyle.BeginScope(container)) {
                     var service = container.GetInstance<TService>();
                     this.settings.Action(service);
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 this.logger.LogError(ex, ex.Message);
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken) {
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
             this.timer.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }
 
         public void Dispose() => this.timer.Dispose();
         
-        public class Settings {
+        public class Settings
+        {
             public readonly Container Container;
             public readonly TimeSpan Interval;
             public readonly Action<TService> Action;
             
             public Settings(
-                Container container, TimeSpan interval, Action<TService> action) {
+                Container container, TimeSpan interval, Action<TService> action)
+            {
                 this.Container = container;
                 this.Interval = interval;
                 this.Action = action;

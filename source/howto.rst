@@ -26,34 +26,39 @@ In situations where a service needs to create multiple instances of a certain co
 .. code-block:: c#
 
     // Definition
-    public interface IMyServiceFactory {
+    public interface IMyServiceFactory
+    {
         IMyService CreateNew();
     }
 
     // Implementation
-    sealed class ServiceFactory : IMyServiceFactory {
-        public IMyService CreateNew() {
-            return new MyServiceImpl();
-        }
+    sealed class ServiceFactory : IMyServiceFactory
+    {
+        public IMyService CreateNew() => new MyServiceImpl();
     }
 
     // Registration
     container.RegisterInstance<IMyServiceFactory>(new ServiceFactory());
 
     // Usage
-    public class MyService {
+    public class MyService
+    {
         private readonly IMyServiceFactory factory;
         
-        public MyService(IMyServiceFactory factory) {
+        public MyService(IMyServiceFactory factory)
+        {
             this.factory = factory;
         }
         
-        public void SomeOperation() {
-            using (var service1 = this.factory.CreateNew()) {
+        public void SomeOperation()
+        {
+            using (var service1 = this.factory.CreateNew())
+            {
                 // use service 1
             }
 
-            using (var service2 = this.factory.CreateNew()) {
+            using (var service2 = this.factory.CreateNew())
+            {
                 // use service 2
             }
         }
@@ -67,15 +72,19 @@ Instead of creating specific interfaces for your factories, you can also choose 
     container.RegisterInstance<Func<IMyService>>(() => new MyServiceImpl());
 
     // Usage
-    public class MyService {
+    public class MyService
+    {
         private readonly Func<IMyService> factory;
         
-        public MyService(Func<IMyService> factory) {
+        public MyService(Func<IMyService> factory)
+        {
             this.factory = factory;
         }
         
-        public void SomeOperation() {
-            using (var service1 = this.factory.Invoke()) {
+        public void SomeOperation()
+        {
+            using (var service1 = this.factory.Invoke())
+            {
                 // use service 1
             }
         }
@@ -117,8 +126,10 @@ To take this one step further, the following extension method allows Simple Inje
     // using System.Linq;
     // using System.Linq.Expressions;
     // using SimpleInjector;
-    public static void AllowResolvingFuncFactories(this ContainerOptions options) {
-        options.Container.ResolveUnregisteredType += (s, e) => {
+    public static void AllowResolvingFuncFactories(this ContainerOptions options)
+    {
+        options.Container.ResolveUnregisteredType += (s, e) =>
+        {
             var type = e.UnregisteredServiceType;
 
             if (!type.IsClosedTypeOf(typeof(Func<>))) {
@@ -163,15 +174,19 @@ Just like *Func<T>* delegates can be injected, *Lazy<T>* instances can also be i
         () => new Lazy<IMyService>(container.GetInstance<IMyService>));
 
     // Usage
-    public class SomeController {
+    public class SomeController
+    {
         private readonly Lazy<IMyService> myService;
         
-        public SomeController(Lazy<IMyService> myService) {
+        public SomeController(Lazy<IMyService> myService)
+        {
             this.myService = myService;
         }
         
-        public void SomeOperation(bool someCondition) {
-            if (someCondition) {
+        public void SomeOperation(bool someCondition)
+        {
+            if (someCondition)
+            {
                 this.myService.Value.Operate();
             }
         }
@@ -182,10 +197,12 @@ Instead of polluting the API of your application with *Lazy<T>* dependencies, ho
 .. code-block:: c#
 
     // Proxy definition
-    public class LazyServiceProxy : IMyService {
+    public class LazyServiceProxy : IMyService
+    {
         private readonly Lazy<IMyService> wrapped;
         
-        public LazyServiceProxy(Lazy<IMyService> wrapped) {
+        public LazyServiceProxy(Lazy<IMyService> wrapped)
+        {
             this.wrapped = wrapped;
         }
         
@@ -202,15 +219,19 @@ This way application components can simply depend on *IMyService* instead of *La
 .. code-block:: c#
 
     // Usage
-    public class SomeController {
+    public class SomeController
+    {
         private readonly IMyService myService;
         
-        public SomeController(IMyService myService) {
+        public SomeController(IMyService myService)
+        {
             this.myService = myService;
         }
         
-        public void SomeOperation(bool someCondition) {
-            if (someCondition) {
+        public void SomeOperation(bool someCondition)
+        {
+            if (someCondition)
+            {
                 this.myService.Operate();
             }
         }
@@ -238,7 +259,8 @@ Take a look at the following scenario, where you want to retrieve *IRequestHandl
 .. code-block:: c#
 
     // Definition
-    public interface IRequestHandlerFactory {
+    public interface IRequestHandlerFactory
+    {
         IRequestHandler CreateNew(string name);
     }
 
@@ -252,7 +274,8 @@ By inheriting from the BCL's *Dictionary<TKey, TValue>*, creating an *IRequestHa
 .. code-block:: c#
 
     public class RequestHandlerFactory
-        : Dictionary<string, Func<IRequestHandler>>, IRequestHandlerFactory {
+        : Dictionary<string, Func<IRequestHandler>>, IRequestHandlerFactory
+    {
         public IRequestHandler CreateNew(string name) => this[name]();
     }
 
@@ -266,7 +289,8 @@ With this class, you can register *Func<IRequestHandler>* factory methods by a k
     container.Register<OrdersRequestHandler>();
     container.Register<CustomersRequestHandler>();
      
-    container.RegisterInstance<IRequestHandlerFactory>(new RequestHandlerFactory {
+    container.RegisterInstance<IRequestHandlerFactory>(new RequestHandlerFactory
+    {
         { "default", () => container.GetInstance<DefaultRequestHandler>() },
         { "orders", () => container.GetInstance<OrdersRequestHandler>() },
         { "customers", () => container.GetInstance<CustomersRequestHandler>() },
@@ -276,10 +300,12 @@ Alternatively, the design can be changed to be a *Dictionary<string, Type>* inst
 
 .. code-block:: c#
 
-    public class RequestHandlerFactory : Dictionary<string, Type>, IRequestHandlerFactory {
+    public class RequestHandlerFactory : Dictionary<string, Type>, IRequestHandlerFactory
+    {
         private readonly Container container;
         
-        public RequestHandlerFactory(Container container) {
+        public RequestHandlerFactory(Container container)
+        {
             this.container = container;
         }
 
@@ -297,7 +323,8 @@ The registration will then look as follows:
     container.Register<OrdersRequestHandler>();
     container.Register<CustomersRequestHandler>();    
     
-    container.RegisterInstance<IRequestHandlerFactory>(new RequestHandlerFactory(container) {
+    container.RegisterInstance<IRequestHandlerFactory>(new RequestHandlerFactory(container)
+    {
         { "default", typeof(DefaultRequestHandler) },
         { "orders", typeof(OrdersRequestHandler) },
         { "customers", typeof(CustomersRequestHandler) },
@@ -311,13 +338,15 @@ A final option for implementing keyed registrations is to manually create the re
 
 .. code-block:: c#
 
-    public class RequestHandlerFactory : IRequestHandlerFactory {
+    public class RequestHandlerFactory : IRequestHandlerFactory
+    {
         readonly Container container;
         readonly Dictionary<string, InstanceProducer<IRequestHandler>> producers =
             new Dictionary<string, InstanceProducer<IRequestHandler>>(
                 StringComparer.OrdinalIgnoreCase);
 
-        public RequestHandlerFactory(Container container) {
+        public RequestHandlerFactory(Container container)
+        {
             this.container = container;
         }
 
@@ -325,7 +354,8 @@ A final option for implementing keyed registrations is to manually create the re
             this.producers[name].GetInstance();
 
         public void Register<TImplementation>(string name)
-            where TImplementation : class, IRequestHandler {
+            where TImplementation : class, IRequestHandler
+        {
             var producer = Lifestyle.Transient
                 .CreateProducer<IRequestHandler, TImplementation>(container);
 
@@ -482,45 +512,52 @@ Running code on a new thread can be done by adding a little bit of infrastructur
 .. code-block:: c#
 
     // Synchronous implementation of IMailSender
-    public sealed class RealMailSender : IMailSender {
+    public sealed class RealMailSender : IMailSender
+    {
         private readonly IMailFormatter formatter;
         
-        public class RealMailSender(IMailFormatter formatter) {
+        public class RealMailSender(IMailFormatter formatter)
+        {
             this.formatter = formatter;
         }
 
-        void IMailSender.SendMail(string to, string message) {
+        void IMailSender.SendMail(string to, string message)
+        {
             // format mail
             // send mail
         }
     }
 
     // Proxy for executing IMailSender asynchronously.
-    sealed class AsyncMailSenderProxy : IMailSender {
+    sealed class AsyncMailSenderProxy : IMailSender
+    {
         private readonly ILogger logger;
         private readonly Func<IMailSender> mailSenderFactory;
 
-        public AsyncMailSenderProxy(ILogger logger, Func<IMailSender> mailSenderFactory) {
+        public AsyncMailSenderProxy(ILogger logger, Func<IMailSender> mailSenderFactory)
+        {
             this.logger = logger;
             this.mailSenderFactory = mailSenderFactory;
         }
 
-        void IMailSender.SendMail(string to, string message) {
+        void IMailSender.SendMail(string to, string message)
+        {
             // Run on a new thread
-            Task.Factory.StartNew(() => {
-                this.SendMailAsync(to, message);
-            });        
+            Task.Factory.StartNew(() => this.SendMailAsync(to, message));
         }
 
-        private void SendMailAsync(string to, string message) {
+        private void SendMailAsync(string to, string message)
+        {
             // Here we run on a different thread and the
             // services should be requested on this thread.
             var mailSender = this.mailSenderFactory();
 
-            try {
+            try
+            {
                 mailSender.SendMail(to, message);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 // logging is important, because we run on a different thread.
                 this.logger.Log(ex);
             }
@@ -602,11 +639,13 @@ Although even inside the Composition Root it might make sense to split the regis
         container.Verify();
     }
 
-    class BusinessLayerBootstrapper {
+    class BusinessLayerBootstrapper
+    {
         public static void Bootstrap(Container container) { ... }
     }
     
-    class PresentationLayerBootstrapper {
+    class PresentationLayerBootstrapper
+    {
         public static void Bootstrap(Container container) { ... }
     }
 

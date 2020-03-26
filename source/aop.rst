@@ -26,17 +26,20 @@ Take the plausible scenario where you want to validate all commands that get exe
 
 .. code-block:: c#
 
-    public class ValidationCommandHandlerDecorator<TCommand> : ICommandHandler<TCommand> {
+    public class ValidationCommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
+    {
         private readonly IValidator validator;
         private readonly ICommandHandler<TCommand> decoratee;
 
-        public ValidationCommandHandlerDecorator(IValidator validator, 
-            ICommandHandler<TCommand> decoratee) {
+        public ValidationCommandHandlerDecorator(
+            IValidator validator, ICommandHandler<TCommand> decoratee)
+        {
             this.validator = validator;
             this.decoratee = decoratee;
         }
 
-        void ICommandHandler<TCommand>.Handle(TCommand command) {
+        void ICommandHandler<TCommand>.Handle(TCommand command)
+        {
             // validate the supplied command (throws when invalid).
             this.validator.ValidateObject(command);
             
@@ -53,8 +56,10 @@ The *ValidationCommandHandlerDecorator<TCommand>* depends on an *IValidator* int
 
     using System.ComponentModel.DataAnnotations;
 
-    public class DataAnnotationsValidator : IValidator {       
-        void IValidator.ValidateObject(object instance) {
+    public class DataAnnotationsValidator : IValidator
+    {       
+        void IValidator.ValidateObject(object instance)
+        {
             var context = new ValidationContext(instance, null, null);
 
             // Throws an exception when instance is invalid.
@@ -129,11 +134,13 @@ Simple Injector will automatically apply decorators conditionally based on defin
     {
         private readonly ICommandHandler<TCommand> decoratee;
 
-        public AccessValidationCommandHandlerDecorator(ICommandHandler<TCommand> decoratee){
+        public AccessValidationCommandHandlerDecorator(ICommandHandler<TCommand> decoratee)
+        {
             this.decoratee = decoratee;
         }
 
-        void ICommandHandler<TCommand>.Handle(TCommand command) {
+        void ICommandHandler<TCommand>.Handle(TCommand command)
+        {
             // Do access validation
             this.decoratee.Handle(command);
         }
@@ -182,21 +189,28 @@ Taking the same *AsyncCommandHandlerDecorator<T>* as an example, it could be imp
 
 .. code-block:: c#
 
-    public class AsyncCommandHandlerDecorator<T> : ICommandHandler<T> {
+    public class AsyncCommandHandlerDecorator<T> : ICommandHandler<T>
+    {
         private readonly Func<ICommandHandler<T>> decorateeFactory;
 
-        public AsyncCommandHandlerDecorator(Func<ICommandHandler<T>> decorateeFactory) {
+        public AsyncCommandHandlerDecorator(Func<ICommandHandler<T>> decorateeFactory)
+        {
             this.decorateeFactory = decorateeFactory;
         }
         
-        public void Handle(T command) {
+        public void Handle(T command)
+        {
             // Execute on different thread.
-            ThreadPool.QueueUserWorkItem(state => {
-                try {
+            ThreadPool.QueueUserWorkItem(state =>
+            {
+                try
+                {
                     // Create new handler in this thread.
                     ICommandHandler<T> handler = this.decorateeFactory.Invoke();
                     handler.Handle(command);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     // log the exception
                 }            
             });
@@ -262,19 +276,23 @@ Another useful application for *Func<T>* decoratee factories is when a command n
 
     using SimpleInjector.Lifestyles;
 
-    public class ThreadScopedCommandHandlerProxy<T> : ICommandHandler<T> {
+    public class ThreadScopedCommandHandlerProxy<T> : ICommandHandler<T>
+    {
         private readonly Container container;
         private readonly Func<ICommandHandler<T>> decorateeFactory;
 
-        public ThreadScopedCommandHandlerProxy(Container container,
-            Func<ICommandHandler<T>> decorateeFactory) {
+        public ThreadScopedCommandHandlerProxy(
+            Container container, Func<ICommandHandler<T>> decorateeFactory)
+        {
             this.container = container;
             this.decorateeFactory = decorateeFactory;
         }
 
-        public void Handle(T command) {
+        public void Handle(T command)
+        {
             // Start a new scope.
-            using (ThreadScopedLifestyle.BeginScope(container)) {
+            using (ThreadScopedLifestyle.BeginScope(container))
+            {
                 // Create the decorateeFactory within the scope.
                 ICommandHandler<T> handler = this.decorateeFactory.Invoke();
                 handler.Handle(command);
@@ -364,7 +382,8 @@ When a collection is uncontrolled, it means that the lifetime of its elements ar
 .. code-block:: c#
 
     IEnumerable<IEventHandler<CustomerMovedEvent>> handlers =
-        new IEventHandler<CustomerMovedEvent>[] {
+        new IEventHandler<CustomerMovedEvent>[]
+        {
             new CustomerMovedEventHandler(),
             new NotifyStaffWhenCustomerMovedEventHandler(),
         };
@@ -395,7 +414,8 @@ Sometimes, however, you might want to apply a decorator unconditionally, but let
 
 .. code-block:: c#
 
-    public class TransactionCommandHandlerDecorator<T> : ICommandHandler<T> {
+    public class TransactionCommandHandlerDecorator<T> : ICommandHandler<T>
+    {
         private readonly ITransactionBuilder builder;
         private readonly ICommandHandler<T> decoratee;
         private readonly TransactionType transactionType;
@@ -403,7 +423,8 @@ Sometimes, however, you might want to apply a decorator unconditionally, but let
         public TransactionCommandHandlerDecorator(
             DecoratorContext decoratorContext,
             ITransactionBuilder builder, 
-            ICommandHandler<T> decoratee) {
+            ICommandHandler<T> decoratee)
+        {
             this.builder = builder;
             this.decoratee = decoratee;
             this.transactionType = decoratorContext.ImplementationType
@@ -411,8 +432,10 @@ Sometimes, however, you might want to apply a decorator unconditionally, but let
                 .TransactionType;
         }
         
-        public void Handle(T command) {
-            using (var ta = this.builder.BeginTransaction(this.transactionType)) {
+        public void Handle(T command)
+        {
+            using (var ta = this.builder.BeginTransaction(this.transactionType))
+            {
                 this.decoratee.Handle(command);
                 ta.Complete();
             }
@@ -424,8 +447,10 @@ The previous code snippet shows a decorator that applies a transaction behavior 
 .. code-block:: c#
 
     [Transaction(TransactionType.ReadCommitted)]
-    public class ShipOrderHandler : ICommandHandler<ShipOrder> {
-        public void Handle(ShipOrder command) {
+    public class ShipOrderHandler : ICommandHandler<ShipOrder>
+    {
+        public void Handle(ShipOrder command)
+        {
             // Business logic here
         }
     }
@@ -500,15 +525,18 @@ Using the :doc:`Interception extensions <InterceptionExtensions>` code snippets,
 
 .. code-block:: c#
 
-    private class MonitoringInterceptor : IInterceptor {
+    private class MonitoringInterceptor : IInterceptor
+    {
         private readonly ILogger logger;
 
         // Using constructor injection on the interceptor
-        public MonitoringInterceptor(ILogger logger) {
+        public MonitoringInterceptor(ILogger logger)
+        {
             this.logger = logger;
         }
 
-        public void Intercept(IInvocation invocation) {
+        public void Intercept(IInvocation invocation)
+        {
             var watch = Stopwatch.StartNew();
 
             // Calls the decorated instance.

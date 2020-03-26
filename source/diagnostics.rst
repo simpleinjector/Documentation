@@ -202,11 +202,13 @@ The Diagnostic Services **cannot** analyze the following:
 
 .. code-block:: c#
 
-    public class MyService : IService {
+    public class MyService : IService
+    {
         private ITimeProvider provider;
         
         // Type depends on the container (don't do this)
-        public MyService(Container container) {
+        public MyService(Container container)
+        {
             // This dependency will be unknown during diagnosis
             this.provider = container.GetInstance<ITimeProvider>();
         }

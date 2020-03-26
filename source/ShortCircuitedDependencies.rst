@@ -43,10 +43,12 @@ Example
     container.Register<HomeController>();
 
     // Definition of HomeController
-    public class HomeController : Controller {
+    public class HomeController : Controller
+    {
         private readonly MyUnitOfWork uow;
 
-        public HomeController(MyUnitOfWork uow) {
+        public HomeController(MyUnitOfWork uow)
+        {
             this.uow = uow;
         }
     }
@@ -73,14 +75,16 @@ The following example shows how to query the Diagnostic API for Short-Circuited 
     var results = Analyzer.Analyze(container)
         .OfType<ShortCircuitedDependencyDiagnosticResult>();
         
-    foreach (var result in results) {
+    foreach (var result in results)
+    {
         Console.WriteLine(result.Description);
         Console.WriteLine(
             "Lifestyle of service with the short-circuited dependency: " + 
             result.Relationship.Lifestyle.Name);
         
         Console.WriteLine("One of the following types was expected instead:");
-        foreach (var expected in result.ExpectedDependencies) {
+        foreach (var expected in result.ExpectedDependencies)
+        {
             Console.WriteLine("-" + expected.ServiceType.FullName);
         }
     }

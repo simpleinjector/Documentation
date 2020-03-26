@@ -81,7 +81,8 @@ The following example shows how to query the Diagnostic API for Lifetime Mismatc
     var results = Analyzer.Analyze(container)
         .OfType<LifestyleMismatchDiagnosticResult>();
         
-    foreach (var result in results) {
+    foreach (var result in results)
+    {
         Console.WriteLine(result.Description);
         Console.WriteLine("Lifestyle of service: " + 
             result.Relationship.Lifestyle.Name);

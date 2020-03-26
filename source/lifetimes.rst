@@ -56,7 +56,8 @@ The next example instantiates a new *RealService* instance on each call by using
 
 .. code-block:: c#
 
-    container.Register<IService>(() => new RealService(new SqlRepository()),
+    container.Register<IService>(
+        () => new RealService(new SqlRepository()),
         Lifestyle.Transient); 
 
 .. container:: Note
@@ -95,7 +96,8 @@ There is also a **RegisterSingleton<T>** overload that takes an *Func<T>* delega
 
 .. code-block:: c#
 
-    container.Register<IService>(() => new RealService(new SqlRepository()),
+    container.Register<IService>(
+        () => new RealService(new SqlRepository()),
         Lifestyle.Singleton);
 
     // Or alternatively:
@@ -145,24 +147,24 @@ In other situations, where there is no integration package available or, alterna
      
 Simple Injector contains the following scoped lifestyles:
 
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| Lifestyle                                     | Description                                                           | Disposal                   |
-+===============================================+=======================================================================+============================+
-| :ref:`Thread Scoped <ThreadScoped>`           | Within a certain (explicitly defined) scope, there will be only one   | Instance will be disposed  |
-|                                               | instance of a given service type A created scope is specific to one   | when their scope gets      |
-|                                               | particular thread, and can't be moved across threads.                 | disposed.                  |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| :ref:`Async Scoped <AsyncScoped>`             | There will be only one instance of a given service type within a      | Instance will be disposed  |
-|                                               | certain (explicitly defined) scope. This scope will automatically     | when their scope gets      |
-|                                               | flow with the logical flow of control of asynchronous methods.        | disposed.                  |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| :ref:`Web Request <WebRequest>`               | Only one instance will be created by the container per web request.   | Instances will be disposed | 
-|                                               | Use this lifestyle in ASP.NET Web Forms and ASP.NET MVC applications. | when the web request ends. |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
-| :ref:`WCF Operation <WcfOperation>`           | Only one instance will be created by the container during the lifetime| Instances will be disposed |
-|                                               | of the WCF service class.                                             | when the WCF service class |
-|                                               |                                                                       | is released.               |
-+-----------------------------------------------+-----------------------------------------------------------------------+----------------------------+
++-------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| Lifestyle                           | Description                                                           | Disposal                   |
++=====================================+=======================================================================+============================+
+| :ref:`Thread Scoped <ThreadScoped>` | Within a certain (explicitly defined) scope, there will be only one   | Instance will be disposed  |
+|                                     | instance of a given service type A created scope is specific to one   | when their scope gets      |
+|                                     | particular thread, and can't be moved across threads.                 | disposed.                  |
++-------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Async Scoped <AsyncScoped>`   | There will be only one instance of a given service type within a      | Instance will be disposed  |
+|                                     | certain (explicitly defined) scope. This scope will automatically     | when their scope gets      |
+|                                     | flow with the logical flow of control of asynchronous methods.        | disposed.                  |
++-------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`Web Request <WebRequest>`     | Only one instance will be created by the container per web request.   | Instances will be disposed | 
+|                                     | Use this lifestyle in ASP.NET Web Forms and ASP.NET MVC applications. | when the web request ends. |
++-------------------------------------+-----------------------------------------------------------------------+----------------------------+
+| :ref:`WCF Operation <WcfOperation>` | Only one instance will be created by the container during the lifetime| Instances will be disposed |
+|                                     | of the WCF service class.                                             | when the WCF service class |
+|                                     |                                                                       | is released.               |
++-------------------------------------+-----------------------------------------------------------------------+----------------------------+
 
 *Web Request* and *WCF Operation* implement scoping implicitly, which means that the user does not have to start or finish the scope to allow the lifestyle to end and to dispose cached instances. The *Container* does this for you. With the *Thread Scoped* and *Async Scoped* lifestyles on the other hand, you explicitly define a scope (just like you would do with .NET's `TransactionScope` class).
 
@@ -255,7 +257,8 @@ Within an explicitly defined scope, there will be only one instance of a service
 
 .. code-block:: c#
 
-    using (ThreadScopedLifestyle.BeginScope(container)) {
+    using (ThreadScopedLifestyle.BeginScope(container))
+    {
         var uow1 = container.GetInstance<IUnitOfWork>();
         var uow2 = container.GetInstance<IUnitOfWork>();
 
@@ -272,13 +275,15 @@ Scopes can be nested and each scope will get its own set of instances:
 
 .. code-block:: c#
 
-    using (ThreadScopedLifestyle.BeginScope(container)) {
+    using (ThreadScopedLifestyle.BeginScope(container))
+    {
         var outer1 = container.GetInstance<IUnitOfWork>();
         var outer2 = container.GetInstance<IUnitOfWork>();
 
         Assert.AreSame(outer1, outer2);
 
-        using (ThreadScopedLifestyle.BeginScope(container)) {
+        using (ThreadScopedLifestyle.BeginScope(container))
+        {
             var inner1 = container.GetInstance<IUnitOfWork>();
             var inner2 = container.GetInstance<IUnitOfWork>();
 
@@ -314,7 +319,8 @@ Within an explicitly defined scope, there will be only one instance of a service
 
 .. code-block:: c#
 
-    using (AsyncScopedLifestyle.BeginScope(container)) {
+    using (AsyncScopedLifestyle.BeginScope(container))
+    {
         var uow1 = container.GetInstance<IUnitOfWork>();
         await SomeAsyncOperation();
         var uow2 = container.GetInstance<IUnitOfWork>();
@@ -333,14 +339,16 @@ Scopes can be nested and each scope will get its own set of instances:
 
 .. code-block:: c#
 
-    using (AsyncScopedLifestyle.BeginScope(container)) {
+    using (AsyncScopedLifestyle.BeginScope(container))
+    {
         var outer1 = container.GetInstance<IUnitOfWork>();
         await SomeAsyncOperation();
         var outer2 = container.GetInstance<IUnitOfWork>();
 
         Assert.AreSame(outer1, outer2);
 
-        using (AsyncScopedLifestyle.BeginScope(container)) {
+        using (AsyncScopedLifestyle.BeginScope(container))
+        {
             var inner1 = container.GetInstance<IUnitOfWork>();
             
             await SomeOtherAsyncOperation();
@@ -531,7 +539,8 @@ When Simple Injector calls the **CreateLifestyleApplier**, it is your job to ret
     var sillyTransientLifestyle = Lifestyle.CreateCustom(
         name: "Silly Transient",
         // instanceCreator is of type Func<object>
-        lifestyleApplierFactory: instanceCreator => {
+        lifestyleApplierFactory: instanceCreator =>
+        {
             // A Func<object> is returned that applies caching.
             return () => instanceCreator.Invoke();
         });
@@ -550,15 +559,19 @@ Here's an example of the creation of a more useful custom lifestyle that caches 
 
     var tenMinuteLifestyle = Lifestyle.CreateCustom(
         name: "Absolute 10 Minute Expiration", 
-        lifestyleApplierFactory: instanceCreator => {
+        lifestyleApplierFactory: instanceCreator =>
+        {
             TimeSpan timeout = TimeSpan.FromMinutes(10);
             var syncRoot = new object();
             var expirationTime = DateTime.MinValue;
             object instance = null;
 
-            return () => {
-                lock (syncRoot) {
-                    if (expirationTime < DateTime.UtcNow) {
+            return () =>
+            {
+                lock (syncRoot)
+                {
+                    if (expirationTime < DateTime.UtcNow)
+                    {
                         instance = instanceCreator.Invoke();
                         expirationTime = DateTime.UtcNow.Add(timeout);
                     }

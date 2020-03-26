@@ -16,9 +16,12 @@ To allow scoped instances to be resolved during an OWIN request, the following r
     using SimpleInjector;
     using SimpleInjector.Lifestyles;
 
-    public void Configuration(IAppBuilder app) {
-        app.Use(async (context, next) => {
-            using (AsyncScopedLifestyle.BeginScope(container)) {
+    public void Configuration(IAppBuilder app)
+    {
+        app.Use(async (context, next) =>
+        {
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
                 await next();
             }
         });
@@ -49,11 +52,13 @@ When working with OWIN you will occasionally find yourself wanting access to the
 
 .. code-block:: c#
 
-    public interface IOwinContextAccessor {
+    public interface IOwinContextAccessor
+    {
         IOwinContext CurrentContext { get; }
     }
      
-    public class CallContextOwinContextAccessor : IOwinContextAccessor {
+    public class CallContextOwinContextAccessor : IOwinContextAccessor
+    {
         public static AsyncLocal<IOwinContext> OwinContext = new AsyncLocal<IOwinContext>();
         public IOwinContext CurrentContext => OwinContext.Value;
     }
@@ -64,7 +69,8 @@ The following code snippet can be used to register this *IOwinContextAccessor* a
     
 .. code-block:: c#
 
-    app.Use(async (context, next) => {
+    app.Use(async (context, next) =>
+    {
         CallContextOwinContextAccessor.OwinContext.Value = context;
         await next();
     });

@@ -61,7 +61,8 @@ Example
             ICoffeeMaker coffeeMaker,
             IKitchenSink kitchenSink,
             IIceCubeProducer iceCubeProducer,
-            IWaterCooker waterCooker) {
+            IWaterCooker waterCooker)
+        {
         }
     }
 
@@ -81,7 +82,8 @@ The following example shows how to query the Diagnostic API for possible Single 
     var results = Analyzer.Analyze(container)
         .OfType<SingleResponsibilityViolationDiagnosticResult>();
         
-    foreach (var result in results) {
+    foreach (var result in results)
+    {
         Console.WriteLine(result.ImplementationType.Name + 
             " has " + result.Dependencies.Count + " dependencies.");
     }

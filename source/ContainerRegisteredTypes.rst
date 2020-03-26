@@ -50,10 +50,12 @@ Example
     container.Verify();
 
     // Definition of HomeController
-    public class HomeController : Controller {
+    public class HomeController : Controller
+    {
         private readonly SqlUserRepository repository;
 
-        public HomeController(SqlUserRepository repository) {
+        public HomeController(SqlUserRepository repository)
+        {
             this.repository = repository;
         }
     }
@@ -76,10 +78,12 @@ Instead of depending directly on *SqlUserRepository*, *HomeController* can bette
     container.Verify();
 
     // Definition of HomeController
-    public class HomeController : Controller {
+    public class HomeController : Controller
+    {
         private readonly IUserRepository repository;
 
-        public HomeController(IUserRepository repository) {
+        public HomeController(IUserRepository repository)
+        {
             this.repository = repository;
         }
     }

@@ -59,7 +59,8 @@ To prevent having to change the container for each new repository we can use the
         from service in type.GetInterfaces()
         select new { service, implementation = type };
 
-    foreach (var reg in registrations) {
+    foreach (var reg in registrations)
+    {
         container.Register(reg.service, reg.implementation, Lifestyle.Transient);
     }
 
@@ -69,7 +70,8 @@ Another interesting scenario is registering multiple implementations of a generi
 
 .. code-block:: c#
 
-    public interface IValidator<T> {
+    public interface IValidator<T>
+    {
         ValidationResults Validate(T instance);
     }
 
@@ -110,17 +112,21 @@ It is not generally regarded as best practice to have an *IEnumerable<IValidator
 
 .. code-block:: c#
 
-    public class CompositeValidator<T> : IValidator<T> {
+    public class CompositeValidator<T> : IValidator<T>
+    {
         private readonly IEnumerable<IValidator<T>> validators;
 
-        public CompositeValidator(IEnumerable<IValidator<T>> validators) {
+        public CompositeValidator(IEnumerable<IValidator<T>> validators)
+        {
             this.validators = validators;
         }
 
-        public ValidationResults Validate(T instance) {
+        public ValidationResults Validate(T instance)
+        {
             var allResults = ValidationResults.Valid;
 
-            foreach (var validator in this.validators) {
+            foreach (var validator in this.validators)
+            {
                 var results = validator.Validate(instance);
                 allResults = ValidationResults.Join(allResults, results);
             }
@@ -270,7 +276,8 @@ To register collections that contain both non-generic and open-generic component
 
 .. code-block:: c#
 
-    container.Collection.Register(typeof(IValidator<>), new[] {
+    container.Collection.Register(typeof(IValidator<>), new[]
+    {
         typeof(DataAnnotationsValidator<>), // open generic
         typeof(CustomerValidator), // implements IValidator<Customer>
         typeof(GoldCustomerValidator), // implements IValidator<Customer>
@@ -389,11 +396,13 @@ A very common scenario is to base the type of the injected dependency on the typ
 
     public class Logger<T> : ILogger { }
 
-    public class Consumer1 {
+    public class Consumer1
+    {
         public Consumer1(ILogger logger) { }
     }
 
-    public class Consumer2 {
+    public class Consumer2
+    {
         public Consumer2(ILogger logger) { }
     }
 
@@ -527,7 +536,8 @@ The second way to inject properties is by implementing a custom **IPropertySelec
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    class ImportPropertySelectionBehavior : IPropertySelectionBehavior {
+    class ImportPropertySelectionBehavior : IPropertySelectionBehavior
+    {
         public bool SelectProperty(Type implementationType, PropertyInfo prop) =>
             prop.GetCustomAttributes(typeof(ImportAttribute)).Any();
     }
@@ -564,26 +574,32 @@ Take a look at the following application design around the *IEventHandler<in TEv
 
 .. code-block:: c#
 
-    public interface IEventHandler<in TEvent> {
+    public interface IEventHandler<in TEvent>
+    {
         void Handle(TEvent e);
     }
 
-    public class CustomerMovedEvent {
+    public class CustomerMovedEvent
+    {
         public readonly Guid CustomerId;
-        public CustomerMovedEvent(Guid customerId) {
+        public CustomerMovedEvent(Guid customerId)
+        {
             this.CustomerId = customerId;
         }
     }
 
-    public class CustomerMovedAbroadEvent : CustomerMovedEvent {
+    public class CustomerMovedAbroadEvent : CustomerMovedEvent
+    {
         public CustomerMovedEvent(Guid customerId) : base(customerId) { }    
     }
 
-    public class SendFlowersToMovedCustomer : IEventHandler<CustomerMovedEvent> {
+    public class SendFlowersToMovedCustomer : IEventHandler<CustomerMovedEvent>
+    {
         public void Handle(CustomerMovedEvent e) { ... }
     }
 
-    public class WarnShippingDepartmentAboutMove : IEventHandler<CustomerMovedAbroadEvent> {
+    public class WarnShippingDepartmentAboutMove : IEventHandler<CustomerMovedAbroadEvent>
+    {
         public void Handle(CustomerMovedAbroadEvent e) { ... }
     }    
 
@@ -599,7 +615,8 @@ The design contains two event classes *CustomerMovedEvent* and *CustomerMovedAbr
     // Usage
     var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
 
-    foreach (var handler in handlers) {
+    foreach (var handler in handlers)
+    {
         Console.WriteLine(handler.GetType().Name);
     }
     

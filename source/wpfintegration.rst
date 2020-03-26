@@ -33,7 +33,8 @@ Add a *Program.cs* file to your project to be the new entry point for the applic
     static class Program
     {
         [STAThread]
-        static void Main() {
+        static void Main()
+        {
             var container = Bootstrap();
 
             // Any additional other configuration, e.g. of your desired MVVM toolkit.
@@ -41,7 +42,8 @@ Add a *Program.cs* file to your project to be the new entry point for the applic
             RunApplication(container);
         }
 
-        private static Container Bootstrap() {
+        private static Container Bootstrap()
+        {
             // Create the container as usual.
             var container = new Container();
 
@@ -58,13 +60,17 @@ Add a *Program.cs* file to your project to be the new entry point for the applic
             return container;
         }
 
-        private static void RunApplication(Container container) {
-            try {
+        private static void RunApplication(Container container)
+        {
+            try
+            {
                 var app = new App();
                 app.InitializeComponent();
                 var mainWindow = container.GetInstance<MainWindow>();
                 app.Run(mainWindow);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 //Log the exception and exit
             }
         }
@@ -87,8 +93,10 @@ Constructor injection can now be used in any window (e.g. *MainWindow*) and view
 
     using System.Windows;
 
-    public partial class MainWindow : Window {
-        public MainWindow(MainWindowViewModel viewModel) {
+    public partial class MainWindow : Window
+    {
+        public MainWindow(MainWindowViewModel viewModel)
+        {
             InitializeComponent();
 
             // Assign to the data context so binding can be used.
@@ -96,12 +104,14 @@ Constructor injection can now be used in any window (e.g. *MainWindow*) and view
         }
     }
 
-    public class MainWindowViewModel {
+    public class MainWindowViewModel
+    {
         private readonly IQueryProcessor queryProcessor;
         private readonly IUserContext userContext;
 
-        public MainWindowViewModel(IQueryProcessor queryProcessor,
-            IUserContext userContext) {
+        public MainWindowViewModel(
+            IQueryProcessor queryProcessor, IUserContext userContext)
+        {
             this.queryProcessor = queryProcessor;
             this.userContext = userContext;
         }

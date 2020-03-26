@@ -12,7 +12,8 @@ Configuring Simple Injector to build up *Page* classes with their dependencies i
 
     public partial class App : Application
     {
-        public App() {
+        public App()
+        {
             this.Startup += this.Application_Startup;
             this.Exit += this.Application_Exit;
             this.UnhandledException += this.Application_UnhandledException;
@@ -20,13 +21,15 @@ Configuring Simple Injector to build up *Page* classes with their dependencies i
             InitializeComponent();
         }
 
-        private void Application_Startup(object sender, StartupEventArgs e) {
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
             var container = Bootstrap();
 
             this.RootVisual = container.GetInstance<MainPage>();
         }
 
-        public static Container Bootstrap() {
+        public static Container Bootstrap()
+        {
             // Create the container as usual.
             var container = new Container();
 
@@ -51,8 +54,10 @@ Constructor injection can now be used in any pages (e.g. *MainPage*) and view mo
 
     using System.Windows;
 
-    public partial class MainPage : Page {
-        public MainPage(MainPageViewModel viewModel) {
+    public partial class MainPage : Page
+    {
+        public MainPage(MainPageViewModel viewModel)
+        {
             InitializeComponent();
 
             // Assign to the data context so binding can be used.
@@ -60,7 +65,8 @@ Constructor injection can now be used in any pages (e.g. *MainPage*) and view mo
         }
     }
 
-    public class MainPageViewModel {
+    public class MainPageViewModel
+    {
         private readonly IQueryProcessor queryProcessor;
         private readonly IUserContext userContext;
 

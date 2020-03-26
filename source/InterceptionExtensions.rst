@@ -16,11 +16,13 @@ Interception Extensions
 
     using SimpleInjector;
 
-    public interface IInterceptor {
+    public interface IInterceptor
+    {
         void Intercept(IInvocation invocation);
     }
 
-    public interface IInvocation {
+    public interface IInvocation
+    {
         object InvocationTarget { get; }
         object ReturnValue { get; set; }
         object[] Arguments { get; }
@@ -30,13 +32,16 @@ Interception Extensions
 
     // Extension methods for interceptor registration
     // NOTE: These extension methods can only intercept interfaces, not abstract types.
-    public static class InterceptorExtensions {
-        public static void InterceptWith<TInterceptor>(this Container container,
-            Func<Type, bool> predicate)
-            where TInterceptor : class, IInterceptor {
+    public static class InterceptorExtensions
+    {
+        public static void InterceptWith<TInterceptor>(
+            this Container container, Func<Type, bool> predicate)
+            where TInterceptor : class, IInterceptor
+        {
             container.Options.ConstructorResolutionBehavior.GetConstructor(typeof(TInterceptor));
 
-            var interceptWith = new InterceptionHelper() {
+            var interceptWith = new InterceptionHelper()
+            {
                 BuildInterceptorExpression =
                     e => BuildInterceptorExpression<TInterceptor>(container),
                 Predicate = type => predicate(type)
@@ -46,8 +51,10 @@ Interception Extensions
         }
 
         public static void InterceptWith(this Container container,
-            Func<IInterceptor> interceptorCreator, Func<Type, bool> predicate) {
-            var interceptWith = new InterceptionHelper() {
+            Func<IInterceptor> interceptorCreator, Func<Type, bool> predicate)
+        {
+            var interceptWith = new InterceptionHelper()
+            {
                 BuildInterceptorExpression =
                     e => Expression.Invoke(Expression.Constant(interceptorCreator)),
                 Predicate = type => predicate(type)
@@ -58,8 +65,10 @@ Interception Extensions
 
         public static void InterceptWith(this Container container,
             Func<ExpressionBuiltEventArgs, IInterceptor> interceptorCreator,
-            Func<Type, bool> predicate) {
-            var interceptWith = new InterceptionHelper() {
+            Func<Type, bool> predicate)
+        {
+            var interceptWith = new InterceptionHelper()
+            {
                 BuildInterceptorExpression = e => Expression.Invoke(
                     Expression.Constant(interceptorCreator),
                     Expression.Constant(e)),
@@ -70,8 +79,10 @@ Interception Extensions
         }
 
         public static void InterceptWith(this Container container,
-            IInterceptor interceptor, Func<Type, bool> predicate) {
-            var interceptWith = new InterceptionHelper() {
+            IInterceptor interceptor, Func<Type, bool> predicate)
+        {
+            var interceptWith = new InterceptionHelper()
+            {
                 BuildInterceptorExpression = e => Expression.Constant(interceptor),
                 Predicate = predicate
             };
@@ -86,7 +97,8 @@ Interception Extensions
         {
             var interceptorRegistration = container.GetRegistration(typeof(TInterceptor));
 
-            if (interceptorRegistration == null) {
+            if (interceptorRegistration == null)
+            {
                 // This will throw an ActivationException
                 container.GetInstance<TInterceptor>();
             }
@@ -106,15 +118,18 @@ Interception Extensions
             internal Func<Type, bool> Predicate;
 
             [DebuggerStepThrough]
-            public void OnExpressionBuilt(object sender, ExpressionBuiltEventArgs e) {
-                if (this.Predicate(e.RegisteredServiceType)) {
+            public void OnExpressionBuilt(object sender, ExpressionBuiltEventArgs e)
+            {
+                if (this.Predicate(e.RegisteredServiceType))
+                {
                     ThrowIfServiceTypeNotInterface(e);
                     e.Expression = this.BuildProxyExpression(e);
                 }
             }
 
             [DebuggerStepThrough]
-            private static void ThrowIfServiceTypeNotInterface(ExpressionBuiltEventArgs e) {
+            private static void ThrowIfServiceTypeNotInterface(ExpressionBuiltEventArgs e)
+            {
                 // NOTE: We can only handle interfaces, because
                 // System.Runtime.Remoting.Proxies.RealProxy only supports interfaces.
                 if (!e.RegisteredServiceType.IsInterface) {
@@ -124,7 +139,8 @@ Interception Extensions
             }
 
             [DebuggerStepThrough]
-            private Expression BuildProxyExpression(ExpressionBuiltEventArgs e) {
+            private Expression BuildProxyExpression(ExpressionBuiltEventArgs e)
+            {
                 var expr = this.BuildInterceptorExpression(e);
 
                 // Create call to
@@ -137,7 +153,8 @@ Interception Extensions
                             e.Expression),
                         e.RegisteredServiceType);
 
-                if (e.Expression is ConstantExpression && expr is ConstantExpression) {
+                if (e.Expression is ConstantExpression && expr is ConstantExpression)
+                {
                     return Expression.Constant(CreateInstance(proxyExpression),
                         e.RegisteredServiceType);
                 }
@@ -146,7 +163,8 @@ Interception Extensions
             }
 
             [DebuggerStepThrough]
-            private static object CreateInstance(Expression expression) {
+            private static object CreateInstance(Expression expression)
+            {
                 var instanceCreator = Expression.Lambda<Func<object>>(expression,
                     new ParameterExpression[0])
                     .Compile();
@@ -163,12 +181,14 @@ Interception Extensions
 
         [DebuggerStepThrough]
         public static object CreateProxy(Type serviceType, IInterceptor interceptor,
-            object realInstance) {
+            object realInstance)
+        {
             var proxy = new InterceptorProxy(serviceType, realInstance, interceptor);
             return proxy.GetTransparentProxy();
         }
 
-        private sealed class InterceptorProxy : RealProxy {
+        private sealed class InterceptorProxy : RealProxy
+        {
             private static MethodBase GetTypeMethod = typeof(object).GetMethod("GetType");
 
             private object realInstance;
@@ -176,12 +196,14 @@ Interception Extensions
 
             [DebuggerStepThrough]
             public InterceptorProxy(Type classToProxy, object obj, IInterceptor interceptor)
-                : base(classToProxy) {
+                : base(classToProxy)
+            {
                 this.realInstance = obj;
                 this.interceptor = interceptor;
             }
 
-            public override IMessage Invoke(IMessage msg) {
+            public override IMessage Invoke(IMessage msg)
+            {
                 if (msg is IMethodCallMessage) {
                     var message = (IMethodCallMessage)msg;
                     return object.ReferenceEquals(message.MethodBase, GetTypeMethod)
@@ -192,7 +214,8 @@ Interception Extensions
                 return msg;
             }
 
-            private IMessage InvokeMethodCall(IMethodCallMessage msg) {
+            private IMessage InvokeMethodCall(IMethodCallMessage msg)
+            {
                 var i = new Invocation { Proxy = this, Message = msg, Arguments = msg.Args };
                 i.Proceeding = () => 
                     i.ReturnValue = msg.MethodBase.Invoke(this.realInstance, i.Arguments);
@@ -201,12 +224,14 @@ Interception Extensions
                     i.Arguments.Length, null, msg);
             }
 
-            private IMessage Bypass(IMethodCallMessage msg) {
+            private IMessage Bypass(IMethodCallMessage msg)
+            {
                 object value = msg.MethodBase.Invoke(this.realInstance, msg.Args);
                 return new ReturnMessage(value, msg.Args, msg.Args.Length, null, msg);
             }
 
-            private class Invocation : IInvocation {
+            private class Invocation : IInvocation
+            {
                 public Action Proceeding;
                 public InterceptorProxy Proxy { get; set; }
                 public object[] Arguments { get; set; }
@@ -237,14 +262,17 @@ After copying the previous code snippet to your project, you can add interceptio
 
     // Here is an example of an interceptor implementation.
     // NOTE: Interceptors must implement the IInterceptor interface:
-    private class MonitoringInterceptor : IInterceptor {
+    private class MonitoringInterceptor : IInterceptor
+    {
         private readonly ILogger logger;
 
-        public MonitoringInterceptor(ILogger logger) {
+        public MonitoringInterceptor(ILogger logger)
+        {
             this.logger = logger;
         }
 
-        public void Intercept(IInvocation invocation) {
+        public void Intercept(IInvocation invocation)
+        {
             var watch = Stopwatch.StartNew();
 
             // Calls the decorated instance.

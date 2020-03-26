@@ -12,11 +12,13 @@ The following code snippet is an example of how to register Simple Injector cont
     using System.Windows.Forms;
     using SimpleInjector;
 
-    static class Program {
+    static class Program
+    {
         private static Container container;
 
         [STAThread]
-        static void Main() {
+        static void Main()
+        {
         
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -24,7 +26,8 @@ The following code snippet is an example of how to register Simple Injector cont
             Application.Run(container.GetInstance<Form1>());
         }
 
-        private static void Bootstrap() {
+        private static void Bootstrap()
+        {
             // Create the container as usual.
             container = new Container();
 
@@ -42,19 +45,23 @@ With this code in place, we can now write our *Form* classes as follows:
 
 .. code-block:: c#
 
-    public partial class Form1 : Form {
+    public partial class Form1 : Form
+    {
         private readonly IUserRepository userRepository;
         private readonly IUserContext userContext;
 
-        public Form1(IUserRepository userRepository, IUserContext userContext) {
+        public Form1(IUserRepository userRepository, IUserContext userContext)
+        {
             this.userRepository = userRepository;
             this.userContext = userContext;
 
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e) {
-            if (this.userContext.IsAdministrator) {
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (this.userContext.IsAdministrator)
+            {
                 this.userRepository.ControlSomeStuff();
             }
         }

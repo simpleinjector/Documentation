@@ -16,7 +16,8 @@ After installing this NuGet package, it must be initialized in the start-up path
 
 .. code-block:: c#
 
-    protected void Application_Start(object sender, EventArgs e) {
+    protected void Application_Start(object sender, EventArgs e)
+    {
         // Create the container as usual.
         var container = new Container();
         container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
@@ -62,10 +63,12 @@ When hosting WCF Services in WAS (Windows Activation Service), you are not given
 
 .. code-block:: c#
 
-    public static class Bootstrapper {
+    public static class Bootstrapper
+    {
         public static readonly Container Container;
      
-        static Bootstrapper() {
+        static Bootstrapper()
+        {
             var container = new Container();
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
     
@@ -86,9 +89,11 @@ Your custom *ServiceHostFactory* can now use the static **Bootstrapper.Container
  
 .. code-block:: c#
  
-    public class WcfServiceFactory : SimpleInjectorServiceHostFactory {
-        protected override ServiceHost CreateServiceHost(Type serviceType,
-            Uri[] baseAddresses) {
+    public class WcfServiceFactory : SimpleInjectorServiceHostFactory
+    {
+        protected override ServiceHost CreateServiceHost(
+            Type serviceType, Uri[] baseAddresses)
+        {
             return new SimpleInjectorServiceHost(
                 Bootstrapper.Container, 
                 serviceType, 
@@ -100,9 +105,11 @@ Optionally, you can apply your custom service behaviors and contract behaviors t
     
 .. code-block:: c#
      
-    public class WcfServiceFactory : SimpleInjectorServiceHostFactory {
-        protected override ServiceHost CreateServiceHost(Type serviceType,
-            Uri[] baseAddresses) {
+    public class WcfServiceFactory : SimpleInjectorServiceHostFactory
+    {
+        protected override ServiceHost CreateServiceHost(
+            Type serviceType, Uri[] baseAddresses)
+        {
             var host = new SimpleInjectorServiceHost(
                 Bootstrapper.Container, 
                 serviceType, 
@@ -115,15 +122,19 @@ Optionally, you can apply your custom service behaviors and contract behaviors t
             return host;
         }
      
-        private void ApplyServiceBehaviors(ServiceHost host) {
+        private void ApplyServiceBehaviors(ServiceHost host)
+        {
             foreach (var behavior in this.container.GetAllInstances<IServiceBehavior>()) {
                 host.Description.Behaviors.Add(behavior);
             }
         }
      
-        private void ApplyContractBehaviors(SimpleInjectorServiceHost host) {
-            foreach (var behavior in this.container.GetAllInstances<IContractBehavior>()) {
-                foreach (var contract in host.GetImplementedContracts()) {
+        private void ApplyContractBehaviors(SimpleInjectorServiceHost host)
+        {
+            foreach (var behavior in this.container.GetAllInstances<IContractBehavior>())
+            {
+                foreach (var contract in host.GetImplementedContracts())
+                {
                     contract.Behaviors.Add(behavior);
                 }
             }

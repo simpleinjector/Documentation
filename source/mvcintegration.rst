@@ -19,7 +19,8 @@ The following code snippet shows how to use the integration package (note that t
     using SimpleInjector.Integration.Web.Mvc;
 
     // This is the Application_Start event from the Global.asax file.
-    protected void Application_Start(object sender, EventArgs e) {
+    protected void Application_Start(object sender, EventArgs e)
+    {
         // Create the container as usual.
         var container = new Container();
         container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
