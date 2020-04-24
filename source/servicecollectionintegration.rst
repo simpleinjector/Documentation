@@ -167,6 +167,42 @@ Like auto cross wiring, **CrossWire<TService>** does the required plumbing such 
 
     **NOTE**: Even though auto cross wiring makes cross wiring very easy, you should still prevent letting application components depend on types provided by application frameworks such as ASP.NET as much as possible. In most cases it not the best solution and in violation of the `Dependency Inversion Principle <https://en.wikipedia.org/wiki/Dependency_inversion_principle>`_. Instead, application components should typically depend on *application-provided abstractions*. These abstractions can be implemented by proxy and/or adapter implementations that forward the call to the framework component. In that case cross wiring can still be used to allow the framework component to be injected into the adapter, but this isn't required.
 
+.. _disposing-the-container:
+
+Disposing the Container
+=======================
+
+The Simple Injector **Container** class implements `IDisposable`, which allows any disposable singletons to be disposed off. You can call **Container.Dispose** when the application shuts down. In the case of an ASP.NET Core application, dispose would typically have to be called from inside an `IHostApplicationLifetime` event.
+
+Fortunately, the **AddSimpleInjector** extension method ensures the Simple Injector **Container** is disposed of when the framework's root `IServiceProvider` is disposed of. In an ASP.NET Core application, this typically means on application shutdown. The following code snippet demonstrates this:
+
+.. code-block:: c#
+
+    var container = new Container();
+
+    var services = new ServiceCollection()
+        // Ensures the container gets disposed
+        .AddSimpleInjector(container);
+
+    ServiceProvider provider = services
+        .BuildServiceProvider(validateScopes: true);
+
+    provider.UseSimpleInjector(container);
+
+    provider.Dispose();
+
+
+This behavior, however, can be configured by setting the **SimpleInjectorAddOptions**'s **DisposeContainerWithServiceProvider** property to false:
+
+.. code-block:: c#
+
+    services.AddSimpleInjector(container, options =>
+    {
+        options.DisposeContainerWithServiceProvider = false;
+    });
+
+By setting **DisposeContainerWithServiceProvider** to false prevents the container from being disposed when `ServiceProvider` is being disposed of. This allows you to control if and when the **Container** is disposed of.
+
 .. _microsoft-logging:
 
 Integrating with Microsoft Logging
