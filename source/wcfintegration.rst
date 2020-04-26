@@ -8,10 +8,6 @@ The `Simple Injector WCF Integration NuGet Package <https://nuget.org/packages/S
 
     **NOTE**: With the introduction of version 4.1 of this integration package, asynchronous programming through async/await is supported. WCF service methods can now be specified using the `async` keyword.
 
-.. container:: Note
-
-    **Note**: To be able to run the WCF integration package, you need *.NET 4.5* or above.    
-
 After installing this NuGet package, it must be initialized in the start-up path of the application by calling the **SimpleInjectorServiceHostFactory.SetContainer** method:
 
 .. code-block:: c#

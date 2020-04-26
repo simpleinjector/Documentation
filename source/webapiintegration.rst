@@ -4,10 +4,6 @@ ASP.NET Web API Integration Guide
 
 Simple Injector contains `Simple Injector ASP.NET Web API Integration Quick Start NuGet package for IIS-hosted applications <https://www.nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_. If you're not using NuGet, you must include the **SimpleInjector.Integration.WebApi.dll** in your Web API application, which is part of the standard download on Github.
 
-.. container:: Note
-
-    **Note**: To be able to run the Web API integration packages, `you need <https://stackoverflow.com/questions/22392032/are-there-any-technical-reasons-simpleinjector-cannot-support-webapi-on-net-4-0>`_ *.NET 4.5* or above.
-
 .. _Web-API-basic-setup:
     
 Basic setup

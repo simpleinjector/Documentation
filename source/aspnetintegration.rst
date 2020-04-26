@@ -4,10 +4,6 @@ ASP.NET Core and ASP.NET Core MVC Integration Guide
 
 Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_ for integration with ASP.NET Core MVC.
 
-.. container:: Note
-
-    **IMPORTANT**: This page is specific to the integration packages for Simple Injector v4.8 and up. In case you are using an older version of Simple Injector, please see the :doc:`old integration page <aspnetintegration_46>`. However, in the context of integration with ASP.NET Core, you are advised to upgrade to v4.8. Those versions fixed numerous bugs concerning integration with ASP.NET Core.
-
 The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
 
 .. code-block:: c#
