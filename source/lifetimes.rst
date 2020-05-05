@@ -226,10 +226,6 @@ The same method can be applied when asynchronously disposing instances that are 
     
     container.Dispose();
 
-.. container:: Note
-    
-    **Note**: The **Container.ContainerScope** property is new in v4.5.
-
 .. _PerLifetimeScope:
 .. _ThreadScoped:
 

@@ -106,10 +106,6 @@ To allow **Transient** dependencies to be injected into **Scoped** consumers wit
 
     container.Options.UseLoosenedLifestyleMismatchBehavior = true;
 
-.. container:: Note
-
-    **Note** the **Options.UseLoosenedLifestyleMismatchBehavior** setting requires Simple Injector v4.9 or newer.
-
 
 What about Hybrid lifestyles?
 =============================
@@ -136,7 +132,7 @@ This does imply that two components with the same hybrid lifestyle can't safely 
 Iterating injected collections during construction can lead to warnings
 =======================================================================
 
-Simple Injector v4.5 improved the ability to find Lifestyle Mismatches by trying to detect when injected collections are iterated during object composition. This can lead to warnings similar to the following:
+Simple Injector tries to detect when injected collections are iterated during object composition, as this could otherwise lead to Lifestyle Mismatches. This can lead to warnings similar to the following:
 
 .. container:: Note
 

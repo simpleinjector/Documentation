@@ -201,10 +201,6 @@ The previous `Startup` snippet already showed how a custom middleware class can 
         ...
     }
     
-.. container:: Note
-
-    **IMPORTANT**: The API changed in v4.8 of the Simple Injector ASP.NET Core integration packages. Previously, **UseMiddleware** was called inside the **UseSimpleInjector** method. Doing so, caused middleware to be applied at the wrong stage in the pipeline. This could, for instance, cause your middleware to be executed before the static files middleware (i.e. the `.UseStaticFiles()` call) or before authorization is applied (i.e. the `.UseAuthorization()` call). Instead, take care that you call **.UseMiddleware<TMiddleware>(Container)** at the right stage. This typically means after `.UseStaticFiles()` and `.UseAuthorization()`, but before `.UseEndpoints(...)`, as shown in the next listing.
-    
 .. code-block:: c#
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -446,7 +446,7 @@ An **InstanceProducer** instance is responsible of caching the compiled factory 
 Container-locking
 =================
 
-Simple Injector v4.8 added a new **Container.Options.ContainerLocking** event. This allows you to get notified just before the container gets locked. This typically happens when the first instance is resolved, or when the container is being verified. This event can be used to add some last-minute registrations, that should be made last, or to detect who is locking the container to early:
+The **Container.Options.ContainerLocking** event allows you to get notified just before the container gets locked. This typically happens when the first instance is resolved, or when the container is being verified. This event can be used to add some last-minute registrations, that should be made last, or to detect who is locking the container to early:
 
 .. code-block:: c#
     
