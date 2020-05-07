@@ -101,6 +101,11 @@ Multiple decorators can be wrapped by calling the **RegisterDecorator** method m
 
 The decorators are applied in the order in which they are registered, which means that the first decorator (*TransactionCommandHandlerDecorator<T>* in this case) wraps the real instance, the second decorator (*DeadlockRetryCommandHandlerDecorator<T>* in this case) wraps the first decorator, and so on.
 
+.. container:: Note
+
+    **Tip**: Are the previous three decorators applied in the correct order? `This GitHub issue <https://github.com/simpleinjector/Documentation/issues/111/>`_ gives more insights into this.
+
+
 .. _Applying-decorators-conditionally:
 
 Applying Decorators conditionally
