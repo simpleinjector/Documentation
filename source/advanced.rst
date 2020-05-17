@@ -15,6 +15,7 @@ This chapter discusses the following subjects:
 * :ref:`Property injection <Property-Injection>`
 * :ref:`Covariance and Contravariance <Covariance-Contravariance>`
 * :ref:`Registering plugins dynamically <Plugins>`
+* :ref:`Accessing a dependency's metadata <Metadata>`
 
 .. _Generics:
 
@@ -665,3 +666,47 @@ The given example makes use of an *IPlugin* interface that is known to the appli
 .. container:: Note
 
     **Note**: Collections in Simple Injector behave as **streams**. Please see the section about :ref:`collection types <Collection-types>` for more information.
+
+.. _Metadata:
+
+Accessing a dependency's metadata
+=================================
+
+In some more-advanced scenarios, a consumer might need access to its dependency's metadata. This can be achieved by injecting **InstanceProducer<T>** instances into the consumer. This is especially useful when the consumer is an infrastructure component, located inside the `Composition Root <https://mng.bz/K1qZ>`_. Metadata, for instance, allows access to the dependency's implementation, even though the dependency might be decorated or intercepted.
+
+From perspective of the Dependency Inversion Principle and Liskov Substitution Principle, a consumer should not have to know about the supplied implementation—the consumer should only know about the abstraction. At the same time, the infrastructure within the Composition Root sometimes needs to know in order to make good desicions. Based on the implementation type, or metadata (i.e. attributes) applied to that specific implementation type, the infrastructure can ensure the correct application flow.
+
+The following code example demonstrates the injection of **InstanceProducer<T>** instances.
+
+.. code-block:: c#
+
+    class EventForwarder<T>
+    {
+        private Dictionary<Type, InstanceProducer<IEventHandler<T>>> producers;
+
+        public EventForwarder(IList<InstanceProducer<IEventHandler<T>>> producers)
+        {
+            this.producers = producers.ToDictionary(p => p.ImplementationType);
+        }
+
+        public void Process(T message, Type handlerType)
+        {
+            var producer = this.producers[handlerType];
+            IEventHandler<T> handler = producer.GetInstance();
+            handler.Handle(message);
+        }
+    }
+    
+    // Registration
+    container.Collection.Register(typeof(IEventHandler<>), assemblies);
+    container.Register(typeof(EventForwarder<>), typeof(EventForwarder<>));
+
+In this example, the `EventForwarder<T>` is used to forward incoming events to an underlying handler. As there might be multiple handlers for a single message, the handlers are registered as collection.
+
+When those messages are coming in from a durable queue, such message likely needs to be retried when a handler fails. But a failing handler should typically not cause the other handlers to be retried as they might already been succeeded, and retrying has a performance overhead.
+
+For such a scenario the queuing infrastructure should be able to give each handler its own queue. In this case, the infrastructure calls the `EventForwarder<T>` with the actual handler type for which the message should be executed. But if the `EventForwarder<T>` was injected with an `IEnumerable<IEventHandler<T>>` instead, it would become much harder to get the implementation type, especially when decorators are applied. Calling `.GetType()` on elements of the collection would only get the type of the outer-most decorator. Besides, it would force iterating the entire collection, while there could potentially be many handlers injected.
+
+Instead, by letting the `EventForwarder<T>` depend on `IList<InstanceProducer<IEventHandler<T>>>` (or any other of Simple Injector's supported collection types), you can solve this problem. **InstanceProducer<T>** are the factories that allow the creation of a single registration. They allow calling **GetInstance()** to resolve an instance according to its lifestyle, and provides, among other things, access to the type's registered implementation type through the **InstanceProducer.ImplementationType** property.
+
+The previous `EventForwarder<T>` converts the injected list of InstanceProducers to a dictionary, where the original implementation type is used as the dictionary's key.
