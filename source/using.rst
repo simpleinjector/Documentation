@@ -18,7 +18,7 @@ Simple Injector's main type is the *Container* class. An instance of *Container*
 
 .. container:: Note
 
-    **Warning**: Do not create an infinite number of *Container* instances (such as one *Container* instance per request). Doing so will drain the performance of your application. Simple Injector is optimized for using a very limited number of *Container* instances. Creating and initializing *Container* instances has a large overhead, but resolving from the *Container* is extremely fast once initialized.
+    **Warning**: Do not create an infinite number of *Container* instances (such as one *Container* instance per request). Doing so will drain the performance of your application. Simple Injector is optimized for using a limited number of *Container* instances. Creating and initializing *Container* instances has a large overhead, but resolving from the *Container* is extremely fast once initialized.
 
 Creating and configuring a *Container* is done by newing up an instance and calling the **Register** overloads to register each of your services:
 
