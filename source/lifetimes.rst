@@ -262,6 +262,43 @@ Order of disposal
 
 When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B* (assuming both implement *IDisposable*). This allows *A* to use *B* while *A* is being disposed.
 
+The following example demonstrates this:
+
+.. code-block:: c#
+
+    class A : IDisposable
+    {
+        public A(B b) => Console.WriteLine("Creating A");
+        public void Dispose() => Console.WriteLine("Disposing A");
+    }
+
+    class B : IDisposable
+    {
+        public B() => Console.WriteLine("Creating B");
+        public void Dispose() => Console.WriteLine("Disposing B");
+    }
+    
+    // Registrations
+    container.Register<A>(Lifestyle.Scoped);
+    container.Register<B>(Lifestyle.Scoped);
+    
+    // Usage
+    using (AsyncScopedLifestyle.BeginScope(container))
+    {
+        container.GetInstance<A>();
+        Console.WriteLine("Using A");
+    }
+
+Execution of the above code example results in the following output:
+    
+.. code-block:: c#
+
+    Creating B
+    Creating A
+    Using A
+    Disposing A
+    Disposing B
+
 
 .. _PerLifetimeScope:
 .. _ThreadScoped:
