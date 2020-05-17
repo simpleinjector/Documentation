@@ -184,6 +184,73 @@ Most of the time, you will only use one particular scoped lifestyle per applicat
 Just like *Singleton* registrations, instances of scoped registrations that are created by the container will be disposed when the their scope ends. Scoped lifestyles are especially useful for implementing patterns such as the `Unit of Work <https://martinfowler.com/eaaCatalog/unitOfWork.html>`_.
 
 
+.. _Disposing-a-scope:
+
+Disposing a Scope
+-----------------
+
+The managing of Scoped instances is done using the **Scope** class. A **Scope** keeps references to any created Scoped components to ensure the same instance is returned within the context of the same **Scope** and it allows the **Scope** to deterministically dispose off all disposable Scoped instances.
+
+The following example shows how to manually create and dispose a **Scope** instance. The example uses the **AsyncScopedLifestyle** which is the most common Scoped lifestyle to use:
+
+.. code-block:: c#
+
+    using (Scope scope = AsyncScopedLifestyle.BeginScope(container))
+    {
+        var service = container.GetInstance<IOrderShipmentProcessor>();
+        
+        service.ProcessShipment();
+    }
+
+At the end of the using block, the **Scope** instances is automatically disposed off, and with it, all its cached disposable components.
+
+.. _Async-disposal:
+
+Asynchronous disposal
+---------------------
+
+The .NET 4.6.1 and .NET Standard 2.1 versions of Simple Injector support asynchronous disposal of both **Scope** and **Container** instances. This means that components that implement `IAsyncDisposable <https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable>`_ can be disposed asynchronously by Simple Injector. This, however, requires you call **Scope.DisposeAsync**:
+
+.. code-block:: c#
+
+    using (AsyncScopedLifestyle.BeginScope(container))
+    {
+        var service = container.GetInstance<IOrderShipmentProcessor>();
+        
+        await service.ProcessShipmentAsync();
+        
+        await scope.DisposeAsync();
+    }
+
+.. container:: Note
+
+    **Warning**: Simple Injector's .NET 4.5, .NET Standard 1.0 and 1.3 versions do **not** support asynchronous disposal.
+
+Or you can use C# 8's new `await using` syntax:
+
+.. code-block:: c#
+
+    await using (AsyncScopedLifestyle.BeginScope(container))
+    {
+        var service = container.GetInstance<IOrderShipmentProcessor>();
+        
+        await service.ProcessShipmentAsync();
+    }
+
+Likewise, you can asynchronously dispose of a **Container** instance. This will dispose all cached Singletons:
+
+.. code-block:: c#
+
+    await container.DisposeAsync();
+    
+.. container:: Note
+
+    Calling **DisposeAsync** ensures that all cached disposable instances are disposed off—both `IDisposable` and `IAsyncDisposable` implementations will be disposed. A class that implements both `IDisposable` and `IAsyncDisposable`, however, will only have its `DisposeAsync` method invoked.
+
+.. container:: Note
+
+    **Tip**: Calling **DisposeAsync** disposes a **Scope** or **Container**. You don't need to call both **DisposeAsync** and **Dispose**. This behavior is in line with that of C#'s `await using` behavior, which also *only* calls `DisposeAsync`.
+
 .. _Order-of-disposal:
 
 Order of disposal
@@ -195,36 +262,6 @@ Order of disposal
 
 When a component *A* depends on component *B*, *B* will be created before *A*. This means that *A* will be disposed before *B* (assuming both implement *IDisposable*). This allows *A* to use *B* while *A* is being disposed.
 
-
-.. _Retrieving-disposables:
-
-Retrieving list of container-created disposables
-------------------------------------------------
-
-By calling **Scope.GetDisposables**, the scope's created, and cached, *Scoped* instances that implement `IDisposable` are returned. This list of instances will get disposed automatically, when the `Scope` instance is disposed.
-
-Retrieving the disposable instances can be especially beneficial whenever you require asynchronous disposal. It is impossible for Simple Injector to apply asynchronous disposal, because that requires a framework-supplied abstraction that allows asynchronous disposal, e.g an `IAsyncDisposable`. Such abstraction however does not exist (yet).
-
-To mitigate this, you can define your own abstraction that allows disposable objects to flush themselves asynchronously, in such way that their `Dispose()` method will not cause any blocking operations. Using the **Scope.GetDisposables** method, the following code can be used before disposing the `Scope` instance:
-
-.. code-block:: c#
-        
-    foreach (var flushable in scope.GetDisposables().OfType<IAsyncFlushable>().Reverse())
-    {
-        await flushable.FlushAsync();
-    }
-    
-The same method can be applied when asynchronously disposing instances that are created with the `Singleton` lifestyle. Those instances are not stored in a request-specific `Scope` instance, but stored for the lifetime of the container. The following code can be used before disposing the `Container` instance:
-
-.. code-block:: c#
-    
-    var disposabless = container.ContainerScope.GetDisposables();
-    foreach (var flushable in disposables.OfType<IAsyncFlushable>().Reverse())
-    {
-        await flushable.FlushAsync();
-    }
-    
-    container.Dispose();
 
 .. _PerLifetimeScope:
 .. _ThreadScoped:
