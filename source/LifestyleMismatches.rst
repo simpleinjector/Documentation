@@ -130,29 +130,6 @@ To enable this strict behavior, you can configure **Options.UseLoosenedLifestyle
 
     container.Options.UseLoosenedLifestyleMismatchBehavior = false;
 
-
-What about Hybrid lifestyles?
-=============================
-
-A :ref:`Hybrid lifestyle <Hybrid>` is a mix between two or more other lifestyles. Here is an example of a custom lifestyle that mixes the **Transient** and **Singleton** lifestyles together:
-
-.. code-block:: c#
-
-    var hybrid = Lifestyle.CreateHybrid(
-        lifestyleSelector: () => someCondition,
-        trueLifestyle: Lifestyle.Transient,
-        falseLifestyle: Lifestyle.Singleton);
-
-.. container:: Note
-
-    **Note** that this example is quite bizarre, since it is a very unlikely combination of lifestyles to mix together, but it serves us well for the purpose of this explanation.
-
-As explained, components should only depend on equal length or longer-lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of `someCondition`. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).
-
-From the Diagnostic Services' perspective, a component can only safely depend on a hybrid-lifestyle service if the consuming component's lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid-lifestyle component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the **longest** lifestyle is used in the comparison when the hybrid is part of the consuming component, and the **shortest** lifestyle is used when the hybrid is part of the dependency.
-
-This does imply that two components with the same hybrid lifestyle can't safely depend on each other. This is true since in theory the supplied predicate could change results in each call. In practice however, those components would usually be able safely relate since it is normally unlikely that the predicate changes lifestyles within a single object graph. This is an exception the Diagnostic Services can make pretty safely. From the Diagnostic Services' perspective, components can safely be related when both share the exact same lifestyle instance and no warning will be displayed in this case. This does mean however, that you should be very careful using predicates that change the lifestyle during the object graph.
-
 Iterating injected collections during construction can lead to warnings
 =======================================================================
 
@@ -213,3 +190,25 @@ In this case, Simple Injector will still report the Lifestyle Mismatch between `
 .. container:: Note
 
     Even though false positives might occur, best practice is to prevent iterating the injected stream inside the constructor, as prescribed `here <https://blog.ploeh.dk/2011/03/03/InjectionConstructorsshouldbesimple/>`_.
+
+What about Hybrid lifestyles?
+=============================
+
+A :ref:`Hybrid lifestyle <Hybrid>` is a mix between two or more other lifestyles. Here is an example of a custom lifestyle that mixes the **Transient** and **Singleton** lifestyles together:
+
+.. code-block:: c#
+
+    var hybrid = Lifestyle.CreateHybrid(
+        lifestyleSelector: () => someCondition,
+        trueLifestyle: Lifestyle.Transient,
+        falseLifestyle: Lifestyle.Singleton);
+
+.. container:: Note
+
+    **Note** that this example is quite bizarre, since it is a very unlikely combination of lifestyles to mix together, but it serves us well for the purpose of this explanation.
+
+As explained, components should only depend on equal length or longer-lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of `someCondition`. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).
+
+From the Diagnostic Services' perspective, a component can only safely depend on a hybrid-lifestyle service if the consuming component's lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid-lifestyle component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the **longest** lifestyle is used in the comparison when the hybrid is part of the consuming component, and the **shortest** lifestyle is used when the hybrid is part of the dependency.
+
+This does imply that two components with the same hybrid lifestyle can't safely depend on each other. This is true since in theory the supplied predicate could change results in each call. In practice however, those components would usually be able safely relate since it is normally unlikely that the predicate changes lifestyles within a single object graph. This is an exception the Diagnostic Services can make pretty safely. From the Diagnostic Services' perspective, components can safely be related when both share the exact same lifestyle instance and no warning will be displayed in this case. This does mean however, that you should be very careful using predicates that change the lifestyle during the object graph.
