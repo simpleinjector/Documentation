@@ -12,6 +12,10 @@ Cause
 
 The component depends on a service with a lifestyle that is shorter than that of the component.
 
+.. container:: Note
+
+    **Note**: This kind of error is also known as `Captive Dependency <https://blog.ploeh.dk/2014/06/02/captive-dependency/>`_.
+
 Warning Description
 ===================
 
@@ -43,8 +47,8 @@ The Diagnostic Services detect this kind of misconfiguration and report it. The 
 
 .. container:: Note
 
-    **Note**: This kind of error is also known as `Captive Dependency <https://blog.ploeh.dk/2014/06/02/captive-dependency/>`_.
-    
+    **Important**: **Transient**, in the context of Simple Injector, means *short lived*. This is why Simple Injector disallows injecting **Transient** dependencies into **Singleton** components, opposed to some other DI Containers that consider Transients to be 'stateless.'
+   
 .. container:: Note
 
     **Tip**: Lifestyle mismatches are such a common source of bugs, that the container always checks for mismatches the first time a component is resolved, no matter whether you call *Container.Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
@@ -112,17 +116,21 @@ The following example shows how to query the Diagnostic API for Lifetime Mismatc
 Working with Scoped components
 ==============================
 
-Simple Injector's Lifestyle Mismatch verification is strict and will warn about injecting :ref:`Transient <Transient>` dependencies into :ref:`Scoped <Scoped>` components. This is because **Transient**, in the context of Simple Injector, means *short lived*. A **Scoped** component, however, could live for quite a long time, depending on the time you decide to keep the `Scope` alive. Simple Injector does not know how your application handles scoping.
+**Transient**, in the context of Simple Injector, means *short lived*. This is why 
 
-This, however, can be a quite restrictive model. Especially for applications where the lifetime of a scope equals that of a web request. In that case the `Scope` lives very short, and in that case the difference in lifetime between the **Transient** and **Scoped** lifestyle might be non-existing. It can, therefore, make sense in these types of applications to loosen the restriction and allow **Transient** dependencies to be injected into **Scoped** consumers. Especially because Simple Injector does track **Scoped** dependencies and allows them to be disposed, while **Transient** components are not tracked. See the :doc:`Disposable Transient Components diagnostic warning <disposabletransientcomponent>` for more information on this behavior.
+With the introduction of Simple Injector v5, we changed the default Lifestyle Mismatch verification behavior to be more loosely. This means that :ref:`Transient <Transient>` dependencies can now be injected into :ref:`Scoped <Scoped>` components. This simplifies working with applications where the lifetime of a scope is always deterministically short—e.g. when the scope is bound to a web request in a web application. In that case the `Scope` lives very short, and in that case the difference in lifetime between the **Transient** and **Scoped** lifestyle is typically a non-issue.
 
-To allow **Transient** dependencies to be injected into **Scoped** consumers without causing verification warnings, you can configure **Options.UseLoosenedLifestyleMismatchBehavior** as follows:
+This loosened behavior is simplifies working with Simple injector, because it tracks **Scoped** dependencies and allows them to be disposed of, while **Transient** components are not tracked and never disposed of. See the :doc:`Disposable Transient Components diagnostic warning <disposabletransientcomponent>` for more information on this behavior.
+
+If, however, you build an application where the used **Scope** instances can live for a long time, you might want to switch back to the original, strict behavior to get this extra layer of validation. This ensures Simple Injector warns about injecting :ref:`Transient <Transient>` dependencies into :ref:`Scoped <Scoped>` components. 
+
+To prevent **Transient** dependencies to be injected into **Scoped** consumers, you can configure **Options.UseLoosenedLifestyleMismatchBehavior** as follows:
 
 .. code-block:: c#
 
     var container = new Container();
 
-    container.Options.UseLoosenedLifestyleMismatchBehavior = true;
+    container.Options.UseLoosenedLifestyleMismatchBehavior = false;
 
 
 What about Hybrid lifestyles?
