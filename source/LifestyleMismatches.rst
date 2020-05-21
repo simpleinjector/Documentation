@@ -17,6 +17,24 @@ Warning Description
 
 In general, components should only depend on other components that are configured to live at least as long. In other words, it is safe for a transient component to depend on a singleton, but not the other way around. Because components store a reference to their dependencies in (private) instance fields, those dependencies are kept alive for the lifetime of that component. This means that dependencies that are configured with a shorter lifetime than their consumer, accidentally live longer than intended. This can lead to all sorts of bugs, such as hard to debug multi-threading issues.
 
+The following code snippet demonstrates how the `IUserRepository` dependency is kept alive by the `RealUserService` component:
+
+.. code-block:: c#
+
+    public class RealUserService : IUserService
+    {
+        // Private instance field for storage of the IUserRepository dependency.
+        private readonly IUserRepository repository;
+        
+        public RealUserService(IUserRepository repository)
+        {
+            // The incoming 'repository' dependency is stored in the private field.
+            this.repository = repository;
+        }
+    }
+	
+This example shows common, and perfectly valid use of the Dependency Injection pattern where dependencies are injected through the constructor and stored in private fields for later use. Problems, however, start to appear when there is a mismatch in the lifestyles of the `RealUserService` class and its `IUserRepository` dependency.
+
 The Diagnostic Services detect this kind of misconfiguration and report it. The container will be able to compare all built-in lifestyles (and sometimes even custom lifestyles). Here is an overview of the built-in lifestyles ordered by their length:
 
 * :ref:`Transient <Transient>`
@@ -29,7 +47,7 @@ The Diagnostic Services detect this kind of misconfiguration and report it. The 
     
 .. container:: Note
 
-    **Note**: Lifestyle mismatches are such a common source of bugs, that the container always checks for mismatches the first time a component is resolved, no matter whether you call *Container.Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
+    **Tip**: Lifestyle mismatches are such a common source of bugs, that the container always checks for mismatches the first time a component is resolved, no matter whether you call *Container.Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
 
 
 How to Fix Violations
