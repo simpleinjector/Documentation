@@ -47,7 +47,7 @@ The Diagnostic Services detect this kind of misconfiguration and report it. The 
 
 .. container:: Note
 
-    **Important**: **Transient**, in the context of Simple Injector, means *short lived*. This is why Simple Injector disallows injecting **Transient** dependencies into **Singleton** components, opposed to some other DI Containers that consider Transients to be 'stateless.'
+    **Important**: **Transient**, in the context of Simple Injector, means *short lived*. Therefore Simple Injector disallows injecting **Transient** dependencies into **Singleton** components, opposed to some other DI Containers that consider Transients to be 'stateless.'
    
 .. container:: Note
 
@@ -116,15 +116,13 @@ The following example shows how to query the Diagnostic API for Lifetime Mismatc
 Working with Scoped components
 ==============================
 
-**Transient**, in the context of Simple Injector, means *short lived*. This is why 
+Simple Injector v5 changed the default Lifestyle Mismatch verification behavior to be less strict. This means that :ref:`Transient <Transient>` dependencies can now be injected into :ref:`Scoped <Scoped>` components. This simplifies working with applications where the lifetime of a scope is always deterministically short—e.g. when the scope is bound to a web request in a web application. In that case the `Scope` lives very short, and in that case the difference in lifetime between the **Transient** and **Scoped** lifestyle is typically a non-issue.
 
-With the introduction of Simple Injector v5, we changed the default Lifestyle Mismatch verification behavior to be more loosely. This means that :ref:`Transient <Transient>` dependencies can now be injected into :ref:`Scoped <Scoped>` components. This simplifies working with applications where the lifetime of a scope is always deterministically short—e.g. when the scope is bound to a web request in a web application. In that case the `Scope` lives very short, and in that case the difference in lifetime between the **Transient** and **Scoped** lifestyle is typically a non-issue.
+This loosened behavior simplifies working with Simple injector, because it tracks **Scoped** dependencies and allows them to be disposed of, while **Transient** components are not tracked and never disposed of. See the :doc:`Disposable Transient Components diagnostic warning <disposabletransientcomponent>` for more information on this disposing behavior.
 
-This loosened behavior is simplifies working with Simple injector, because it tracks **Scoped** dependencies and allows them to be disposed of, while **Transient** components are not tracked and never disposed of. See the :doc:`Disposable Transient Components diagnostic warning <disposabletransientcomponent>` for more information on this behavior.
+If, however, you build an application where the used **Scope** instances can live for a long time, you might want to switch back to the original, strict behavior to get this extra layer of validation. This ensures Simple Injector warns when it injects :ref:`Transient <Transient>` dependencies into :ref:`Scoped <Scoped>` components.
 
-If, however, you build an application where the used **Scope** instances can live for a long time, you might want to switch back to the original, strict behavior to get this extra layer of validation. This ensures Simple Injector warns about injecting :ref:`Transient <Transient>` dependencies into :ref:`Scoped <Scoped>` components. 
-
-To prevent **Transient** dependencies to be injected into **Scoped** consumers, you can configure **Options.UseLoosenedLifestyleMismatchBehavior** as follows:
+To enable this strict behavior, you can configure **Options.UseLoosenedLifestyleMismatchBehavior** as follows:
 
 .. code-block:: c#
 
@@ -149,11 +147,11 @@ A :ref:`Hybrid lifestyle <Hybrid>` is a mix between two or more other lifestyles
 
     **Note** that this example is quite bizarre, since it is a very unlikely combination of lifestyles to mix together, but it serves us well for the purpose of this explanation.
 
-As explained, components should only depend on equal length or longer lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of `someCondition`. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).
+As explained, components should only depend on equal length or longer-lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of `someCondition`. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).
 
-From the Diagnostic Services' perspective, a component can only safely depend on a hybrid-lifestyled service if the consuming component's lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid-lifestyled component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the **longest** lifestyle is used in the comparison when the hybrid is part of the consuming component, and the **shortest** lifestyle is used when the hybrid is part of the dependency.
+From the Diagnostic Services' perspective, a component can only safely depend on a hybrid-lifestyle service if the consuming component's lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid-lifestyle component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the **longest** lifestyle is used in the comparison when the hybrid is part of the consuming component, and the **shortest** lifestyle is used when the hybrid is part of the dependency.
 
-This does imply that two components with the same hybrid lifestyle can't safely depend on each other. This is true since in theory the supplied predicate could change results in each call. In practice however, those components would usually be able safely relate, since it is normally unlikely that the predicate changes lifestyles within a single object graph. This is an exception the Diagnostic Services can make pretty safely. From the Diagnostic Services' perspective, components can safely be related when both share the exact same lifestyle instance and no warning will be displayed in this case. This does mean however, that you should be very careful using predicates that change the lifestyle during the object graph.
+This does imply that two components with the same hybrid lifestyle can't safely depend on each other. This is true since in theory the supplied predicate could change results in each call. In practice however, those components would usually be able safely relate since it is normally unlikely that the predicate changes lifestyles within a single object graph. This is an exception the Diagnostic Services can make pretty safely. From the Diagnostic Services' perspective, components can safely be related when both share the exact same lifestyle instance and no warning will be displayed in this case. This does mean however, that you should be very careful using predicates that change the lifestyle during the object graph.
 
 Iterating injected collections during construction can lead to warnings
 =======================================================================
