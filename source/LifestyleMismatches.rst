@@ -122,13 +122,13 @@ This loosened behavior simplifies working with Simple injector, because it track
 
 If, however, you build an application where the used **Scope** instances can live for a long time, you might want to switch back to the original, strict behavior to get this extra layer of validation. This ensures Simple Injector warns when it injects :ref:`Transient <Transient>` dependencies into :ref:`Scoped <Scoped>` components.
 
-To enable this strict behavior, you can configure **Options.UseLoosenedLifestyleMismatchBehavior** as follows:
+To enable this strict behavior, you can configure **Options.UseStrictLifestyleMismatchBehavior** as follows:
 
 .. code-block:: c#
 
     var container = new Container();
 
-    container.Options.UseLoosenedLifestyleMismatchBehavior = false;
+    container.Options.UseStrictLifestyleMismatchBehavior = true;
 
 Iterating injected collections during construction can lead to warnings
 =======================================================================
