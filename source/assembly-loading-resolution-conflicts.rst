@@ -2,7 +2,7 @@
 Resolution conflicts caused by dynamic assembly loading
 =======================================================
 
-Simple Injector can sometimes throw an exception message similar to the following when batch-registration is mixed with dynamic loading of assemblies:
+Simple Injector can sometimes throw an exception message similar to the following when Auto-Registration is mixed with dynamic loading of assemblies:
 
 .. container:: Note
 

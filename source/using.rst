@@ -380,7 +380,7 @@ When supplying a list of assemblies to the **Register** method, the container go
 
 .. container:: Note
 
-    **Note**: For more information about batch registration, please see the :ref:`Batch-registration <batch-registration>` section.
+    **Note**: For more information about batch registration, please see the :ref:`Auto-Registration <auto-registration>` section.
 
 .. _Collections:
 

@@ -233,7 +233,7 @@ For more information about how to use this event, please look at the `ResolveUnr
 Overriding Lifestyle Selection Behavior
 =======================================
 
-By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the **Transient** lifestyle. This behavior can be overridden and this is especially useful in batch-registration scenarios.
+By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the **Transient** lifestyle. This behavior can be overridden and this is especially useful in Auto-Registration scenarios.
 
 Here are some examples of registration calls that all register types as *Transient*:
 

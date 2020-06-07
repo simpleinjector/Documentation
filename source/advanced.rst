@@ -38,7 +38,7 @@ Generics
 Batch-Registration / Auto-Registration
 ======================================
 
-Auto-registration or batch-registration is a way of registering a set of (related) types in one go based on some convention. This feature removes the need to constantly update the container's configuration each and every time a new type is added. The following example show a series of manually registered repositories: 
+Auto-registration (or batch-registration) is a way of registering a set of (related) types in one go based on some convention. This feature removes the need to constantly update the container's configuration each and every time a new type is added. The following example show a series of manually registered repositories: 
 
 .. code-block:: c#
 
