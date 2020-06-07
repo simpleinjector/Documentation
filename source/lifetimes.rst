@@ -666,4 +666,4 @@ Do note that even though locking is used to synchronize access, this custom life
 
 .. container:: Note
     
-    In case you wish to develop a custom lifestyle, we strongly advice posting a question on the Forum. We will be able to guide you through this process.
+    In case you wish to develop a custom lifestyle, we strongly advise posting a question on `our Forum <https://simpleinjector.org/forum>`_. We will be able to guide you through this process.
