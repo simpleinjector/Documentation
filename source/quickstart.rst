@@ -11,7 +11,7 @@ Many of the existing DI libraries have a big complicated legacy API or are new, 
 
 The following platforms are supported:
 
-* *.NET 4.0* and up.
+* *.NET 4.5* and up.
 * *.NET Standard* including:
   * *Universal Windows Programs*.
   * *Mono*.
@@ -86,6 +86,11 @@ The general idea behind Simple Injector (or any DI library for that matter) is t
     }
 
 The *CancelOrderHandler* class depends on the *IOrderRepository*, *ILogger* and *IEventPublisher* interfaces. By not depending on concrete implementations, you can test *CancelOrderHandler* in isolation. But ease of testing is only one of a number of things that Dependency Injection gives us. It also enables you, for example, to design highly flexible systems that can be completely composed in one specific location (often the startup path) of the application.
+
+.. container:: Note
+
+    Please be aware that it is not this documentation's intention to teach you about the fundamentals of Dependency Injection. To gain more in-depth knowledge about the fundamentals of Dependency Injection and the design patterns and principles surrounding it, the book `Dependency Injection Principles, Practices, and Patterns <https://mng.bz/BYNl>`_ is an excellent place to start. This book is co-authored by Simple Injector's lead maintainer.
+
 
 Introducing Simple Injector
 ---------------------------

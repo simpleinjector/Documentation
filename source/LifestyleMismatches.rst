@@ -12,10 +12,32 @@ Cause
 
 The component depends on a service with a lifestyle that is shorter than that of the component.
 
+.. container:: Note
+
+    **Note**: This kind of error is also known as `Captive Dependency <https://blog.ploeh.dk/2014/06/02/captive-dependency/>`_.
+
 Warning Description
 ===================
 
 In general, components should only depend on other components that are configured to live at least as long. In other words, it is safe for a transient component to depend on a singleton, but not the other way around. Because components store a reference to their dependencies in (private) instance fields, those dependencies are kept alive for the lifetime of that component. This means that dependencies that are configured with a shorter lifetime than their consumer, accidentally live longer than intended. This can lead to all sorts of bugs, such as hard to debug multi-threading issues.
+
+The following code snippet demonstrates how the `IUserRepository` dependency is kept alive by the `RealUserService` component:
+
+.. code-block:: c#
+
+    public class RealUserService : IUserService
+    {
+        // Private instance field for storage of the IUserRepository dependency.
+        private readonly IUserRepository repository;
+        
+        public RealUserService(IUserRepository repository)
+        {
+            // The incoming 'repository' dependency is stored in the private field.
+            this.repository = repository;
+        }
+    }
+	
+This example shows common, and perfectly valid use of the Dependency Injection pattern where dependencies are injected through the constructor and stored in private fields for later use. Problems, however, start to appear when there is a mismatch in the lifestyles of the `RealUserService` class and its `IUserRepository` dependency.
 
 The Diagnostic Services detect this kind of misconfiguration and report it. The container will be able to compare all built-in lifestyles (and sometimes even custom lifestyles). Here is an overview of the built-in lifestyles ordered by their length:
 
@@ -25,11 +47,11 @@ The Diagnostic Services detect this kind of misconfiguration and report it. The 
 
 .. container:: Note
 
-    **Note**: This kind of error is also known as `Captive Dependency <https://blog.ploeh.dk/2014/06/02/captive-dependency/>`_.
-    
+    **Important**: **Transient**, in the context of Simple Injector, means *short lived*. Therefore Simple Injector disallows injecting **Transient** dependencies into **Singleton** components, opposed to some other DI Containers that consider Transients to be 'stateless.'
+   
 .. container:: Note
 
-    **Note**: Lifestyle mismatches are such a common source of bugs, that the container always checks for mismatches the first time a component is resolved, no matter whether you call *Container.Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
+    **Tip**: Lifestyle mismatches are such a common source of bugs, that the container always checks for mismatches the first time a component is resolved, no matter whether you call *Container.Verify()* or not. This behavior can be suppressed by setting the **Container.Options.SuppressLifestyleMismatchVerification** property, but you are advised to keep the default settings.
 
 
 How to Fix Violations
@@ -94,49 +116,24 @@ The following example shows how to query the Diagnostic API for Lifetime Mismatc
 Working with Scoped components
 ==============================
 
-Simple Injector's Lifestyle Mismatch verification is strict and will warn about injecting :ref:`Transient <Transient>` dependencies into :ref:`Scoped <Scoped>` components. This is because **Transient**, in the context of Simple Injector, means *short lived*. A **Scoped** component, however, could live for quite a long time, depending on the time you decide to keep the `Scope` alive. Simple Injector does not know how your application handles scoping.
+Simple Injector v5 changed the default Lifestyle Mismatch verification behavior to be less strict. This means that :ref:`Transient <Transient>` dependencies can now be injected into :ref:`Scoped <Scoped>` components. This simplifies working with applications where the lifetime of a scope is always deterministically short—e.g. when the scope is bound to a web request in a web application. In that case the `Scope` lives very short, and in that case the difference in lifetime between the **Transient** and **Scoped** lifestyle is typically a non-issue.
 
-This, however, can be a quite restrictive model. Especially for applications where the lifetime of a scope equals that of a web request. In that case the `Scope` lives very short, and in that case the difference in lifetime between the **Transient** and **Scoped** lifestyle might be non-existing. It can, therefore, make sense in these types of applications to loosen the restriction and allow **Transient** dependencies to be injected into **Scoped** consumers. Especially because Simple Injector does track **Scoped** dependencies and allows them to be disposed, while **Transient** components are not tracked. See the :doc:`Disposable Transient Components diagnostic warning <disposabletransientcomponent>` for more information on this behavior.
+This loosened behavior simplifies working with Simple injector, because it tracks **Scoped** dependencies and allows them to be disposed of, while **Transient** components are not tracked and never disposed of. See the :doc:`Disposable Transient Components diagnostic warning <disposabletransientcomponent>` for more information on this disposing behavior.
 
-To allow **Transient** dependencies to be injected into **Scoped** consumers without causing verification warnings, you can configure **Options.UseLoosenedLifestyleMismatchBehavior** as follows:
+If, however, you build an application where the used **Scope** instances can live for a long time, you might want to switch back to the original, strict behavior to get this extra layer of validation. This ensures Simple Injector warns when it injects :ref:`Transient <Transient>` dependencies into :ref:`Scoped <Scoped>` components.
+
+To enable this strict behavior, you can configure **Options.UseStrictLifestyleMismatchBehavior** as follows:
 
 .. code-block:: c#
 
     var container = new Container();
 
-    container.Options.UseLoosenedLifestyleMismatchBehavior = true;
-
-.. container:: Note
-
-    **Note** the **Options.UseLoosenedLifestyleMismatchBehavior** setting requires Simple Injector v4.9 or newer.
-
-
-What about Hybrid lifestyles?
-=============================
-
-A :ref:`Hybrid lifestyle <Hybrid>` is a mix between two or more other lifestyles. Here is an example of a custom lifestyle that mixes the **Transient** and **Singleton** lifestyles together:
-
-.. code-block:: c#
-
-    var hybrid = Lifestyle.CreateHybrid(
-        lifestyleSelector: () => someCondition,
-        trueLifestyle: Lifestyle.Transient,
-        falseLifestyle: Lifestyle.Singleton);
-
-.. container:: Note
-
-    **Note** that this example is quite bizarre, since it is a very unlikely combination of lifestyles to mix together, but it serves us well for the purpose of this explanation.
-
-As explained, components should only depend on equal length or longer lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of `someCondition`. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).
-
-From the Diagnostic Services' perspective, a component can only safely depend on a hybrid-lifestyled service if the consuming component's lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid-lifestyled component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the **longest** lifestyle is used in the comparison when the hybrid is part of the consuming component, and the **shortest** lifestyle is used when the hybrid is part of the dependency.
-
-This does imply that two components with the same hybrid lifestyle can't safely depend on each other. This is true since in theory the supplied predicate could change results in each call. In practice however, those components would usually be able safely relate, since it is normally unlikely that the predicate changes lifestyles within a single object graph. This is an exception the Diagnostic Services can make pretty safely. From the Diagnostic Services' perspective, components can safely be related when both share the exact same lifestyle instance and no warning will be displayed in this case. This does mean however, that you should be very careful using predicates that change the lifestyle during the object graph.
+    container.Options.UseStrictLifestyleMismatchBehavior = true;
 
 Iterating injected collections during construction can lead to warnings
 =======================================================================
 
-Simple Injector v4.5 improved the ability to find Lifestyle Mismatches by trying to detect when injected collections are iterated during object composition. This can lead to warnings similar to the following:
+Simple Injector tries to detect when injected collections are iterated during object composition, as this could otherwise lead to Lifestyle Mismatches. This can lead to warnings similar to the following:
 
 .. container:: Note
 
@@ -193,3 +190,25 @@ In this case, Simple Injector will still report the Lifestyle Mismatch between `
 .. container:: Note
 
     Even though false positives might occur, best practice is to prevent iterating the injected stream inside the constructor, as prescribed `here <https://blog.ploeh.dk/2011/03/03/InjectionConstructorsshouldbesimple/>`_.
+
+What about Hybrid lifestyles?
+=============================
+
+A :ref:`Hybrid lifestyle <Hybrid>` is a mix between two or more other lifestyles. Here is an example of a custom lifestyle that mixes the **Transient** and **Singleton** lifestyles together:
+
+.. code-block:: c#
+
+    var hybrid = Lifestyle.CreateHybrid(
+        lifestyleSelector: () => someCondition,
+        trueLifestyle: Lifestyle.Transient,
+        falseLifestyle: Lifestyle.Singleton);
+
+.. container:: Note
+
+    **Note** that this example is quite bizarre, since it is a very unlikely combination of lifestyles to mix together, but it serves us well for the purpose of this explanation.
+
+As explained, components should only depend on equal length or longer-lived components. But how long does a component with this hybrid lifestyle live? For components that are configured with the lifestyle defined above, it depends on the implementation of `someCondition`. But without taking this condition into consideration, we can say that it will at most live as long as the longest wrapped lifestyle (Singleton in this case) and at least live as long as shortest wrapped lifestyle (in this case Transient).
+
+From the Diagnostic Services' perspective, a component can only safely depend on a hybrid-lifestyle service if the consuming component's lifestyle is shorter than or equal the shortest lifestyle the hybrid is composed of. On the other hand, a hybrid-lifestyle component can only safely depend on another service when the longest lifestyle of the hybrid is shorter than or equal to the lifestyle of the dependency. Thus, when a relationship between a component and its dependency is evaluated by the Diagnostic Services, the **longest** lifestyle is used in the comparison when the hybrid is part of the consuming component, and the **shortest** lifestyle is used when the hybrid is part of the dependency.
+
+This does imply that two components with the same hybrid lifestyle can't safely depend on each other. This is true since in theory the supplied predicate could change results in each call. In practice however, those components would usually be able safely relate since it is normally unlikely that the predicate changes lifestyles within a single object graph. This is an exception the Diagnostic Services can make pretty safely. From the Diagnostic Services' perspective, components can safely be related when both share the exact same lifestyle instance and no warning will be displayed in this case. This does mean however, that you should be very careful using predicates that change the lifestyle during the object graph.

@@ -186,13 +186,13 @@ To be able to intercept, you will need to take a dependency on your interception
 Limited Auto-Registration API
 ==============================
 
-Most DI libraries have a large and advanced auto-registration API that often allow specifying registrations in a fluent way. The downside of these APIs is that developers will struggle to use them correctly; they are often far from intuitive and the library's documentation needs to be repeatedly consulted. 
+Most DI libraries have a large and advanced Auto-Registration API that often allow specifying registrations in a fluent way. The downside of these APIs is that developers will struggle to use them correctly; they are often far from intuitive and the library's documentation needs to be repeatedly consulted. 
 
 Instead of creating our own API that would fall into the same trap as all the others, we decided not to have such elaborate API, because:
 
 * :ref:`Features should be intuitive <Features-should-be-intuitive>`
 
-In most cases we found it much easier to write batch registrations using LINQ; a language that most developers are already familiar with. Specifying your registrations in LINQ reduces the need to learn yet another (domain-specific) language (with all its quirks).
+In most cases we found it much easier to write Auto-Registrations using LINQ; a language that most developers are already familiar with. Specifying your registrations in LINQ reduces the need to learn yet another (domain-specific) language (with all its quirks).
 
 When it comes to auto-registering generic types things are different. Auto-registering generic types can be very complex without tool support. We have defined a clear API consisting of a few **Register** and **Collection.Register** overloads that covers the majority of the cases. 
 

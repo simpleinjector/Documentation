@@ -275,18 +275,18 @@ This configuration has an interesting mix of decorator registrations.
 
     **Warning**: Please note that the previous example is just meant for educational purposes. In practice, you don't want your commands to be processed this way, because it could lead to message loss. Instead you want to use a durable queue.
 
-Another useful application for *Func<T>* decoratee factories is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new thread-specific scope, as follows:
+Another useful application for *Func<T>* decoratee factories is when a command needs to be executed in an isolated fashion, e.g. to prevent sharing the unit of work with the request that triggered the execution of that command. This can be achieved by creating a proxy that starts a new operation-specific scope, as follows:
 
 .. code-block:: c#
 
     using SimpleInjector.Lifestyles;
 
-    public class ThreadScopedCommandHandlerProxy<T> : ICommandHandler<T>
+    public class ScopedCommandHandlerProxy<T> : ICommandHandler<T>
     {
         private readonly Container container;
         private readonly Func<ICommandHandler<T>> decorateeFactory;
 
-        public ThreadScopedCommandHandlerProxy(
+        public ScopedCommandHandlerProxy(
             Container container, Func<ICommandHandler<T>> decorateeFactory)
         {
             this.container = container;
@@ -296,7 +296,7 @@ Another useful application for *Func<T>* decoratee factories is when a command n
         public void Handle(T command)
         {
             // Start a new scope.
-            using (ThreadScopedLifestyle.BeginScope(container))
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Create the decorateeFactory within the scope.
                 ICommandHandler<T> handler = this.decorateeFactory.Invoke();
@@ -305,38 +305,24 @@ Another useful application for *Func<T>* decoratee factories is when a command n
         }
     }
     
-This proxy class starts a new :ref:`thread scoped lifestyle <ThreadScoped>` and resolves the decoratee within that new scope using the factory. The use of the factory ensures that the decoratee is resolved according to its lifestyle, independent of the lifestyle of our proxy class. The proxy can be registered as follows:
+This proxy class starts a new :ref:`async-scoped lifestyle <AsyncScoped>` and resolves the decoratee within that new scope using the factory. The use of the factory ensures that the decoratee is resolved according to its lifestyle, independent of the lifestyle of the proxy class. The proxy can be registered as follows:
 
 .. code-block:: c#
 
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
-        typeof(ThreadScopedCommandHandlerProxy<>),
+        typeof(ScopedCommandHandlerProxy<>),
         Lifestyle.Singleton);
 
 .. container:: Note
 
-    **Note**: Because the *ThreadScopedCommandHandlerProxy<T>* only depends on singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it too can safely be registered as singleton.
-        
-Because a typical application will not use the thread-scoped lifestyle, but would prefer a scope specific to the application type, a special :ref:`hybrid lifestyle <Hybrid>` needs to be defined that allows object graphs to be resolved in this mixed-request scenario:
+    **Note**: Because the *ScopedCommandHandlerProxy<T>* only depends on two singletons (both the *Container* and the *Func<ICommandHandler<T>>* are singletons), it too can safely be registered as singleton.
+       
+If you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use both the *ScopedCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
 
 .. code-block:: c#
 
-    container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
-        defaultLifestyle = new ThreadScopedLifestyle(),
-        fallbackLifestyle: new WebRequestLifestyle());
-
-    container.Register<IUnitOfWork, DbUnitOfWork>(Lifestyle.Scoped);
-
-If you run (part of) your commands on a background thread and also use registrations with a :ref:`scoped lifestyle <Scoped>` you will have a use both the *ThreadScopedCommandHandlerProxy<T>* and *AsyncCommandHandlerDecorator<T>* together which can be seen in the following configuration:
-
-.. code-block:: c#
-
-    container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
-        defaultLifestyle = new ThreadScopedLifestyle(),
-        fallbackLifestyle: new WebRequestLifestyle());
-
-    container.Options.DefaultScopedLifestyle = scopedLifestyle;
+    container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
     container.Register<IUnitOfWork, DbUnitOfWork>(Lifestyle.Scoped);
     container.Register<IRepository<User>, UserRepository>(Lifestyle.Scoped);
@@ -345,7 +331,7 @@ If you run (part of) your commands on a background thread and also use registrat
 
     container.RegisterDecorator(
         typeof(ICommandHandler<>),
-        typeof(ThreadScopedCommandHandlerProxy<>),
+        typeof(ScopedCommandHandlerProxy<>),
         Lifestyle.Singleton);
         
     container.RegisterDecorator(

@@ -29,10 +29,10 @@ In these rare cases we need to override the way Simple Injector does its constru
 
     public interface IConstructorResolutionBehavior
     {
-        ConstructorInfo GetConstructor(Type implementationType);
+        ConstructorInfo? TryGetConstructor(Type implementationType, out string? errorMessage);
     }
 
-Simple Injector will call into the registered **IConstructorResolutionBehavior** when the type is registered to allow the **IConstructorResolutionBehavior** implementation to verify the type. The implementation is called again when the registered type is resolved for the first time.
+Simple Injector will call into the configured **IConstructorResolutionBehavior** directly upon registration to allow the **IConstructorResolutionBehavior** implementation to verify the type. This gives users immediate feedback during registration. Simple Injector will call the **IConstructorResolutionBehavior** again just before the registered type is resolved for the first time and its object graph is being constructed.
 
 The following example changes the constructor resolution behavior to always select the constructor with the most parameters (the greediest constructor):
 
@@ -41,11 +41,17 @@ The following example changes the constructor resolution behavior to always sele
     // Custom constructor resolution behavior
     public class GreediestConstructorBehavior : IConstructorResolutionBehavior
     {
-        public ConstructorInfo GetConstructor(Type implementationType) => (
-            from ctor in implementationType.GetConstructors()
-            orderby ctor.GetParameters().Length descending
-            select ctor)
-            .First();
+        public ConstructorInfo? TryGetConstructor(
+            Type implementationType, out string? errorMessage)
+        {
+            errorMessage = $"{implementationType} has no public constructors.";
+
+            return (
+                from ctor in implementationType.GetConstructors()
+                orderby ctor.GetParameters().Length descending
+                select ctor)
+                .FirstOrDefault();
+        }
     }
 
     // Usage
@@ -56,7 +62,7 @@ The following bit more advanced example changes the constructor resolution behav
 
 .. code-block:: c#
 
-    public class MostResolvableParametersConstructorResolutionBehavior 
+    public class MostResolvableParametersConstructorResolutionBehavior
         : IConstructorResolutionBehavior
     {
         private readonly Container container;
@@ -66,14 +72,14 @@ The following bit more advanced example changes the constructor resolution behav
             this.container = container;
         }
 
-        private bool IsCalledDuringRegistrationPhase => !this.container.IsLocked();
+        private bool IsCalledDuringRegistrationPhase => !this.container.IsLocked;
 
         [DebuggerStepThrough]
-        public ConstructorInfo GetConstructor(Type implementationType)
+        public ConstructorInfo TryGetConstructor(Type type, out string errorMessage)
         {
-            var constructor = this.GetConstructors(implementationType).FirstOrDefault();
-            if (constructor != null) return constructor;
-            throw new ActivationException(BuildExceptionMessage(implementationType));
+            var constructor = this.GetConstructors(type).FirstOrDefault();
+            errorMessage = constructor == null ? BuildExceptionMessage(type) : null;
+            return constructor;
         }
 
         private IEnumerable<ConstructorInfo> GetConstructors(Type implementation) =>
@@ -104,7 +110,7 @@ The following bit more advanced example changes the constructor resolution behav
         private static string TypeShouldHaveConstructorWithResolvableTypes(Type type) =>
             string.Format(CultureInfo.InvariantCulture,
                 "For the container to be able to create {0}, it should contain a public " +
-                "constructor that only contains parameters that can be resolved.", 
+                "constructor that only contains parameters that can be resolved.",
                 type.ToFriendlyName());
     }
 
@@ -227,7 +233,7 @@ For more information about how to use this event, please look at the `ResolveUnr
 Overriding Lifestyle Selection Behavior
 =======================================
 
-By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the **Transient** lifestyle. This behavior can be overridden and this is especially useful in batch-registration scenarios.
+By default, when registering a type without explicitly specifying a lifestyle, that type is registered using the **Transient** lifestyle. This behavior can be overridden and this is especially useful in Auto-Registration scenarios.
 
 Here are some examples of registration calls that all register types as *Transient*:
 
@@ -440,7 +446,7 @@ An **InstanceProducer** instance is responsible of caching the compiled factory 
 Container-locking
 =================
 
-Simple Injector v4.8 added a new **Container.Options.ContainerLocking** event. This allows you to get notified just before the container gets locked. This typically happens when the first instance is resolved, or when the container is being verified. This event can be used to add some last-minute registrations, that should be made last, or to detect who is locking the container to early:
+The **Container.Options.ContainerLocking** event allows you to get notified just before the container gets locked. This typically happens when the first instance is resolved, or when the container is being verified. This event can be used to add some last-minute registrations, that should be made last, or to detect who is locking the container to early:
 
 .. code-block:: c#
     

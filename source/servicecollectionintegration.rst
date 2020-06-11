@@ -113,9 +113,6 @@ In case the automatic cross wiring of framework components is not desired, it ca
         
     provider.UseSimpleInjector(container);
 
-.. container:: Note
-
-    **IMPORTANT**: This section has changed with the introduction of Simple Injector v4.8. There was a **AutoCrossWireFrameworkComponents** property on **UseSimpleInjector**, but it is marked as obsolete. You will get a compile error and a runtime error when using it. You should use the **AutoCrossWireFrameworkComponents** on **AddSimpleInjector** instead, as shown in the previous listing.
 
 Or more specifically for ASP.NET Core:
     
@@ -151,10 +148,6 @@ When auto cross wiring is disabled, individual framework components can still be
         // Cross wires ILoggerFactory
         options.CrossWire<ILoggerFactory>();
     });
-
-.. container:: Note
-
-    **IMPORTANT**: Similar as noted above, cross wiring changed in Simple Injector v4.8. With the introduction of v4.8, cross wiring needs to be applied during **AddSimpleInjector** instead of during **UseSimpleInjector**. You will get a compile warning when using cross wiring inside **UseSimpleInjector**.
 
 Like auto cross wiring, **CrossWire<TService>** does the required plumbing such as making sure the type is registered with the same lifestyle as configured in .NET Core, but with the difference of just cross wiring that single supplied type. The following listing demonstrates its use:
 
