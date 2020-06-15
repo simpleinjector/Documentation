@@ -7,8 +7,6 @@ Starting with v5.0, Simple Injector will no long resolve unregistered concrete t
 .. container:: Note
 
     No registration for type {type} could be found. Make sure {type} is registered, for instance by calling 'Container.Register<{type}>();' during the registration phase. An implicit registration could not be made because Container.Options.ResolveUnregisteredConcreteTypes is set to 'false', which is now the default setting in v5. This disallows the container to construct this unregistered concrete type. For more information on why resolving unregistered concrete types is now disallowed by default, and what possible fixes you can apply, see https://simpleinjector.org/ructd.
-	
-	concrete types is now disallowed by default, and what possible fixes you can apply, 
 
 What's the problem?
 ===================
