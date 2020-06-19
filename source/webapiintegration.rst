@@ -167,8 +167,46 @@ The following example visualizes this:
     }
 
 By moving all the logic and dependencies out of the attribute, the attribute becomes a small infrastructural piece of code; a humble object that simply forwards the call to the real service.
+
+Instead of making the attribute a piece of infrastructure, a cleaner approach is to make your attributes `passive <https://blog.ploeh.dk/2014/06/13/passive-attributes/>`_. This means the attribute merely contains data, while you create a seperate filter class, which contains the logic:
+
+.. code-block:: c#
+
+    // Passive attribute
+    public class MinimumAgeActionFilterAttribute : Attribute
+    {
+        public readonly int MinimumAge;
+
+        public MinimumAgeActionFilterAttribute(int minimumAge)
+        {
+            this.MinimumAge = minimumAge;
+        }
+    }
     
-If the number of required filter attributes grows, a different model might be in place. In that case you might want to make your attributes `passive <https://blog.ploeh.dk/2014/06/13/passive-attributes/>`_ as explained `here <https://blogs.cuttingedge.it/steven/posts/2014/dependency-injection-in-attributes-dont-do-it/>`_.
+    public class MinimumAgeActionFilter : FilterAttribute
+    {
+        public override Task OnActionExecutingAsync(
+            HttpActionContext actionContext, CancellationToken cancellationToken)
+        {
+            var checker = GlobalConfiguration.Configuration.DependencyResolver
+                .GetService(typeof(IMinimumAgeChecker)) as IMinimumAgeChecker;
+
+            var attribute = actionContext.ActionDescriptor.ControllerDescriptor
+                .GetCustomAttribute<MinimumAgeActionFilterAttribute>();
+
+            checker.VerifyCurrentUserAge(attribute.MinimumAge);
+
+            return Task.CompletedTask;
+        }
+    }
+
+The `MinimumAgeActionFilter` can be added to the Web API pipeline as follows:
+
+.. code-block:: c#
+
+    GlobalConfiguration.Configuration.Filters.Add(new MinimumAgeActionFilter());
+    
+If the number of required filter attributes grows, a different model might be in place. In that case you might want to make use of `this approach <https://blogs.cuttingedge.it/steven/posts/2014/dependency-injection-in-attributes-dont-do-it/>`_.
 
 .. _Injecting-dependencies-into-Web-API-message-handlers:
 
