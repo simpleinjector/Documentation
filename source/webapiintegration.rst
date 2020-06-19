@@ -162,7 +162,7 @@ The following example visualizes this:
 
             checker.VerifyCurrentUserAge(this.MinimumAge);
 
-            return TaskHelpers.Completed();
+            return Task.CompletedTask;
         }
     }
 
