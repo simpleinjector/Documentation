@@ -91,7 +91,7 @@ There are multiple possible solutions you can apply.
       
       public object GetPage(Type pageType)
       {
-          InstaceProducer producer = this.producers.GetOrAdd(pageType, this.CreateProducer);
+          InstanceProducer producer = this.producers.GetOrAdd(pageType, this.CreateProducer);
           return producer.GetInstance();
       }
       
