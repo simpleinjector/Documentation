@@ -274,7 +274,7 @@ texinfo_show_urls = 'footnote'
 epub_title = 'Simple Injector'
 epub_author = 'Simple Injector Contributors'
 epub_publisher = 'Simple Injector Contributors'
-epub_copyright = '2014-2017, Simple Injector Contributors'
+epub_copyright = '2014-%s, Simple Injector Contributors' % datetime.datetime.now().year
 
 # The basename for the epub file. It defaults to the project name.
 #epub_basename = 'Simple Injector'
