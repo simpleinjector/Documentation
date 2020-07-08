@@ -75,10 +75,28 @@ There are multiple possible solutions you can apply.
       
       // This allows you to resolve any unregistered concrete type:
       container.GetInstance<TimeProvider>();
+  
+  As a migration strategy, you can hook onto the **ResolveUnregisteredType** event to log any accidental resolved unregistered types. This allows you to fix any occurrences. This allows you to, later on, switch back to the default behavior:
+
+  .. code-block:: c#
+  
+    container.Options.ResolveUnregisteredConcreteTypes = this.IsProductionEnvironment;
+
+    container.ResolveUnregisteredType += (s, e) =>
+    {
+        if (!e.Handled && !e.UnregisteredServiceType.IsAbstract)
+        {
+            this.log.Error($"UnregisteredServiceType: {e.UnregisteredServiceType}");
+        }
+    };
     
 * In case the concrete types can't be registered, because they don't exist at compile time, you can create **InstanceProducer** instances and resolve from them.
   
   ASP.NET Web Forms, for instance, generates `Page` classes that derive from classes you wrote. Those generated classes, however, are generated at runtime and, therefore, can't be registered. Still, the runtime might request for these generated sub classes instead.
+
+  .. container:: Note
+
+    A similar model must be applied to ASP.NET MVC ViewPages. See `This discussion <https://github.com/simpleinjector/SimpleInjector/issues/826#issuecomment-650210706>`_ for more details.
   
   For scenarios like the previous, Simple Injector allows for the just-in-time registration of root types, which is a more sensible setting compared to reverting to the old `ResolveUnregisteredConcreteTypes` behavior completely. The following code snippet shows how InstanceProducers can be used to achieve this:
 
