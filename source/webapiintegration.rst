@@ -131,7 +131,7 @@ This implementation can be implemented as follows:
 Injecting dependencies into Web API filter attributes
 -----------------------------------------------------
 
-Web API caches filter attribute instances indefinitely per action, effectively making them singletons. This makes them unsuited for dependency injection, since the attribute's dependencies will be accidentally promoted to singleton as well, which can cause all sorts of concurrency issues. This problem is commonly referred to as `Captive Dependencies <https://blog.ploeh.dk/2014/06/02/captive-dependency/>`_ and although Simple Injector tries to :ref:`find those issues <LifestyleMismatches>`, it will be unable to do so in this this case.
+Web API caches filter attribute instances indefinitely per action, effectively making them singletons. This makes them unsuited for dependency injection, since the attribute's dependencies will be accidentally promoted to singleton as well, which can cause all sorts of concurrency issues. This problem is commonly referred to as `Captive Dependencies <https://blog.ploeh.dk/2014/06/02/captive-dependency/>`_ and although Simple Injector tries to :doc:`find those issues <LifestyleMismatches>`, it will be unable to do so in this this case.
 
 Since dependency injection is not an option here, an other mechanism is advised. There are basically two options here. Which one is best depends on the amount of filter attributes your application needs. If the number of attributes is limited (to a few), the simplest solution is to revert to the Service Locator (anti-)pattern within your attributes. If the number of attributes is larger, it might be better to make attributes passive.
 
