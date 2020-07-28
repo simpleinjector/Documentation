@@ -388,7 +388,6 @@ Integration for Razor Pages is part of the *SimpleInjector.Integration.AspNetCor
 
 .. code-block:: c#
 
-    // This method gets called by the runtime.
     public void ConfigureServices(IServiceCollection services)
     {
         ...
@@ -401,6 +400,46 @@ Integration for Razor Pages is part of the *SimpleInjector.Integration.AspNetCor
     }
 
 This is all that is required to integrate Simple Injector with ASP.NET Core Razor Pages.
+
+When working with Razor Components, however, it can be useful to override the integration's `IServiceScope` reuse behavior, which is discussed next.
+
+.. _service-scope-reuse behavior:
+
+Overriding the default IServiceScope Reuse Behavior
+===================================================
+
+In order to allow framework services to be cross wired, Simple Injector's basic :doc:`ServiceCollection Integration <servicecollectionintegration>` managed the framework's `IServiceScope` instances within its own **Scope**. This means that, with the basic integration, every Simple Injector **Scope** gets its own new `IServiceScope`.
+
+This behavior, however, is overridden by Simple Injector's ASP.NET Core integration. It ensures that, within the context of a single web request, the request's original `IServiceScope` implementation is used. Not reusing that `IServiceScope` would cause scoped framework components to lose request information, which is supplied by the ASP.NET Core framework at the beginning of the request.
+
+This behavior is typically preferable, because it would otherwise force you to add quite some infrastructural code to get this data back. On the other hand, it does mean, that even if you start a nested **Scope** within a web request, you are still getting the same cross-wired scoped framework services. For instance, in case you inject a cross-wired `DbContext` (registered through `services.AddDbContext<T>()`), you get the same `DbContext` instance, even within that nested scope—this might not be the behavior you want, and this behavior can be overridden.
+
+Especially when building a Razor Page application, overriding the default can be important. Razor Pages tend to reuse the same `IServiceCollection` for the same user as long as they stay on the same page (because the SignalR pipeline is kept open). This reuse can have rather problematic consequences, especially because the user can cause server requests to happen in parallel (by clicking a button multiple times within a short time span). This causes problems, because `DbContext`, for instance, is not thread safe. This is also a case where you might want to override the default behavior.
+
+The following code snippet demonstrates how this behavior can be overridden:
+
+.. code-block:: c#
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        ...
+
+        services.AddSimpleInjector(container, options =>
+        {
+            options.AddAspNetCore(ServiceScopeReuseBehavior.OnePerRequest)
+                .AddPageModelActivation();
+        });
+    }
+
+.. container:: Note
+
+    **NOTE**: This **AddAspNetCore** overload is new in **v5.1** of the SimpleInjector.Integration.AspNetCore integration package.
+
+The **AddAspNetCore** method contains an overload that accepts an **ServiceScopeReuseBehavior** enum. This enum has the following options:
+
+* **OnePerRequest**: Within the context of a web request (or SignalR connection), Simple Injector will reuse the same `IServiceScope` instance, irregardless of how many Simple Injector **Scope** instances are created. Outside the context of a (web) request (i.e. `IHttpContextAccessor.HttpContext` returns `null`), this behavior falls back to the **Unchanged** behavior as discussed below.
+* **OnePerNestedScope**: Within the context of a web request (or SignalR connection), Simple Injector will use the request's `IServiceScope` within its root scope. Within a nested scope or outside the context of a (web) request, this behavior falls back to **Unchanged**.
+* **Unchanged**: This leaves the original configured **SimpleInjectorAddOptions.ServiceProviderAccessor** as-is. If **ServiceProviderAccessor** is not replaced, the default value, as returned by **AddSimpleInjector**, ensures the creation of a new .NET Core `IServiceScope` instance, for every Simple Injector **Scope**. The `IServiceScope` is *scoped* to that Simple Injector **Scope**. The ASP.NET Core's request `IServiceScope` will **NEVER** be used. Instead Simple Injector creates a new one for the request (and one for each nested scope). This disallows accessing ASP.NET Core services that depend on or return request-specific data. Setting the **ServiceScopeReuseBehavior** to **Unchanged** in a web application might force you to provide request-specific data to services using ASP.NET Middleware.
 
 .. _identity:
     
