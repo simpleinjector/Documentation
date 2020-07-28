@@ -45,7 +45,7 @@ The following example changes the constructor resolution behavior to always sele
             Type implementationType, out string? errorMessage)
         {
             errorMessage = $"{implementationType} has no public constructors.";
-
+    
             return (
                 from ctor in implementationType.GetConstructors()
                 orderby ctor.GetParameters().Length descending
@@ -53,10 +53,11 @@ The following example changes the constructor resolution behavior to always sele
                 .FirstOrDefault();
         }
     }
-
+    
     // Usage
     var container = new Container();
-    container.Options.ConstructorResolutionBehavior = new GreediestConstructorBehavior();
+    container.Options.ConstructorResolutionBehavior =
+        new GreediestConstructorBehavior();
 
 The following bit more advanced example changes the constructor resolution behavior to always select the constructor with the most parameters from the list of constructors with only resolvable parameters:
 
