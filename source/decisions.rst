@@ -23,7 +23,7 @@ Our :doc:`design principles <principles>` have influenced the direction of the d
 The container is locked after the first call to resolve
 =======================================================
 
-When an application makes its first call to **GetInstance**, **GetAllIntances** or **Verify**, the container locks itself to prevent any future changes being made by explicit registrations. This strictly separates the configuration of the container from its use and forces the user to configure the container in one single place. This design decision is inspired by the following design principle:
+When an application makes its first call to **GetInstance**, **GetAllInstances** or **Verify**, the container locks itself to prevent any future changes being made by explicit registrations. This strictly separates the configuration of the container from its use and forces the user to configure the container in one single place. This design decision is inspired by the following design principle:
 
 * :ref:`Push developers into best practices <Push-developers-into-best-practices>`
 
