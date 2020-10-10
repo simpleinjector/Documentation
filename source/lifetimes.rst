@@ -598,7 +598,7 @@ A custom lifestyle can be created by calling the **Lifestyle.CreateCustom** fact
 .. code-block:: c#
 
     public delegate Func<object> CreateLifestyleApplier(
-        Func<object> transientInstanceCreator)    
+        Func<object> transientInstanceCreator)
 
 The **CreateLifestyleApplier** delegate accepts a *Func<object>* that allows the creation of a transient instance of the registered type. This *Func<object>* is created by Simple Injector supplied to the registered  **CreateLifestyleApplier** delegate for the registered type. When this *Func<object>* delegate is called, the creation of the type goes through the :doc:`Simple Injector pipeline <pipeline>`. This keeps the experience consistent with the rest of the library.
 
@@ -667,3 +667,152 @@ Do note that even though locking is used to synchronize access, this custom life
 .. container:: Note
     
     In case you wish to develop a custom lifestyle, we strongly advise posting a question on `our Forum <https://simpleinjector.org/forum>`_. We will be able to guide you through this process.
+
+
+
+
+
+
+
+.. _Collections-and-lifetime-management:
+
+Collections and Lifetime Management
+===================================
+
+Most applications that apply Dependency Injection need to work with collections of dependencies of some sort. In a typical situation, the dependencies that are part of the injected collection should all be part of the same scope. Without making any special adjustments to your code, this is the behavior you get out of the box. The following example demonstrates this:
+
+.. code-block:: c#
+    
+    // Registration
+    container.Register<IService, Service>();
+    container.Collection.Append<ILogger, MailLogger>(Lifestyle.Transient);
+    container.Collection.Append<ILogger, SqlLogger>(Lifestyle.Scoped);
+    container.Collection.Append<ILogger, FileLogger>(Lifestyle.Singleton);
+    container.Collection.AppendInstance<ILogger>(new ConsoleLogger(ConsoleColor.Gray));
+        
+    // Class depending on a collection of dependencies
+    public class Service : IService
+    {
+        private readonly IEnumerable<ILogger> loggers;
+
+        public Service(IEnumerable<ILogger> loggers)
+        {
+            this.loggers = loggers;
+        }
+
+        void IService.DoStuff()
+        {
+            foreach (var logger in this.loggers)
+            {
+                logger.Log("Some message");
+            }
+            
+            // For sake of argument, this method iterates the loggers again.
+            foreach (var logger in this.loggers)
+            {
+                logger.Log("Something else");
+            }
+        }
+    }
+
+    // Usage
+    using (Scope scope = AsyncScopedLifstyle.BeginScope(container))
+    {
+        var service = container.GetInstance<IService>();
+        service.DoStuff();
+    }
+
+In the example above, the `Service` class is injected with a collection of four different `ILogger` implementations, each with their own different lifestyle. The `Service` class's `DoStuff` method is invoked in the context of the scope of an **AsyncScopedLifstyle**. During the execution of that scope there will only be one instance of `SqlLogger`, as it is registered as **Scoped**. On the other hand, `MailLogger` is registered as **Transient**. This means multiple instance can be created and, in fact, in this example two instances are created, because each iteration of the `loggers` collection will create a new `MailLogger` instance. This happens because, in Simple Injector, collections are considered *streams*.
+
+So far so good, but in more-specialized cases you might want to operate each collection dependency in its own scope. This allows running each dependency in its own isolated bubble, for instance with its own Entity Framework database context or similar Unit of Work implementation. Event handlers are a great example of when this might be beneficial. The following code shows how the `Publisher<TEvent>` class is used to dispatch a single event message to multiple handler implementations for that event:
+
+.. code-block:: c#
+    
+    public class Publisher<TEvent> : IPublisher<TEvent>
+    {
+        private readonly IEnumerable<IEventHandler<TEvent>> handlers;
+
+        public Publisher(IEnumerable<IEventHandler<TEvent>> handlers)
+        {
+            this.handlers = handlers;
+        }
+
+        public void Publish(TEvent e)
+        {
+            foreach (var handler in this.handlers)
+            {
+                handler.Handle(e);
+            }
+        }
+    }
+
+With the previous implementation all handlers (and their dependencies) will run in the same **Scope**, similar to the previous `Service` example. But since every handler is created lazily during iteration of the collection, the following change allows every handler to run in its own isolated **Scope**:
+
+.. code-block:: c#
+    
+    public class Publisher<TEvent> : IPublisher<TEvent>
+    {
+        private readonly Container container;
+        private readonly IEnumerable<IEventHandler<TEvent>> handlers;
+
+        public Publisher(
+            Container container, IEnumerable<IEventHandler<TEvent>> handlers)
+        {
+            this.container = container;
+            this.handlers = handlers;
+        }
+
+        public void Publish(TEvent e)
+        {
+            using (var enumerator = this.handlers.GetEnumerator())
+            {
+                while (true)
+                {
+                    using (AsyncScopedLifestyle.BeginScope(this.container))
+                    {
+                        if (enumerator.MoveNext())
+                        {
+                            enumerator.Current.Handle(e);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+When iterating a collection, the `MoveNext()` of the enumerator delegates the call to the **GetInstance** method of the underlying **InstanceProducer** of the specific dependency. Because each element is wrapped in its own **Scope**, before `MoveNext` is called, it guarantees that each element lives in its own scope.
+
+The previous example, however, is rather complicated and can be confusing to understand. Simple Injector v5's metadata feature, however, simplifies this use case considerably. Using the new `DependencyMetadata<T>` class, the previous example can be simplified to the following:
+
+.. code-block:: c#
+    
+    public class Publisher<TEvent> : IPublisher<TEvent>
+    {
+        private readonly Container container;
+        private readonly IEnumerable<DependencyMetadata<IEventHandler<TEvent>>> metadatas;
+
+        public Publisher(
+            Container container,
+            IEnumerable<DependencyMetadata<IEventHandler<TEvent>>> metadatas)
+        {
+            this.container = container;
+            this.metadatas = metadatas;
+        }
+
+        public void Publish(TEvent e)
+        {
+            foreach (var metadata in this.metadatas)
+            {
+                using (AsyncScopedLifestyle.BeginScope(this.container))
+                {
+                    metadata.GetInstance().Handle(e);
+                }
+            }
+        }
+    }
+
+This this last code snippet, rather than being injected with a stream of `IEventHandler<TEvent>` instances, the `Publisher<TEvent>` is injected with a stream of `DependencyMetadata<IEventHandler<TEvent>>` instances. `DependencyMetadata<T>` is Simple Injector v5's new construct, which allows to access the dependency's metadata and allow resolving an instance of that dependency. In this case, its **GetInstance** method is used to resolve an instance within its own **Scope**.
