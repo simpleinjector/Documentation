@@ -33,6 +33,7 @@ Further reading:
 * :ref:`Per HTTP Session <PerHttpSession>`
 * :ref:`Hybrid <Hybrid>`
 * :ref:`Developing a Custom Lifestyle <CustomLifestyles>`
+* :ref:`Collections and lifetime management <Collections-and-lifetime-management>`
 
 .. _Transient:
 
