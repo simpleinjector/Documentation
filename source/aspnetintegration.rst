@@ -92,6 +92,7 @@ The following code snippet shows how to use the integration package to apply Sim
             app.UseAuthorization();
 
             // Add your custom Simple Injector-created middleware to the pipeline.
+            // NOTE: these middleware classes must implement IMiddleware.
             app.UseMiddleware<CustomMiddleware1>(container);
             app.UseMiddleware<CustomMiddleware2>(container);
 
@@ -282,7 +283,7 @@ The previous `Startup` snippet already showed how a custom middleware class can 
         container.Verify();
     }
     
-The type supplied to **UseMiddleware<T>** should implement the `IMiddleware` interface from the `Microsoft.AspNetCore.Http` namespace. A compile error will be given in case the middleware does not implement that interface.
+The type supplied to **UseMiddleware<T>** should implement the `IMiddleware` interface from the `Microsoft.AspNetCore.Http` namespace.
     
 This **UseMiddleware** overload ensures two particular things:
 
