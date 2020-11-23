@@ -500,6 +500,81 @@ In this example you register the *LoggingEventHandlerDecorator<TEvent, TLogTarge
 
     **Note**: The type factory delegate is typically called once per closed type and the result is burned in the compiled object graph. You can't use this delegate to make runtime decisions.
 
+
+.. _Applying-lifestyles-to-Decorators:
+
+Applying lifestyles to Decorators
+---------------------------------
+
+Just as with any other registration, lifestyles can be applied to decorators. The following code snippet demonstrates this:
+
+.. code-block:: c#
+
+    container.Register<IMessageSender, SmtpMessageSender>(Lifestyle.Singleton);
+
+    container.RegisterDecorator<IMessageSender, AsyncMessageSenderDecorator>(
+        Lifestyle.Singleton);
+
+The following code listing shows the definitions of *SmtpMessageSender* and *AsyncMessageSenderDecorator*:
+
+.. code-block:: c#
+    
+    class SmtpMessageSender : IMessageSender
+    {
+        public void Send(string message) { ... }
+    }
+    
+    class AsyncMessageSenderDecorator : IMessageSender
+    {
+        private readonly IMessageSender decoratee;
+    
+        public AsyncMessageSenderDecorator(IMessageSender decoratee)
+        {
+            this.decoratee = decoratee;
+        }
+        
+        public void Send(string message) { ... }
+    }
+
+In this example, when *IMessageSender* is resolved, Simple Injector ensures that the same *AsyncMessageSenderDecorator* instance is always returned, which will reference the *SmtpMessageSender* instance. But Simple Injector does not always guarantee that a **Singleton** decorator will only have one instance—and for good reason, which we'll explain below.
+
+.. container:: Note
+
+    **Warning**: Lifestyles applied to decorators do not have the same uniqueness characteristics as with normal registrations. Lifestyles are applied to the decorator in combination with the wrapped service. 
+
+Consider the following variation of the previous code sample, but where there is not one *IMessageSender*, but instead a collection of *IMessageSender* components:
+
+.. code-block:: c#
+
+    container.Collection.Append<IMessageSender, SmtpMessageSender>(Lifestyle.Singleton);
+    container.Collection.Append<IMessageSender, SmsMessageSender>(Lifestyle.Singleton);
+
+    container.RegisterDecorator<IMessageSender, AsyncMailSenderDecorator>(
+        Lifestyle.Singleton);
+
+In this case, the two implementations *SmtpMessageSender* and *SmsMessageSender* are registered as part of a collection of *IMessageSender* services. In this case, even though *AsyncMailSenderDecorator* is registered as **Singleton**, two decorator instances will exist: one that wraps *SmtpMessageSender* and one that wraps *SmsMessageSender*.
+
+Consider what would have happened if Simple Injector would guarantee that only one *AsyncMailSenderDecorator* was ever created. As one *AsyncMailSenderDecorator* instance could only reference one single *IMessageSender*, Simple Injector would have to choose whether to inject *SmtpMessageSender* or *SmsMessageSender*, neither which is correct, because that would remove the other service from the collection. Making *AsyncMailSenderDecorator* truly unique would, therefore, cause Simple Injector to return a collection that would be shaped as follows:
+
+.. code-block:: c#
+
+    var decorator = new AsyncMailSenderDecorator(new SmtpMessageSender());
+
+    // Two elements in the collection, so decorator should be returned twice.
+    return IMessageSender[] { decorator, decorator };
+
+Instead, you would expect the collection to be shaped as follows (which is what Simple Injector actually does):
+
+.. code-block:: c#
+
+    var decorator1 = new AsyncMailSenderDecorator(new SmtpMessageSender());
+    var decorator2 = new AsyncMailSenderDecorator(new SmsMessageSender());
+
+    return IMessageSender[] { decorator1, decorator2 };
+
+What this means is that Simple Injector will guarantee uniqueness of a decorator, but this uniqueness is not global, but rather local to a specific registration.
+
+
 .. _Interception-using-Dynamic-Proxies:
 .. _Interception:
 
