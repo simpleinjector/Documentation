@@ -681,21 +681,21 @@ Just as with any other registration, lifestyles can be applied to open-generic r
 
 .. code-block:: c#
 
-    container.Register(typeof(IValidator<>), typeof(DataAnnotationsValidator<>),
+    container.Register(typeof(IValidator<>), typeof(DefaultValidator<>),
         Lifestyle.Singleton);
 
-This registers the open-generic *DataAnnotationsValidator<T>* class as **Singleton** for the *IValidator<T>* service. One might think, though, that there will only be a single instance of *DataAnnotationsValidator<T>* returned by the Container, but this is not the case.
+This registers the open-generic *DefaultValidator<T>* class as **Singleton** for the *IValidator<T>* service. One might think, though, that there will only be a single instance of *DefaultValidator<T>* returned by the Container, but this is not the case.
 
-At runtime, it is impossible to create an instance of an open-generic type, such as *DataAnnotationsValidator<T>*. Only closed versions can be created. An instance of *DataAnnotationsValidator<Customer>*, for instance, can be created, just as you can create a new *DataAnnotationsValidator<Order>* instance. But what the .NET runtime is concerned, these are two completely unrelated types. You can't replace one for the other. For instance, if some class requires an *IValidator<Customer>*, Simple Injector can't inject an *IValidator<Order>* implementation instead. The runtime doesn't allow this, and neither would the C# compiler if you coded this by hand.
+At runtime, it is impossible to create an instance of an open-generic type, such as *DefaultValidator<T>*. Only closed versions can be created. An instance of *DefaultValidator<Customer>*, for instance, can be created, just as you can create a new *DefaultValidator<Order>* instance. But what the .NET runtime is concerned, these are two completely unrelated types. You can't replace one for the other. For instance, if some class requires an *IValidator<Customer>*, Simple Injector can't inject an *IValidator<Order>* implementation instead. The runtime doesn't allow this, and neither would the C# compiler if you coded this by hand.
 
 So instead, you should consider a registration for an open-generic type, a complete list of its closed-generic types instead:
 
 .. code-block:: c#
 
-    container.RegisterSingleton<IValidator<Customer>, DataAnnotationsValidator<Customer>();
-    container.RegisterSingleton<IValidator<Order>, DataAnnotationsValidator<Order>();
-    container.RegisterSingleton<IValidator<Product>, DataAnnotationsValidator<Product>();
-    container.RegisterSingleton<IValidator<Shipment>, DataAnnotationsValidator<Shipment>();
+    container.RegisterSingleton<IValidator<Customer>, DefaultValidator<Customer>();
+    container.RegisterSingleton<IValidator<Order>, DefaultValidator<Order>();
+    container.RegisterSingleton<IValidator<Product>, DefaultValidator<Product>();
+    container.RegisterSingleton<IValidator<Shipment>, DefaultValidator<Shipment>();
     // etc
 
 This is what actually happens under the covers with your generic registration. Simple Injector will make a last-minute registration for the closed type when it is resolved for the first time. And as the above example shows, each closed registration will have its own lifestyle cache.    
