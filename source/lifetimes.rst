@@ -211,24 +211,13 @@ At the end of the using block, the **Scope** instances is automatically disposed
 Asynchronous disposal
 ---------------------
 
-The .NET 4.6.1 and .NET Standard 2.1 versions of Simple Injector support asynchronous disposal of both **Scope** and **Container** instances. This means that components that implement `IAsyncDisposable <https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable>`_ can be disposed asynchronously by Simple Injector. This, however, requires you call **Scope.DisposeAsync**:
-
-.. code-block:: c#
-
-    using (AsyncScopedLifestyle.BeginScope(container))
-    {
-        var service = container.GetInstance<IOrderShipmentProcessor>();
-        
-        await service.ProcessShipmentAsync();
-        
-        await scope.DisposeAsync();
-    }
+With the introduction of Simple Injector v5.2 all its builds have support for asynchronous disposal of both **Scope** and **Container** instances. This means that components that implement `IAsyncDisposable <https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable>`_ can be disposed asynchronously by Simple Injector. This, however, does require you to call one of Simple Injector's methods for asynchronous disposal.
 
 .. container:: Note
 
-    **Warning**: Simple Injector's .NET 4.5, .NET Standard 1.0 and 1.3 versions do **not** support asynchronous disposal.
+    **Tip**: Simple Injector v5.2 even supports asynchronous disposal on the older .NET 4.5, .NET Standard 1.0, and Standard 1.3 platforms. This is done using duck typing which will be explained below.
 
-Or you can use C# 8's new `await using` syntax:
+Depending on what C# and framework version you are using, there are multiple methods for asynchronous disposal. When using C# 8 in combination with .NET Core 3 or .NET 5, you can use C#'s new `await using` syntax, as seen in the following code:
 
 .. code-block:: c#
 
@@ -239,19 +228,66 @@ Or you can use C# 8's new `await using` syntax:
         await service.ProcessShipmentAsync();
     }
 
-Likewise, you can asynchronously dispose of a **Container** instance. This will dispose all cached Singletons:
+.. container:: Note
+
+    The `async using` keyword is only available for Simple Injector's `netstandard2.1` build, hence the requirement of running .NET Core 3 or .NET 5.
+
+For older platforms and C# versions, disposal of a **Scope** can be done by calling **DisposeScopeAsync** inside a `finally` block.
 
 .. code-block:: c#
 
-    await container.DisposeAsync();
+    var scope = AsyncScopedLifestyle.BeginScope(container);
+    
+    try
+    {
+        var service = container.GetInstance<IOrderShipmentProcessor>();
+        
+        await service.ProcessShipmentAsync();
+    }
+    finally
+    {
+        await scope.DisposeScopeAsync();
+    }
     
 .. container:: Note
 
-    Calling **DisposeAsync** ensures that all cached disposable instances are disposed off—both `IDisposable` and `IAsyncDisposable` implementations will be disposed. A class that implements both `IDisposable` and `IAsyncDisposable`, however, will only have its `DisposeAsync` method invoked.
+    Calling **DisposeAsync**, **DisposeScopeAsync** or **DisposeContainerAsync** ensures that all cached disposable instances are disposed of—both `IDisposable` and `IAsyncDisposable` implementations will be disposed. A class that implements both `IDisposable` and `IAsyncDisposable`, however, will only have its `DisposeAsync` method invoked.
 
+Likewise, you can asynchronously dispose of a **Container** instance. This will dispose all disposable cached Singletons:
+
+.. code-block:: c#
+
+    await container.DisposeContainerAsync();
+
+When running an application on .NET 4 or .NET Core 2, the `IAsyncDisposable` interface is not available by default. To support asynchronous disposal on these platform versions you have two options:
+
+1. Use the `Microsoft.Bcl.AsyncInterfaces <https://nuget.org/packages/Microsoft.Bcl.AsyncInterfaces>`_ NuGet package. This package contains the `IAsyncDisposable` interface. Simple Injector will recognize this interface when placed on your application components.
+2. Define a System.IAsyncDisposable interface in application code. Simple Injector will still recognize this custom interface by making use of duck typing.
+
+Which option to pick depends on several factors:
+
+* Microsoft.Bcl.AsyncInterfaces only supports .NET 4.6.1 and .NET Standard 2.0. If you're running .NET 4.5 or creating a reusable library that supports versions below .NET Standard 2.0, using the second option is your only option.
+* You should go for option 1 in case your application is already depending on Microsoft.Bcl.AsyncInterfaces through third-party packages. Simple Injector only supports asynchronous disposal on a single interface. Having multiple interfaces name "System.IAsyncDisposable" can break your application.
+* You should go for options 2 if you're trying to prevent binding redirect issues caused by Microsoft.Bcl.AsyncInterfaces or one of its dependencies. Microsoft.Bcl.AsyncInterfaces is a common source of binding direct issues for developers, which is the sole reason Simple Injector v5.2 switched to using duck typing, compared to taking a dependency on Microsoft.Bcl.AsyncInterfaces. You can read more about our reasoning `on our blog <https://blog.simpleinjector.org/2020/12/the-tale-of-the-async-interfaces/>`_.
+
+In case you go for option 2, you need to add the following code to your application:
+
+.. code-block:: c#
+
+    namespace System
+    {
+        public interface IAsyncDisposable
+        {
+            Task DisposeAsync();
+        }
+    }
+
+The signature of this self-defined interface is similar to the built-in version with the sole difference that this interface returns `Task` rather than `ValueTask`. That's because, just like `IAsyncDisposable`, `ValueTask` is not a built-in type prior to .NET Core 3. 
+    
 .. container:: Note
 
-    **Tip**: Calling **DisposeAsync** disposes a **Scope** or **Container**. You don't need to call both **DisposeAsync** and **Dispose**. This behavior is in line with that of C#'s `await using` behavior, which also *only* calls `DisposeAsync`.
+    **Warning:** Because this interface has a different signature compared to the built-in version, upgrading your application to .NET Core 3 later on does require you to change the classes implementing this interface.
+
 
 .. _Order-of-disposal:
 
