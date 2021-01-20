@@ -66,7 +66,7 @@ The next example instantiates a new *RealService* instance on each call by using
     
     **Note**: It is recommended that registrations for your application components are made using the former Auto-Wiring overload, while registrations of components that are out of your control (e.g. framework or third-party components) are made using the latter delegate overload. This typically results in the most maintainable `Composition Root <https://mng.bz/K1qZ>`_.
     
-Simple Injector considers Transient registrations to be *lasting for only a short time; temporary*, i.e. short lived and not reused. For that reason, Simple Injector prevents the injection of Transient components into Scoped and Singleton consumers as they are expected to be longer lived, which would otherwise result in :doc:`Lifestyle Mismatches <LifestyleMismatches>`.
+Simple Injector considers Transient registrations to be *lasting for only a short time; temporary*, i.e. short lived and not reused. For that reason, Simple Injector prevents the injection of Transient components into Singleton consumers as they are expected to be longer lived, which would otherwise result in :doc:`Lifestyle Mismatches <LifestyleMismatches>`.
     
 .. container:: Note
 
