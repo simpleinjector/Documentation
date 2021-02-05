@@ -4,6 +4,11 @@ ASP.NET Core and ASP.NET Core MVC Integration Guide
 
 Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet package <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_ for integration with ASP.NET Core MVC.
 
+.. container:: Note
+
+    **TIP**: Even though the ASP.NET Core integration packages take a dependency on the Simple Injector core library, prefer installing the `the core library <https://nuget.org/packages/SimpleInjector>`_ explicitly into your startup project. The core library uses an independent versioning and release cycle. Installing the core library explicitly, therefore, gives you the newest, latest release (instead of the lowest compatible release), and allows the NuGet package manager to inform you about new minor and patch releases in the future.
+
+
 The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
 
 .. code-block:: c#
@@ -409,7 +414,7 @@ When working with Razor Components, however, it can be useful to override the in
 Overriding the default IServiceScope Reuse Behavior
 ===================================================
 
-In order to allow framework services to be cross wired, Simple Injector's basic :doc:`ServiceCollection Integration <servicecollectionintegration>` managed the framework's `IServiceScope` instances within its own **Scope**. This means that, with the basic integration, every Simple Injector **Scope** gets its own new `IServiceScope`.
+In order to allow framework services to be cross wired, Simple Injector's basic :doc:`ServiceCollection Integration <servicecollectionintegration>` manages the framework's `IServiceScope` instances within its own **Scope**. This means that, with the basic integration, every Simple Injector **Scope** gets its own new `IServiceScope`.
 
 This behavior, however, is overridden by Simple Injector's ASP.NET Core integration. It ensures that, within the context of a single web request, the request's original `IServiceScope` implementation is used. Not reusing that `IServiceScope` would cause scoped framework components to lose request information, which is supplied by the ASP.NET Core framework at the beginning of the request.
 
