@@ -4,6 +4,10 @@
 
 Simple Injector offers the `Simple Injector Generic Host Integration NuGet package <https://www.nuget.org/packages/SimpleInjector.Integration.GenericHost>`_ for integration with .NET Core 2.1 Generic Host applications.
 
+.. container:: Note
+
+    **TIP**: Even though this integration packages take a dependency on the Simple Injector core library, prefer installing the `the core library <https://nuget.org/packages/SimpleInjector>`_ explicitly into your startup project. The core library uses an independent versioning and release cycle. Installing the core library explicitly, therefore, gives you the newest, latest release (instead of the lowest compatible release), and allows the NuGet package manager to inform you about new minor and patch releases in the future.
+
 The following code snippet shows how to use the integration package to apply Simple Injector to your Console application's `Main` method:
 
 .. code-block:: c#

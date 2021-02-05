@@ -2,11 +2,15 @@
 ASP.NET MVC Integration Guide
 =============================
 
-Simple Injector contains `Simple Injector MVC Integration Quick Start NuGet package <https://nuget.org/packages/SimpleInjector.MVC3>`_.
+Simple Injector offers the `Simple Injector MVC Integration Quick Start NuGet package <https://nuget.org/packages/SimpleInjector.MVC3>`_ for integration in MVC 3 and up.
 
 .. container:: Note
 
     **Warning**: If you are starting from an Empty MVC project template (File | New | Project | MVC 4 | Empty Project Template) you have to manually setup *System.Web.Mvc* binding redirects, or reference System.Web.Mvc from the GAC.
+
+.. container:: Note
+
+    **TIP**: Even though this integration packages take a dependency on the Simple Injector core library, prefer installing the `the core library <https://nuget.org/packages/SimpleInjector>`_ explicitly into your startup project. The core library uses an independent versioning and release cycle. Installing the core library explicitly, therefore, gives you the newest, latest release (instead of the lowest compatible release), and allows the NuGet package manager to inform you about new minor and patch releases in the future.
 
 The following code snippet shows how to use the integration package (note that the quick start package injects this code into your Visual Studio MVC project).
 

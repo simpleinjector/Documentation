@@ -14,6 +14,10 @@ To combat this unfortunate tight coupling of framework and third-party component
 
 .. container:: Note
 
+    **TIP**: Even though this integration packages take a dependency on the Simple Injector core library, prefer installing the `the core library <https://nuget.org/packages/SimpleInjector>`_ explicitly into your startup project. The core library uses an independent versioning and release cycle. Installing the core library explicitly, therefore, gives you the newest, latest release (instead of the lowest compatible release), and allows the NuGet package manager to inform you about new minor and patch releases in the future.
+
+.. container:: Note
+
     **NOTE**: The *SimpleInjector.Integration.ServiceCollection* package defines the core behavior that the :doc:`.NET Generic Host Integration Guide <generichostintegration>` and :doc:`ASP.NET Core MVC Integration Guide <aspnetintegration>` build upon. If you're building a Generic Host or ASP.NET Core application, please read the documentation of those topics.
 
 The following code snippet shows how to use the integration package to apply Simple Injector to your Console application. In this example, the application requires working with framework components that can't easily be configured without `IServiceCollection` (in this case, a pooled `DbContext`):
