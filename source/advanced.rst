@@ -560,6 +560,41 @@ This enables explicit property injection on all properties that are marked with 
 
     **Note**: The **IPropertySelectionBehavior** extension mechanism can also be used to implement implicit property injection. There's `an example of this <https://github.com/simpleinjector/SimpleInjector/blob/master/src/SimpleInjector.CodeSamples/ImplicitPropertyInjectionExtensions.cs>`_ in the source code. Doing so, however, is not encouraged because of the reasons given above.
 
+Property Injection limitations 
+------------------------------
+
+There are several limitations to consider when using property injection:
+
+* **Static and read-only properties:** While Simple Injector will prope the custom **IPropertySelectionBehavior** for static and read-only properties, it will throw an exception whenever the custom implementation returns `true` on them. Read-only properties can not be injected by Simple Injector, and although it would be possible for Simple Injector to inject into static properties, it deliberately chooses not to, because static properties lead to the `Ambient Context anti-pattern <https://freecontent.manning.com/the-ambient-context-anti-pattern/>`_. By probing the property selection behavior it ensures that those properties are not accidentally skipped because of a typing error. Say, for instance, you created a custom behavior that allows injecting properties that are marked with an `[Import]` attribute (as shown in the previous section), skipping such a property when it was read only or static means "failing silently," which is something the Simple Injector design principles :ref:`argue against <never-fail-silently>`.
+* **Inaccessible properties**: Properties that are inaccissible to the resolved component are not considered for injection. When a base class contains a property that with a `private` accessibility (or `internal` while the resolved sub class lives in a different assembly) such property is skipped. Having private injectable properties on base classes are a bad practice, because they make unit testing impossible. Unfortunately, in this case, Simple Injector silently skips them, which is a form of "failing silently." This is an unfortunate result on a limitation in .NET Standard 1.3, which Simple Injector currently builds for. Future versions might remove the .NET Standard 1.3 dependency, which might allow us to prevent failing silently.
+
+In case you wish to apply injection into inaccessible properties, we would like you to reconsider, because:
+
+* Properties on base classes are code smells—they lead to base classes containing (cross-cutting) behavior, which leads to Single Responsibility Principle violations. :ref:`Decoration <Decoration>` and :ref:`Interception <Interception-using-Dynamic-Proxies>` are better approaches.
+* *Private* properties on base classes could even be considered an anti-pattern, because besides the previous argument, it makes it impossible to unit test the base class and the derivatives.
+
+If you are in a situation where you can't (yet) change your design, you can use the following workaround:
+
+.. code-block:: c#
+
+    // Determine inaccessible properties to inject, for instance:
+    var inaccessibleProperties = typeof(SomeBaseClass)
+        .GetRuntimeProperties()
+        .Where(p => p.GetAccessors(true).All(a => a.IsPrivate))
+        .ToArray();
+
+    // Register an initializer on the base class
+    container.RegisterInitializer<SomeBaseClass>(c =>
+    {
+        // Inject all inaccessible properties on each resolve.
+        // Warning: You are leaving the safety of Simple Injector diagnostics
+        // system here.
+        foreach (var property in inaccessibleProperties)
+        {
+            property.SetValue(c, container.GetInstance(property.PropertyType));
+        }
+    });
+
 .. _Covariance-Contravariance:
 
 Covariance and Contravariance
