@@ -18,12 +18,12 @@ This integration guide has the following prerequisites:
 
 Please be aware that due to current state of Microsoft Blazor, integration with Simple Injector contains the following limitations:
 
-* **`@inject`:** The `@inject` Razor directive will not work on Simple Injector registrations. You should instead define a custom attribute on properties defined inside a component's `@code` block, for instance using a `[Dependency]` attribute, as demonstrated below.
+* **@inject:** The `@inject` Razor directive will not work on Simple Injector registrations. You should instead place dependencies as properties inside a component's `@code` block and mark them with custom attribute, for instance using a `[Dependency]` attribute, as demonstrated below.
 * **Base class:** Razor components must inherit from a custom base class to allow page `@on{EVENT}` (e.g. `@onclick`) to run inside a Simple Injector scope. The example razor page below demonstrates this.
 
 .. container:: Note
 
-    **WARNING**: Please be aware that when it comes to scoping, Microsoft decided to implement a very different model. In this model, a single scope lives for the duration of a single user's page, which can be up to hours. Such single scope can be executed in parallel by multiple incoming events. This means that any `Transient` and `Scoped` services **must be thread-safe**. For that reason, services that aren't thread-safe (such as `DbContext`) should not be dependencies of Razor Components. For more information on this topic, please read `the official Microsoft Documentation <https://docs.microsoft.com/en-us/aspnet/core/blazor/blazor-server-ef-core#database-access-5x>`_. Note that this Simple Injector integration guide currently follows this behavior, which means that this warning also holds for Simple Injector-injected components.
+    **WARNING**: Please be aware that when it comes to scoping, Microsoft decided to implement a very different model compared to the rest of the web stack. This scoping model is more similar to desktop applications; a single scope lives for the duration of a single user's component, which can be up to hours. Such single scope can be executed in parallel by multiple incoming events. This means that any `Transient` and `Scoped` services **must be thread-safe**. For that reason, services that aren't thread-safe (such as `DbContext`) should not be dependencies of Razor Components. For more information on this topic, please read `the official Microsoft Documentation <https://docs.microsoft.com/en-us/aspnet/core/blazor/blazor-server-ef-core#database-access-5x>`_. Note that this Simple Injector integration guide currently follows this behavior, which means that this warning also holds for Simple Injector-injected components.
     
 Using the integration code shown further down on this page, your razor components will look similar to the following example:
     
