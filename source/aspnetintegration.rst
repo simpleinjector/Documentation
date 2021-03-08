@@ -128,18 +128,19 @@ The following code snippet shows how to use the integration package to apply Sim
 Available integration packages
 ==============================
 
-In case you need more fine-grained control over the number of Microsoft packages that get included in your application, you can decide to use one of the other available ASP.NET Core integration packages. The following table lists the relevant integration packages sorted from most complete to most basic integration:
+The `SimpleInjector.Integration.AspNetCore.Mvc <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_ NuGet package is the umbrella package that pulls in all integration functionality. The downside is that it also pulls in many ASP.NET Core packages that you might not need, or might not want. In case you need more fine-grained control over the number of Microsoft packages that get included in your application, you can decide to use one of the other available ASP.NET Core integration packages. The following table lists the relevant integration packages sorted from most complete to most basic integration:
  
 +--------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 | Integration Package                                                                  | Description                                                                    |
 +======================================================================================+================================================================================+
 | `SimpleInjector.Integration .AspNetCore.Mvc                                          | Adds **Tag Helper** and **Page Model** integration for ASP.NET Core MVC.       |
-| <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_             | The features of this package are described on his page.                        |
-|                                                                                      |                                                                                |
+| <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_             |                                                                                |
 |                                                                                      | Main extension methods:                                                        |
 |                                                                                      |                                                                                |
 |                                                                                      | * .AddPageModelActivation()                                                    |
 |                                                                                      | * .AddTagHelperActivation()                                                    |
+|                                                                                      |                                                                                |
+|                                                                                      | The previous code example demonstrates the use of these extension methods.     |
 |                                                                                      |                                                                                |
 |                                                                                      | This package contains the following dependencies:                              |
 |                                                                                      |                                                                                |
@@ -147,8 +148,9 @@ In case you need more fine-grained control over the number of Microsoft packages
 |                                                                                      | * Microsoft.AspNetCore.Mvc.Razor                                               |
 |                                                                                      | * Microsoft.AspNetCore.Mvc.RazorPages                                          |
 +--------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
-| `SimpleInjector.Integration .AspNetCore.Mvc.ViewFeatures                             | Adds **View Component** integration for ASP.NET Core MVC.                      |
-| <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures>`_| The features of this package are described on his page.                        |
+| `SimpleInjector.Integration .AspNetCore.Mvc.ViewFeatures                             | Adds `View Component                                                           |
+| <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures>`_| <https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-components>`_     |
+|                                                                                      | integration for ASP.NET Core MVC.                                              |
 |                                                                                      |                                                                                |
 |                                                                                      | Main extension methods:                                                        |
 |                                                                                      |                                                                                |
@@ -160,11 +162,14 @@ In case you need more fine-grained control over the number of Microsoft packages
 |                                                                                      | * Microsoft.AspNetCore.Mvc.ViewFeatures                                        |
 +--------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 | `SimpleInjector.Integration .AspNetCore.Mvc.Core                                     | Adds **Controller** integration for ASP.NET Core MVC (and Web API).            |
-| <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc.Core>`_        | The features of this package are described on his page.                        |
-|                                                                                      |                                                                                |
+| <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc.Core>`_        |                                                                                |
 |                                                                                      | Main extension methods:                                                        |
 |                                                                                      |                                                                                |
 |                                                                                      | * .AddControllerActivation()                                                   |
+|                                                                                      | * .AddControllerActivation(Lifestyle)                                          |
+|                                                                                      |                                                                                |
+|                                                                                      | This page'ss initial code example demonstrates the use of this extension       |
+|                                                                                      | method.                                                                        |
 |                                                                                      |                                                                                |
 |                                                                                      | This package contains the following dependencies:                              |
 |                                                                                      |                                                                                |
@@ -172,7 +177,7 @@ In case you need more fine-grained control over the number of Microsoft packages
 |                                                                                      | * Microsoft.AspNetCore.Mvc.Core                                                |
 +--------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 | `SimpleInjector.Integration .AspNetCore                                              | Adds **request scoping** and **middleware** integration ASP.NET Core.          |
-| <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore>`_                 | The features of this package are described on his page.                        |
+| <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore>`_                 | The features of this package are described on this page.                       |
 |                                                                                      |                                                                                |
 |                                                                                      | Main extension methods:                                                        |
 |                                                                                      |                                                                                |
@@ -182,15 +187,15 @@ In case you need more fine-grained control over the number of Microsoft packages
 |                                                                                      |                                                                                |
 |                                                                                      | This package contains the following dependencies:                              |
 |                                                                                      |                                                                                |
+|                                                                                      | * SimpleInjector.Integration .GenericHost                                      |
 |                                                                                      | * SimpleInjector.Integration .ServiceCollection                                |
 |                                                                                      | * Microsoft.AspNetCore.Abstractions                                            |
 |                                                                                      | * Microsoft.AspNetCore.Http                                                    |
 |                                                                                      | * Microsoft.AspNetCore.Http.Abstractions                                       |
 |                                                                                      | * Microsoft.Extensions.Hosting.Abstractions                                    |
 +--------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
-| `SimpleInjector.Integration .GenericHost                                             | Adds .NET Core 2.1 **Hosted Service** integration and integration on top of    |
-| <https://nuget.org/packages/SimpleInjector.Integration.GenericHost>`_                | IHost.                                                                         |
-|                                                                                      | The features of this package are discussed in the                              |
+| `SimpleInjector.Integration .GenericHost                                             | Adds  **Hosted Service** integration and integration on top of IHost.          |
+| <https://nuget.org/packages/SimpleInjector.Integration.GenericHost>`_                | The features of this package are discussed in the                              |
 |                                                                                      | :doc:`.NET Generic Host Integration Guide  <generichostintegration>`.          |
 |                                                                                      |                                                                                |
 |                                                                                      | Main extension methods:                                                        |
@@ -206,7 +211,7 @@ In case you need more fine-grained control over the number of Microsoft packages
 +--------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 | `SimpleInjector.Integration .ServiceCollection                                       | Adds integration with .NET Core's configuration system (i.e.                   |
 | <https://nuget.org/packages/SimpleInjector.Integration.ServiceCollection>`_          | *IServiceCollection*) by allowing framework-configured services to be          |
-|                                                                                      | injected into Simple Injector-managed components. Furthermore, simplifies      |
+|                                                                                      | injected into Simple Injector-managed components. It, furthermore, simplifies  |
 |                                                                                      | integration with .NET Core's logging infrastructure.                           |
 |                                                                                      | The features of this package are discussed in the                              |
 |                                                                                      | :doc:`ServiceCollection Integration Guide <servicecollectionintegration>`.     |
