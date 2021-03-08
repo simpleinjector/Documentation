@@ -9,8 +9,9 @@ Simple Injector can be used in a wide range of .NET technologies, both server si
 
     Console Applications <consoleintegration>
     ASP.NET Core MVC <aspnetintegration>
-	.NET Generic Host <generichostintegration>
-	ServiceCollection Console Applications <servicecollectionintegration>
+    .NET Generic Host <generichostintegration>
+    ServiceCollection Console Applications <servicecollectionintegration>
+    Blazor Server App Integration <blazorintegration>
     ASP.NET MVC <mvcintegration>
     ASP.NET Web API <webapiintegration>
     ASP.NET Web Forms <webformsintegration>
