@@ -14,23 +14,17 @@ This integration guide has the following prerequisites:
 
 .. container:: Note
 
-    **TIP**: Even though the Service Collection integration package take a dependency on the Simple Injector core library, prefer installing the `the core library <https://nuget.org/packages/SimpleInjector>`_ explicitly into your startup project. The core library uses an independent versioning and release cycle. Installing the core library explicitly, therefore, gives you the newest, latest release (instead of the lowest compatible release), and allows the NuGet package manager to inform you about new minor and patch releases in the future.
+    **TIP**: Even though the Service Collection integration package takes a dependency on the Simple Injector core library, prefer installing the `the core library <https://nuget.org/packages/SimpleInjector>`_ explicitly into your startup project. The core library uses an independent versioning and release cycle. Installing the core library explicitly, therefore, gives you the newest, latest release (instead of the lowest compatible release), and allows the NuGet package manager to inform you about new minor and patch releases in the future.
 
-Please be aware that due to current state of Azure Functions, it is impossible to inject Simple Injector-registered components into an Azure Function class. An Azure Function class can only contain dependencies registered through the built-in (MS.DI) container. The integration below tries to mitigate this by injecting an Adapter (the `AzureToSimpleInjectorMediator`) into the Azure Function that forwards the call to Simple Injector.
+Please be aware that due to current state of Azure Functions, it is impossible to inject Simple Injector-registered components into an Azure Function class. An Azure Function class can only contain dependencies registered through the built-in registration API. The integration below tries to mitigate this by injecting an Adapter (the `AzureToSimpleInjectorMediator`) into the Azure Function that forwards the call to Simple Injector.
 
 .. container:: Note
 
-    **IMPORTANT**: This integration guide assumes you are using a command/query/CQRS-like architecture. If you're not currently using this type of design, consider refactoring your code into such style. Their are a lot of online resources that can be helpful, such as `this <https://blogs.cuttingedge.it/steven/p/commands/>`_ and`this <https://blogs.cuttingedge.it/steven/p/queries/>`_ or read chapter 10 of `Dependency Injection Principles, Practices, and Patterns <https://cuttingedge.it/book/>`_. Alternatively, look at reusable libraries such as `MediatR <https://github.com/jbogard/MediatR>`_ for inspiration.
+    **IMPORTANT**: This integration guide assumes you are using a command/query/CQRS-like architecture. If you're not currently using this type of design, consider refactoring your code into such style. Their are a lot of online resources that can be helpful, such as `this <https://blogs.cuttingedge.it/steven/p/commands/>`_ and `this <https://blogs.cuttingedge.it/steven/p/queries/>`_ or read chapter 10 of `Dependency Injection Principles, Practices, and Patterns <https://cuttingedge.it/book/>`_. Alternatively, look at reusable libraries such as `MediatR <https://github.com/jbogard/MediatR>`_ for inspiration.
 
-Instead of implementing business logic inside an Azure Function class, you yield better results by moving this logic out of your Azure Function class and make them into `Humble Objects <https://martinfowler.com/bliki/HumbleObject.html>`_. This can be done by injecting the extracted service directly into the Azure Function's constructor -or- as shown below, by introducing a Mediator that delegates the request to an underlying handler implementation:
+Instead of implementing business logic inside an Azure Function class, you yield better results by moving this logic out of your Azure Function class and make a Function class into a `Humble Object <https://martinfowler.com/bliki/HumbleObject.html>`_. This can be done by injecting the extracted service directly into the Azure Function's constructor -or- as shown below, by introducing a Mediator that delegates the request to an underlying handler implementation. This next code snippet demonstrates the suggested way of constructing your Azure Function classes:
     
 .. code-block:: c#
-
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Azure.WebJobs;
-    using Microsoft.Azure.WebJobs.Extensions.Http;
 
     public class Function1
     {
@@ -49,9 +43,6 @@ Instead of implementing business logic inside an Azure Function class, you yield
 The previous `Function1` class is a refactored version of the Azure Function that comes with Visual Studio's Azure Functions template. All `Function1` does is wrapping all relevant request information into a new `Function1Request` object and pass it on to the mediator. `Function1Request` is shown in the following snippet:
 
 .. code-block:: c#
-
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
 
     public sealed class Function1Request : IRequest<ObjectResult>
     {
@@ -74,13 +65,12 @@ All relevant logic is extracted from `Function1` into the `Function1Handler`, sh
     {
         private readonly ILogger log;
 
-        public Function1Handler(ILogger log)
-        {
-            this.log = log;
-        }
+        public Function1Handler(ILogger log) => this.log = log;
 
         public async Task<ObjectResult> HandleAsync(Function1Request message)
         {
+            // NOTE: Don't forget to add your applications root namespace to logging/logLevel
+            // node of the the application's host.json. Otherwise the line below won't log.
             this.log.LogInformation("C# HTTP trigger function processed a request.");
 
             string name = message.Req.Query["name"];
@@ -92,7 +82,7 @@ All relevant logic is extracted from `Function1` into the `Function1Handler`, sh
             string responseMessage = string.IsNullOrEmpty(name)
                 ? "This HTTP triggered function executed successfully. Pass a name in the " +
                     "query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+                : "Hello, " + name + ". This HTTP triggered function executed successfully.";
 
             return new OkObjectResult(responseMessage);
         }
@@ -100,7 +90,7 @@ All relevant logic is extracted from `Function1` into the `Function1Handler`, sh
 
 `Function1Handler` is a plain-old C# object, which contains the code extracted from the Azure Function. It implements the application-defined `IRequestHandler<TRequest, TResult>` interface. The addition of this interface allows the `IMediator` implementation to dispatch the request to the correct underlying handler, and additionally allows cross-cutting concerns to be applied around the execution of those handlers.
 
-The previous code samples showed classes that either used or implemented `IMediator`, `IRequest<TResult>`, or `IRequestHandler<TRequest, TResult>`. The listing below shows their definitions:
+The previous code samples showed usages of the `IMediator`, `IRequest<TResult>`, and `IRequestHandler<TRequest, TResult>` interfaces. The listing below shows their definitions:
 
 .. code-block:: c#
 
@@ -121,7 +111,7 @@ The previous code samples showed classes that either used or implemented `IMedia
 
     **TIP**: The three previous interfaces are just for demonstrative purposes. Depending on your architectural style and application, you might structure these interfaces differently, or have separate interfaces for commands and queries. Prefer not letting third-party libraries dictate the shape of these interfaces for you; pick the design that works best for your application.
 
-To function, your Azure Functions application requires a bootstrapper that ties everything together. The following `Startup` class demonstrates how to tie Simple Injector in with the Azure Functions eco system:
+To start, your Azure Functions application requires a bootstrapper that ties everything together. The following `Startup` class demonstrates how to tie Simple Injector in with the Azure Functions eco system:
 
 .. code-block:: c#
 
@@ -159,6 +149,7 @@ To function, your Azure Functions application requires a bootstrapper that ties 
             {
                 // Batch-register all your request handlers.
                 container.Register(typeof(IRequestHandler<,>), this.GetType().Assembly);
+                // TODO: Add your registrations here.
             }
 
             public void Configure(IServiceProvider app)
@@ -262,3 +253,5 @@ The only part missing from the equation is the `IMediator` implementation, which
             public void Dispose() { }
         }
     }
+
+The code below provides you with a working Azure Functions application. You can now start adding your own functions, requests, and handlers to start building your own awesome Azure Functions application.
