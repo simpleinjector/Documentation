@@ -16,11 +16,11 @@ This integration guide has the following prerequisites:
 
     **TIP**: Even though the Service Collection integration package takes a dependency on the Simple Injector core library, prefer installing the `the core library <https://nuget.org/packages/SimpleInjector>`_ explicitly into your startup project. The core library uses an independent versioning and release cycle. Installing the core library explicitly, therefore, gives you the newest, latest release (instead of the lowest compatible release), and allows the NuGet package manager to inform you about new minor and patch releases in the future.
 
-Please be aware that due to current state of Azure Functions, it is impossible to inject Simple Injector-registered components into an Azure Function class. An Azure Function class can only contain dependencies registered through the built-in registration API. The integration below tries to mitigate this by injecting an Adapter (the `AzureToSimpleInjectorMediator`) into the Azure Function that forwards the call to Simple Injector.
+Please be aware that due to current state of Azure Functions, it is impossible to inject Simple Injector-registered components into an Azure Function class. Azure Function classes can only contain dependencies registered through the built-in registration API. The integration below tries to mitigate this by injecting an Adapter (the `AzureToSimpleInjectorMediator`) into the Azure Function that forwards the call to Simple Injector.
 
 .. container:: Note
 
-    **IMPORTANT**: This integration guide assumes you are using a command/query/CQRS-like architecture. If you're not currently using this type of design, consider refactoring your code into such style. Their are a lot of online resources that can be helpful, such as `this <https://blogs.cuttingedge.it/steven/p/commands/>`_ and `this <https://blogs.cuttingedge.it/steven/p/queries/>`_ or read chapter 10 of `Dependency Injection Principles, Practices, and Patterns <https://cuttingedge.it/book/>`_. Alternatively, look at reusable libraries such as `MediatR <https://github.com/jbogard/MediatR>`_ for inspiration.
+    **IMPORTANT**: This integration guide assumes you are using a command/query/CQRS-like architecture. If you're not currently using this type of design, consider refactoring your code into such style. There are a lot of online resources that can be helpful, such as `this <https://blogs.cuttingedge.it/steven/p/commands/>`_ and `this <https://blogs.cuttingedge.it/steven/p/queries/>`_ or read chapter 10 of `Dependency Injection Principles, Practices, and Patterns <https://cuttingedge.it/book/>`_. Alternatively, look at reusable libraries such as `MediatR <https://github.com/jbogard/MediatR>`_ for inspiration.
 
 Instead of implementing business logic inside an Azure Function class, you yield better results by moving this logic out of your Azure Function class and make a Function class into a `Humble Object <https://martinfowler.com/bliki/HumbleObject.html>`_. This can be done by injecting the extracted service directly into the Azure Function's constructor -or- as shown below, by introducing a Mediator that delegates the request to an underlying handler implementation. This next code snippet demonstrates the suggested way of constructing your Azure Function classes:
     
@@ -254,4 +254,4 @@ The only part missing from the equation is the `IMediator` implementation, which
         }
     }
 
-The code below provides you with a working Azure Functions application. You can now start adding your own functions, requests, and handlers to start building your own awesome Azure Functions application.
+The presented code provides you with a template for a working Azure Functions application. Using this template, you can now start adding your own functions, requests, and handlers to start building your own awesome Azure Functions application.
