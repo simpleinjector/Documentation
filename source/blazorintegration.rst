@@ -33,6 +33,22 @@ Using the integration code shown further down on this page, your razor component
     @page "/fetchdata"
 
     <h1>Weather forecast</h1>
+    
+    @if (forecasts == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <tbody>
+                @foreach (var forecast in forecasts)
+                {
+                    <tr><td>@forecast.TemperatureC</td></tr>
+                }
+            </tbody>
+        </table>
+    }    
 
     <button @onclick="Navigate">Navigate home</button>
 
@@ -40,6 +56,8 @@ Using the integration code shown further down on this page, your razor component
         [Dependency] WeatherForecastService ForecastService { get; set; }
         [Dependency] NavigationManager NavigationManager { get; set; }
 
+        private WeatherForecast[] forecasts;
+        
         protected override async Task OnInitializedAsync()
         {
             forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
