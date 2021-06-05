@@ -905,8 +905,8 @@ Simple Injector's default modus operandi is to store active scopes in ambient st
 
 This model has several interesting advantages over resolving from a `Scope`, as some other DI Containers require:
 
-* It simplifies the registration of delegates, as those delegates can directly resolve from the container, instead having to use a supplied scope.
-* It removes the distinction between resolving from the `Container` vs. a `Scope`, where resolving from the `Container` would cause instances to be cached indefinitely, and cause memory leaks, as what happens with some other DI Containers.
+* It simplifies the registration of delegates, as those delegates can directly resolve from the container, instead of having to use a supplied scope.
+* It removes the distinction between resolving from the `Container` vs. a `Scope`, where resolving from the `Container` would cause instances to be cached indefinitely, and cause memory leaks. This is what happens with some other DI Containers.
 * It simplifies resolving Scoped and Transient services from inside Singleton components, just by injecting the `Container` instance. Even inside the context of a Singleton class, the `Container` instance knows in which scope it is currently running.
 
 Even though this ambient model has advantages, there are scenarios where it doesn't work, which is when you need to run multiple isolated scopes within the same ambient context. Within ASP.NET and ASP.NET Core, each web request gets its own ambient context from the framework. This means that when you start a `Scope` that scope will be automatically isolated for that request. With desktop technologies, on the other hand, such as WinForms and WPF, all the forms and views you create run in the same ambient context. This disallows running each page or view in their own isolated bubble—Simple Injector will automatically nest all created scopes because of the existence of that single ambient context. An isolated bubble per form/view is required when you want each form/view to have its own instance of a scoped service.
@@ -918,7 +918,7 @@ The most common scenario is when injecting `DbContext` instances into object gra
     var container = new Container();
     container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
 
-When you configure Simple Injector to use Flowing scopes, the active scope will no longer be available ubiquously, and you won't be able to call `Container.GetInstance<T>` any longer to resolve object graphs that contain `Scoped` components. Instead, you will have to do the following:
+When you configure Simple Injector to use Flowing scopes, the active scope will no longer be available ubiquously. Therefore you won't be able to call `Container.GetInstance<T>` any longer to resolve object graphs that contain `Scoped` components. Instead, you will have to do the following:
 
 .. code-block:: c#
 
@@ -928,7 +928,7 @@ When you configure Simple Injector to use Flowing scopes, the active scope will 
         scope.GetInstance<MainView>();
     }
 
-Advantage of Flowing Scopes is that you can have as many isolated scopes running side by side, for instance:
+The advantage of Flowing Scopes is that you can have many isolated scopes running side by side, for instance:
 
 .. code-block:: c#
 
@@ -948,7 +948,7 @@ This change from resolving from the `Container` to resolving from a `Scope` migh
 
 When running in Ambient-Scoping mode, collections in Simple Injector act as streams. This allows a collection of Scoped and Transient services to be injected in a Singleton consumer. When the collection is iterated, the Scoped services will automatically be resolved according to the active scope. For more information about this, see :ref:`collections and lifetime management <Collections-and-lifetime-management>`.
 
-When running in Flowing Scoping, on the other hand, an injected collection of Transient and Scoped instances will no longer be injected into a Singleton consumer, because that would otherwise store a single Scope instance indefinitely. You will, in that case, must lower the lifetime of the consuming component to either Scoped or Transient. This could have consequences on the design of the application because it is not always easy to lower the lifetime of a component.
+When running in Flowing Scoping, on the other hand, an injected collection of Transient and Scoped instances will no longer be injected into a Singleton consumer, because that would otherwise store a single Scope instance indefinitely. You will, in that case, have to lower the lifetime of the consuming component to either Scoped or Transient. This could have consequences on the design of the application because it is not always easy to lower the lifetime of a component.
 
 Another case where changes might be required is when working with :ref:`decoratee factories <Decorators-with-Func-factories>`. Simple Injector allows factory delegates to be injected into decorators, as the following example demonstrates:
 
@@ -957,10 +957,10 @@ Another case where changes might be required is when working with :ref:`decorate
     public class ServiceDecorator : IService
     {
         private readonly Container container;
-        private readonly Func<Scope, IService> decorateeFactory;
+        private readonly Func<IService> decorateeFactory;
 
         public ServiceDecorator(
-            Container container, Func<Scope, IService> decorateeFactory)
+            Container container, Func<IService> decorateeFactory)
         {
             this.container = container;
             this.decorateeFactory = decorateeFactory;
