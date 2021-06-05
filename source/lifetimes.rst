@@ -950,7 +950,7 @@ When running in Ambient-Scoping mode, collections in Simple Injector act as stre
 
 When running in Flowing Scoping, on the other hand, an injected collection of Transient and Scoped instances will no longer be injected into a Singleton consumer, because that would otherwise store a single Scope instance indefinitely. You will, in that case, must lower the lifetime of the consuming component to either Scoped or Transient. This could have consequences on the design of the application because it is not always easy to lower the lifetime of a component.
 
-Another case where changes might be required is when working with :ref:`decoratee factories <decorators-with-func-t-decoratee-factories>`. Simple Injector allows factory delegates to be injected into decorators, as the following example demonstrates:
+Another case where changes might be required is when working with :ref:`decoratee factories <Decorators-with-Func-factories>`. Simple Injector allows factory delegates to be injected into decorators, as the following example demonstrates:
 
 .. code-block:: c#
 
