@@ -35,6 +35,7 @@ Further reading:
 * :ref:`Developing a Custom Lifestyle <CustomLifestyles>`
 * :ref:`Generics and lifetime management <Generics-and-lifetime-management>`
 * :ref:`Collections and lifetime management <Collections-and-lifetime-management>`
+* :ref:`Flowing scopes <flowing-scopes>`
 
 .. _Transient:
 
@@ -884,10 +885,10 @@ The previous example, however, is rather complicated and can be confusing to und
 
 This this last code snippet, rather than being injected with a stream of `IEventHandler<TEvent>` instances, the `Publisher<TEvent>` is injected with a stream of `DependencyMetadata<IEventHandler<TEvent>>` instances. `DependencyMetadata<T>` is Simple Injector v5's new construct, which allows to access the dependency's metadata and allow resolving an instance of that dependency. In this case, its **GetInstance** method is used to resolve an instance within its own **Scope**.
 
-.. _Flowing-scoping:
+.. _flowing-scopes:
 
-Flowing scoping
-===============
+Flowing scopes
+==============
 
 Simple Injector's default modus operandi is to store active scopes in ambient state. This is why, with Simple Injector, within the context of a scope you'd still resolve instances from the `Container`—not the `Scope`, as the following example demonstrates:
 
