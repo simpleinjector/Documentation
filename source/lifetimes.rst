@@ -883,3 +883,124 @@ The previous example, however, is rather complicated and can be confusing to und
     }
 
 This this last code snippet, rather than being injected with a stream of `IEventHandler<TEvent>` instances, the `Publisher<TEvent>` is injected with a stream of `DependencyMetadata<IEventHandler<TEvent>>` instances. `DependencyMetadata<T>` is Simple Injector v5's new construct, which allows to access the dependency's metadata and allow resolving an instance of that dependency. In this case, its **GetInstance** method is used to resolve an instance within its own **Scope**.
+
+.. _Flowing-scoping:
+
+Flowing scoping
+===============
+
+Simple Injector's default modus operandi is to store active scopes in ambient state. This is why, with Simple Injector, within the context of a scope you'd still resolve instances from the `Container`—not the `Scope`, as the following example demonstrates:
+
+.. code-block:: c#
+
+    var container = new Container();
+    container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+    using (AsyncScopedLifestyle.BeginScope(container))
+    {
+        // Here you simply resolve from the Containe
+        container.GetInstance<IMyService>();
+    }
+
+This model has several interesting advantages over resolving from a `Scope`, as some other DI Containers require:
+
+* It simplifies the registration of delegates, as those delegates can directly resolve from the container, instead having to use a supplied scope.
+* It removes the distinction between resolving from the `Container` vs. a `Scope`, where resolving from the `Container` would cause instances to be cached indefinitely, and cause memory leaks, as what happens with some other DI Containers.
+* It simplifies resolving Scoped and Transient services from inside Singleton components, just by injecting the `Container` instance. Even inside the context of a Singleton class, the `Container` instance knows in which scope it is currently running.
+
+Even though this ambient model has advantages, there are scenarios where it doesn't work, which is when you need to run multiple isolated scopes within the same ambient context. Within ASP.NET and ASP.NET Core, each web request gets its own ambient context from the framework. This means that when you start a `Scope` that scope will be automatically isolated for that request. With desktop technologies, on the other hand, such as WinForms and WPF, all the forms and views you create run in the same ambient context. This disallows running each page or view in their own isolated bubble—Simple Injector will automatically nest all created scopes because of the existence of that single ambient context. An isolated bubble per form/view is required when you want each form/view to have its own instance of a scoped service.
+
+The most common scenario is when injecting `DbContext` instances into object graphs with forms/view (screens) as their root type. You might open multiple screens at the same time, and they might live for quite some time, but reusing the same `DbContext` throughout all screens in the system effectively means the `DbContext` becomes a Singleton, which leads to all kinds of problems. Instead, you can give each screen its own `DbContext` and dispose of that `DbContext` when the screen is closed. For this scenario, Simple Injector contains an alternative to its Ambient Scopes, which is Flowing Scopes. Flowing scopes are configured as follows:
+
+.. code-block:: c#
+
+    var container = new Container();
+    container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+When you configure Simple Injector to use Flowing scopes, the active scope will no longer be available ubiquously, and you won't be able to call `Container.GetInstance<T>` any longer to resolve object graphs that contain `Scoped` components. Instead, you will have to do the following:
+
+.. code-block:: c#
+
+    using (var scope = new Scope(container))
+    {
+        // You will have to resolve directly from the scope.
+        scope.GetInstance<MainView>();
+    }
+
+Advantage of Flowing Scopes is that you can have as many isolated scopes running side by side, for instance:
+
+.. code-block:: c#
+
+    var scope1 = new Scope(container);
+    var scope2 = new Scope(container);
+    var scope3 = new Scope(container);
+    
+    scope1.GetInstance<MainView>();
+    scope2.GetInstance<ProductsView>();
+    scope2.Dispose();
+    scope3.GetInstance<CustomersView>();
+    
+    scope1.Dispose();
+    scope3.Dispose();
+
+This change from resolving from the `Container` to resolving from a `Scope` might seem trivial, but it is important to understand that under the covers, things are changing quite drastically. There are several scenarios where Simple Injector internally expects the availability of an Ambient Scope in order to resolve instances—i.e. collections. When injecting collections while resolving through Flowing Scopes, that active scope needs to be stored inside the injected collection.
+
+When running in Ambient-Scoping mode, collections in Simple Injector act as streams. This allows a collection of Scoped and Transient services to be injected in a Singleton consumer. When the collection is iterated, the Scoped services will automatically be resolved according to the active scope. For more information about this, see :ref:`collections and lifetime management <Collections-and-lifetime-management>`.
+
+When running in Flowing Scoping, on the other hand, an injected collection of Transient and Scoped instances will no longer be injected into a Singleton consumer, because that would otherwise store a single Scope instance indefinitely. You will, in that case, must lower the lifetime of the consuming component to either Scoped or Transient. This could have consequences on the design of the application because it is not always easy to lower the lifetime of a component.
+
+Another case where changes might be required is when working with :ref:`decoratee factories <decorators-with-func-t-decoratee-factories>`. Simple Injector allows factory delegates to be injected into decorators, as the following example demonstrates:
+
+.. code-block:: c#
+
+    public class ServiceDecorator : IService
+    {
+        private readonly Container container;
+        private readonly Func<Scope, IService> decorateeFactory;
+
+        public ServiceDecorator(
+            Container container, Func<Scope, IService> decorateeFactory)
+        {
+            this.container = container;
+            this.decorateeFactory = decorateeFactory;
+        }
+
+        public void Do()
+        {
+            using (AsyncScopedLifestyle.BeginScope(this.container))
+            {
+                IService service = this.decorateeFactory.Invoke();
+                service.Do();
+            }
+        }
+    }
+
+This technique allows the creation of the decorated instance to be postponed and run in their own isolated scope. When running with Flowing Scopes, however, the factory delegate needs to be supplied with a `Scope` instance, as follows:
+
+.. code-block:: c#
+
+    public class ServiceDecorator : IService
+    {
+        private readonly Container container;
+        private readonly Func<Scope, IService> decorateeFactory;
+
+        public ServiceDecorator(
+            Container container, Func<Scope, IService> decorateeFactory)
+        {
+            this.container = container;
+            this.decorateeFactory = decorateeFactory;
+        }
+
+        public void Do()
+        {
+            using (var scope = new Scope(this.container))
+            {
+                IService service = this.decorateeFactory.Invoke(scope);
+                service.Do();
+            }
+        }
+    }
+
+Just like with the injection of `Func<T>` delegates, Simple Injector natively understands `Func<Scope, T>` delegates when injected into decorators.
+
+The Flowing-Scoping model is a more recent concept to Simple Injector, compared to its original Ambient-Scoping model. It is added especially for the rare scenarios where Ambient Scoping doesn't work. Because of the newness of the Flowing model, you will likely stumble upon scenarios that are not easily supported with this model, compared to its original model. We, therefore, discourage the use of this model in cases where Ambient Scoping would do just fine.
