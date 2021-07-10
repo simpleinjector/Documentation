@@ -592,7 +592,7 @@ But auto verification can also have a negative impact on performance when runnin
 .. code-block:: c#
 
     var container = new Container();
-	container.Options.EnableAutoVerification = false;
+    container.Options.EnableAutoVerification = false;
 
 .. container:: Note
 
