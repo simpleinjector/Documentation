@@ -581,14 +581,25 @@ To be able to do this, Simple Injector contains the **Collection.Append** method
 Verifying the container's configuration
 =======================================
 
-You can call the *Verify* method of the *Container*. The *Verify* method provides a fail-fast mechanism to prevent your application from starting when the *Container* has been accidentally misconfigured. The *Verify* method checks the entire configuration by creating an instance of each registered type and checks for common configuration mistakes.
+Simple Injector allows its configuration to be verified. Verification provides a fail-fast mechanism to prevent your application from starting when the *Container* has been accidentally misconfigured. Verification checks the entire configuration by creating an instance of each registered type and checks for :doc:`common configuration mistakes <diagnostics>`.
+
+You can trigger the verification process by calling *Container.Verify()* after you configured the last service. With the introduction of Simple Injector v5, however, the *Container* automatically runs its verification when the first service is resolved from the *Container*.  This typically happens when you call *GetInstance* for the first time. This means you won't have to call *Container.Verify()* manually; the *Container* automatically does this on your behalf.
+
+This auto-verification feature is a good sensible default, but it does come with some consequences to consider. When you explicitly call *Container.Verify()*, verification is triggered early in the startup of your application. If verification fails, your application will fail to start, which is typically what you want. With auto verification, on the other hand, verification is done just in time, and it might mean that the application is started, but is still in an invalid state, because the *Container* instance is invalid. Auto verification also means that all configured classes will be created at the point that *GetInstance()* is first invoked. This can be confusing to a new developer, as they might be expecting a specific class to be created, not all of them.
+
+But auto verification can also have a negative impact on performance when running integration tests. With integration testing you would typically create a new *Container* instance per test, but with auto verification it means that verification is performed for each integration test, instead of having a single integration test that verifies the complete configuration. When your container configuration consists of hundreds of registrations, this can severely impact the time it takes to run all the application's integration tests. In that case, you should consider turning of auto verification during integration testing. The following code example demonstrates how to disable auto verification:
+
+.. code-block:: c#
+
+    var container = new Container();
+	container.Options.EnableAutoVerification = false;
 
 .. container:: Note
 
-    **Tip**: Calling **Verify** is not required, but is *highly encouraged*.
-
+    **Tip**: Calling **Container.Verify()** is not required after you disabled auto verification, but in that case we *highly recommend* verifying the container's configuration manually by calling **Container.Verify()**. This can be done either during startup or, alternatively, inside an single integration test.
 
 For more information about creating an application and container configuration that can be successfully verified, please read the :ref:`How To Verify the container's configuration <Verify-Configuration>`.
+
 
 .. _Automatic-Constructor-Injection:
 
