@@ -4,7 +4,7 @@ Azure Functions Integration
 
 .. container:: Note
 
-    **WARNING**: This integration guide is an evolving document. It gets updated any time we find better ways to integrate Simple Injector with Azure Functions, and any time Microsoft makes improvement that simplify integration. If you run into any limitations, other than the ones already mentioned below, help us in improving this guidance by reporting this on `our forum <https://simpleinjector.org/forum>`_.
+    **WARNING**: This integration guide is an evolving document. It gets updated any time we find better ways to integrate Simple Injector with Azure Functions, and any time Microsoft makes improvement that simplify integration. If you run into any limitations, other than the ones already mentioned below, help us improve this guidance by reporting this on `our forum <https://simpleinjector.org/forum>`_.
 
 This integration guide has the following prerequisites:
 
