@@ -4,7 +4,7 @@ Blazor Server App Integration
 
 .. container:: Note
 
-    **WARNING**: This integration guide is an evolving document. It gets updated any time we find better ways to integrate Simple Injector with Blazor, and any time Microsoft makes improvement that simplify integration. Integrating with Blazor is currently quite verbose, but this will improve over time. If you run into any limitations, other than the ones already mentioned below, help us in improving this guidance by reporting this on `our forum <https://simpleinjector.org/forum>`_.
+    **WARNING**: This integration guide is an evolving document. It gets updated any time we find better ways to integrate Simple Injector with Blazor, and any time Microsoft makes improvement that simplify integration (such as `this <https://github.com/dotnet/aspnetcore/issues/28957>`_ and `this <https://github.com/dotnet/aspnetcore/issues/29194>`_). Integrating with Blazor is currently quite verbose, but this will improve over time. If you run into any limitations, other than the ones already mentioned below, help us improve this guidance by reporting them on `our forum <https://simpleinjector.org/forum>`_.
 
 This integration guide has the following prerequisites:
 
