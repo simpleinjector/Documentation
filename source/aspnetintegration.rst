@@ -294,6 +294,10 @@ The previous `Startup` snippet already showed how a custom middleware class can 
     }
     
 The type supplied to **UseMiddleware<T>** should implement the `IMiddleware` interface from the `Microsoft.AspNetCore.Http` namespace.
+
+.. container:: Note
+
+    **IMPORTANT**: Besides implementing the `IMiddleware` interface, ASP.NET Core supports the notion of `convention-based middleware <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/extensibility>`_—i.e. middleware that doesn't implement the `IMiddleware` interface. Simple Injector, however, does *not* support convention-based middleware because it doesn't follow Simple Injector's best practices. To integrate with Simple Injector, you need to implement ASP.NET Core's `IMiddleware` interface on your middleware classes.
     
 This **UseMiddleware** overload ensures two particular things:
 
