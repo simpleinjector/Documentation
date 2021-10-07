@@ -461,7 +461,7 @@ The **AddAspNetCore** method contains an overload that accepts an **ServiceScope
 Working with ASP.NET Core Identity
 ==================================
 
-The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. The default template requires a fair amount of cross-wired dependencies. When auto cross wiring is enabled (when calling **AddSimpleInjector**) integration with ASP.NET Core Identity couldn't be more straightforward. When you followed the :ref:`cross wire guidelines <cross-wiring>`, this is all you'll have to do to get Identity running.
+The default Visual Studio template comes with built-in authentication through the use of ASP.NET Core Identity. The default template requires a fair amount of cross-wired dependencies. When auto cross wiring is enabled (when calling **AddSimpleInjector** and **CrossWire**) integration with ASP.NET Core Identity couldn't be more straightforward. When you followed the :ref:`cross wire guidelines <cross-wiring>`, this is all you'll have to do to get Identity running.
 
 .. container:: Note
 
