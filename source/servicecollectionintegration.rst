@@ -303,15 +303,76 @@ Once you have a correctly read and verified configuration object, registration o
 
 .. code-block:: c#
 
-    MyMailSettings mailSettings =
-        config.GetSection("Root:SectionName").Get<MyMailSettings>();
+    MailSettings mailSettings =
+        Configuration.GetSection("MailSettings").Get<MailSettings>();
 
-    // Verify mailSettings here (if required)
+    // TODO: Verify mailSettings here (if required)
 
-    // Supply mailSettings as constructor argument to a type that requires it,
-    container.Register<IMessageSender>(() => new MailMessageSender(mailSettings));
+    // Register MailSettings as singleton in the container.
+    container.RegisterInstance<MailSettings>(mailSettings);
 
-    // or register MailSettings as singleton in the container.
-    container.RegisterInstance<MyMailSettings>(mailSettings);
-    container.Register<IMessageSender, MailMessageSender>();
+The code below is a complete working Console application that expands the previous example:
 
+.. code-block:: c#
+
+    // Used NuGet packages:
+    // - Microsoft.Extensions.Configuration
+    // - Microsoft.Extensions.Configuration.Binder
+    // - Microsoft.Extensions.Configuration.Json
+    // - SimpleInjector
+
+    using System;
+    using Microsoft.Extensions.Configuration;
+    using SimpleInjector;
+
+    public class MailSettings
+    {
+        public string SmtpServer { get; set; }
+        public string FromAddress { get; set; }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var container = new Container();
+
+            IConfiguration Configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            MailSettings mailSettings =
+                Configuration.GetSection("MailSettings").Get<MailSettings>();
+
+            // TODO: Verify mailSettings here (if required)
+
+            // or register MailSettings as singleton in the container.
+            container.RegisterInstance<MailSettings>(mailSettings);
+
+            container.Register<IMessageSender, MailMessageSender>();
+
+            container.GetInstance<IMessageSender>().Send("Hello world");
+        }
+    }
+
+    public interface IMessageSender
+    {
+        void Send(string message);
+    }
+
+    public record MailMessageSender(MailSettings Settings) : IMessageSender
+    {
+        public void Send(string message) =>
+            Console.WriteLine($"Sending '{message}' to {this.Settings.SmtpServer}.");
+    }
+
+This sample uses an appsettings.json with the following content:
+
+.. code-block:: json
+
+    {
+      "MailSettings": {
+        "SmtpServer": "smtp.mycompany.org",
+        "From": "noreply@mycompany.org"
+      }
+    }
