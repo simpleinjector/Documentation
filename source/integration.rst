@@ -2,7 +2,7 @@
 Integration Guide
 =================
 
-Simple Injector can be used in a wide range of .NET technologies, both server side as client side. Jump directly to the integration page for the application framework of your choice. When the framework of your choice is not listed, doesn't mean it isn't supported, but just that we didn't have the time write it :-)
+Simple Injector can be used in a wide range of .NET technologies, both server side as client side. Jump directly to the integration page for the application framework of your choice. When the framework of your choice is not listed, doesn't mean it isn't supported, but just that we didn't have the time write the documentation for it. When in doubt, you can raise a integration question `here <https://simpleinjector.org/forum>`_.
 
 .. toctree::
     :maxdepth: 1
