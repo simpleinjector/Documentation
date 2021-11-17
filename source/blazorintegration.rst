@@ -130,7 +130,7 @@ To integrate Simple Injector with Blazor, please follow the following steps:
 
             services.AddSimpleInjector(container, options =>
             {
-                options.AddServerSideBlazor(options, this.GetType().Assembly);
+                options.AddServerSideBlazor(this.GetType().Assembly);
             });
 
             InitializeContainer();
