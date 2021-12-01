@@ -80,7 +80,7 @@ The following code snippet shows how to use the integration package to apply Sim
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // UseSimpleInjector() finalizes the integration process.
-            app.UseSimpleInjector(container);
+            app.Services.UseSimpleInjector(container);
 
             if (env.IsDevelopment())
             {
