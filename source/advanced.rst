@@ -141,7 +141,7 @@ This *CompositeValidator<T>* can be registered as follows:
 .. code-block:: c#
 
     container.Register(
-        typeof(IValidate<>),
+        typeof(IValidator<>),
         typeof(CompositeValidator<>),
         Lifestyle.Singleton);
 
@@ -162,24 +162,24 @@ When working with generic interfaces, you will often see numerous implementation
 
 .. code-block:: c#
 
-    container.Register<IValidate<Customer>, CustomerValidator>();
-    container.Register<IValidate<Employee>, EmployeeValidator>();
-    container.Register<IValidate<Order>, OrderValidator>();
-    container.Register<IValidate<Product>, ProductValidator>();
+    container.Register<IValidator<Customer>, CustomerValidator>();
+    container.Register<IValidator<Employee>, EmployeeValidator>();
+    container.Register<IValidator<Order>, OrderValidator>();
+    container.Register<IValidator<Product>, ProductValidator>();
     // and the list goes on...
 
 As the previous section explained, this can be rewritten to the following one-liner:
 
 .. code-block:: c#
 
-    container.Register(typeof(IValidate<>), typeof(IValidate<>).Assembly);
+    container.Register(typeof(IValidator<>), typeof(IValidator<>).Assembly);
 
-Sometimes you'll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The *IValidate<T>* is a good example. It is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this you would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:
+Sometimes you'll find that many implementations of the given generic interface are no-ops or need the same standard implementation. The *IValidator<T>* is a good example. It is very likely that not all entities will need validation but your solution would like to treat all entities the same and not need to know whether any particular type has validation or not (having to write a specific empty validation for each type would be a horrible task). In a situation such as this you would ideally like to use the registration as described above, and have some way to fallback to some default implementation when no explicit registration exist for a given type. Such a default implementation could look like this:
  
 .. code-block:: c#
 
     // Implementation of the Null Object pattern.
-    public sealed class NullValidator<T> : IValidate<T> {
+    public sealed class NullValidator<T> : IValidator<T> {
         public ValidationResults Validate(T instance) => ValidationResults.Valid;
     }
 
@@ -187,28 +187,28 @@ We could configure the container to use this *NullValidator<T>* for any entity t
 
 .. code-block:: c#
 
-    container.Register<IValidate<OrderLine>, NullValidator<OrderLine>>();
-    container.Register<IValidate<Address>, NullValidator<Address>>();
-    container.Register<IValidate<UploadImage>, NullValidator<UploadImage>>();
-    container.Register<IValidate<Mothership>, NullValidator<Mothership>>();
+    container.Register<IValidator<OrderLine>, NullValidator<OrderLine>>();
+    container.Register<IValidator<Address>, NullValidator<Address>>();
+    container.Register<IValidator<UploadImage>, NullValidator<UploadImage>>();
+    container.Register<IValidator<Mothership>, NullValidator<Mothership>>();
     // and the list goes on...
 
 This repeated registration is, of course, not very practical. You might be tempted to again fix this as follows:
 
 .. code-block:: c#
 
-    container.Register(typeof(IValidate<>), typeof(NullValidator<>));
+    container.Register(typeof(IValidator<>), typeof(NullValidator<>));
     
-This will, however, not work because this registration will try to map any closed *IValidate<T>* abstraction to the *NullValidator<T>* implementation, but other registrations (such as *ProductValidator* and *OrderValidator*) already exist. What you need here is to make *NullValidator<T>* a fallback registration and Simple Injector allows this using the **RegisterConditional** method overloads:
+This will, however, not work because this registration will try to map any closed *IValidator<T>* abstraction to the *NullValidator<T>* implementation, but other registrations (such as *ProductValidator* and *OrderValidator*) already exist. What you need here is to make *NullValidator<T>* a fallback registration and Simple Injector allows this using the **RegisterConditional** method overloads:
 
 .. code-block:: c#
 
     container.RegisterConditional(
-        typeof(IValidate<>),
+        typeof(IValidator<>),
         typeof(NullValidator<>),
         c => !c.Handled);
 
-The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for *IValidate<Department>*, for example, will return a *NullValidator<Department>* instance each time. The **RegisterConditional** is supplied with a predicate. In this case the predicate checks whether there already is a different registration that handles the requested service type. In that case the predicate returns *false* and the registration is not applied.
+The result of this registration is exactly as you would have expected to see from the individual registrations above. Each request for *IValidator<Department>*, for example, will return a *NullValidator<Department>* instance each time. The **RegisterConditional** is supplied with a predicate. In this case the predicate checks whether there already is a different registration that handles the requested service type. In that case the predicate returns *false* and the registration is not applied.
 
 This predicate can also be used to apply types conditionally based on a number of contextual arguments. Here's an example:
 
