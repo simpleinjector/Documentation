@@ -60,12 +60,12 @@ Using the integration code shown further down on this page, your razor component
         
         protected override async Task OnInitializedAsync()
         {
-            forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+            forecasts = await this.ForecastService.GetForecastAsync(DateTime.Now);
         }
 
         void Navigate()
         {
-            this.NavigationManager1.NavigateTo("", true);
+            this.NavigationManager.NavigateTo("", true);
         }
     }
 
