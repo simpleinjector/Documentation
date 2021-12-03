@@ -130,6 +130,9 @@ To integrate Simple Injector with Blazor, please follow the following steps:
 
             services.AddSimpleInjector(container, options =>
             {
+                // If you plan on adding AspNetCore as well, change the ServiceScopeReuseBehavior to OnePerNestedScope.
+                // options.AddAspNetCore(ServiceScopeReuseBehavior.OnePerNestedScope);
+
                 options.AddServerSideBlazor(this.GetType().Assembly);
             });
 
