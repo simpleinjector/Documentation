@@ -416,7 +416,7 @@ Integration for Razor Pages is part of the *SimpleInjector.Integration.AspNetCor
 
 This is all that is required to integrate Simple Injector with ASP.NET Core Razor Pages.
 
-When working with Razor Components, however, it can be useful to override the integration's `IServiceScope` reuse behavior, which is discussed next.
+When [integrating Razor components into Razor Pages and MVC apps](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/built-in/component-tag-helper), however, it can be useful to override the integration's `IServiceScope` reuse behavior, which is discussed next.
 
 .. _service-scope-reuse behavior:
 
@@ -429,7 +429,7 @@ This behavior, however, is overridden by Simple Injector's ASP.NET Core integrat
 
 This behavior is typically preferable, because it would otherwise force you to add quite some infrastructural code to get this data back. On the other hand, it does mean, that even if you start a nested **Scope** within a web request, you are still getting the same cross-wired scoped framework services. For instance, in case you inject a cross-wired `DbContext` (registered through `services.AddDbContext<T>()`), you get the same `DbContext` instance, even within that nested scope—this might not be the behavior you want, and this behavior can be overridden.
 
-Especially when building a Razor Page application, overriding the default can be important. Razor Pages tend to reuse the same `IServiceCollection` for the same user as long as they stay on the same page (because the SignalR pipeline is kept open). This reuse can have rather problematic consequences, especially because the user can cause server requests to happen in parallel (by clicking a button multiple times within a short time span). This causes problems, because `DbContext`, for instance, is not thread safe. This is also a case where you might want to override the default behavior.
+Especially when building a Blazor Server application, overriding the default can be important. Blazor Server applications tend to reuse the same `IServiceCollection` for the same user as long as they stay on the same page (because the SignalR pipeline is kept open). This reuse can have rather problematic consequences, especially because the user can cause server requests to happen in parallel (by clicking a button multiple times within a short time span). This causes problems, because `DbContext`, for instance, is not thread safe. This is also a case where you might want to override the default behavior.
 
 The following code snippet demonstrates how this behavior can be overridden:
 
