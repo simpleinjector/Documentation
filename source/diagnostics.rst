@@ -143,7 +143,7 @@ A warning can be suppressed by disabling a specific warning type on a **Registra
 
     container.AddRegistration(typeof(HomeController), registration);
 
-    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent, "Add your justification");
 
 In the previous code sample, a **Registration** instance for the *HomeController* type is created and registered in the container. This **Registration** instance is explicitly marked to suppress the diagnostic warning type **Disposable Transient Component**.
 
@@ -155,7 +155,7 @@ Alternatively, you can also request an already made registered and suppress a wa
 
     var registration = container.GetRegistration(typeof(HomeController)).Registration;
 
-    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent, "Add your justification");
 
 .. container:: Note
 
