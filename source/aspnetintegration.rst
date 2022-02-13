@@ -416,7 +416,7 @@ Integration for Razor Pages is part of the *SimpleInjector.Integration.AspNetCor
 
 This is all that is required to integrate Simple Injector with ASP.NET Core Razor Pages.
 
-When [integrating Razor components into Razor Pages and MVC apps](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/built-in/component-tag-helper), however, it can be useful to override the integration's `IServiceScope` reuse behavior, which is discussed next.
+When `integrating Razor components into Razor Pages and MVC apps <https://docs.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/built-in/component-tag-helper>`_, however, it can be useful to override the integration's `IServiceScope` reuse behavior, which is discussed next.
 
 .. _service-scope-reuse behavior:
 
