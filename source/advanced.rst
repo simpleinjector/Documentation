@@ -333,7 +333,7 @@ Alternatively, we can make use of the Container's **GetTypesToRegister** to find
 
     var typesToRegister = container.GetTypesToRegister(
         serviceType: typeof(IValidator<>),
-        assemblies: new[] { typeof(IValidator<>).Assembly) }, 
+        assemblies: new[] { typeof(IValidator<>).Assembly },
         options: new TypesToRegisterOptions { 
             IncludeGenericTypeDefinitions = true,
             IncludeComposites = false,
