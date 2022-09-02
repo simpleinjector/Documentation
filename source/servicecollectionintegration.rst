@@ -30,8 +30,12 @@ The following code snippet shows how to use the integration package to apply Sim
         
         var services = new ServiceCollection()
             // Add all framework components you wish to inject into application
-            // components, for instance:
+            // components (this requires referencing Microsoft's NuGet packages).
+			// Common components you might wish to include are:
+			// 1. Registers your DbContext using connection pooling
             .AddDbContextPool<AdventureWorksContext>(options => { /*options */ })
+			// 2. Adds IHttpClientFactory
+			.AddHttpClient()
             
             // Integrate with Simple Injector
             .AddSimpleInjector(container);
