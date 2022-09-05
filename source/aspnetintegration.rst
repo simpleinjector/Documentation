@@ -26,9 +26,6 @@ The following code snippet shows how to use the integration package to apply Sim
 
         public Startup(IConfiguration configuration)
         {
-            // Set to false. This will be the default in v5.x and going forward.
-            container.Options.ResolveUnregisteredConcreteTypes = false;
-
             Configuration = configuration;
         }
 
@@ -120,7 +117,7 @@ The following code snippet shows how to use the integration package to apply Sim
 
 .. container:: Note
 
-    **TIP**: By using **AddSimpleInjector**, you allow the Simple Injector **Container** to be automatically disposed when the application shuts down. To override this behavior, please see :ref:`this <disposing-the-container>`.
+    **TIP**: By using **AddSimpleInjector**, you allow the Simple Injector **Container** to be automatically disposed when the application shuts down. To override this behavior, please read :ref:`this <disposing-the-container>`.
 
 
 .. _core-integration-packages:
