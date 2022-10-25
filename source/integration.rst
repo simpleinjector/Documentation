@@ -8,6 +8,7 @@ Simple Injector can be used in a wide range of .NET technologies, both server si
     :maxdepth: 1
 
     Console Applications <consoleintegration>
+    Using your DI Container during testing <testintegration>
     ASP.NET Core MVC <aspnetintegration>
     .NET Generic Host <generichostintegration>
     ServiceCollection Console Applications <servicecollectionintegration>
