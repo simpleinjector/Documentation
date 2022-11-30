@@ -899,7 +899,7 @@ Simple Injector's default modus operandi is to store active scopes in ambient st
 
     using (AsyncScopedLifestyle.BeginScope(container))
     {
-        // Here you simply resolve from the Containe
+        // Here you simply resolve from the Container
         container.GetInstance<IMyService>();
     }
 
