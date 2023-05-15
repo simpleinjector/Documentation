@@ -152,7 +152,7 @@ The following example configures a single instance of type *RealUserService* to 
 .. code-block:: c#
 
     // Configuration
-    container.Register<IUserService, RealUserService>();
+    container.RegisterSingleton<IUserService, RealUserService>();
 
     // Usage
     // RealUserService is created using Auto-Wiring
@@ -237,11 +237,11 @@ By supplying a delegate, types can be registered that cannot be created by using
         return handler;
     });
 
+    // Alternatively you can supply the transient Lifestyle with the same effect.
     container.Register<IHandler<MoveCustomerCommand>>(
         () => { ... },
         Lifestyle.Transient);
         
-    // Alternatively you can supply the transient Lifestyle with the same effect.
     // Usage
     var handler = container.GetInstance<IHandler<MoveCustomerCommand>>();
 
@@ -587,7 +587,7 @@ You can trigger the verification process by calling *Container.Verify()* after y
 
 This auto-verification feature is a good sensible default, but it does come with some consequences to consider. When you explicitly call *Container.Verify()*, verification is triggered early in the startup of your application. If verification fails, your application will fail to start, which is typically what you want. With auto verification, on the other hand, verification is done just in time, and it might mean that the application is started, but is still in an invalid state, because the *Container* instance is invalid. Auto verification also means that all configured classes will be created at the point that *GetInstance()* is first invoked. This can be confusing to a new developer, as they might be expecting a specific class to be created, not all of them.
 
-But auto verification can also have a negative impact on performance when running integration tests. With integration testing you would typically create a new *Container* instance per test, but with auto verification it means that verification is performed for each integration test, instead of having a single integration test that verifies the complete configuration. When your container configuration consists of hundreds of registrations, this can severely impact the time it takes to run all the application's integration tests. In that case, you should consider turning of auto verification during integration testing. The following code example demonstrates how to disable auto verification:
+But auto verification can also have a negative impact on performance when running integration tests. With integration testing you would typically create a new *Container* instance per test, but with auto verification it means that verification is performed for each integration test, instead of having a single integration test that verifies the complete configuration. When your container configuration consists of hundreds of registrations, this can severely impact the time it takes to run all the application's integration tests. In that case, you should consider turning off auto verification during integration testing. The following code example demonstrates how to disable auto verification:
 
 .. code-block:: c#
 

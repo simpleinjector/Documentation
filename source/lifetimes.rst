@@ -269,7 +269,7 @@ Which option to pick depends on several factors:
 
 * Microsoft.Bcl.AsyncInterfaces only supports .NET 4.6.1 and .NET Standard 2.0. If you're running .NET 4.5 or creating a reusable library that supports versions below .NET Standard 2.0, using the second option is your only option.
 * You should go for option 1 in case your application is already depending on Microsoft.Bcl.AsyncInterfaces through third-party packages. Simple Injector only supports asynchronous disposal on a single interface. Having multiple interfaces name "System.IAsyncDisposable" can break your application.
-* You should go for options 2 if you're trying to prevent binding redirect issues caused by Microsoft.Bcl.AsyncInterfaces or one of its dependencies. Microsoft.Bcl.AsyncInterfaces is a common source of binding direct issues for developers, which is the sole reason Simple Injector v5.2 switched to using duck typing, compared to taking a dependency on Microsoft.Bcl.AsyncInterfaces. You can read more about our reasoning `on our blog <https://blog.simpleinjector.org/2020/12/the-tale-of-the-async-interfaces/>`_.
+* You should go for options 2 if you're trying to prevent binding redirect issues caused by Microsoft.Bcl.AsyncInterfaces or one of its dependencies. Microsoft.Bcl.AsyncInterfaces is a common source of binding redirect issues for developers, which is the sole reason Simple Injector v5.2 switched to using duck typing, compared to taking a dependency on Microsoft.Bcl.AsyncInterfaces. You can read more about our reasoning `on our blog <https://blog.simpleinjector.org/2020/12/the-tale-of-the-async-interfaces/>`_.
 
 In case you go for option 2, you need to add the following code to your application:
 
@@ -560,7 +560,7 @@ Instance Per Dependency Lifestyle
     
     Each consumer will get a new instance of the given service type and that dependency is expected to get live as long as its consuming type.
 
-This lifestyle behaves the same as the built-in **Transient** lifestyle, but the intend is completely different. A **Transient** instance is expected to have a very short lifestyle and injecting it into a consumer with a longer lifestyle (such as **Singleton**) is an error. Simple Injector will prevent this from happening by checking for :doc:`lifestyle mismatches <LifestyleMismatches>`. With the *Instance Per Dependency* lifestyle on the other hand, the created component is expected to stay alive as long as the consuming component does. So when the *Instance Per Dependency* component is injected into a **Singleton** component, we intend it to be kept alive by its consumer.
+This lifestyle behaves the same as the built-in **Transient** lifestyle, but the intent is completely different. A **Transient** instance is expected to have a very short lifestyle and injecting it into a consumer with a longer lifestyle (such as **Singleton**) is an error. Simple Injector will prevent this from happening by checking for :doc:`lifestyle mismatches <LifestyleMismatches>`. With the *Instance Per Dependency* lifestyle on the other hand, the created component is expected to stay alive as long as the consuming component does. So when the *Instance Per Dependency* component is injected into a **Singleton** component, we intend it to be kept alive by its consumer.
 
 This lifestyle is deliberately left out of Simple Injector, because its usefulness is very limited compared to the **Transient** lifestyle. It ignores :doc:`lifestyle mismatch checks <LifestyleMismatches>` and this can easily lead to errors, and it ignores the fact that application components should be immutable. In case a component is immutable, it's very unlikely that each consumer requires its own instance of the injected dependency.
 
@@ -593,7 +593,7 @@ Hybrid Lifestyle
 
 .. container:: Note
     
-    A hybrid lifestyle is a mix between two or more lifestyles where the the developer defines the context for which the wrapped lifestyles hold.
+    A hybrid lifestyle is a mix between two or more lifestyles where the developer defines the context for which the wrapped lifestyles hold.
 
 Simple Injector has no built-in hybrid lifestyles, but has a simple mechanism for defining them:
 
@@ -723,7 +723,7 @@ Just as with any other registration, lifestyles can be applied to open-generic r
 
 This registers the open-generic *DefaultValidator<T>* class as **Singleton** for the *IValidator<T>* service. One might think, though, that there will only be a single instance of *DefaultValidator<T>* returned by the Container, but this is not the case.
 
-At runtime, it is impossible to create an instance of an open-generic type, such as *DefaultValidator<T>*. Only closed versions can be created. An instance of *DefaultValidator<Customer>*, for instance, can be created, just as you can create a new *DefaultValidator<Order>* instance. But what the .NET runtime is concerned, these are two completely unrelated types. You can't replace one for the other. For instance, if some class requires an *IValidator<Customer>*, Simple Injector can't inject an *IValidator<Order>* implementation instead. The runtime doesn't allow this, and neither would the C# compiler if you coded this by hand.
+At runtime, it is impossible to create an instance of an open-generic type, such as *DefaultValidator<T>*. Only closed versions can be created. An instance of *DefaultValidator<Customer>*, for instance, can be created, just as you can create a new *DefaultValidator<Order>* instance. The .NET runtime sees them as two completely unrelated types. You can't replace one for the other. For instance, if some class requires an *IValidator<Customer>*, Simple Injector can't inject an *IValidator<Order>* implementation instead. The runtime doesn't allow this, and neither would the C# compiler if you coded this by hand.
 
 So instead, you should consider a registration for an open-generic type, a complete list of its closed-generic types instead:
 
@@ -883,7 +883,7 @@ The previous example, however, is rather complicated and can be confusing to und
         }
     }
 
-This this last code snippet, rather than being injected with a stream of `IEventHandler<TEvent>` instances, the `Publisher<TEvent>` is injected with a stream of `DependencyMetadata<IEventHandler<TEvent>>` instances. `DependencyMetadata<T>` is Simple Injector v5's new construct, which allows to access the dependency's metadata and allow resolving an instance of that dependency. In this case, its **GetInstance** method is used to resolve an instance within its own **Scope**.
+This last code snippet, rather than being injected with a stream of `IEventHandler<TEvent>` instances, the `Publisher<TEvent>` is injected with a stream of `DependencyMetadata<IEventHandler<TEvent>>` instances. `DependencyMetadata<T>` is Simple Injector v5's new construct, which allows to access the dependency's metadata and allow resolving an instance of that dependency. In this case, its **GetInstance** method is used to resolve an instance within its own **Scope**.
 
 .. _flowing-scopes:
 
@@ -899,7 +899,7 @@ Simple Injector's default modus operandi is to store active scopes in ambient st
 
     using (AsyncScopedLifestyle.BeginScope(container))
     {
-        // Here you simply resolve from the Containe
+        // Here you simply resolve from the Container
         container.GetInstance<IMyService>();
     }
 
@@ -918,7 +918,7 @@ The most common scenario is when injecting `DbContext` instances into object gra
     var container = new Container();
     container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
 
-When you configure Simple Injector to use Flowing scopes, the active scope will no longer be available ubiquously. Therefore you won't be able to call `Container.GetInstance<T>` any longer to resolve object graphs that contain `Scoped` components. Instead, you will have to do the following:
+When you configure Simple Injector to use Flowing scopes, the active scope will no longer be available ubiquitously. Therefore you won't be able to call `Container.GetInstance<T>` any longer to resolve object graphs that contain `Scoped` components. Instead, you will have to do the following:
 
 .. code-block:: c#
 

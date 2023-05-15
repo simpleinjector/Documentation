@@ -65,7 +65,6 @@ Add a *Program.cs* file to your project to be the new entry point for the applic
             try
             {
                 var app = new App();
-                app.InitializeComponent();
                 var mainWindow = container.GetInstance<MainWindow>();
                 app.Run(mainWindow);
             }
