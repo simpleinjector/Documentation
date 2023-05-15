@@ -723,7 +723,7 @@ Just as with any other registration, lifestyles can be applied to open-generic r
 
 This registers the open-generic *DefaultValidator<T>* class as **Singleton** for the *IValidator<T>* service. One might think, though, that there will only be a single instance of *DefaultValidator<T>* returned by the Container, but this is not the case.
 
-At runtime, it is impossible to create an instance of an open-generic type, such as *DefaultValidator<T>*. Only closed versions can be created. An instance of *DefaultValidator<Customer>*, for instance, can be created, just as you can create a new *DefaultValidator<Order>* instance. But when the .NET runtime is concerned, these are two completely unrelated types. You can't replace one for the other. For instance, if some class requires an *IValidator<Customer>*, Simple Injector can't inject an *IValidator<Order>* implementation instead. The runtime doesn't allow this, and neither would the C# compiler if you coded this by hand.
+At runtime, it is impossible to create an instance of an open-generic type, such as *DefaultValidator<T>*. Only closed versions can be created. An instance of *DefaultValidator<Customer>*, for instance, can be created, just as you can create a new *DefaultValidator<Order>* instance. The .NET runtime sees them as two completely unrelated types. You can't replace one for the other. For instance, if some class requires an *IValidator<Customer>*, Simple Injector can't inject an *IValidator<Order>* implementation instead. The runtime doesn't allow this, and neither would the C# compiler if you coded this by hand.
 
 So instead, you should consider a registration for an open-generic type, a complete list of its closed-generic types instead:
 
