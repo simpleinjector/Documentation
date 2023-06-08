@@ -78,7 +78,7 @@ The following test method makes use of the previous `CreateSut` factory method, 
         Assert.IsTrue(parser.GotCalled);
     }
 
-In this test, only the `ExcelParser` is supplied, because it is explicitly queried during the test. The other two dependencies will be supplied with a default (probably fake) null implementation by the `CreateSut` method. By letting `Parser_should_always_be_called` supply only the dependencies it is interested in, you gain the following advantages:
+In this test, only the `ExcelParser` is supplied, because it is explicitly queried during the test. The other two dependencies will be supplied with a default (probably fake) implementation by the `CreateSut` method. By letting `Parser_should_always_be_called` supply only the dependencies it is interested in, you gain the following advantages:
 
 * You remove noise from the test method, making the method more readable.
 * You prevent sweeping changes through the test class in case the SUT gets another dependency. In an ideal case only the `CreateSut` factory needs to be changed, and new tests written. Existing tests don't need to be updated, thus making the test class more maintainable.
@@ -113,13 +113,12 @@ Here's an example for an integration test:
         var parser = new FakeExcelParser();
 
         // Create a valid container to resolve object graphs from
-        var container = TestBootstrapper.BuildContainer();
+        Container container = TestBootstrapper.BuildContainer();
 
-        // Configure it especially for this test (note that I'm inventing a
-        // DI Container API here. API will very per DI Container)
+        // Configure it especially for this test
         container.RegisterInstance<IExcelParser>(parser);
 
-        // Resolve the SUT from the DI Container
+        // Resolve te fully initialized SUT from the DI Container
         var sut = container.GetInstance<AgentProvisioningServiceHelper>();
 
         // Act
@@ -164,7 +163,7 @@ This is very different from running unit tests, where there is a high level of i
 Integration Testing Performance Considerations
 ==============================================
 
-Because of the desired level of isolation, each integration test should, ideally, get its own DI Container instance. But registering components and verifying the container can take a considerable amount of time, especially when the Container contains a large set of registrations. Especially the verification process can take a considerable amount of time and resources. During verification, Simple Injector tries to resolve all registered components, which will cause the creation of expression trees, generation of Intermediate Language code, and the JIT compilation of that IL into machine code.
+Because of the desired level of isolation, each integration test should, ideally, get its own DI Container instance. But registering components and verifying the container can take a considerable amount of time, especially when the Container contains a large set of registrations. Especially the verification process can take a considerable amount of time and resources. During verification, Simple Injector tries to resolve all registered components, which will cause the creation of expression trees, generation of Intermediate Language (IL) code, and the JIT compilation of that IL into machine code.
 
 That's a lot of overhead in case the integration test is only interested in a small part of the application's entire object structure. Especially when your application contains a large set of integration tests and a large set of application components.
 
@@ -200,9 +199,9 @@ For very large applications, the possibility exists that just disabling auto-ver
 * Construct a per-test Container instance that contains a subset of that of the full application
 * Use a single, global Container instance, used by all integration tests
 
-All three options have their own set of disadvantages, and are typically tricky to implement. Below we'll give a proof-of-concept example for each, but keep in mind that in practice these solutions might be cumbersome to maintain.
+Both options have their own set of disadvantages, and are typically tricky to implement. Below we'll give a proof-of-concept example for both, but keep in mind that in practice these solutions might be cumbersome to maintain.
 
-That means that before using any of these approaches, also consider the following solutions:
+That means that before using either of these approaches, also consider the following solutions:
 
 * Differentiate unit tests from integration tests, so that developers can typically run just the unit tests, and only run all integration tests before a commit.
 * Run integration tests on multiple threads. Many testing frameworks allow tests to be run on all the machine's processors, which can considerably shorten the amount of time required to run those tests.
@@ -266,7 +265,7 @@ There are, however, a few consequences or downsides to this approach:
 
 When there is too much overhead in creating a Container instance per test, one global Container instance for all tests to reuse, similar to how the final application is using a single Container instance. Although this can give a considerable performance boost, in practice this can be quite tricky, especially when separate tests require different fake dependencies. As you can see from the code samples below, this can take a considerable amount of adjustments to the test suite and the Composition Root.
 
-At the very least it requires scoped proxy implementations that can be configured to forward calls to specific test-specific fake implementations. The Container's `Scope` can be used as holder for test-specific fakes.
+At the very least it requires scoped proxy implementations that can be configured to forward calls to test-specific fake implementations. The Container's `Scope` can be used as holder for test-specific fakes.
 
 For instance, an integration test could use a specially crafted version of the `TestBootstrapper` to allow reusing the same container instance. The following code sample demonstrates this:
 
@@ -331,7 +330,7 @@ The following code listing demonstrates a possible implementation of the `TestBo
         
             var scope = AsyncScopedLifestyle.BeginScope(container);
             
-            replaces.Apply(container);
+            replacer.Apply(container);
         
             return new ContainerScope(container, scope);
         }
