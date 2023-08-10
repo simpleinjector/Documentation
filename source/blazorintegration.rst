@@ -320,7 +320,7 @@ To integrate Simple Injector with Blazor, please follow the following steps:
             var shouldAwaitTask = task.Status != TaskStatus.RanToCompletion &&
                 task.Status != TaskStatus.Canceled;
 
-            StateHasChanged();
+            base.StateHasChanged();
 
             return shouldAwaitTask ?
                 CallStateHasChangedOnAsyncCompletion(task) :
