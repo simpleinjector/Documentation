@@ -4,7 +4,7 @@ ASP.NET Core Integration Guide
 
 Simple Injector offers the following NuGet package for for integration with ASP.NET Core (both for Web API and MVC projects):
 
-* `Simple Injector ASP.NET Core MVC Integration <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`
+* `Simple Injector ASP.NET Core MVC Integration <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_
 
 .. container:: Note
 
