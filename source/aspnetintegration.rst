@@ -4,7 +4,7 @@ ASP.NET Core Integration Guide
 
 Simple Injector offers the following NuGet package for for integration with ASP.NET Core (both for Web API and MVC projects):
 
-* `Simple Injector ASP.NET Core MVC Integration <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_
+* `Simple Injector ASP.NET Core MVC Integration <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_.
 
 .. container:: Note
 
@@ -17,7 +17,79 @@ To install from the NuGet package manager console:
     PM> Install-Package SimpleInjector
     PM> Install-Package SimpleInjector.Integration.AspNetCore.Mvc
 
-The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
+The following code snippet shows how to use the integration package to apply Simple Injector to your ASP.NET Core 6 (and up) web application's program.cs:
+
+.. code-block:: c#
+
+    using SimpleInjector;
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    var services = builder.Services;
+
+    // ASP.NET default stuff here
+    services.AddControllersWithViews();
+
+    services.AddLogging();
+    services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+    // Sets up the basic configuration that for integrating Simple Injector with
+    // ASP.NET Core by setting the DefaultScopedLifestyle, and setting up auto
+    // cross wiring.
+    var container = new SimpleInjector.Container();
+    services.AddSimpleInjector(container, options =>
+    {
+        // AddAspNetCore() wraps web requests in a Simple Injector scope and
+        // allows request-scoped framework services to be resolved.
+        options.AddAspNetCore()
+
+            // Ensure activation of a specific framework type to be created by
+            // Simple Injector instead of the built-in configuration system.
+            // All calls are optional. You can enable what you need. For instance,
+            // ViewComponents, PageModels, and TagHelpers are not needed when you
+            // build a Web API.
+            .AddControllerActivation()
+            .AddViewComponentActivation()
+            .AddPageModelActivation()
+            .AddTagHelperActivation();
+
+        // Optionally, allow application components to depend on the non-generic
+        // ILogger (Microsoft.Extensions.Logging) or IStringLocalizer
+        // (Microsoft.Extensions.Localization) abstractions.
+        options.AddLogging();
+        options.AddLocalization();
+    });
+
+    // Add application services. For instance:
+    container.Register<IUserService, UserService>(Lifestyle.Singleton);
+
+    var app = builder.Build();
+
+    // UseSimpleInjector() finalizes the integration process.
+    app.Services.UseSimpleInjector(container);
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+    }
+
+    app.UseStaticFiles();
+    app.UseRouting();
+    app.UseAuthorization();
+
+    // Add your custom Simple Injector-created middleware to the pipeline.
+    // NOTE: these middleware classes must implement IMiddleware.
+    app.UseMiddleware<CustomMiddleware1>(container);
+    app.UseMiddleware<CustomMiddleware2>(container);
+
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    app.Run();
+
+Prior to ASP.NET Core 6, startup code had to be written in the `Startup` class, which was created by the default Visual Studio template for ASP.NET Core. The following code snippet shows how to use the integration package to apply Simple Injector to that 'old' `Startup` class.
 
 .. code-block:: c#
 
