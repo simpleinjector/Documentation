@@ -19,8 +19,10 @@ To install from the NuGet package manager console:
     PM> Install-Package SimpleInjector
     PM> Install-Package SimpleInjector.Integration.AspNetCore.Mvc
 
+.. _core-6-program_example:
+
 ASP.NET Core 6 program.cs integration example
----------------------------------------------
+=============================================
 
 The following code snippet shows how to use the integration package to apply Simple Injector to your ASP.NET Core 6 (and up) web application's program.cs:
 
@@ -105,8 +107,10 @@ The following code snippet shows how to use the integration package to apply Sim
 
     **TIP**: By using **AddSimpleInjector**, you allow the Simple Injector **Container** to be automatically disposed when the application shuts down. To override this behavior, please read :ref:`this <disposing-the-container>`.
 
+.. _core-startup_example:
+
 ASP.NET Core Startup class integration example
-----------------------------------------------
+==============================================
 
 Prior to ASP.NET Core 6, startup code had to be written in the `Startup` class, which was created by the default Visual Studio template for ASP.NET Core. The following code snippet shows how to use the integration package to apply Simple Injector to that 'old' `Startup` class.
 
