@@ -1,12 +1,14 @@
-﻿===================================================
-ASP.NET Core and ASP.NET Core MVC Integration Guide
-===================================================
+﻿==============================
+ASP.NET Core Integration Guide
+==============================
 
-Simple Injector offers the `Simple Injector ASP.NET Core MVC Integration NuGet package <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_ for integration with ASP.NET Core MVC.
+Simple Injector offers the following NuGet package for for integration with ASP.NET Core (both for Web API and MVC projects):
+
+* `Simple Injector ASP.NET Core MVC Integration <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`
 
 .. container:: Note
 
-    **TIP**: Even though the ASP.NET Core integration packages take a dependency on the Simple Injector core library, prefer installing the `the core library <https://nuget.org/packages/SimpleInjector>`_ explicitly into your startup project. The core library uses an independent versioning and release cycle. Installing the core library explicitly, therefore, gives you the newest, latest release (instead of the lowest compatible release), and allows the NuGet package manager to inform you about new minor and patch releases in the future.
+    **TIP**: Even though the ASP.NET Core integration packages take a dependency on the Simple Injector core library, prefer installing the `the core library <https://nuget.org/packages/SimpleInjector>`_ explicitly into your startup project as well. The core library uses an independent versioning and release cycle. Installing the core library explicitly, therefore, gives you the newest, latest release (instead of the lowest compatible release), and allows the NuGet package manager to inform you about new minor and patch releases in the future.
 
 
 The following code snippet shows how to use the integration package to apply Simple Injector to your web application's `Startup` class.
