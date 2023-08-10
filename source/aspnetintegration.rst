@@ -2,9 +2,11 @@
 ASP.NET Core Integration Guide
 ==============================
 
-Simple Injector offers the following NuGet package for for integration with ASP.NET Core (both for Web API and MVC projects):
+With the introduction to ASP.NET Core, Microsoft created one unified model that integrates both MVC and Web API. They call this framework *ASP.NET Core MVC*. Simple Injector offers the following NuGet package for integration with ASP.NET Core MVC:
 
 * `Simple Injector ASP.NET Core MVC Integration <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_ NuGet package.
+
+This is the package to use if you want all functionality from the Simple Injector integration and are not worried  about the number of dependencies it pulls in. If you need more fine-grained control over the number of (Microsoft) packages that get included in your application, you should read about the :ref:`available integration packages <_core-integration-packages>`.
 
 .. container:: Note
 
@@ -214,7 +216,9 @@ Prior to ASP.NET Core 6, startup code had to be written in the `Startup` class, 
 Available integration packages
 ==============================
 
-The `SimpleInjector.Integration.AspNetCore.Mvc <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_ NuGet package is the umbrella package that pulls in all integration functionality. The downside is that it also pulls in many ASP.NET Core packages that you might not need, or might not want. In case you need more fine-grained control over the number of Microsoft packages that get included in your application, you can decide to use one of the other available ASP.NET Core integration packages. The following table lists the relevant integration packages sorted from most complete to most basic integration:
+The `SimpleInjector.Integration.AspNetCore.Mvc <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_ NuGet package is the umbrella package that pulls in all integration functionality. The downside is that it also pulls in many ASP.NET Core packages that you might not need, or might not want. In case you need more fine-grained control over the number of Microsoft packages that get included in your application, you can decide to use one of the other available ASP.NET Core integration packages.
+
+With ASP.NET Core, Microsoft follows an onion-layered model where more features can be utilized by including extra packages. Simple Injector's integration packages follow this onion-layered model by adding a package per relevant onion layer. The following table lists the relevant integration packages sorted from most complete to most basic integration:
  
 +--------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 | Integration Package                                                                  | Description                                                                    |
