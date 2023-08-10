@@ -85,11 +85,14 @@ The following code snippet shows how to use the integration package to apply Sim
     // NOTE: these middleware classes must implement IMiddleware.
     app.UseMiddleware<CustomMiddleware1>(container);
     app.UseMiddleware<CustomMiddleware2>(container);
-
+    
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 
+    // Always verify the container
+    container.Verify();
+    
     app.Run();
  
 .. container:: Note
@@ -322,59 +325,42 @@ The `SimpleInjector.Integration.AspNetCore.Mvc <https://nuget.org/packages/Simpl
 Wiring custom middleware
 ========================
 
-The previous `Startup` snippet already showed how a custom middleware class can be used in the ASP.NET Core pipeline. The Simple Injector ASP.NET Core integration packages add an **UseMiddleware** extension method that allows adding custom middleware. The following listing shows how a `CustomMiddleware` class is added to the pipeline.
+The previous program.cs and `Startup` integration examples already showed how a custom middleware class can be used in the ASP.NET Core pipeline. The Simple Injector ASP.NET Core integration packages add an **UseMiddleware** extension method that allows adding custom middleware. The following listing shows how a `CustomMiddleware` class is added to the pipeline.
 
 .. code-block:: c#
 
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-    {
-        app.UseSimpleInjector(container);
- 
-        app.UseMiddleware<CustomMiddleware>(container);
+    app.UseSimpleInjector(container);
+
+    app.UseMiddleware<CustomMiddleware>(container);
   
-        ...
-    }
+    ...
     
 .. code-block:: c#
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    app.UseSimpleInjector(container);
+
+    if (!env.IsDevelopment())
     {
-        // UseSimpleInjector() enables framework services to be injected into
-        // application components, resolved by Simple Injector.
-        app.UseSimpleInjector(container);
-
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
-        else
-        {
-            app.UseExceptionHandler("/Home/Error");
-        }
-
-        app.UseStaticFiles();
-
-        app.UseRouting();
-
-        app.UseAuthorization();
-
-        // In ASP.NET Core, middleware is applied in the order of registration.
-        // (opposite to how decorators are applied in Simple Injector). This means
-        // that the following two custom middleware components are wrapped inside
-        // the authorization middleware, which is typically what you'd want.
-        app.UseMiddleware<CustomMiddleware1>(container);
-        app.UseMiddleware<CustomMiddleware2>(container);
-
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
-        });
-        
-        // Always verify the container
-        container.Verify();
+        app.UseExceptionHandler("/Home/Error");
     }
+
+    app.UseStaticFiles();
+    app.UseRouting();
+    app.UseAuthorization();
+
+    // In ASP.NET Core, middleware is applied in the order of registration.
+    // (opposite to how decorators are applied in Simple Injector). This means
+    // that the following two custom middleware components are wrapped inside
+    // the authorization middleware, which is typically what you'd want.
+    app.UseMiddleware<CustomMiddleware1>(container);
+    app.UseMiddleware<CustomMiddleware2>(container);
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");
+    });
     
 The type supplied to **UseMiddleware<T>** should implement the `IMiddleware` interface from the `Microsoft.AspNetCore.Http` namespace.
 
@@ -448,7 +434,7 @@ While the use of `[FromServices]` works for services registered in ASP.NET Core'
 
 .. container:: Note
 
-    **IMPORTANT**: Simple Injector's ASP.NET Core integration packages do not allow any Simple Injector registered dependencies to be injected into ASP.NET Core MVC controller action methods using the `[FromServices]` attribute.
+    **IMPORTANT**: Simple Injector's ASP.NET Core integration packages do not allow any Simple Injector-registered dependencies to be injected into ASP.NET Core MVC controller action methods using the `[FromServices]` attribute.
 
 The use of method injection, as the `[FromServices]` attribute allows, has a few considerate downsides that should be prevented.
 
