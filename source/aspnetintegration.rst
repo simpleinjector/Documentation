@@ -4,7 +4,7 @@ ASP.NET Core Integration Guide
 
 Simple Injector offers the following NuGet package for for integration with ASP.NET Core (both for Web API and MVC projects):
 
-* `Simple Injector ASP.NET Core MVC Integration <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_.
+* `Simple Injector ASP.NET Core MVC Integration <https://nuget.org/packages/SimpleInjector.Integration.AspNetCore.Mvc>`_ NuGet package.
 
 .. container:: Note
 
@@ -16,6 +16,9 @@ To install from the NuGet package manager console:
 
     PM> Install-Package SimpleInjector
     PM> Install-Package SimpleInjector.Integration.AspNetCore.Mvc
+
+ASP.NET Core 6 program.cs integration example
+---------------------------------------------
 
 The following code snippet shows how to use the integration package to apply Simple Injector to your ASP.NET Core 6 (and up) web application's program.cs:
 
@@ -88,6 +91,9 @@ The following code snippet shows how to use the integration package to apply Sim
         pattern: "{controller=Home}/{action=Index}/{id?}");
 
     app.Run();
+
+ASP.NET Core Startup class integration example
+----------------------------------------------
 
 Prior to ASP.NET Core 6, startup code had to be written in the `Startup` class, which was created by the default Visual Studio template for ASP.NET Core. The following code snippet shows how to use the integration package to apply Simple Injector to that 'old' `Startup` class.
 
