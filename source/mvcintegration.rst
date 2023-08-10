@@ -4,7 +4,7 @@ ASP.NET MVC Integration Guide
 
 .. container:: Note
 
-    **Warning**: This documentation describes integration with the *old* ASP.NET 'classic' MVC framework, which was first released by Microsoft on 13 March 2009 for .NET 3, and which is _no longer maintained_. If you're looking for the new, and actively maintained ASP.NET _Core_ (MVC) framework, the integration guide can be found :doc:`here <aspnetintegration>`.
+    **Warning**: This documentation describes integration with the *old* ASP.NET 'classic' MVC framework, which was first released by Microsoft on 13 March 2009 for .NET 3, and which is *no longer maintained* by Microsoft. If you're looking for the new, and actively maintained ASP.NET *Core* (MVC) framework, the integration guide can be found :doc:`here <aspnetintegration>`.
 
 Simple Injector offers the `Simple Injector MVC Integration Quick Start NuGet package <https://nuget.org/packages/SimpleInjector.MVC3>`_ for integration in MVC 3 and up.
 

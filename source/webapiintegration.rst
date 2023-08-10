@@ -4,7 +4,7 @@ ASP.NET Web API Integration Guide
 
 .. container:: Note
 
-    **Warning**: This documentation describes integration with the *old* ASP.NET 'classic' Web API framework, which was first released by Microsoft in 2012 for .NET 4, and which is _no longer maintained_. If you're looking for the new, and actively maintained ASP.NET _Core_ (Web API) framework, the integration guide can be found :doc:`here <aspnetintegration>`.
+    **Warning**: This documentation describes integration with the *old* ASP.NET 'classic' Web API framework, which was first released by Microsoft in 2012 for .NET 4, and which is *no longer maintained* by Microsoft. If you're looking for the new, and actively maintained ASP.NET *Core* (Web API) framework, the integration guide can be found :doc:`here <aspnetintegration>`.
 
 Simple Injector offers the `Simple Injector ASP.NET Web API Integration Quick Start NuGet package for IIS-hosted applications <https://www.nuget.org/packages/SimpleInjector.Integration.WebApi.WebHost.QuickStart>`_.
 
