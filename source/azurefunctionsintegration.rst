@@ -28,6 +28,7 @@ Instead of implementing business logic inside an Azure Function class, you yield
 
     public class Function1
     {
+        // Note that this IMediator interface is defined later on in this document.
         private readonly IMediator mediator;
 
         public Function1(IMediator mediator) => this.mediator = mediator;
