@@ -116,6 +116,7 @@ To start, your Azure Functions application requires a bootstrapper that ties eve
 .. code-block:: c#
 
     using System;
+    using MediatR;
     using Microsoft.Azure.Functions.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
     using SimpleInjector;
@@ -177,6 +178,7 @@ The only part missing from the equation is the `IMediator` implementation, which
 
     using System;
     using System.Threading.Tasks;
+    using MediatR;
     using Microsoft.Extensions.DependencyInjection;
     using SimpleInjector;
     using SimpleInjector.Integration.ServiceCollection;
