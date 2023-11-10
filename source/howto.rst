@@ -246,7 +246,7 @@ This way application components can simply depend on *IMyService* instead of *La
 Resolve instances by key
 ========================
 
-Resolving instances by a key is a feature that is deliberately left out of Simple Injector, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the *Container* instance and this leads to the `Service Locator anti-pattern <https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/>`_.
+Resolving instances by a key is a feature that is deliberately left out of Simple Injector, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the *Container* instance and this leads to the `Service Locator anti-pattern <https://freecontent.manning.com/the-service-locator-anti-pattern/>`_.
 
 This doesn't mean that resolving instances by a key is never useful. But resolving instances by a key is normally a job for a specific factory rather than the *Container*. This approach makes the design much cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn't consider.
 
@@ -576,7 +576,7 @@ In this case the container will ensure that when an *IMailSender* is requested, 
 
 .. container:: Note
 
-    **Warning:** Please note that the previous example is just meant for educational purposes. In practice, you want the sending of e-mails to go through a durable queue or `outbox <http://gistlabs.com/2014/05/the-outbox/>`_ to prevent loss of e-mails. Loss can occur when the mail server is unavailable, which is something that is guaranteed to happen at some point in time, even when the mail server is running locally.
+    **Warning:** Please note that the previous example is just meant for educational purposes. In practice, you want the sending of e-mails to go through a durable queue or `outbox <https://gistlabs.com/2014/05/the-outbox/>`_ to prevent loss of e-mails. Loss can occur when the mail server is unavailable, which is something that is guaranteed to happen at some point in time, even when the mail server is running locally.
 
 .. _Package-registrations:
 
