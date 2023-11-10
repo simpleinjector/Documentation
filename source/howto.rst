@@ -246,13 +246,17 @@ This way application components can simply depend on *IMyService* instead of *La
 Resolve instances by key
 ========================
 
-Resolving instances by a key is a feature that is deliberately left out of Simple Injector, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the *Container* instance and this leads to the `Service Locator anti-pattern <https://freecontent.manning.com/the-service-locator-anti-pattern/>`_.
+_Keyed Registration_ is the concept of having multiple registrations for the same service type and differentiating them by a tag, label, or key of some sort. Later on, the correct implementation can be either be requested from the DI Container by supplying that tag besides the service type, or a constructor argument could be marked with the key using an attribute, such that the DI Container knows which registration to inject.
 
-This doesn't mean that resolving instances by a key is never useful. But resolving instances by a key is normally a job for a specific factory rather than the *Container*. This approach makes the design much cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn't consider.
+While such feature might seem useful at first, resolving instances by a key is a feature that is deliberately left out of Simple Injector. This section describes why it was left out, and how to do things the Simple Injector Way™.
+
+We didn't include such keyed registration feature, because it invariably leads to a design where the application tends to have numerous dependencies on the DI container itself. To resolve a keyed instance you will likely need to call directly into the *Container* instance and this leads to the `Service Locator anti-pattern <https://freecontent.manning.com/the-service-locator-anti-pattern/>`_. And the use of attributes to mark constructor arguments inevidably leads to a vendor lock-in, which goes against our :ref:`design principles <Vendor-lock-in>`.
+
+This doesn't mean that resolving instances by a key is never useful. But resolving instances by a key is normally a job for a specific factory rather than the *Container*. This approach makes the design cleaner, saves you from having to take numerous dependencies on the DI library and enables many scenarios that the DI container authors simply didn't consider.
 
 .. container:: Note
 
-    **Note**: The need for keyed registration can be an indication of ambiguity in the application design and a sign of a `Liskov Substitution Principle <https://en.wikipedia.org/wiki/Liskov_substitution_principle>`_ violation. Take a good look if each keyed registration shouldn't have its own unique interface, or perhaps each registration should implement its own version of a generic interface.
+    **Note**: The need for keyed registration can be an indication of ambiguity in the application design and a sign of a `Liskov Substitution Principle <https://en.wikipedia.org/wiki/Liskov_substitution_principle>`_ violation. Take a good look if each keyed registration shouldn't have its own unique interface, or perhaps each registration should implement :ref:`its own version of a generic interface <Auto-Registration>`.
 
 Take a look at the following scenario, where you want to retrieve *IRequestHandler* instances by a string key. There are several ways to achieve this, but here is a simple but effective way, by defining an *IRequestHandlerFactory*:
 
@@ -379,7 +383,34 @@ The registration will then look as follows:
 
 The advantage of this method is that it completely integrates with the *Container*. :ref:`Decorators <decoration>` can be applied to individual returned instances, types can be registered multiple times and the registered handlers can be analyzed using the :doc:`Diagnostic Services <diagnostics>`.
 
-The previous examples showed how registrations could be requested based on a key. Another common use case with multiple consumers of a given abstraction, is where each consumer requires a different implementation of that abstraction. In Simple Injector this can be achieved through :ref:`Context based injection <Context-Based-Injection>`.
+Some other DI Containers require the keyed-registration feature to supply different implementations of a service to different registrations. Take a look at the following example where two components `ServiceA` and `ServiceB` both depend on `ILogger`, but both want to be supplied with a different implementation:
+
+.. code-block:: c#
+
+    container.Register<IServiceA>(() => new ServiceA(
+            // How to inject a FileLogger implementing ILogger
+        ));
+        
+    container.Register<IServiceB>(() => new ServiceB(
+            // How to inject a NullLogger implementing ILogger
+        ));        
+
+With Simple Injector, the strategy of choosing which implementation to inject in which consumer is not implemented on the registration of the consumer, as the previous example shows. Instead, this is done on the dependency's registration instead using :ref:`Context-based injection <Context-Based-Injection>`. This removes the need to make registrations keyed, as the following example demonstrates:
+
+.. code-block:: c#
+
+    container.Register<IServiceA, ServiceA>();
+    container.Register<IServiceB, ServiceB>();
+        
+    container.RegisterConditional<ILogger, NullLogger>(
+        c => c.Consumer.ImplementationType == typeof(ServiceB));
+    container.RegisterConditional<ILogger, FileLogger>(
+        c => c.Consumer.ImplementationType == typeof(ServiceA));
+    container.RegisterConditional<ILogger, DatabaseLogger>(c => !c.Handled);
+
+For more information on context-based injection, we'd like to direct you to :ref:`this section <Context-Based-Injection>`.
+
+The previous examples showed how registrations could be requested based on a key or completely removed the need to apply keys altogether.
 
 .. _Register-Multiple-Interfaces-With-The-Same-Implementation:
 
