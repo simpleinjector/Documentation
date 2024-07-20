@@ -39,6 +39,9 @@ The general idea behind Simple Injector (or any DI library for that matter) is t
 
 .. code-block:: c#
 
+    using System;
+    using System.IO;
+
     public class CancelOrderHandler
     {
         private readonly IOrderRepository repository;
@@ -56,14 +59,20 @@ The general idea behind Simple Injector (or any DI library for that matter) is t
 
         public void Handle(CancelOrder command)
         {
-            this.logger.Log("Cancelling order " + command.OrderId);
-            var order = this.repository.GetById(command.OrderId);
+            logger.Log("Cancelling order " + command.OrderId);
+            var order = repository.GetById(command.OrderId);
             order.Status = OrderStatus.Cancelled;
-            this.repository.Save(order);
-            this.publisher.Publish(new OrderCancelled(command.OrderId));
+            repository.Save(order);
+            publisher.Publish(new OrderCancelled(command.OrderId));
         }
     }
-    
+
+    public interface IOrderRepository
+    {
+        Order GetById(Guid id);
+        void Save(Order order);
+    }
+
     public class SqlOrderRepository : IOrderRepository
     {
         private readonly ILogger logger;
@@ -73,18 +82,46 @@ The general idea behind Simple Injector (or any DI library for that matter) is t
         {
             this.logger = logger;
         }
-    
+
         public Order GetById(Guid id)
         {
-            this.logger.Log("Getting Order " + order.Id);
+            logger.Log("Getting Order " + id);
             // Retrieve from db.
         }
-        
+
         public void Save(Order order)
         {
-            this.logger.Log("Saving order " + order.Id);
+            logger.Log("Saving order " + order.Id);
             // Save to db.
-        }        
+        }
+    }
+
+    public interface ILogger
+    {
+        void Log(string message);
+    }
+
+    public class FileLogger : ILogger
+    {
+        public void Log(string message)
+        {
+            File.AppendAllText(
+                path: @"c:\temp\log.txt",
+                contents: message + Environment.NewLine);
+        }
+    }
+
+    public interface IEventPublisher
+    {
+        void Publish<TEvent>(TEvent @event);
+    }
+
+    public class AzureMessageBusEventPublisher : IEventPublisher
+    {
+        public void Publish<TEvent>(TEvent @event)
+        {
+            // Publish event to the Azure Service Bus.
+        }
     }
 
 The *CancelOrderHandler* class depends on the *IOrderRepository*, *ILogger* and *IEventPublisher* interfaces. By not depending on concrete implementations, you can test *CancelOrderHandler* in isolation. But ease of testing is only one of a number of things that Dependency Injection gives us. It also enables you, for example, to design highly flexible systems that can be completely composed in one specific location (often the startup path) of the application.
@@ -115,6 +152,7 @@ Using Simple Injector in a simple Console application, the configuration of the 
             // 2. Configure the container (register)
             container.Register<IOrderRepository, SqlOrderRepository>();
             container.Register<ILogger, FileLogger>(Lifestyle.Singleton);
+            container.Register<IEventPublisher, AzureMessageBusEventPublisher>();
             container.Register<CancelOrderHandler>();
             
             // 3. Verify your configuration
@@ -133,15 +171,15 @@ Using Simple Injector in a simple Console application, the configuration of the 
         }
     }
 
-The given configuration registers implementations for the *IOrderRepository* and *ILogger* interfaces, as well as registering the concrete class *CancelOrderHandler*. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as *SqlOrderRepository*) to an interface or base type (such as *IOrderRepository*). In the given example, every time you ask the container for an *IOrderRepository*, it will always create a new *SqlOrderRepository* on your behalf (in DI terminology: an object with a **Transient** lifestyle).
+The given configuration registers implementations for the *IOrderRepository*, *ILogger*, and *IEventPublisher* interfaces, as well as registering the concrete class *CancelOrderHandler*. The code snippet shows a few interesting things. First of all, you can map concrete instances (such as *SqlOrderRepository*) to an interface or base type (such as *IOrderRepository*). In the given example, every time you ask the container for an *IOrderRepository*, it will always create a new *SqlOrderRepository* on your behalf (in Simple Injector's terminology: an object with a **Transient** lifestyle).
 
-The second registration maps the *ILogger* interface to a *FileLogger* implementation. This *FileLogger* is registered with the **Singleton** lifestyle—only one instance of *FileLogger* will ever be created by the **Container**.
+The second registration maps the *ILogger* interface to a *FileLogger* implementation. This *FileLogger* is registered with the **Singleton** lifestyle—only one instance of *FileLogger* will ever be created by the **Container** instance.
 
 Further more, you can map a concrete implementation to itself (as shown with the *CancelOrderHandler*). This registration is a short-hand for the following registration:
 
 .. code-block:: csharp
 
-    container.Register<CancelOrderHandler, CancelOrderHandler>();
+    container.Register<CancelOrderHandler, CancelOrderHandler>(Lifestyle.Transient);
     
 This basically means, every time you request a *CancelOrderHandler*, you'll get a new *CancelOrderHandler*.
 
@@ -150,9 +188,9 @@ Using this configuration, when a *CancelOrderHandler* is requested, the followin
 .. code-block:: csharp
 
     new CancelOrderHandler(
-        new SqlOrderRepository(
-            logger),
-        logger);
+        new SqlOrderRepository(logger),
+        logger,
+        new AzureMessageBusEventPublisher());
         
 Note that object graphs can become very deep. What you can see is that not only *CancelOrderHandler* contains dependencies—so does *SqlOrderRepository*. In this case *SqlOrderRepository* itself contains an *ILogger* dependency. Simple Injector will not only resolve the dependencies of *CancelOrderHandler* but will instead build a whole tree structure of any level deep for you.
 
