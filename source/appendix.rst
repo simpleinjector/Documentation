@@ -9,3 +9,4 @@ Appendix
     Variance Extensions <varianceextensions>
     Resolution conflicts caused by dynamic assembly loading <assembly-loading-resolution-conflicts>
     Resolving unregistered concrete types is disallowed by default <resolving-unregistered-concrete-types-is-disallowed-by-default>
+	COM objects can't be registered <com-objects>
