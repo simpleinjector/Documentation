@@ -1,3 +1,5 @@
+.. _containerregisteredtypes:
+
 ===============================================
 Diagnostic Warning - Container-registered Types
 ===============================================

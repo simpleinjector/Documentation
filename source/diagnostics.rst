@@ -31,6 +31,7 @@ Supported Information Messages
 
     Potential Single Responsibility Violations <PotentialSingleResponsibilityViolations>
     Container-Registered Types <ContainerRegisteredTypes>
+    Unused Conditional Registrations <unusedconditionalregistrations>
 
 How to view diagnostic results
 ==============================
